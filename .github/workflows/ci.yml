@@ -18,3 +18,8 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Pruebas automatizadas
         run: pytest -q
+      - name: Demostración reproducible (datos SINTÉTICOS)
+        run: |
+          tbot alerts example
+          tbot alerts demo --minutes 120 --runtime runtime/demo --quiet
+          tbot alerts demo --minutes 120 --runtime runtime/demo_edge --planted-edge --experimental --quiet

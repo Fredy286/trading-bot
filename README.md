@@ -58,9 +58,10 @@ tbot alerts demo --planted-edge --experimental     # ventaja sembrada artificial
 tbot serve --runtime runtime/demo                  # panel en http://127.0.0.1:8765
 
 # 2) Datos reales y estudio pre-registrado
-tbot data download --symbols EURUSD,BTCUSDT --start 2021-01-01 --end 2026-09-01
+tbot data download --symbols EURUSD,BTCUSDT --start 2021-01-01 --end 2026-09-01   # Dukascopy (bid/ask) y Binance
+tbot data download --symbols EURUSD --source histdata                           # alternativa: HistData (solo BID)
 tbot data quality --symbol EURUSD
-tbot research run --symbol EURUSD --stage dev      # walk-forward, sin tocar el periodo bloqueado
+tbot research run --symbol EURUSD --stage dev      # walk-forward, sin tocar el periodo bloqueado (añada --source histdata si usó HistData)
 tbot research report --stage dev                   # veredicto mecánico + config/frozen.json
 
 # 3) Alertas en vivo SIN dinero real (hoy: BTC/USDT vía API pública de Binance)

@@ -10,7 +10,7 @@ from __future__ import annotations
 import io
 import re
 import zipfile
-from datetime import date
+from datetime import date, timedelta
 
 import pandas as pd
 
@@ -53,7 +53,8 @@ def download(inst: Instrument, start: date, end: date, assumed_spread: float, pr
     session = make_session()
     frames = []
     today = date.today()
-    for year in range(start.year, end.year + 1):
+    last_year = (end - timedelta(days=1)).year  # `end` es exclusivo
+    for year in range(start.year, last_year + 1):
         months = [None] if year < today.year else list(range(1, 13))
         for m in months:
             if m and date(year, m, 1) >= min(end, today):
