@@ -31,7 +31,7 @@ def cmd_data_download(a) -> int:
 
     for sym in a.symbols.split(","):
         inst = get_instrument(sym.strip())
-        store.ensure_downloaded(inst, _d(a.start), _d(a.end), Path(a.root), workers=a.workers)
+        store.ensure_downloaded(inst, _d(a.start), _d(a.end), Path(a.root), workers=a.workers, source=a.source)
     return 0
 
 
@@ -72,7 +72,7 @@ def cmd_data_quality(a) -> int:
     from .instruments import get_instrument
 
     inst = get_instrument(a.symbol)
-    _, rep = to_canonical(store.load(Path(a.root), inst))
+    _, rep = to_canonical(store.load(Path(a.root), inst, source=a.source), fill_gaps=(a.source == "histdata"))
     print(json.dumps(rep, indent=2, ensure_ascii=False))
     return 0
 
@@ -96,8 +96,8 @@ def cmd_research_run(a) -> int:
                   file=sys.stderr)
             return 2
     inst = get_instrument(a.symbol)
-    raw = store.load(Path(a.root), inst)
-    res = run_symbol(inst.symbol, raw, a.stage, cfg, n_boot=a.n_boot)
+    raw = store.load(Path(a.root), inst, source=a.source)
+    res = run_symbol(inst.symbol, raw, a.stage, cfg, n_boot=a.n_boot, source=a.source)
     out_dir = Path(a.out) / a.stage
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"{inst.symbol}.json").write_text(json.dumps(res, ensure_ascii=False))
@@ -186,6 +186,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--end", default="2026-09-01")
     x.add_argument("--root", default="data/raw")
     x.add_argument("--workers", type=int, default=8)
+    x.add_argument("--source", choices=["dukascopy", "binance", "histdata"], default=None,
+                   help="por defecto, la fuente del instrumento (Dukascopy para FX/oro, Binance para BTC)")
     x.set_defaults(func=cmd_data_download)
     x = d.add_parser("synth", help="genera datos SINTÉTICOS (solo pruebas/demostración)")
     x.add_argument("--start", default="2023-01-02")
@@ -206,6 +208,7 @@ def build_parser() -> argparse.ArgumentParser:
     x = d.add_parser("quality", help="informe de calidad de datos")
     x.add_argument("--symbol", required=True)
     x.add_argument("--root", default="data/raw")
+    x.add_argument("--source", choices=["dukascopy", "binance", "histdata"], default=None)
     x.set_defaults(func=cmd_data_quality)
 
     r = sub.add_parser("research", help="estudio walk-forward").add_subparsers(dest="sub", required=True)
@@ -217,6 +220,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--root", default="data/raw")
     x.add_argument("--out", default="results")
     x.add_argument("--n-boot", type=int, default=1000)
+    x.add_argument("--source", choices=["dukascopy", "binance", "histdata"], default=None)
     x.set_defaults(func=cmd_research_run)
     x = r.add_parser("report")
     x.add_argument("--stage", choices=["dev", "holdout"], default="dev")

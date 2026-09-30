@@ -96,3 +96,36 @@ def test_clean_marks_closed_market_and_negative_spread():
     assert bars["c"].iloc[60:120].isna().all()
     assert bars["no_tick"].iloc[10] and not np.isnan(bars["c"].iloc[10])
     assert np.isnan(bars["c"].iloc[5]) and rep["negative_spread_minutes"] == 1
+
+
+def test_histdata_token_extraction():
+    from tradingbot.data.histdata_dl import HistDataError, extract_token
+
+    html = '<form><input type="hidden" name="tk" id="tk" value="abc123XYZ" /></form>'
+    assert extract_token(html) == "abc123XYZ"
+    assert extract_token('<input value="t0k" id="tk">') == "t0k"
+    with pytest.raises(HistDataError):
+        extract_token("<html>sin token</html>")
+
+
+def test_histdata_gap_fill_is_causal_and_detects_weekend():
+    inst = get_instrument("EURUSD")
+    lines = []
+    t = pd.Timestamp("2024-01-02 10:00")  # EST
+    closes = {0: 1.1000, 1: 1.1002, 4: 1.1005, 5: 1.1001}  # faltan los minutos 2 y 3 (sin ticks)
+    for i, c in closes.items():
+        ts = (t + pd.Timedelta(minutes=i)).strftime("%Y%m%d %H%M%S")
+        lines.append(f"{ts};{c};{c};{c};{c};0")
+    # 60 minutos después (hueco largo = mercado cerrado) otro dato
+    ts = (t + pd.Timedelta(minutes=70)).strftime("%Y%m%d %H%M%S")
+    lines.append(f"{ts};1.2;1.2;1.2;1.2;0")
+    raw = histdata.parse_ascii_m1("\n".join(lines), inst, assumed_spread=0.0002)
+    bars, rep = to_canonical(raw, fill_gaps=True)
+    m2 = pd.Timestamp("2024-01-02 15:02", tz="UTC")
+    assert bars.loc[m2, "c"] == pytest.approx(1.1002 + 0.0001)  # plana al cierre ANTERIOR (medio)
+    assert bars.loc[m2, "no_tick"]
+    assert rep["filled_no_tick_minutes"] == 2
+    assert bars.loc[pd.Timestamp("2024-01-02 15:30", tz="UTC"), "c"] != bars.loc[pd.Timestamp("2024-01-02 15:30", tz="UTC"), "c"]  # NaN: cerrado
+    # Sin relleno, los minutos faltantes quedan como NaN.
+    bars2, _ = to_canonical(raw, fill_gaps=False)
+    assert np.isnan(bars2.loc[m2, "c"])

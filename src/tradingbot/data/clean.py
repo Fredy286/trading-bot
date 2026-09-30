@@ -29,13 +29,29 @@ def _run_lengths(mask: np.ndarray) -> np.ndarray:
     return out
 
 
-def to_canonical(raw: pd.DataFrame, closed_run_minutes: int = 30) -> tuple[pd.DataFrame, dict]:
+def to_canonical(raw: pd.DataFrame, closed_run_minutes: int = 30, fill_gaps: bool = False) -> tuple[pd.DataFrame, dict]:
+    """`fill_gaps=True` para fuentes que OMITEN los minutos sin ticks (HistData): los huecos más
+    cortos que `closed_run_minutes` se rellenan con velas planas al último cierre conocido."""
     if raw.empty:
         raise ValueError("Datos vacíos")
     raw = raw.sort_index()
     raw = raw[~raw.index.duplicated(keep="last")]
     grid = pd.date_range(raw.index[0].floor("min"), raw.index[-1].floor("min"), freq="min", tz="UTC", name="time")
     r = raw.reindex(grid)
+    filled = 0
+    if fill_gaps:
+        missing = r["bid_c"].isna().to_numpy()
+        short = missing & (_run_lengths(missing) < closed_run_minutes)
+        filled = int(short.sum())
+        for side in ("bid", "ask"):
+            prev = r[f"{side}_c"].ffill()  # último cierre conocido (pasado)
+            for k in ("o", "h", "l", "c"):
+                r.loc[short, f"{side}_{k}"] = prev[short]
+        for col in ("bid_v", "ask_v"):
+            if col in r:
+                r.loc[short, col] = 0.0
+        if "trades" in r:
+            r.loc[short, "trades"] = 0.0
     df = pd.DataFrame(index=grid)
     for k in ("o", "h", "l", "c"):
         df[k] = (r[f"bid_{k}"] + r[f"ask_{k}"]) / 2.0
@@ -49,7 +65,8 @@ def to_canonical(raw: pd.DataFrame, closed_run_minutes: int = 30) -> tuple[pd.Da
         no_tick = vol.fillna(0) <= 0
     df["no_tick"] = no_tick & df["c"].notna()
 
-    report: dict = {"grid_minutes": int(len(grid)), "present_minutes": int(df["c"].notna().sum())}
+    report: dict = {"grid_minutes": int(len(grid)), "present_minutes": int(df["c"].notna().sum()),
+                    "filled_no_tick_minutes": filled}
 
     neg = df["spread_o"].lt(0) | df["spread_c"].lt(0)
     report["negative_spread_minutes"] = int(neg.sum())

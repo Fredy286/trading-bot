@@ -271,3 +271,33 @@ configuración haya superado los criterios de validación de la sección 8.
 - Deriv — [documentación de la API](https://developers.deriv.com/docs/), [índices sintéticos (RNG)](https://deriv.com/markets/derived-indices/synthetic-indices)
 - IQ Option API no oficial — [GitHub](https://github.com/iqoptionapi/iqoptionapi)
 - Interactive Brokers API — [IBKR](https://www.interactivebrokers.com/en/trading/ib-api.php); OANDA v20 — [developer.oanda.com](https://developer.oanda.com/rest-live-v20/introduction/); MetaTrader 5 Python — [MQL5](https://www.mql5.com/en/docs/python_metatrader5)
+
+---
+
+## Enmienda 1 — cambio de fuente para divisas y oro (2026-09-30, ANTES de ver resultados de divisas)
+
+**Motivo verificable.** Desde los servidores de GitHub Actions, el datafeed de Dukascopy respondió
+13–17 s por archivo y luego HTTP 503 y 429 (limitación de tasa explícita) — ejecuciones
+`36666769740` y `36667788455` del workflow, registradas en `docs/04_registro_de_errores.md`. Descargar
+los ~15 000 archivos diarios necesarios así es inviable. HistData respondió con normalidad.
+
+**Cambio.** Para EUR/USD, GBP/USD, USD/JPY, AUD/USD y XAU/USD el estudio ejecutado en GitHub usa
+**HistData.com, velas M1 de precio BID** (zona EST fija, convertida a UTC). BTC/USDT sigue con Binance.
+Todo lo demás del protocolo (hipótesis, particiones, modelos, políticas, criterios) queda **igual**.
+
+**Consecuencias declaradas:**
+1. La dirección se mide con el precio **BID**, no con el precio medio. Con spread aproximadamente
+   constante dentro de un minuto la diferencia es pequeña, pero no nula.
+2. El spread **no se observa**: para el contrato de contado se usa un spread **supuesto optimista**
+   tipo cuenta ECN (EUR/USD 0,2 pips; GBP/USD 0,5; USD/JPY 0,3; AUD/USD 0,4; oro 0,25 USD) más la
+   comisión pre-registrada. Si el contado no es rentable ni con costos optimistas, la conclusión es más
+   robusta; si lo fuera, habría que confirmarlo con spreads observados. El informe añade una tabla de
+   sensibilidad del umbral a costos de 0,5–10 pb que no depende del supuesto.
+3. Las variables de spread (`spread_vol`, `spread_rel`) quedan constantes y no aportan información.
+4. HistData omite los minutos sin ticks; se reconstruyen como velas planas al último cierre conocido
+   (sin información futura) si el hueco dura < 30 min; huecos más largos = mercado cerrado.
+5. El contrato binario no depende del spread, por lo que la hipótesis principal (H1) no se ve afectada
+   por el supuesto de costos.
+
+El código conserva el descargador de Dukascopy (bid/ask) para ejecutar el mismo estudio desde un PC
+personal, donde la limitación de tasa probablemente no aplique (`tbot data download --source dukascopy`).

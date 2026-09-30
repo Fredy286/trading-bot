@@ -44,7 +44,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        symbol: [EURUSD, GBPUSD, USDJPY, AUDUSD, XAUUSD, BTCUSDT]
+        # Dukascopy limita las IP de GitHub (503/429): FX y oro se descargan de HistData (BID, M1).
+        # Ver la enmienda 1 del protocolo (docs/01_informe_investigacion_fase1a.md).
+        include:
+          - {symbol: EURUSD, source: histdata}
+          - {symbol: GBPUSD, source: histdata}
+          - {symbol: USDJPY, source: histdata}
+          - {symbol: AUDUSD, source: histdata}
+          - {symbol: XAUUSD, source: histdata}
+          - {symbol: BTCUSDT, source: binance}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -57,19 +65,19 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: data/raw
-          key: data-v1-${{ matrix.symbol }}-2021-01-01-2026-09-01
+          key: data-v1-${{ matrix.source }}-${{ matrix.symbol }}-2021-01-01-2026-09-01
       - name: Descargar datos reales
-        run: tbot data download --symbols ${{ matrix.symbol }} --start 2021-01-01 --end 2026-09-01 --workers 6
+        run: tbot data download --symbols ${{ matrix.symbol }} --source ${{ matrix.source }} --start 2021-01-01 --end 2026-09-01 --workers 6
       - name: Guardar datos en caché
         if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: data/raw
-          key: data-v1-${{ matrix.symbol }}-2021-01-01-2026-09-01
+          key: data-v1-${{ matrix.source }}-${{ matrix.symbol }}-2021-01-01-2026-09-01
       - name: Calidad de datos
-        run: tbot data quality --symbol ${{ matrix.symbol }}
+        run: tbot data quality --symbol ${{ matrix.symbol }} --source ${{ matrix.source }}
       - name: Ejecutar estudio (${{ needs.setup.outputs.stage }})
-        run: tbot research run --symbol ${{ matrix.symbol }} --stage ${{ needs.setup.outputs.stage }}
+        run: tbot research run --symbol ${{ matrix.symbol }} --source ${{ matrix.source }} --stage ${{ needs.setup.outputs.stage }}
       - uses: actions/upload-artifact@v4
         with:
           name: results-${{ matrix.symbol }}

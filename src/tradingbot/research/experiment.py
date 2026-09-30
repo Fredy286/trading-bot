@@ -132,11 +132,13 @@ def summarize(sim: dict, contract, times: pd.DatetimeIndex, hour_b: np.ndarray, 
 
 
 def run_symbol(symbol: str, raw: pd.DataFrame, stage: str, cfg: dict, n_boot: int = 1000,
-               log=print) -> dict:
+               log=print, source: str | None = None) -> dict:
     t0 = time.time()
     inst = get_instrument(symbol)
+    source = source or inst.source
     st, cc, ec = cfg["study"], cfg["contracts"], cfg["execution"]
-    bars, quality = to_canonical(raw)
+    # HistData omite los minutos sin ticks: se reconstruyen como velas planas (ver clean.py).
+    bars, quality = to_canonical(raw, fill_gaps=(source == "histdata"))
     bars = bars[bars.index >= pd.Timestamp(st["data_start"], tz="UTC")]
     bars = enforce_lock(bars, stage, st)
     log(f"[{symbol}] velas: {len(bars):,} minutos en rejilla, calidad: {quality}")
@@ -148,7 +150,10 @@ def run_symbol(symbol: str, raw: pd.DataFrame, stage: str, cfg: dict, n_boot: in
     hour_b_all = local_b.hour.to_numpy()
     # Clave de día (Bogotá) independiente de la resolución interna de las marcas de tiempo.
     day_all = (local_b.year * 10000 + local_b.month * 100 + local_b.day).to_numpy().astype(np.int64)
-    out: dict = {"symbol": symbol, "stage": stage, "code_version": __version__, "git_sha": git_sha(),
+    out: dict = {"symbol": symbol, "stage": stage, "source": source,
+                 "price": "BID (spread supuesto)" if source == "histdata" else
+                 ("negociado (sin bid/ask)" if source == "binance" else "medio (bid+ask)/2"),
+                 "code_version": __version__, "git_sha": git_sha(),
                  "config_hash": config_hash(cfg), "quality": quality, "horizons": {},
                  "folds": [{"name": f.name, "train_start": f.train_start, "calib_start": f.calib_start,
                             "test_start": f.test_start, "test_end": f.test_end} for f in folds]}

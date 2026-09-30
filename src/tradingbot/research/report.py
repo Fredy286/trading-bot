@@ -137,12 +137,14 @@ def render_markdown(results: list[dict], cands: pd.DataFrame, acc_tab: pd.DataFr
         L.append("")
 
     L.append("## 2. Calidad de datos\n")
-    L.append("| Instrumento | Minutos en sesión | Minutos cerrados | Min. sin ticks aislados | Spread mediano | Desde | Hasta |")
-    L.append("|---|---|---|---|---|---|---|")
+    L.append("| Instrumento | Fuente | Precio | Minutos en sesión | Minutos cerrados | Min. sin ticks | "
+             "Rellenados (sin ticks) | Spread mediano | Desde | Hasta |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|")
     for r in results:
         q = r.get("quality", {})
-        L.append(f"| {r['symbol']} | {q.get('session_minutes', 0):,} | {q.get('closed_minutes', 0):,} | "
-                 f"{q.get('isolated_no_tick_minutes', 0):,} | {_num(q.get('spread_median'), 6)} | "
+        L.append(f"| {r['symbol']} | {r.get('source', '?')} | {r.get('price', '?')} | {q.get('session_minutes', 0):,} | "
+                 f"{q.get('closed_minutes', 0):,} | {q.get('isolated_no_tick_minutes', 0):,} | "
+                 f"{q.get('filled_no_tick_minutes', 0):,} | {_num(q.get('spread_median'), 6)} | "
                  f"{str(q.get('first', ''))[:10]} | {str(q.get('last', ''))[:10]} |")
     L.append("")
 
@@ -159,6 +161,25 @@ def render_markdown(results: list[dict], cands: pd.DataFrame, acc_tab: pd.DataFr
             be_txt = _pct(be) + (" (inalcanzable)" if be is not None and be > 1 else "")
             L.append(f"| {r['symbol']} | {h} | {_num(d['mean_abs_move_bps'], 2)} | {_num(d['mean_cost_bps'], 2)} | "
                      f"{be_txt} | {_pct(d['tie_rate'])} |")
+    L.append("")
+
+    L.append("### Sensibilidad del umbral de contado al costo total ida y vuelta\n")
+    L.append("Calculado con el movimiento medio medido; no depende del spread supuesto. "
+             "Referencia: 1 pip de EUR/USD ≈ 0,9 pb.\n")
+    grid = [0.5, 1.0, 2.0, 5.0, 10.0]
+    L.append("| Instrumento | h | " + " | ".join(f"costo {c:g} pb" for c in grid) + " |")
+    L.append("|---|---|" + "---|" * len(grid))
+    for r in results:
+        for h, hres in r.get("horizons", {}).items():
+            d = hres.get("descriptive")
+            if not d or not d.get("mean_abs_move_bps"):
+                continue
+            m = d["mean_abs_move_bps"]
+            cells = []
+            for c in grid:
+                be = 0.5 + c / (2 * m)
+                cells.append("inalcanzable" if be > 1 else _pct(be))
+            L.append(f"| {r['symbol']} | {h} | " + " | ".join(cells) + " |")
     L.append("")
 
     if not cands.empty:

@@ -16,6 +16,7 @@ class Instrument:
     commission_px: float  # comisión ida y vuelta en unidades de precio (escenario contado)
     commission_bps: float = 0.0  # comisión ida y vuelta en puntos básicos (cripto)
     display: str = ""
+    assumed_spread: float = 0.0  # spread SUPUESTO (unidades de precio) para fuentes solo-BID (HistData)
 
     @property
     def label(self) -> str:
@@ -24,12 +25,20 @@ class Instrument:
 
 # Comisión FX: 0,7 pips ida y vuelta (≈ 7 USD por lote estándar en cuentas ECN).
 # Oro: 0,07 USD/oz ida y vuelta. BTC/USDT: 0,1 % por lado (tarifa taker estándar) = 20 pb.
+# Spread supuesto (solo para HistData, que no trae ASK): escenario OPTIMISTA tipo cuenta ECN
+# (EUR/USD 0,2 pips; GBP/USD 0,5; USD/JPY 0,3; AUD/USD 0,4; oro 0,25 USD). Los spreads minoristas
+# suelen ser mayores; el informe incluye una tabla de sensibilidad del umbral a otros costos.
 INSTRUMENTS: dict[str, Instrument] = {
-    "EURUSD": Instrument("EURUSD", "dukascopy", 1e-5, 1e-4, 100_000, (0.8, 1.6), 0.7e-4, display="EUR/USD"),
-    "GBPUSD": Instrument("GBPUSD", "dukascopy", 1e-5, 1e-4, 100_000, (0.9, 1.8), 0.7e-4, display="GBP/USD"),
-    "AUDUSD": Instrument("AUDUSD", "dukascopy", 1e-5, 1e-4, 100_000, (0.45, 1.0), 0.7e-4, display="AUD/USD"),
-    "USDJPY": Instrument("USDJPY", "dukascopy", 1e-3, 1e-2, 1_000, (90.0, 200.0), 0.7e-2, display="USD/JPY"),
-    "XAUUSD": Instrument("XAUUSD", "dukascopy", 1e-3, 1e-1, 1_000, (1200.0, 6000.0), 0.07, display="XAU/USD"),
+    "EURUSD": Instrument("EURUSD", "dukascopy", 1e-5, 1e-4, 100_000, (0.8, 1.6), 0.7e-4, display="EUR/USD",
+                         assumed_spread=0.2e-4),
+    "GBPUSD": Instrument("GBPUSD", "dukascopy", 1e-5, 1e-4, 100_000, (0.9, 1.8), 0.7e-4, display="GBP/USD",
+                         assumed_spread=0.5e-4),
+    "AUDUSD": Instrument("AUDUSD", "dukascopy", 1e-5, 1e-4, 100_000, (0.45, 1.0), 0.7e-4, display="AUD/USD",
+                         assumed_spread=0.4e-4),
+    "USDJPY": Instrument("USDJPY", "dukascopy", 1e-3, 1e-2, 1_000, (90.0, 200.0), 0.7e-2, display="USD/JPY",
+                         assumed_spread=0.3e-2),
+    "XAUUSD": Instrument("XAUUSD", "dukascopy", 1e-3, 1e-1, 1_000, (1200.0, 6000.0), 0.07, display="XAU/USD",
+                         assumed_spread=0.25),
     "BTCUSDT": Instrument("BTCUSDT", "binance", 1e-2, 1.0, 1, (10_000.0, 250_000.0), 0.0, commission_bps=20.0,
                           display="BTC/USDT"),
     # Instrumento sintético SOLO para pruebas y demostraciones (nunca para conclusiones).

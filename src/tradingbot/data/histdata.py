@@ -3,6 +3,8 @@
 HistData no tiene API oficial: el usuario descarga los ZIP manualmente desde histdata.com.
 Formato: `AAAAMMDD HHMMSS;apertura;máximo;mínimo;cierre;volumen`, precios BID, zona horaria
 EST **sin** horario de verano (UTC−5 fija). No trae ASK: el spread se debe suponer (parámetro).
+Los minutos sin ticks NO aparecen en el archivo: `to_canonical(..., fill_gaps=True)` los reconstruye
+como velas planas al cierre anterior (sin usar información futura).
 """
 
 from __future__ import annotations
@@ -30,6 +32,7 @@ def parse_ascii_m1(text: str | bytes, inst: Instrument, assumed_spread: float) -
         out[f"ask_{k}"] = out[f"bid_{k}"] + assumed_spread
     out["bid_v"] = df["v"].to_numpy(float)
     out["ask_v"] = 0.0
+    out["trades"] = 1.0  # HistData solo incluye minutos con ticks; los omitidos se tratan en clean.py
     return out.sort_index()
 
 
