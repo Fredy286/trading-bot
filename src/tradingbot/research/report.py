@@ -138,13 +138,15 @@ def render_markdown(results: list[dict], cands: pd.DataFrame, acc_tab: pd.DataFr
 
     L.append("## 2. Calidad de datos\n")
     L.append("| Instrumento | Fuente | Precio | Minutos en sesión | Minutos cerrados | Min. sin ticks | "
-             "Rellenados (sin ticks) | Spread mediano | Desde | Hasta |")
-    L.append("|---|---|---|---|---|---|---|---|---|---|")
+             "Rellenados (sin ticks) | Huecos inesperados (≥2 h, días hábiles) | Spread mediano | Desde | Hasta |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|")
     for r in results:
         q = r.get("quality", {})
         L.append(f"| {r['symbol']} | {r.get('source', '?')} | {r.get('price', '?')} | {q.get('session_minutes', 0):,} | "
                  f"{q.get('closed_minutes', 0):,} | {q.get('isolated_no_tick_minutes', 0):,} | "
-                 f"{q.get('filled_no_tick_minutes', 0):,} | {_num(q.get('spread_median'), 6)} | "
+                 f"{q.get('filled_no_tick_minutes', 0):,} | "
+                 f"{(q.get('unexpected_gaps') or {}).get('count', '—')} "
+                 f"({(q.get('unexpected_gaps') or {}).get('total_minutes', 0):,} min) | {_num(q.get('spread_median'), 6)} | "
                  f"{str(q.get('first', ''))[:10]} | {str(q.get('last', ''))[:10]} |")
     L.append("")
 
@@ -251,5 +253,81 @@ def render_markdown(results: list[dict], cands: pd.DataFrame, acc_tab: pd.DataFr
             L.append(f"| {r['symbol']} | {d['n']:,} | {_pct(d['tp_hit_rate'])} | {_pct(d['win_rate'])} | "
                      f"{_num(d['mean_net_bps'], 2)} | {_num(d.get('avg_win_bps'), 2)} | "
                      f"{_num(d.get('avg_loss_bps'), 2)} |")
+    L.append("")
+    return "\n".join(L)
+
+
+def holdout_verdict(frozen: dict, hold_df: pd.DataFrame, dev_df: pd.DataFrame | None, alpha: float = 0.05) -> dict:
+    """Veredicto MECÁNICO del periodo bloqueado para las candidatas congeladas en desarrollo.
+
+    - Criterio mínimo (sección 8 del protocolo, descarte): EV > 0 y acierto > umbral (binaria)
+      o EV > 0 (contado).
+    - Criterio estricto (definición de H1): límite inferior de Wilson 95 % > umbral y límite inferior
+      del IC del EV > 0 (binaria) o IC del EV > 0 (contado), y p-valor de Holm < alfa calculado sobre
+      la familia de candidatas. Solo el criterio estricto otorga el estado VALIDADO_HOLDOUT.
+    - Deterioro (informativo): EV del periodo bloqueado por debajo del límite inferior del IC en desarrollo.
+    """
+    cands = frozen.get("candidates", [])
+    rows = []
+    for c in cands:
+        m = hold_df
+        for k in KEY:
+            m = m[m[k] == c[k]]
+        if m.empty:
+            rows.append({**c, "found": False})
+            continue
+        r = m.iloc[0]
+        rows.append({**c, "found": True, "n_trades": int(r.n_trades), "hit": r.hit, "hit_lo95": r.hit_lo95,
+                     "breakeven": r.breakeven, "ev": r.ev, "ev_lo95": r.ev_lo95, "ev_hi95": r.ev_hi95,
+                     "pvalue": r.pvalue})
+    pv = [x.get("pvalue", 1.0) if x.get("found") else 1.0 for x in rows]
+    adj = holm([1.0 if (p is None or (isinstance(p, float) and np.isnan(p))) else p for p in pv]) if rows else []
+    passed, passed_min = [], []
+    for x, pa in zip(rows, adj):
+        x["p_holm_family"] = pa
+        if not x.get("found"):
+            x.update(pass_min=False, pass_strict=False)
+            continue
+        is_bin = x["contract"] == "binaria"
+        x["pass_min"] = bool(x["ev"] > 0 and (x["hit"] > x["breakeven"] if is_bin else True))
+        strict_ci = (x["hit_lo95"] > x["breakeven"] and x["ev_lo95"] > 0) if is_bin else x["ev_lo95"] > 0
+        x["pass_strict"] = bool(strict_ci and pa < alpha)
+        if dev_df is not None and not dev_df.empty:
+            d = dev_df
+            for k in KEY:
+                d = d[d[k] == x[k]]
+            if not d.empty:
+                x["dev_ev"] = float(d.iloc[0].ev)
+                x["dev_ev_lo95"] = float(d.iloc[0].ev_lo95)
+                x["deteriorated"] = bool(x["ev"] < d.iloc[0].ev_lo95)
+        key = {k: x[k] for k in KEY}
+        if x["pass_min"]:
+            passed_min.append(key)
+        if x["pass_strict"]:
+            passed.append(key)
+    return {"generated_by": "selección mecánica (research/report.py: holdout_verdict)",
+            "frozen_git_sha": frozen.get("git_sha"), "config_hash": frozen.get("config_hash"),
+            "n_candidates": len(cands), "passed": passed, "passed_min": passed_min, "details": rows,
+            "verdict": "SIN SEÑAL" if not passed else "CANDIDATAS VALIDADAS EN PERIODO BLOQUEADO "
+                                                   "(pendiente observación en vivo sin dinero)"}
+
+
+def render_holdout_verdict(v: dict) -> str:
+    L = ["## 0. Veredicto del periodo bloqueado (candidatas congeladas en desarrollo)\n",
+         f"**{v['verdict']}** — candidatas evaluadas: {v['n_candidates']}; pasan criterio estricto: "
+         f"{len(v['passed'])}; pasan criterio mínimo: {len(v['passed_min'])}.\n",
+         "| Instrumento | h | Contrato | Modelo | Política | n | Acierto [LI95] | Umbral | EV [IC95] | "
+         "EV en desarrollo | p Holm (familia) | Mínimo | Estricto |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for x in v["details"]:
+        if not x.get("found"):
+            L.append(f"| {x['symbol']} | {x['horizon']} | {x['contract']} | {x['model']} | {x['policy']} | "
+                     "no encontrada | | | | | | no | no |")
+            continue
+        L.append(f"| {x['symbol']} | {x['horizon']} | {x['contract']} | {x['model']} | {x['policy']} | "
+                 f"{x['n_trades']} | {_pct(x['hit'])} [{_pct(x['hit_lo95'])}] | {_pct(x['breakeven'], 2)} | "
+                 f"{_num(x['ev'])} [{_num(x['ev_lo95'])}, {_num(x['ev_hi95'])}] | {_num(x.get('dev_ev'))} | "
+                 f"{_num(x['p_holm_family'], 4)} | {'sí' if x['pass_min'] else 'no'} | "
+                 f"{'sí' if x['pass_strict'] else 'no'} |")
     L.append("")
     return "\n".join(L)

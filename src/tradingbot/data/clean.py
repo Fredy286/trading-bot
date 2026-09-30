@@ -81,6 +81,7 @@ def to_canonical(raw: pd.DataFrame, closed_run_minutes: int = 30, fill_gaps: boo
     df["no_tick"] = df["no_tick"] & ~closed
 
     valid = df["c"].notna()
+    report["unexpected_gaps"] = unexpected_gaps(df.index, ~valid.to_numpy())
     report["session_minutes"] = int(valid.sum())
     report["first"] = df.index[valid.to_numpy()].min().isoformat() if valid.any() else None
     report["last"] = df.index[valid.to_numpy()].max().isoformat() if valid.any() else None
@@ -89,3 +90,22 @@ def to_canonical(raw: pd.DataFrame, closed_run_minutes: int = 30, fill_gaps: boo
         report["spread_median"] = float(sp.median())
         report["spread_p95"] = float(sp.quantile(0.95))
     return df, report
+
+
+def unexpected_gaps(index: pd.DatetimeIndex, missing: np.ndarray, min_minutes: int = 120, top: int = 10) -> dict:
+    """Huecos ≥ `min_minutes` que NO empiezan en el cierre habitual de fin de semana
+    (viernes ≥ 20:00 UTC, sábado o domingo). Útil para detectar meses faltantes del proveedor."""
+    m = missing.astype(np.int8)
+    change = np.flatnonzero(np.diff(np.concatenate(([0], m, [0]))))
+    starts, ends = change[0::2], change[1::2]
+    rows = []
+    for s_, e_ in zip(starts, ends):
+        if e_ - s_ < min_minutes or s_ == 0 or e_ == len(index):
+            continue
+        t = index[s_]
+        weekend = (t.dayofweek == 4 and t.hour >= 20) or t.dayofweek >= 5
+        if not weekend:
+            rows.append((int(e_ - s_), t.isoformat(), index[e_ - 1].isoformat()))
+    rows.sort(reverse=True)
+    return {"count": len(rows), "total_minutes": int(sum(r[0] for r in rows)),
+            "largest": [{"minutes": r[0], "from": r[1], "to": r[2]} for r in rows[:top]]}

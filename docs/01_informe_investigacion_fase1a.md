@@ -301,3 +301,17 @@ Todo lo demás del protocolo (hipótesis, particiones, modelos, políticas, crit
 
 El código conserva el descargador de Dukascopy (bid/ask) para ejecutar el mismo estudio desde un PC
 personal, donde la limitación de tasa probablemente no aplique (`tbot data download --source dukascopy`).
+
+## Aclaración 1 — criterio del periodo bloqueado (2026-09-30, después de desarrollo y ANTES del periodo bloqueado)
+
+El protocolo contenía dos redacciones: la de descarte (sección 8: «EV ≤ 0 o acierto ≤ p*») y la de
+H1 («límite inferior de Wilson > p*, IC del EV > 0 y Holm < 0,05, en validación y en el periodo
+bloqueado»). Se adopta la **más exigente** para otorgar `VALIDADO_HOLDOUT`: límite inferior de Wilson
+95 % del acierto > umbral, límite inferior del IC 95 % del EV > 0 y p-valor de Holm < 0,05 sobre la
+familia de candidatas congeladas. El criterio mínimo se reporta solo como información. Además se
+informa si el EV del periodo bloqueado cae por debajo del IC de desarrollo (deterioro). Implementado en
+`research/report.py::holdout_verdict` y probado antes de ejecutar el periodo bloqueado.
+
+Observación registrada antes del periodo bloqueado: en desarrollo, las candidatas de BTC/USDT a 1 y
+5 minutos **pierden la ventaja con 60 s de retraso** en la entrada (sensibilidad `B_lat60`), por lo que
+serían inoperables con latencia humana aunque superen el periodo bloqueado.

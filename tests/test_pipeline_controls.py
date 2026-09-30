@@ -63,3 +63,23 @@ def test_positive_control_is_detected(cfg):
     assert spot.empty  # el costo supera al movimiento medio a 1 minuto
     assert res["horizons"]["1"]["descriptive"]["spot_breakeven"] > 1.0
     assert np.isfinite(res["horizons"]["1"]["calibration"]["logit"]["ece"])
+
+
+def test_holdout_verdict_mechanics():
+    import pandas as pd
+
+    frozen = {"candidates": [
+        {"symbol": "X", "horizon": 15, "contract": "binaria", "model": "logit", "policy": "B"},
+        {"symbol": "X", "horizon": 1, "contract": "binaria", "model": "gbm", "policy": "B"},
+        {"symbol": "Y", "horizon": 60, "contract": "binaria", "model": "logit", "policy": "B"}]}
+    hold = pd.DataFrame([
+        dict(symbol="X", horizon=15, contract="binaria", model="logit", policy="B", n_trades=5000, hit=0.58,
+             hit_lo95=0.566, breakeven=0.5405, ev=0.07, ev_lo95=0.04, ev_hi95=0.10, pvalue=1e-8),
+        dict(symbol="X", horizon=1, contract="binaria", model="gbm", policy="B", n_trades=5000, hit=0.545,
+             hit_lo95=0.531, breakeven=0.5405, ev=0.008, ev_lo95=-0.02, ev_hi95=0.03, pvalue=0.2)])
+    v = report.holdout_verdict(frozen, hold, None)
+    assert [p["horizon"] for p in v["passed"]] == [15]
+    assert {p["horizon"] for p in v["passed_min"]} == {15, 1}
+    assert v["details"][2]["found"] is False
+    empty = report.holdout_verdict(frozen, hold.iloc[1:], None)
+    assert empty["verdict"] == "SIN SEÑAL"

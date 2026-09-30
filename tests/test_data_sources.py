@@ -129,3 +129,14 @@ def test_histdata_gap_fill_is_causal_and_detects_weekend():
     # Sin relleno, los minutos faltantes quedan como NaN.
     bars2, _ = to_canonical(raw, fill_gaps=False)
     assert np.isnan(bars2.loc[m2, "c"])
+
+
+def test_unexpected_gap_detection():
+    from tradingbot.data.clean import unexpected_gaps
+
+    idx = pd.date_range("2024-01-01", periods=7 * 1440, freq="min", tz="UTC")  # lunes a domingo
+    missing = np.zeros(len(idx), bool)
+    missing[1440 * 2 + 600: 1440 * 2 + 900] = True  # miércoles, 5 h sin datos → inesperado
+    missing[1440 * 4 + 21 * 60: 1440 * 6 + 22 * 60] = True  # fin de semana → esperado
+    g = unexpected_gaps(idx, missing)
+    assert g["count"] == 1 and g["largest"][0]["minutes"] == 300

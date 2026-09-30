@@ -126,6 +126,15 @@ def cmd_research_report(a) -> int:
     acc = report.accuracy_target_table(results, cfg["acceptance"]["target_accuracy"],
                                        cfg["acceptance"]["min_n_for_accuracy_claim"])
     md = report.render_markdown(results, cands, acc, a.stage, cfg)
+    if a.stage == "holdout" and Path(a.frozen).exists():
+        frozen = json.loads(Path(a.frozen).read_text())
+        dev_csv = Path(a.out) / "dev" / "all_evaluations.csv"
+        import pandas as pd
+        dev_df = pd.read_csv(dev_csv) if dev_csv.exists() else None
+        v = report.holdout_verdict(frozen, df, dev_df, cfg["acceptance"]["alpha"])
+        (rdir / "verdict.json").write_text(json.dumps(v, indent=2, ensure_ascii=False, default=str))
+        md = report.render_holdout_verdict(v) + "\n" + md
+        print(f"Veredicto del periodo bloqueado: {v['verdict']}")
     (rdir / "summary.md").write_text(md)
     cands.to_csv(rdir / "all_evaluations.csv", index=False)
     if a.stage == "dev":
