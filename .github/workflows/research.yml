@@ -110,7 +110,8 @@ jobs:
         run: |
           tbot research report --stage $STAGE --print | tee report.md
           cat results/$STAGE/summary.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Guardar resultados en la rama
+      - name: Guardar resultados en la rama (solo si TODOS los instrumentos terminaron)
+        if: needs.study.result == 'success'
         env:
           STAGE: ${{ needs.setup.outputs.stage }}
         run: |
