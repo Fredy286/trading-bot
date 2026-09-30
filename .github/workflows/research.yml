@@ -1,0 +1,124 @@
+name: Estudio empírico
+
+# Se ejecuta:
+#  - a mano (Actions → «Estudio empírico» → Run workflow), o
+#  - con un commit cuyo mensaje contenga [research:dev] o [research:holdout].
+# Descarga datos reales (Dukascopy / Binance), ejecuta el protocolo pre-registrado y guarda los
+# resultados en results/<etapa>/ mediante un commit automático en la misma rama.
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Etapa (dev = validación walk-forward; holdout = periodo bloqueado, una sola vez)"
+        required: true
+        default: dev
+        type: choice
+        options: [dev, holdout]
+  push:
+
+concurrency:
+  group: research-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  setup:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[research:')
+    runs-on: ubuntu-latest
+    outputs:
+      stage: ${{ steps.s.outputs.stage }}
+    steps:
+      - id: s
+        env:
+          MSG: ${{ github.event.head_commit.message }}
+          INPUT_STAGE: ${{ github.event.inputs.stage }}
+        run: |
+          if [ -n "$INPUT_STAGE" ]; then echo "stage=$INPUT_STAGE" >> "$GITHUB_OUTPUT";
+          elif echo "$MSG" | grep -q "\[research:holdout\]"; then echo "stage=holdout" >> "$GITHUB_OUTPUT";
+          else echo "stage=dev" >> "$GITHUB_OUTPUT"; fi
+
+  study:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        symbol: [EURUSD, GBPUSD, USDJPY, AUDUSD, XAUUSD, BTCUSDT]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e .
+      - name: Restaurar datos en caché
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/raw
+          key: data-v1-${{ matrix.symbol }}-2021-01-01-2026-09-01
+      - name: Descargar datos reales
+        run: tbot data download --symbols ${{ matrix.symbol }} --start 2021-01-01 --end 2026-09-01 --workers 6
+      - name: Guardar datos en caché
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: data/raw
+          key: data-v1-${{ matrix.symbol }}-2021-01-01-2026-09-01
+      - name: Calidad de datos
+        run: tbot data quality --symbol ${{ matrix.symbol }}
+      - name: Ejecutar estudio (${{ needs.setup.outputs.stage }})
+        run: tbot research run --symbol ${{ matrix.symbol }} --stage ${{ needs.setup.outputs.stage }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.symbol }}
+          path: |
+            results/${{ needs.setup.outputs.stage }}/${{ matrix.symbol }}.json
+            results/registry.jsonl
+
+  report:
+    needs: [setup, study]
+    if: always() && needs.setup.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e .
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Reunir resultados
+        env:
+          STAGE: ${{ needs.setup.outputs.stage }}
+        run: |
+          mkdir -p results/$STAGE
+          for d in artifacts/results-*; do
+            cp $d/$STAGE/*.json results/$STAGE/ 2>/dev/null || true
+            cat $d/registry.jsonl >> results/registry.jsonl 2>/dev/null || true
+          done
+          ls -la results/$STAGE
+      - name: Informe y selección mecánica
+        env:
+          STAGE: ${{ needs.setup.outputs.stage }}
+        run: |
+          tbot research report --stage $STAGE --print | tee report.md
+          cat results/$STAGE/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Guardar resultados en la rama
+        env:
+          STAGE: ${{ needs.setup.outputs.stage }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/ config/frozen.json 2>/dev/null || git add results/
+          git commit -m "Resultados del estudio ($STAGE) — run ${{ github.run_id }} [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((i * 5))
+          done
