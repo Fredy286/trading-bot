@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+
+# Datos descargados y artefactos pesados (se regeneran con los comandos del README)
+data/raw/
+data/processed/
+models/
+runtime/
+
+# Secretos
+.env
+*.key
+autorizacion_dinero_real*.json
+
+# Sistema
+.DS_Store
+Thumbs.db
