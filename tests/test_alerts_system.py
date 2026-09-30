@@ -250,3 +250,15 @@ def test_dashboard_server_endpoints(tmp_path, bars_edge, bundle_edge):
     finally:
         srv.shutdown()
         srv.server_close()
+
+
+def test_live_verdict_requires_sample_and_edge():
+    from tradingbot.signals.monitor import live_verdict
+
+    few = [{"win": True, "tie": False, "pnl": 0.85}] * 50
+    assert not live_verdict(few, 0.5405, "EURUSD", "logit")["passed"]  # muestra insuficiente
+    coin = [{"win": i % 2 == 0, "tie": False, "pnl": 0.85 if i % 2 == 0 else -1.0} for i in range(400)]
+    v = live_verdict(coin, 0.5405, "EURUSD", "logit")
+    assert not v["passed"] and v["reasons"]
+    good = [{"win": i % 10 < 7, "tie": False, "pnl": 0.85 if i % 10 < 7 else -1.0} for i in range(400)]
+    assert live_verdict(good, 0.5405, "EURUSD", "logit")["passed"]

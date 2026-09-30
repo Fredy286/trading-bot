@@ -168,6 +168,18 @@ def cmd_live(a) -> int:
                     runtime_dir=Path(a.runtime), iterations=a.iterations)
 
 
+def cmd_live_verdict(a) -> int:
+    from .signals.monitor import live_verdict
+
+    rows = [json.loads(l) for l in open(Path(a.runtime) / "paper_ledger.jsonl", encoding="utf-8")]
+    v = live_verdict(rows, a.breakeven, a.symbol.upper(), a.model, a.min_n)
+    out = Path(a.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(v, indent=2, ensure_ascii=False))
+    print(json.dumps(v, indent=2, ensure_ascii=False))
+    return 0
+
+
 def cmd_serve(a) -> int:
     from .app.server import serve
 
@@ -262,6 +274,15 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--runtime", default="runtime/live")
     x.add_argument("--iterations", type=int, default=0, help="0 = sin límite")
     x.set_defaults(func=cmd_live)
+
+    x = sub.add_parser("live-verdict", help="veredicto de la observación en vivo sin dinero (criterios fijos)")
+    x.add_argument("--symbol", required=True)
+    x.add_argument("--model", default="logit")
+    x.add_argument("--breakeven", type=float, default=1 / 1.85, help="umbral de acierto del contrato")
+    x.add_argument("--min-n", type=int, default=200)
+    x.add_argument("--runtime", default="runtime/live")
+    x.add_argument("--out", default="results/live/verdict.json")
+    x.set_defaults(func=cmd_live_verdict)
 
     x = sub.add_parser("serve", help="panel web local")
     x.add_argument("--host", default="127.0.0.1")

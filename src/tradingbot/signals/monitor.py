@@ -58,3 +58,26 @@ def evaluate_monitor(outcomes: list[dict], breakeven: float, min_n: int = 50, wi
         return MonitorResult("EXPERIMENTAL", n, hit, hi, mean_p, z,
                              f"Probabilidades sobreestimadas (anunciada {mean_p:.1%} vs observada {hit:.1%}).")
     return MonitorResult("OK", n, hit, hi, mean_p, z, "Sin deterioro detectado.")
+
+
+def live_verdict(ledger_rows: list[dict], breakeven: float, symbol: str, model: str, min_n: int = 200) -> dict:
+    """Veredicto de la observación en vivo SIN dinero (criterios fijos, no ajustables a posteriori):
+    ≥ `min_n` alertas evaluadas sin empate, límite inferior de Wilson 95 % del acierto > umbral y
+    EV medio > 0. Se evalúan TODAS las alertas del periodo, incluidas las malas.
+    """
+    rows = [r for r in ledger_rows if not r.get("tie")]
+    n = len(rows)
+    wins = sum(1 for r in rows if r.get("win"))
+    lo, hi = wilson(wins, n) if n else (float("nan"), float("nan"))
+    ev = float(np.mean([r["pnl"] for r in ledger_rows])) if ledger_rows else float("nan")
+    passed = bool(n >= min_n and lo > breakeven and ev > 0)
+    reasons = []
+    if n < min_n:
+        reasons.append(f"muestra insuficiente: {n} < {min_n}")
+    if n and not lo > breakeven:
+        reasons.append(f"límite inferior {lo:.1%} ≤ umbral {breakeven:.1%}")
+    if not ev > 0:
+        reasons.append(f"EV medio {ev:+.4f} ≤ 0")
+    return {"symbol": symbol, "model": model, "n": n, "wins": wins, "hit": wins / n if n else None,
+            "hit_lo95": lo, "hit_hi95": hi, "ev": ev, "breakeven": breakeven, "min_n": min_n,
+            "passed": passed, "reasons": reasons}
