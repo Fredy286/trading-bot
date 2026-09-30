@@ -71,7 +71,10 @@ class AlertLoop:
         if alert.status in (SIGNAL, EXPERIMENTAL):
             for n in self.notifiers:
                 try:
-                    t = n.send(alert)
+                    t0 = utcnow()
+                    n.send(alert)
+                    # Hora de envío en el reloj del bucle (real o simulado) + duración real del envío.
+                    t = now + (utcnow() - t0)
                     alert.sent_at = alert.sent_at or t
                     self.log.write("sent", alert, channel=n.name, sent_at=t)
                 except Exception as exc:  # un canal caído no detiene el sistema
@@ -115,7 +118,7 @@ class AlertLoop:
                     sp = bars.at[entry_t, "spread_o"] / 2 + bars.at[exit_t, "spread_c"] / 2
                     pnl = float(side * (c - o) - sp) / o * 1e4
                 a.outcome = {"resultado": "empate" if tie else ("acierto" if win else "fallo"),
-                             "entrada": float(o), "salida": float(c), "pnl": pnl}
+                             "entrada": round(float(o), 6), "salida": round(float(c), 6), "pnl": round(pnl, 4)}
                 shadow = a.status != SIGNAL
                 self.ledger.record(a, pnl, bool(tie), bool(win), shadow)
                 if not shadow:

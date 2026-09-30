@@ -17,8 +17,10 @@ jobs:
           python-version: "3.11"
       - run: pip install -e .
       - run: tbot data probe
+        timeout-minutes: 8
       - name: Cabeceras completas de Dukascopy (curl)
+        timeout-minutes: 3
         run: |
-          curl -sS -D - -o /dev/null -A "Mozilla/5.0" "https://datafeed.dukascopy.com/datafeed/EURUSD/2021/00/05/BID_candles_min_1.bi5" || true
+          curl -sS --max-time 30 -D - -o /dev/null -A "Mozilla/5.0" "https://datafeed.dukascopy.com/datafeed/EURUSD/2021/00/05/BID_candles_min_1.bi5" || true
           sleep 2
-          curl -sS -D - -o /dev/null "https://datafeed.dukascopy.com/datafeed/EURUSD/2021/00/05/10h_ticks.bi5" || true
+          curl -sS --max-time 30 -D - -o /dev/null "https://datafeed.dukascopy.com/datafeed/EURUSD/2021/00/05/10h_ticks.bi5" || true

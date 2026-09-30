@@ -103,11 +103,15 @@ class Alert:
         if self.act_before:
             L.append(f"Actuar antes de: {fmt_bogota(self.act_before)}")
         if self.prob is not None:
-            L.append(f"Probabilidad calibrada: {self.prob:.1%} (IC90 del bin: {self.prob_lo:.1%}–{self.prob_hi:.1%}, "
-                     f"n={self.prob_n}) | Umbral de rentabilidad: {self.breakeven:.1%}")
+            be = "—" if self.breakeven is None else f"{self.breakeven:.1%}"
+            ic = "" if self.prob_lo is None else f" (IC90 del bin: {self.prob_lo:.1%}–{self.prob_hi:.1%}, n={self.prob_n})"
+            L.append(f"Probabilidad calibrada: {self.prob:.1%}{ic} | Umbral de rentabilidad: {be}")
+        else:
+            L.append("Probabilidad: no calculada")
         if self.contract == "binaria":
             pv = "verificado" if self.payout_verified else "NO verificado con el intermediario"
-            L.append(f"Contrato: binaria | Pago: {self.payout:.0%} ({pv})")
+            pago = "no definido" if self.payout is None else f"{self.payout:.0%}"
+            L.append(f"Contrato: binaria | Pago: {pago} ({pv})")
         else:
             L.append("Contrato: contado/CFD")
         if self.costs:

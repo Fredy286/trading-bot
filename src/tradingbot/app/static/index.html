@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de alertas</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --surface: #ffffff; --surface-2: #eef1f5; --border: #d9dee6;
+    --text: #1b2330; --muted: #5b6676; --accent: #2f5bd3; --accent-soft: #e6ecfb;
+    --exp: #8a5a00; --exp-soft: #fbf1dc; --none: #5b6676; --none-soft: #eceff3;
+    --pause: #b3261e; --pause-soft: #fbe4e2;
+    --radius: 10px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141b; --surface: #161d27; --surface-2: #1d2633; --border: #2b3645;
+      --text: #e6ebf2; --muted: #9aa6b6; --accent: #7aa2ff; --accent-soft: #1f2d4d;
+      --exp: #f0b43c; --exp-soft: #3a2d10; --none: #9aa6b6; --none-soft: #232c38;
+      --pause: #ff8a80; --pause-soft: #3d1a18;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+           padding: 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  h1 { font-size: 18px; margin: 0; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 14px; }
+  .kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .st-signal { color: var(--accent); background: var(--accent-soft); }
+  .st-exp { color: var(--exp); background: var(--exp-soft); }
+  .st-none { color: var(--none); background: var(--none-soft); }
+  .st-pause { color: var(--pause); background: var(--pause-soft); }
+  .badge { font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 1px 8px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  label { font-size: 14px; color: var(--muted); }
+  .tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; background: var(--surface-2); position: sticky; top: 0; }
+  tbody tr { cursor: pointer; } tbody tr:hover { background: var(--surface-2); }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .empty { padding: 24px; text-align: center; color: var(--muted); }
+  #detail { margin-top: 16px; display: none; }
+  #detail pre { white-space: pre-wrap; font-family: var(--mono); font-size: 13px; background: var(--surface-2);
+                padding: 12px; border-radius: 8px; margin: 8px 0 0; }
+  ul { margin: 4px 0 8px 18px; padding: 0; }
+  button { font: inherit; color: var(--surface); background: var(--accent); border: 0; border-radius: 8px;
+           padding: 6px 14px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  .note { font-size: 13px; color: var(--muted); }
+  footer { max-width: 1200px; margin: 0 auto; padding: 8px 16px 32px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Investigación y alertas</h1>
+    <div class="note" id="updated">Cargando…</div>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+    <span class="badge">Sin dinero real</span>
+    <span class="pill st-none" id="globalStatus">—</span>
+  </div>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>Estado del sistema</h2>
+      <dl class="kv" id="sys"></dl>
+    </section>
+    <section class="card">
+      <h2>Veredicto de la investigación</h2>
+      <dl class="kv" id="research"></dl>
+    </section>
+    <section class="card">
+      <h2>Cuenta simulada</h2>
+      <dl class="kv" id="paper"></dl>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <h2 style="margin:0">Alertas (ordenadas por valor esperado)</h2>
+    <label><input type="checkbox" id="showAll"> mostrar también «sin señal»</label>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr>
+        <th>Hora (Bogotá)</th><th>Instrumento</th><th>Estado</th><th>Dirección</th>
+        <th>Probabilidad [IC90]</th><th>Umbral</th><th>EV</th><th>Vence</th><th>Resultado</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none"></div>
+  </div>
+
+  <section class="card" id="detail">
+    <div class="toolbar">
+      <h2 style="margin:0" id="dTitle">Detalle</h2>
+      <button id="ackBtn">Marcar como recibida</button>
+    </div>
+    <div id="dBody"></div>
+  </section>
+</main>
+<footer>
+  Herramienta de investigación. Ninguna alerta es una recomendación de inversión ni una orden. Las probabilidades
+  son estimaciones con incertidumbre, calibradas con datos pasados, y pueden fallar. No se opera con dinero real.
+</footer>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "—").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct = (x, d = 1) => x == null ? "—" : (100 * x).toFixed(d) + " %";
+const bog = (iso) => iso ? new Date(iso).toLocaleString("es-CO", {timeZone: "America/Bogota", hour12: false}) : "—";
+const hm = (iso) => iso ? new Date(iso).toLocaleTimeString("es-CO", {timeZone: "America/Bogota", hour12: false}) : "—";
+const cls = (s) => s === "SEÑAL" ? "st-signal" : s === "PAUSADO" ? "st-pause" : (s || "").startsWith("EXPERIMENTAL") ? "st-exp" : "st-none";
+let state = null, selected = null;
+
+function kv(el, pairs) { el.innerHTML = pairs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join(""); }
+
+function render() {
+  if (!state) return;
+  $("updated").textContent = state.missing ? "Aún no hay datos: ejecute «tbot alerts demo» o «tbot live»." :
+    "Actualizado: " + bog(state.updated_at) + " · últimos datos: " + bog(state.last_data_time);
+  const last = (state.alerts || [])[0];
+  const gs = last ? last.status : "SIN DATOS";
+  $("globalStatus").className = "pill " + cls(gs); $("globalStatus").textContent = "Ahora: " + gs;
+  const m = state.model || {}, mon = state.monitor || {};
+  kv($("sys"), [
+    ["Modelo", esc(m.model_id)],
+    ["Validación", `<span class="pill ${m.validation_status === "VALIDADO" ? "st-signal" : "st-none"}">${esc(m.validation_status)}</span>`],
+    ["Datos", m.synthetic ? "SINTÉTICOS (demostración)" : "reales"],
+    ["Monitor", `${esc(mon.status)} — ${esc(mon.detail)}`],
+    ["Conteo", esc(Object.entries(state.counts || {}).map(([k, v]) => `${k}: ${v}`).join(" · "))],
+  ]);
+  const r = state.research || {};
+  kv($("research"), r.available ? [
+    ["Veredicto", `<span class="pill ${r.verdict === "SIN SEÑAL" ? "st-none" : "st-exp"}">${esc(r.verdict)}</span>`],
+    ["Candidatas", esc((r.candidates || []).length)],
+    ["Informe dev", r.dev_summary ? "results/dev/summary.md" : "—"],
+    ["Periodo bloqueado", r.holdout_summary ? "results/holdout/summary.md" : "pendiente"],
+  ] : [["Veredicto", "Aún no hay estudio completo (config/frozen.json)."]]);
+  const p = state.paper || {};
+  kv($("paper"), [
+    ["Saldo simulado", esc((p.balance ?? 0).toFixed(2)) + " unidades"],
+    ["Operaciones", esc(p.n ?? 0)],
+    ["Hipotéticas (experimentales)", `${esc(p.shadow_n ?? 0)} · PnL ${esc((p.shadow_pnl ?? 0).toFixed(2))}`],
+  ]);
+  const all = $("showAll").checked;
+  const rows = (state.alerts || []).filter(a => all || a.status !== "SIN SEÑAL")
+    .sort((a, b) => (b.ev ?? -1e9) - (a.ev ?? -1e9) || (b.prob ?? 0) - (a.prob ?? 0));
+  $("rows").innerHTML = rows.map(a => `<tr data-id="${esc(a.alert_id)}">
+      <td class="num">${esc(hm(a.decision_time))}</td><td>${esc(a.instrument)}</td>
+      <td><span class="pill ${cls(a.status)}">${esc(a.status)}</span></td>
+      <td>${a.direction ? (a.direction === "sube" ? "▲ sube" : "▼ baja") : "—"}</td>
+      <td class="num">${a.prob == null ? "—" : `${pct(a.prob)} [${pct(a.prob_lo)}–${pct(a.prob_hi)}]`}</td>
+      <td class="num">${pct(a.breakeven)}</td>
+      <td class="num">${a.ev == null ? "—" : (a.ev >= 0 ? "+" : "") + a.ev.toFixed(4)}</td>
+      <td class="num">${esc(hm(a.act_before))}</td>
+      <td>${esc(a.outcome ? a.outcome.resultado : (a.status === "SIN SEÑAL" ? "—" : "pendiente"))}</td></tr>`).join("");
+  $("empty").style.display = rows.length ? "none" : "block";
+  $("empty").textContent = all ? "Sin registros." : "SIN SEÑAL: ninguna configuración cumple los criterios en este momento.";
+  document.querySelectorAll("#rows tr").forEach(tr => tr.onclick = () => { selected = tr.dataset.id; detail(); });
+  detail();
+}
+
+function list(title, items) {
+  return items && items.length ? `<strong>${esc(title)}</strong><ul>${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : "";
+}
+
+function detail() {
+  const a = (state.alerts || []).find(x => x.alert_id === selected);
+  if (!a) { $("detail").style.display = "none"; return; }
+  $("detail").style.display = "block";
+  $("dTitle").textContent = `${a.status} · ${a.instrument} · ${bog(a.decision_time)}`;
+  $("ackBtn").disabled = !!a.received_at;
+  $("ackBtn").textContent = a.received_at ? "Recibida " + hm(a.received_at) : "Marcar como recibida";
+  const costs = Object.entries(a.costs || {}).map(([k, v]) => `${k}=${v}`).join(", ");
+  $("dBody").innerHTML = `<dl class="kv">
+      <dt>Intermediario</dt><dd>${esc(a.broker)}</dd><dt>Fuente de precio</dt><dd>${esc(a.price_source)}</dd>
+      <dt>Dirección</dt><dd>${esc(a.direction)}</dd><dt>Duración</dt><dd>${esc(a.duration_min)} min</dd>
+      <dt>Actuar antes de</dt><dd>${esc(bog(a.act_before))}</dd>
+      <dt>Probabilidad</dt><dd>${a.prob == null ? "no calculada" : `${pct(a.prob)} (IC90 ${pct(a.prob_lo)}–${pct(a.prob_hi)}, n=${esc(a.prob_n)})`}</dd>
+      <dt>Contrato</dt><dd>${esc(a.contract)} ${a.payout != null ? "· pago " + pct(a.payout, 0) + (a.payout_verified ? " (verificado)" : " (NO verificado)") : ""}</dd>
+      <dt>Costos</dt><dd>${esc(costs)}</dd>
+      <dt>Valor esperado</dt><dd>${a.ev == null ? "—" : esc(a.ev.toFixed(4) + " " + a.ev_units)}</dd>
+      <dt>Motivo sin señal</dt><dd>${esc(a.no_signal_reason)}</dd>
+      <dt>Generada</dt><dd>${esc(bog(a.generated_at))}</dd><dt>Enviada</dt><dd>${esc(bog(a.sent_at))}</dd>
+      <dt>Recibida</dt><dd>${esc(bog(a.received_at))}</dd><dt>Evaluada</dt><dd>${esc(bog(a.evaluated_at))}</dd>
+      <dt>Resultado</dt><dd>${esc(a.outcome ? JSON.stringify(a.outcome) : "—")}</dd>
+    </dl>${list("Razones cuantificables", a.reasons)}${list("Factores que la invalidarían", a.invalidators)}`;
+}
+
+$("ackBtn").onclick = async () => {
+  if (!selected) return;
+  const r = await fetch("/api/ack", {method: "POST", headers: {"Content-Type": "application/json"},
+                                     body: JSON.stringify({alert_id: selected})});
+  if (r.ok) load();
+};
+$("showAll").onchange = render;
+
+async function load() {
+  try { state = await (await fetch("/api/state")).json(); render(); }
+  catch (e) { $("updated").textContent = "Sin conexión con el servidor local."; }
+}
+load(); setInterval(load, 5000);
+</script>
+</body>
+</html>

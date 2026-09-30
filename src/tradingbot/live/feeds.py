@@ -49,7 +49,7 @@ class BinancePollingFeed:
         raw["bid_v"] = df["volume"].astype(float).to_numpy()
         raw["ask_v"] = 0.0
         raw["trades"] = df["trades"].astype(float).to_numpy()
-        raw = raw[close_time.to_numpy() < pd.Timestamp(now_utc).to_datetime64()]  # solo velas cerradas
+        raw = raw[(close_time < pd.Timestamp(now_utc)).to_numpy()]  # solo velas ya cerradas
         bars, _ = to_canonical(raw)
         return bars
 
