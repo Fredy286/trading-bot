@@ -62,9 +62,19 @@ class AlertLoop:
     def step(self, now_utc: datetime | None = None) -> Alert:
         now = now_utc or self.clock()
         bars, received_at = self.feed.get(now)
+        # Precio real «ahora» (si la fuente lo ofrece): salida de alertas que vencen y entrada de las nuevas.
+        live_px = None
+        if hasattr(self.feed, "current_price"):
+            try:
+                live_px, _ = self.feed.current_price(now)
+            except Exception as exc:  # sin precio en vivo: esas alertas quedarán no evaluables
+                self.log.write("price_failed", Alert("-", "-", "-", "-", now, 0), error=str(exc))
         if len(bars):
             self.last_data_time = bars.index[-1] + pd.Timedelta(minutes=1)
+        self._evaluate_pending(bars, now, live_px)
         alert = self.engine.evaluate(bars, now, self.risk, self.monitor.status)
+        if alert.status in (SIGNAL, EXPERIMENTAL) and live_px is not None:
+            alert.entry_price_live, alert.entry_time_live = float(live_px), now
         alert.generated_at = now
         self.log.write("generated", alert, data_received_at=received_at, status=alert.status,
                        payload=alert.to_dict())
@@ -88,13 +98,47 @@ class AlertLoop:
         self.last_status = alert.status
         self.status_counts[alert.status] = self.status_counts.get(alert.status, 0) + 1
         self.alerts.appendleft(alert)
-        self._evaluate_pending(bars, now)
         self.write_state()
         return alert
 
-    def _evaluate_pending(self, bars: pd.DataFrame, now: datetime) -> None:
+    def _record(self, a: Alert, side: int, d: float, o: float, c: float, pnl: float, method: str) -> None:
+        tie, win = d == 0, d == side
+        a.outcome = {"resultado": "empate" if tie else ("acierto" if win else "fallo"), "metodo": method,
+                     "entrada": round(float(o), 6), "salida": round(float(c), 6), "pnl": round(pnl, 4)}
+        shadow = a.status != SIGNAL
+        self.ledger.record(a, pnl, bool(tie), bool(win), shadow)
+        if not shadow:
+            self.risk.register_outcome(pnl)
+        self.outcomes.append({"win": bool(win), "tie": bool(tie), "prob": a.prob})
+        be = a.breakeven if a.breakeven and a.breakeven <= 1 else 0.5
+        self.monitor = evaluate_monitor(self.outcomes, be)
+
+    def _evaluate_pending(self, bars: pd.DataFrame, now: datetime, live_px: float | None = None,
+                          max_late_s: float = 10.0) -> None:
         still = []
         for a in self.pending:
+            side = 1 if a.direction == "sube" else -1
+            if a.entry_price_live is not None:
+                # Evaluación con precios REALES de entrada y de vencimiento (incluye la latencia real).
+                expiry = pd.Timestamp(a.entry_time_live) + pd.Timedelta(minutes=a.duration_min)
+                late = (pd.Timestamp(now) - expiry).total_seconds()
+                if late < 0:
+                    still.append(a)
+                    continue
+                if live_px is None or late > max_late_s:
+                    a.outcome = {"resultado": "no_evaluable", "motivo": f"sin precio al vencer (retraso {late:.0f} s)"}
+                else:
+                    o, c = a.entry_price_live, float(live_px)
+                    d = np.sign(round((c - o) / (self.engine.inst.point / 2)))
+                    if isinstance(self.engine.contract, BinaryContract):
+                        pnl = float(self.engine.contract.pnl(np.array([side]), np.array([d]))[0])
+                    else:
+                        pnl = float(side * (c - o)) / o * 1e4 - float(self.engine.contract.cost_bps(
+                            np.array([o]), np.array([0.0]))[0])
+                    self._record(a, side, d, o, c, pnl, "precio real de entrada y vencimiento")
+                a.evaluated_at = now
+                self.log.write("evaluated", a, outcome=a.outcome, evaluated_at=now)
+                continue
             entry_t = pd.Timestamp(a.decision_time)  # vela que abre en el momento de decisión
             exit_t = entry_t + pd.Timedelta(minutes=a.duration_min - 1)
             if exit_t not in bars.index or entry_t not in bars.index:
@@ -110,22 +154,12 @@ class AlertLoop:
                 a.outcome = {"resultado": "no_evaluable", "motivo": "vela vacía"}
             else:
                 d = np.sign(round((c - o) / (self.engine.inst.point / 2)))
-                side = 1 if a.direction == "sube" else -1
-                tie, win = d == 0, d == side
                 if isinstance(self.engine.contract, BinaryContract):
                     pnl = float(self.engine.contract.pnl(np.array([side]), np.array([d]))[0])
                 else:
                     sp = bars.at[entry_t, "spread_o"] / 2 + bars.at[exit_t, "spread_c"] / 2
                     pnl = float(side * (c - o) - sp) / o * 1e4
-                a.outcome = {"resultado": "empate" if tie else ("acierto" if win else "fallo"),
-                             "entrada": round(float(o), 6), "salida": round(float(c), 6), "pnl": round(pnl, 4)}
-                shadow = a.status != SIGNAL
-                self.ledger.record(a, pnl, bool(tie), bool(win), shadow)
-                if not shadow:
-                    self.risk.register_outcome(pnl)
-                self.outcomes.append({"win": bool(win), "tie": bool(tie), "prob": a.prob})
-                be = a.breakeven if a.breakeven and a.breakeven <= 1 else 0.5
-                self.monitor = evaluate_monitor(self.outcomes, be)
+                self._record(a, side, d, o, c, pnl, "velas (optimista: entrada en la apertura)")
             a.evaluated_at = now
             self.log.write("evaluated", a, outcome=a.outcome, evaluated_at=now)
         self.pending = still

@@ -55,6 +55,9 @@ class Alert:
     received_at: datetime | None = None
     evaluated_at: datetime | None = None
     outcome: dict | None = None
+    # Observación en vivo: precio y hora REALES de entrada (no la apertura ideal de la vela).
+    entry_price_live: float | None = None
+    entry_time_live: datetime | None = None
 
     # ------------------------------------------------------------------ serialización
     def to_dict(self) -> dict:
@@ -69,7 +72,8 @@ class Alert:
     @classmethod
     def from_dict(cls, d: dict) -> "Alert":
         d = {k: v for k, v in d.items() if k in cls.__dataclass_fields__}
-        for k in ("decision_time", "act_before", "generated_at", "sent_at", "received_at", "evaluated_at"):
+        for k in ("decision_time", "act_before", "generated_at", "sent_at", "received_at", "evaluated_at",
+                  "entry_time_live"):
             if d.get(k):
                 d[k] = datetime.fromisoformat(d[k])
         return cls(**d)

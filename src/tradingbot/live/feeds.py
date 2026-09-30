@@ -53,6 +53,13 @@ class BinancePollingFeed:
         bars, _ = to_canonical(raw)
         return bars
 
+    def current_price(self, now_utc: datetime | None = None) -> tuple[float, datetime]:
+        """Último precio negociado (entrada/salida reales de la observación en vivo)."""
+        r = self.session.get("https://api.binance.com/api/v3/ticker/price", params={"symbol": self.symbol},
+                             timeout=5)
+        r.raise_for_status()
+        return float(r.json()["price"]), utcnow()
+
     def get(self, now_utc: datetime | None = None, lookback: int = 1000) -> tuple[pd.DataFrame, datetime]:
         r = self.session.get(self.URL, params={"symbol": self.symbol, "interval": "1m", "limit": lookback},
                              timeout=10)

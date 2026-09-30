@@ -8,6 +8,21 @@ condiciones estrictas, considerar la ejecución automática.
 > muestra **«SIN SEÑAL»**. No opera con dinero real: no existe código para enviar órdenes reales y una
 > guarda lo impide salvo autorización expresa (`docs/03_fase2_intermediarios.md`).
 
+## Resultado de la investigación (resumen)
+
+Estudio pre-registrado con datos reales 2021–2026 (624 hipótesis, corrección por pruebas múltiples,
+periodo final bloqueado evaluado una sola vez). Detalle en
+[`docs/02_resultados_empiricos.md`](docs/02_resultados_empiricos.md).
+
+- **Divisas (EUR/USD, GBP/USD, USD/JPY, AUD/USD) y oro: SIN SEÑAL** a 1, 5, 15 y 60 minutos. A 1 minuto
+  los modelos aciertan 50,5–51,3 %; con pago del 85 % se necesita 54,05 %.
+- **80 % de acierto: no alcanzable** en ningún instrumento ni subconjunto con muestra suficiente
+  (máximo 59,3 %). Un «80 %» se fabrica con salidas asimétricas… y pierde dinero.
+- **Contado/CFD:** sin ninguna configuración rentable, ni con costos optimistas.
+- **BTC/USDT 1 minuto:** efecto estadísticamente real (56,4 % en el año bloqueado) que **solo** existe con
+  entrada instantánea y empate reembolsado; con 60 s de retraso pierde. Estado `VALIDADO_HOLDOUT`:
+  solo alertas «EXPERIMENTAL — NO OPERAR» hasta superar la observación en vivo sin dinero.
+
 ## Documentos
 
 | Documento | Contenido |
@@ -64,11 +79,14 @@ tbot data quality --symbol EURUSD
 tbot research run --symbol EURUSD --stage dev      # walk-forward, sin tocar el periodo bloqueado (añada --source histdata si usó HistData)
 tbot research report --stage dev                   # veredicto mecánico + config/frozen.json
 
-# 3) Alertas en vivo SIN dinero real (hoy: BTC/USDT vía API pública de Binance)
+# 3) Observación en vivo SIN dinero real (hoy: BTC/USDT vía API pública de Binance)
 copy .env.example .env        # macOS/Linux: cp .env.example .env
-tbot train --symbol BTCUSDT --horizon 1 --model logit
+#    en .env ponga TB_SHOW_EXPERIMENTAL=true para ver las alertas experimentales
+tbot data download --symbols BTCUSDT --start 2025-09-01 --end 2026-10-01
+tbot train --symbol BTCUSDT --horizon 1 --model gbm        # estado: VALIDADO_HOLDOUT (no accionable)
 tbot live --symbol BTCUSDT --horizon 1 --runtime runtime/live
-tbot serve --runtime runtime/live
+tbot serve --runtime runtime/live                          # en otra terminal
+tbot live-verdict --symbol BTCUSDT --model gbm             # tras ≥ 200 alertas evaluadas
 ```
 
 El estudio completo con datos reales también se puede lanzar desde GitHub: pestaña **Actions →

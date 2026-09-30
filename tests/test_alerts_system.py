@@ -262,3 +262,35 @@ def test_live_verdict_requires_sample_and_edge():
     assert not v["passed"] and v["reasons"]
     good = [{"win": i % 10 < 7, "tie": False, "pnl": 0.85 if i % 10 < 7 else -1.0} for i in range(400)]
     assert live_verdict(good, 0.5405, "EURUSD", "logit")["passed"]
+
+
+class _LivePriceFeed(ReplayFeed):
+    """Fuente simulada con precio «en vivo» = cierre de la última vela + desplazamiento conocido."""
+
+    def __init__(self, bars, drift):
+        super().__init__(bars)
+        self.drift = drift
+
+    def current_price(self, now_utc):
+        b, _ = self.get(now_utc)
+        return float(b["c"].iloc[-1]) + self.drift, now_utc
+
+
+def test_live_evaluation_uses_real_entry_and_expiry_prices(tmp_path, bars_edge, bundle_edge):
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    start = pd.Timestamp("2023-02-06 13:00", tz="UTC")
+    for i in range(40):
+        loop.step((start + pd.Timedelta(minutes=i, seconds=3)).to_pydatetime())
+    evaluated = [a for a in loop.alerts if a.outcome and a.outcome.get("metodo")]
+    assert evaluated, "debió evaluar alguna alerta experimental"
+    for a in evaluated:
+        assert a.outcome["metodo"] == "precio real de entrada y vencimiento"
+        assert a.entry_price_live == pytest.approx(a.outcome["entrada"], abs=1e-6)
+    # Si el bucle llega tarde al vencimiento, la alerta se marca no evaluable (no se inventa el precio).
+    a = evaluated[0]
+    a.outcome, a.evaluated_at = None, None
+    loop.pending = [a]
+    late = pd.Timestamp(a.entry_time_live) + pd.Timedelta(minutes=a.duration_min, seconds=45)
+    loop._evaluate_pending(bars_edge.iloc[:0], late.to_pydatetime(), live_px=1.1)
+    assert a.outcome["resultado"] == "no_evaluable"

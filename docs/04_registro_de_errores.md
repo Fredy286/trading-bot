@@ -15,10 +15,14 @@
 | 7 | 2026-09-30 | `live/runner.py` | Argumento duplicado `alert` en el registro de eventos; el resumen de la demo contaba solo las últimas 300 alertas. | Ejecución de la demo | Ninguno | Campo renombrado a `payload`; contador de estados independiente. |
 | 8 | 2026-09-30 | `signals/alert.py`, `live/feeds.py` | `format_text` fallaba si el pago no estaba definido; el filtro de velas abiertas de Binance comparaba fechas con y sin zona horaria. | Pruebas automatizadas nuevas del sistema de alertas | Ninguno (no se había ejecutado en vivo) | Manejo de valores ausentes; comparación entre marcas con zona horaria. |
 | 9 | 2026-09-30 | `.github/workflows/diagnose.yml` | `curl` sin tiempo máximo quedó colgado con Dukascopy y hubo que cancelar la ejecución (se perdieron sus registros). | Ejecución 36667482678 | Diagnóstico repetido | `--max-time 30` y límites de tiempo por paso. |
+| 10 | 2026-09-30 | Datos HistData 2023 (divisas) | Los trimestres 2023-T1 a T3 tienen muchas menos decisiones válidas (EUR/USD 2023-T2: 27 834 vs ~90 000) y los huecos detectados (~17 días, casi todos festivos) no lo explican. | Revisión de los tamaños de cada tramo en el log del estudio | Menor muestra en 2023; no cambia conclusiones (sin señal en todos los trimestres) | **Pendiente**: inspeccionar el archivo 2023 de HistData o repetir con Dukascopy. Se añadió la detección automática de huecos al informe de calidad. |
 
 ## Lecciones
 
 1. Las pruebas con datos sintéticos deben cubrir **todas** las variantes de fuente (con y sin bid/ask).
 2. Un informe automático nunca debe publicar resultados de una ejecución incompleta.
-3. Una muestra pequeña engaña: en la demo con ventaja sembrada, 43 operaciones dieron 20 aciertos
+3. Una configuración que «pasa» en un periodo puede no pasar en el siguiente: 8 de las 10 candidatas
+   de desarrollo no superaron el periodo bloqueado. Y las que sí, dependían de condiciones ideales
+   (entrada instantánea, empate reembolsado).
+4. Una muestra pequeña engaña: en la demo con ventaja sembrada, 43 operaciones dieron 20 aciertos
    (parecía que no había ventaja); con 818 operaciones el acierto fue 62,4 % frente a 65,6 % anunciado.
