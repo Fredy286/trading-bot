@@ -1,0 +1,24 @@
+name: Diagnóstico de fuentes
+
+# Se ejecuta a mano o con un commit cuyo mensaje contenga [diagnose].
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  probe:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[diagnose]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e .
+      - run: tbot data probe
+      - name: Cabeceras completas de Dukascopy (curl)
+        run: |
+          curl -sS -D - -o /dev/null -A "Mozilla/5.0" "https://datafeed.dukascopy.com/datafeed/EURUSD/2021/00/05/BID_candles_min_1.bi5" || true
+          sleep 2
+          curl -sS -D - -o /dev/null "https://datafeed.dukascopy.com/datafeed/EURUSD/2021/00/05/10h_ticks.bi5" || true

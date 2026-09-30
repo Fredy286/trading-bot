@@ -65,7 +65,8 @@ def compute_features(bars: pd.DataFrame) -> pd.DataFrame:
     sp = bars["spread_c"]
     f["spread_vol"] = (sp / c) / volf
     sp_med = sp.rolling(240, min_periods=120).median()
-    f["spread_rel"] = sp / sp_med.where(sp_med > 0)
+    # Fuentes sin bid/ask (spread = 0, p. ej. Binance): spread relativo neutro = 1.
+    f["spread_rel"] = (sp / sp_med.where(sp_med > 0)).where(sp_med > 0, 1.0).where(sp_med.notna())
     lv = np.log1p(bars["volume"])
     f["vol_rel"] = lv - lv.rolling(240, min_periods=120).mean()
     f["notick60"] = bars["no_tick"].astype(float).where(c.notna()).rolling(60, min_periods=50).mean()

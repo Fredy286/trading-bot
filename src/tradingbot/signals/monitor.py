@@ -1,0 +1,60 @@
+"""Monitor de deterioro en observación en vivo (sin dinero real).
+
+Reglas pre-registradas (protocolo, sección 8):
+- Con ≥ `min_n` señales evaluadas (sin empates), si el límite SUPERIOR de Wilson 95 % del acierto
+  acumulado o de la ventana móvil queda por debajo del umbral de rentabilidad → PAUSADO.
+- Si la probabilidad media anunciada supera la frecuencia observada de forma significativa
+  (z < −2,5) → EXPERIMENTAL (probabilidades sobreestimadas).
+Las reglas NO se ajustan retrospectivamente para convertir un mal periodo en éxito.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+import numpy as np
+
+from ..research.metrics import wilson
+
+
+@dataclass
+class MonitorResult:
+    status: str  # OK | EXPERIMENTAL | PAUSADO | SIN_DATOS
+    n: int
+    hit: float | None
+    hit_hi95: float | None
+    mean_prob: float | None
+    calib_z: float | None
+    detail: str
+
+    def to_dict(self) -> dict:
+        return dict(self.__dict__)
+
+
+def evaluate_monitor(outcomes: list[dict], breakeven: float, min_n: int = 50, window: int = 200) -> MonitorResult:
+    """`outcomes`: dicts con claves `win` (bool), `tie` (bool) y `prob` (probabilidad anunciada)."""
+    rows = [o for o in outcomes if not o.get("tie")]
+    n = len(rows)
+    if n == 0:
+        return MonitorResult("SIN_DATOS", 0, None, None, None, None, "Aún no hay señales evaluadas.")
+    wins = np.array([bool(o["win"]) for o in rows])
+    probs = np.array([o.get("prob") if o.get("prob") is not None else np.nan for o in rows], float)
+    hit = float(wins.mean())
+    _, hi = wilson(wins.sum(), n)
+    mean_p = float(np.nanmean(probs)) if np.isfinite(probs).any() else None
+    z = None
+    if mean_p is not None and 0 < mean_p < 1:
+        z = float((hit - mean_p) / np.sqrt(mean_p * (1 - mean_p) / n))
+    if n < min_n:
+        return MonitorResult("OK", n, hit, hi, mean_p, z,
+                             f"Observación en curso: {n}/{min_n} señales para poder juzgar.")
+    w = wins[-window:]
+    _, hi_w = wilson(w.sum(), len(w))
+    if hi < breakeven or hi_w < breakeven:
+        return MonitorResult("PAUSADO", n, hit, hi, mean_p, z,
+                             f"Acierto {hit:.1%} con límite superior {min(hi, hi_w):.1%} < umbral {breakeven:.1%}: "
+                             "alertas pausadas.")
+    if z is not None and z < -2.5:
+        return MonitorResult("EXPERIMENTAL", n, hit, hi, mean_p, z,
+                             f"Probabilidades sobreestimadas (anunciada {mean_p:.1%} vs observada {hit:.1%}).")
+    return MonitorResult("OK", n, hit, hi, mean_p, z, "Sin deterioro detectado.")

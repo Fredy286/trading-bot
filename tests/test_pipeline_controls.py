@@ -41,6 +41,19 @@ def test_negative_control_yields_no_signal(cfg):
     assert not acc["reaches_target"].any()
 
 
+def test_zero_spread_source_still_produces_decisions(cfg):
+    """Regresión: con spread 0 (Binance) spread_rel era NaN y se descartaban TODAS las decisiones."""
+    raw = synthetic.generate(start="2023-01-02", days=200, phi=0.0, seed=5)
+    for k in ("o", "h", "l", "c"):
+        mid = (raw[f"bid_{k}"] + raw[f"ask_{k}"]) / 2
+        raw[f"bid_{k}"] = mid
+        raw[f"ask_{k}"] = mid
+    res = run_symbol("SYNTH", raw, "dev", cfg, n_boot=50, log=lambda *a, **k: None)
+    h1 = res["horizons"]["1"]
+    assert h1["n_decisions_test"] > 10_000
+    assert len(h1["evaluations"]) > 0
+
+
 def test_positive_control_is_detected(cfg):
     res, cands = _run(-0.3, cfg)
     b = cands[(cands.contract == "binaria") & (cands.model == "logit") & (cands.policy == "B")].iloc[0]

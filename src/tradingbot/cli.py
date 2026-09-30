@@ -59,6 +59,13 @@ def cmd_data_import_histdata(a) -> int:
     return 0
 
 
+def cmd_data_probe(a) -> int:
+    from .data import probe
+
+    probe.run(pause_s=a.pause)
+    return 0
+
+
 def cmd_data_quality(a) -> int:
     from .data import store
     from .data.clean import to_canonical
@@ -141,7 +148,8 @@ def cmd_alerts_example(a) -> int:
 def cmd_alerts_demo(a) -> int:
     from .live.demo import run_demo
 
-    return run_demo(minutes=a.minutes, runtime_dir=Path(a.runtime), show_experimental=a.experimental)
+    return run_demo(minutes=a.minutes, runtime_dir=Path(a.runtime), show_experimental=a.experimental,
+                    planted_edge=a.planted_edge, verbose=not a.quiet)
 
 
 def cmd_train(a) -> int:
@@ -192,6 +200,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--spread-pips", type=float, required=True)
     x.add_argument("--root", default="data/raw")
     x.set_defaults(func=cmd_data_import_histdata)
+    x = d.add_parser("probe", help="diagnostica el acceso a las fuentes de datos desde esta máquina")
+    x.add_argument("--pause", type=float, default=1.5)
+    x.set_defaults(func=cmd_data_probe)
     x = d.add_parser("quality", help="informe de calidad de datos")
     x.add_argument("--symbol", required=True)
     x.add_argument("--root", default="data/raw")
@@ -222,6 +233,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--minutes", type=int, default=240)
     x.add_argument("--runtime", default="runtime/demo")
     x.add_argument("--experimental", action="store_true", help="mostrar señales experimentales (NO OPERAR)")
+    x.add_argument("--planted-edge", action="store_true",
+                   help="serie sintética con ventaja SEMBRADA (solo para ver el formato de una alerta)")
+    x.add_argument("--quiet", action="store_true", help="alertas en una sola línea")
     x.set_defaults(func=cmd_alerts_demo)
 
     x = sub.add_parser("train", help="entrena un modelo para alertas en vivo")
