@@ -17,9 +17,8 @@ on:
         options: [dev, holdout]
   push:
 
-concurrency:
-  group: research-${{ github.ref }}
-  cancel-in-progress: false
+# Sin «concurrency» a nivel de workflow: un push sin [research:...] crearía una ejecución pendiente
+# que cancelaría un estudio en espera.
 
 jobs:
   setup:

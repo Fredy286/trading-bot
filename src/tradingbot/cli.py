@@ -155,7 +155,8 @@ def cmd_alerts_demo(a) -> int:
 def cmd_train(a) -> int:
     from .signals.registry import train_bundle
 
-    p = train_bundle(a.symbol, a.horizon, a.model, Path(a.root), Path(a.models), Path(a.frozen), a.months)
+    p = train_bundle(a.symbol, a.horizon, a.model, Path(a.root), Path(a.models), Path(a.frozen), a.months,
+                     source=a.source)
     print(f"Modelo guardado: {p}")
     return 0
 
@@ -250,6 +251,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--root", default="data/raw")
     x.add_argument("--models", default="models")
     x.add_argument("--frozen", default="config/frozen.json")
+    x.add_argument("--source", choices=["dukascopy", "binance", "histdata", "synthetic"], default=None)
     x.set_defaults(func=cmd_train)
 
     x = sub.add_parser("live", help="alertas en vivo SIMULADAS (sin dinero real)")

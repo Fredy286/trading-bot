@@ -128,14 +128,15 @@ def fit_bundle(bars: pd.DataFrame, symbol: str, horizon: int, model_name: str, s
 
 
 def train_bundle(symbol: str, horizon: int, model_name: str, root: Path, models_dir: Path, frozen_path: Path,
-                 months: int = 12) -> Path:
+                 months: int = 12, source: str | None = None) -> Path:
     inst = get_instrument(symbol)
-    raw = store.load(Path(root), inst)
-    bars, _ = to_canonical(raw)
+    source = source or inst.source
+    raw = store.load(Path(root), inst, source=source)
+    bars, _ = to_canonical(raw, fill_gaps=(source == "histdata"))
     start = bars.index.max() - pd.DateOffset(months=months)
     bars = bars[bars.index >= start]
-    b = fit_bundle(bars, inst.symbol, horizon, model_name, inst.source, inst.point,
-                   synthetic=inst.source == "synthetic")
+    b = fit_bundle(bars, inst.symbol, horizon, model_name, source, inst.point,
+                   synthetic=source == "synthetic")
     status, evidence = validation_status_for(inst.symbol, horizon, model_name, frozen_path,
                                              Path("results/holdout/verdict.json"), Path("results/live/verdict.json"))
     if b.synthetic:
