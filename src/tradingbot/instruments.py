@@ -41,6 +41,9 @@ INSTRUMENTS: dict[str, Instrument] = {
                          assumed_spread=0.25),
     "BTCUSDT": Instrument("BTCUSDT", "binance", 1e-2, 1.0, 1, (10_000.0, 250_000.0), 0.0, commission_bps=20.0,
                           display="BTC/USDT"),
+    # Añadido para el Estudio 3 (2026-10-03); no forma parte del estudio de la Fase 1B.
+    "ETHUSDT": Instrument("ETHUSDT", "binance", 1e-2, 1.0, 1, (300.0, 15_000.0), 0.0, commission_bps=20.0,
+                          display="ETH/USDT"),
     # Instrumento sintético SOLO para pruebas y demostraciones (nunca para conclusiones).
     "SYNTH": Instrument("SYNTH", "synthetic", 1e-5, 1e-4, 100_000, (0.1, 10.0), 0.7e-4,
                         display="SINTÉTICO (no real)"),

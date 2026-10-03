@@ -61,6 +61,65 @@ def parse_klines_csv(raw_csv: bytes, inst: Instrument) -> pd.DataFrame:
     return canon
 
 
+DAILY_URL = "https://data.binance.vision/data/spot/daily/klines"
+
+
+def day_url(symbol: str, day: date, interval: str = "1m") -> str:
+    s = symbol.upper()
+    return f"{DAILY_URL}/{s}/{interval}/{s}-{interval}-{day:%Y-%m-%d}.zip"
+
+
+def parse_closes_csv(raw_csv: bytes) -> pd.Series:
+    """Velas de 1 s: solo el cierre (último precio negociado de cada segundo), indexado por la apertura."""
+    df = pd.read_csv(io.BytesIO(raw_csv), header=None, usecols=[0, 4], names=["open_time", "close"])
+    if not str(df.iloc[0, 0]).strip().lstrip("-").isdigit():
+        df = df.iloc[1:]
+    ot = pd.to_numeric(df["open_time"]).astype(np.int64)
+    unit = "us" if ot.max() > 10**14 else "ms"
+    return pd.Series(pd.to_numeric(df["close"]).to_numpy(float),
+                     index=pd.DatetimeIndex(pd.to_datetime(ot, unit=unit, utc=True), name="time"), name="c")
+
+
+def download_days(inst: Instrument, start: date, end: date, interval: str = "1m", cache_dir=None,
+                  progress: bool = True):
+    """Archivos DIARIOS (antes de que Binance publique el mensual), con caché en disco.
+
+    interval «1m» → velas en formato canónico (como `download`); «1s» → serie de cierres por segundo.
+    """
+    from pathlib import Path
+
+    session = make_session()
+    cache = Path(cache_dir) / inst.symbol / interval if cache_dir else None
+    parts = []
+    day = start
+    while day < end:
+        f = cache / f"{day:%Y-%m-%d}.parquet" if cache else None
+        if f is not None and f.exists():
+            part = pd.read_parquet(f)
+        else:
+            try:
+                raw = get_bytes(session, day_url(inst.symbol, day, interval), timeout=120)
+            except NotFound:
+                print(f"  {inst.symbol} {interval}: {day} no disponible (404)", flush=True)
+                day += pd.Timedelta(days=1).to_pytimedelta()
+                continue
+            with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+                csv = zf.read(zf.namelist()[0])
+            part = parse_klines_csv(csv, inst) if interval == "1m" else parse_closes_csv(csv).to_frame()
+            if f is not None:
+                f.parent.mkdir(parents=True, exist_ok=True)
+                part.to_parquet(f)
+            if progress:
+                print(f"  {inst.symbol} {interval}: {day} OK", flush=True)
+        parts.append(part)
+        day += pd.Timedelta(days=1).to_pytimedelta()
+    if not parts:
+        return pd.DataFrame() if interval == "1m" else pd.Series(dtype=float, name="c")
+    out = pd.concat(parts).sort_index()
+    out = out[~out.index.duplicated(keep="last")]
+    return out if interval == "1m" else out["c"]
+
+
 def download(inst: Instrument, start: date, end: date, progress: bool = True) -> pd.DataFrame:
     session = make_session()
     frames = []

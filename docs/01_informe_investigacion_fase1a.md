@@ -529,6 +529,11 @@ cierre de la vela de decisión:
 | Otro activo (ETH para BTC, BTC para ETH) | `x_r5`, `x_r15`, `x_r60` | Rendimientos del otro activo en 5, 15 y 60 min |
 | Diferencia con el otro activo | `x_rel15`, `x_rel60` | Rendimiento propio menos el del otro, en 15 y 60 min |
 
+*Nota del mismo día, antes de calcular nada:* el texto de arriba dice «17 variables», pero la tabla
+enumera **19** por nombre (el conteo estaba mal). Se usan las 19 de la tabla, que es la lista explícita.
+Además, «etiquetas con retraso 2» se aplica tanto al ajuste como a la evaluación de los dos modelos.
+Registro de errores, ítem 38.
+
 **Criterios para «pasa la fase de desarrollo»** (los 5, para cada hipótesis):
 1. ≥ 300 operaciones.
 2. Límite inferior de Wilson 95 % > 54,05 %.

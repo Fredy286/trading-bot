@@ -177,6 +177,27 @@ def cmd_live(a) -> int:
                     runtime_dir=Path(a.runtime), iterations=a.iterations, model=a.model)
 
 
+def cmd_research_study3(a) -> int:
+    from .research import study3
+
+    root = Path(a.root)
+    if a.download:
+        study3.download(root)
+    rep = study3.run(root, Path(a.out), n_boot=a.n_boot)
+    for s, v in rep["veredicto"].items():
+        m = rep["resultados"][s]["modelos"]
+        print(f"{s}: pasa={v['pasa']} | criterios {v} | referencia {m['referencia_precio']['hit']} "
+              f"vs prueba {m['precio_mas_bloque_nuevo']['hit']}")
+    return 0
+
+
+def cmd_replay(a) -> int:
+    from .live.replay import run_replay
+
+    return run_replay(a.symbol, a.horizon, a.model, _d(a.start), _d(a.end), Path(a.runtime),
+                      models_dir=Path(a.models), data_root=Path(a.root), entry_delay_s=a.entry_delay_s)
+
+
 def _quantiles(values: list) -> dict | None:
     import numpy as np
 
@@ -330,6 +351,12 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--n-boot", type=int, default=1000)
     x.add_argument("--source", choices=["dukascopy", "binance", "histdata"], default=None)
     x.set_defaults(func=cmd_research_run)
+    x = r.add_parser("study3", help="Estudio 3, fase de desarrollo (pre-registro en docs/01)")
+    x.add_argument("--root", default="data/raw/estudio3")
+    x.add_argument("--out", default="results/estudio3")
+    x.add_argument("--download", action="store_true", help="descarga antes los archivos de Binance")
+    x.add_argument("--n-boot", type=int, default=1000)
+    x.set_defaults(func=cmd_research_study3)
     x = r.add_parser("report")
     x.add_argument("--stage", choices=["dev", "holdout"], default="dev")
     x.add_argument("--config", default="config/research.toml")
@@ -371,6 +398,19 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--runtime", default="runtime/live")
     x.add_argument("--iterations", type=int, default=0, help="0 = sin límite")
     x.set_defaults(func=cmd_live)
+
+    x = sub.add_parser("replay", help="reproduce el bucle en vivo con datos históricos de 1 s (Enmienda 2)")
+    x.add_argument("--symbol", required=True)
+    x.add_argument("--horizon", type=int, default=1)
+    x.add_argument("--model", choices=["logit", "gbm"], required=True)
+    x.add_argument("--start", required=True, help="primer día (UTC), p. ej. 2026-09-01")
+    x.add_argument("--end", required=True, help="día final, excluido")
+    x.add_argument("--runtime", required=True, help="carpeta vacía para el libro y los eventos")
+    x.add_argument("--entry-delay-s", type=float, default=2.0,
+                   help="segundos tras el cierre de la vela hasta el precio de entrada (registrado: 2)")
+    x.add_argument("--models", default="models")
+    x.add_argument("--root", default="data/raw")
+    x.set_defaults(func=cmd_replay)
 
     x = sub.add_parser("live-verdict", help="veredicto de la observación en vivo sin dinero (criterios fijos)")
     x.add_argument("--symbol", required=True)

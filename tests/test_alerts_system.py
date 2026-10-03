@@ -793,6 +793,36 @@ def test_repeated_decision_candle_is_not_counted_twice(tmp_path, bars_edge, bund
     assert again.status == NO_SIGNAL and "decisión repetida" in again.no_signal_reason
 
 
+def test_historical_price_feed_uses_registered_timing(bars_edge, bundle_edge, tmp_path):
+    """Enmienda 2: entrada = último precio antes de cierre + 2 s; vencimiento = 60 s después."""
+    from tradingbot.live.replay import HistoricalPriceFeed
+
+    t0 = pd.Timestamp("2023-02-06 13:00", tz="UTC")
+    secs = pd.date_range(t0, periods=600, freq="s")
+    closes = pd.Series(np.arange(600, dtype=float), index=secs)  # precio = segundos desde t0
+    feed = HistoricalPriceFeed(bars_edge, closes, entry_delay_s=2.0)
+    px, t = feed.current_price((t0 + pd.Timedelta(seconds=61)).to_pydatetime())  # ciclo: cierre 13:01 + 1 s
+    assert px == 61 and pd.Timestamp(t) == t0 + pd.Timedelta(seconds=62)  # vela 13:01:01–13:01:02
+    px30, _ = HistoricalPriceFeed(bars_edge, closes, entry_delay_s=30).current_price(
+        (t0 + pd.Timedelta(seconds=61)).to_pydatetime())
+    assert px30 == 89  # último precio antes de 13:01:30
+    gap = closes.drop(closes.index[100:120])
+    with pytest.raises(ValueError):
+        HistoricalPriceFeed(bars_edge, gap, entry_delay_s=2.0).current_price((t0 + pd.Timedelta(seconds=118)).to_pydatetime())
+    # Solo se ven velas de 1 min ya publicadas (cierre + 0,3 s) y la búsqueda no recorre todo el historial.
+    bars, _ = feed.get((t0 + pd.Timedelta(seconds=61)).to_pydatetime())
+    assert bars.index[-1] == t0 and len(bars) == 2000
+    # Con el bucle real: entrada a +2 s, vencimiento a +62 s, duración exacta de 60 s.
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    long_closes = pd.Series(np.linspace(1.1, 1.2, 4 * 3600), index=pd.date_range(t0, periods=4 * 3600, freq="s"))
+    loop = AlertLoop(eng, HistoricalPriceFeed(bars_edge, long_closes), [], tmp_path, s)
+    for i in range(60):
+        loop.step((t0 + pd.Timedelta(minutes=i + 1, seconds=1)).to_pydatetime())
+    ev = [a for a in loop.alerts if a.outcome and a.outcome.get("metodo")]
+    assert ev and all(a.outcome["duracion_real_s"] == 60 for a in ev)
+    assert all(r["entrada_tras_cierre_s"] == 2 for r in loop.ledger.trades)
+
+
 def test_event_log_never_raises(tmp_path, monkeypatch):
     from tradingbot.live import runner
 
