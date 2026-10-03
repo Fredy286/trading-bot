@@ -145,6 +145,39 @@ periodo bloqueado **ninguna confirmó**: a 15 minutos el acierto bajó a 54,15 %
 y a 60 minutos el modelo no generó señales. **Modo manual: SIN SEÑAL.** Divisas y oro ya estaban sin
 señal en todas las duraciones (1, 5, 15 y 60 min), también con entrada inmediata.
 
+## 6.3 ¿Hay información nueva que pueda dar señales con 1 minuto de anticipación? (revisión, 2026-10-03)
+
+Revisión de literatura (~45 fuentes) y de datos gratuitos de Binance, con un crítico independiente.
+**No es un resultado empírico del proyecto**: es la base para decidir si vale la pena un Estudio 3.
+
+| Información | Evidencia publicada | ¿Sirve a 5–60 min entrando 1 min después? |
+|---|---|---|
+| Flujo de órdenes (compras/ventas agresoras) | Predice en milisegundos y segundos; ventaja económica nula más allá de ~30 s (BTC perpetuo 2025) | No documentado |
+| Futuro/perpetuo → contado, CME → contado | Adelanto de ~7–17 s (2017–2020) | No |
+| Tasa de financiación, interés abierto, ratios largo/corto | Plazos de 8 h a semanas; a corto plazo solo afirmaciones de blogs | No documentado |
+| Liquidaciones | Cascadas reales pero sin patrón anticipable; sin historia gratuita en Binance | No |
+| BTC → ETH y otras monedas | Hasta ~10 min, sobre todo en monedas pequeñas (2019–2021) | Dudoso para ETH |
+| Hora del día / día de la semana | Predicen volumen y volatilidad, no dirección | No |
+| Cuarto de hora (:00/:15/:30/:45) | 57–59 % pero solo en los primeros 10 s (~0,5 pb) | No: diluido a 15 min queda ~50,8 % |
+| Divisas: fixings (Londres 16:00, BCE, Tokio) | Reales pero ~2,5 pb en ventanas de horas (1999–2019); el diferencial los borra | No confirmable (1 operación por ventana y día) |
+| Divisas: datos macro | La dirección depende de la sorpresa, que no se conoce antes | No |
+
+Mejores cifras verificadas de predicción direccional en cripto a 1–60 min: 50,9–56,0 % (solo 2019,
+sin retraso, pérdidas tras costos) y AUC ≈ 0,52–0,54 (≈ 51–53 % de acierto) en 2025–2026. **Ninguna fuente
+seria respalda 75–80 %.** Las tasas de acierto de grupos de señales no se pudieron rastrear a ninguna
+fuente verificable.
+
+**Datos disponibles (verificados desde el PC del usuario):** velas de 1 min con volumen comprador
+agresor (contado desde 2017, futuros desde 2020), `metrics` cada 5 min desde 2020-09 (interés abierto,
+ratios), financiación desde 2020, prima del perpetuo desde 2020; velas de 1 s de contado desde 2017. La
+API de futuros responde desde Colombia.
+
+**Diseño mínimo propuesto si se hiciera un Estudio 3** (crítico): 2 hipótesis (BTC y ETH a 15 min,
+entrada 1 min después), un solo modelo y un único bloque de variables nuevas fijado de antemano;
+confirmación con datos posteriores al 2026-09-01 y muestra fija de ~5 100 operaciones por hipótesis
+(potencia 80 % solo si el acierto real es ≥ 56 %), es decir, **~9 meses**. Expectativa declarada: «SIN
+SEÑAL»; lo plausible es 52–55 %.
+
 ## 7. Qué NO se pudo hacer
 
 - **Observación en vivo:** no se ejecutó (requiere días con un proceso encendido y acceso directo a la
