@@ -136,6 +136,15 @@ en el minuto siguiente con el doble, hasta 3 veces (apuestas 1, 2 y 4). Con pago
 
 Decisión: la martingala **no** se incorpora al sistema ni a una eventual automatización.
 
+## 6.2 Señales manuales con 1 minuto de anticipación (Estudio 2, 2026-10-03)
+
+A pedido del usuario (operar a mano, con al menos 1 minuto de anticipación, en el instrumento y la
+duración más predecibles) se pre-registró el Estudio 2 (docs/01). Con datos de desarrollo, solo BTC/USDT
+a 15 y 60 minutos (modelo logit) superaban los criterios con entrada 1 minuto después de la señal. En el
+periodo bloqueado **ninguna confirmó**: a 15 minutos el acierto bajó a 54,15 % (umbral 54,05 %, EV ≈ 0)
+y a 60 minutos el modelo no generó señales. **Modo manual: SIN SEÑAL.** Divisas y oro ya estaban sin
+señal en todas las duraciones (1, 5, 15 y 60 min), también con entrada inmediata.
+
 ## 7. Qué NO se pudo hacer
 
 - **Observación en vivo:** no se ejecutó (requiere días con un proceso encendido y acceso directo a la

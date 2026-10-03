@@ -437,3 +437,13 @@ desarrollo (deterioro).
 4. Expectativa declarada: aunque confirme, el acierto esperado es **~55–56 %, no 80 %**, con una ganancia
    esperada pequeña (+0,02 a +0,045 por unidad apostada) y medida con el precio de Binance, no con el del
    intermediario donde se opere.
+
+**Resultado de la confirmación 1 (leído después del commit `23a59da`, aplicado mecánicamente):**
+
+| Hipótesis | Operaciones | Acierto | Límite inferior 95 % | EV [IC 95 %] | p | ¿Confirma? |
+|---|---|---|---|---|---|---|
+| M1 BTC/USDT 15 min | 4 187 | 54,15 % | 52,64 % | +0,002 [−0,027; +0,028] | 0,46 | **No** (y deterioro: EV bajo el IC de desarrollo) |
+| M2 BTC/USDT 60 min | 0 | — | — | — | — | **No** (el modelo no generó ninguna señal en el año) |
+
+**Conclusión:** ninguna configuración es predecible con 1 minuto de anticipación según la evidencia
+disponible. El modo manual queda en **«SIN SEÑAL»**. No se emiten señales manuales del Estudio 2.
