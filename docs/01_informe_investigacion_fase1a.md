@@ -385,6 +385,47 @@ punto 7), `live/runner.py::run_live` (impone el registro) y `signals/registry.py
 (solo valida el veredicto del entrenamiento y la política registrados, con la muestra fija de 3 500 y
 el umbral p* del contrato registrado). Pruebas en `tests/test_alerts_system.py`.
 
+## Enmienda 2 — la observación en vivo se sustituye por datos de 1 segundo (2026-10-03, ANTES de descargarlos)
+
+**Motivo:** el usuario no puede dejar el portátil encendido semanas. La observación en vivo de la
+Aclaración 2 se detuvo el 2026-10-03 a las 21:01 UTC por su decisión. Sus 103 alertas evaluadas se
+conservan en `runtime/live`, **no se han inspeccionado** y no deciden nada (se informarán aparte).
+Binance publica gratis las velas de **1 segundo** de BTC/USDT (archivos diarios). Con ellas se mide
+exactamente lo mismo que en vivo, con datos que el modelo nunca vio, sin tener un equipo encendido.
+
+**Datos de evaluación:** velas de contado de BTC/USDT de 1 minuto (para las variables) y de 1 segundo
+(para los precios) **desde el 2026-09-01 00:00 UTC**. El entrenamiento del modelo registrado terminó el
+2026-08-31 23:58 y ninguna evaluación usó esos datos. Lo único que se vio de ese periodo: conteos de
+alertas (sin aciertos) del 2026-09-30 al 2026-10-03 hechos por un revisor, la estructura de un archivo
+y las 103 alertas en vivo del 2026-10-03, cuyos resultados no se miraron.
+
+**Procedimiento (el mismo código que en vivo):** se reproduce minuto a minuto `SignalEngine` +
+`AlertLoop` con el modelo `BTCUSDT-h1-gbm-2026-08-31-e436ef` y la política registrada en
+`config/observacion_en_vivo.json`, sin ningún cambio.
+- **Decisión:** 1 s después del cierre de cada vela, con las velas de 1 minuto ya cerradas.
+- **Entrada:** el último precio negociado antes de cierre + 2 s, es decir, el cierre de la vela de 1 s que
+  empieza en +1 s. En vivo se midió ~1,5 s; se usa +2 s para no favorecer al modelo.
+- **Vencimiento:** el último precio negociado antes de cierre + 62 s, lo que da una duración de 60 s.
+- **Velas de 1 s sin operaciones:** se toma la última anterior, hasta 5 s antes; si no hay ninguna, la
+  alerta es «no evaluable».
+- **Empate:** precio igual, que se reembolsa.
+
+**Muestra y criterio (sin cambios respecto a la Aclaración 2):**
+- Muestra: las primeras **3 500 alertas sin empate** desde el 2026-09-01, en orden de tiempo.
+- Aprobación: límite inferior de Wilson 95 % > 54,05 % y EV medio > 0.
+- Plazo: si con los datos hasta el 2026-10-27 (8 semanas) no se completa, el resultado es «no
+  concluyente».
+- Sensibilidad informativa, que no decide: entrada a +1, +3, +5, +10 y +30 s, y pago del 80 %.
+
+**Consecuencia:** si aprueba, el procedimiento pasa a `VALIDADO` **solo para una eventual
+automatización**, que el usuario hoy no quiere y que exigiría su autorización expresa. Si no aprueba,
+BTC/USDT a 1 minuto queda en «SIN SEÑAL».
+
+**Limitaciones declaradas:**
+- Supone que el bucle habría funcionado todos los minutos, sin cortes.
+- Mide con el precio de Binance, no con el del intermediario.
+- La latencia real de un sistema automático (+2 s) es imposible a mano.
+
 ## Estudio 2 — señales manuales con 1 minuto de anticipación (pre-registro, 2026-10-03)
 
 **Motivo (decisión del usuario, 2026-10-03):** no automatizar. El usuario operará a mano en cualquier
