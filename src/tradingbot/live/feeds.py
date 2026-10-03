@@ -76,7 +76,7 @@ class BinancePollingFeed:
         r = self.session.get("https://api.binance.com/api/v3/ticker/price", params={"symbol": self.symbol},
                              timeout=5)
         r.raise_for_status()
-        return float(r.json()["price"]), utcnow()
+        return float(r.json()["price"]), self.server_now()  # hora de Binance, como el resto del bucle
 
     def _fetch(self, **params) -> list:
         r = self.session.get(self.URL, params={"symbol": self.symbol, "interval": "1m", **params}, timeout=10)
@@ -96,8 +96,7 @@ class BinancePollingFeed:
             self._rows[k[0]] = k  # la vela en curso se reemplaza en cada consulta
         for t in sorted(self._rows)[:-self.HISTORY]:
             del self._rows[t]
-        received = utcnow()
         # Qué vela está cerrada se decide con la hora de Binance, no con el reloj del PC.
-        now_srv = received + timedelta(seconds=self.offset_s)
+        received = self.server_now()
         rows = [self._rows[t] for t in sorted(self._rows)]
-        return self.parse(rows, now_srv), received
+        return self.parse(rows, received), received

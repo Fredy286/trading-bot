@@ -238,9 +238,9 @@ class AlertLoop:
         meas = {"policy": self.policy, "decision_time": a.decision_time.isoformat(),
                 "hora_bogota": a.decision_time.astimezone(BOGOTA).hour,
                 "duracion_real_s": (extra or {}).get("duracion_real_s"), "retraso_s": (extra or {}).get("retraso_s"),
+                # entry_time_live ya está en hora de la fuente (Binance), igual que decision_time.
                 "entrada_tras_cierre_s": (round((pd.Timestamp(a.entry_time_live) - pd.Timestamp(a.decision_time))
-                                                .total_seconds() + (a.clock_offset_s or 0.0), 3)
-                                          if a.entry_time_live else None),
+                                                .total_seconds(), 3) if a.entry_time_live else None),
                 "desfase_reloj_s": a.clock_offset_s}
         self.ledger.record(a, pnl, bool(tie), bool(win), shadow, method=method, extra=meas)
         if not shadow:
@@ -484,7 +484,9 @@ def run_live(symbol: str, horizon: int, feed_name: str, models_dir: Path, runtim
         feed = BinancePollingFeed(inst.symbol)
         cal = load_calendar_csv(s.calendar_csv) if s.calendar_csv else None
         engine = SignalEngine(bundle, s, inst, price_source="Binance spot (API pública)", calendar=cal)
-        loop = AlertLoop(engine, feed, build_notifiers(s, runtime_dir), runtime_dir, s)
+        # Todo el bucle (hora del ciclo, antigüedad de los datos, entrada y vencimiento) usa la hora de
+        # Binance: el reloj de este PC se atrasa ~0,25 s/h con el servicio de hora de Windows detenido.
+        loop = AlertLoop(engine, feed, build_notifiers(s, runtime_dir), runtime_dir, s, clock=feed.server_now)
         loop.log.write("started", model_id=bundle.model_id, validation_status=bundle.validation_status,
                        pid=os.getpid())
         print(f"Modelo {bundle.model_id} — validación: {bundle.validation_status}. Sin dinero real.")
