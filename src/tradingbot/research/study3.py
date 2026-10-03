@@ -72,11 +72,13 @@ def _read_funding(csv: bytes) -> pd.DataFrame:
                         index=pd.DatetimeIndex(pd.to_datetime(ct, unit=unit, utc=True), name="time"))
 
 
-def download(root: Path, start: str = "2020-12", end: str = "2025-08", symbols=SYMBOLS, progress: bool = True) -> None:
+def download(root: Path, start: str = "2020-12", end: str = "2025-08", symbols=SYMBOLS, progress: bool = True,
+             kinds=tuple(PATHS)) -> None:
     """Descarga mensual con caché (data/raw/estudio3/<símbolo>/<tipo>/<AAAA-MM>.parquet)."""
     session = make_session()
     for s in symbols:
-        for kind, pattern in PATHS.items():
+        for kind in kinds:
+            pattern = PATHS[kind]
             for ym in _months(start, end):
                 f = Path(root) / s / kind / f"{ym}.parquet"
                 if f.exists():
@@ -152,29 +154,34 @@ def _logloss(p: np.ndarray, y: np.ndarray) -> np.ndarray:
     return -(y * np.log(p) + (1 - y) * np.log(1 - p))
 
 
-def run_symbol(symbol: str, root: Path, cfg: dict, n_boot: int = 1000, log=print) -> dict:
+def run_symbol(symbol: str, root: Path, cfg: dict, n_boot: int = 1000, log=print, test_start: str = DEV_TEST_START,
+               test_end: str = DEV_END, with_new: bool = True) -> dict:
+    """`with_new=False` evalúa solo el modelo de precio (Estudio 4, periodo de confirmación)."""
     inst = get_instrument(symbol)
     st, cc, ec = cfg["study"], cfg["contracts"], cfg["execution"]
     spot = load(root, symbol, "spot")
     bars = spot_bars(spot)
-    bars = bars[(bars.index >= pd.Timestamp(DATA_START, tz="UTC")) & (bars.index < pd.Timestamp(DEV_END, tz="UTC"))]
+    bars = bars[(bars.index >= pd.Timestamp(DATA_START, tz="UTC")) & (bars.index < pd.Timestamp(test_end, tz="UTC"))]
     pf = compute_features(bars)
-    nf = new_features(bars.index, spot, load(root, symbol, "perp"), load(root, symbol, "prem"),
-                      load(root, symbol, "fund"), load(root, OTHER[symbol], "spot"))
     lab = make_labels(bars, HORIZON, ENTRY_DELAY, inst.point)
     tie_ind = (lab["dir"] == 0).astype(float).where(lab["dir"].notna())
     q_hat = tie_ind.shift(HORIZON + ENTRY_DELAY).rolling(1440, min_periods=200).mean().to_numpy()  # causal
     # Mismas decisiones para los dos modelos: hace falta que existan TODAS las variables.
-    dm = decision_mask(bars.index, HORIZON) & pf.notna().all(axis=1).to_numpy() & nf.notna().all(axis=1).to_numpy()
+    dm = decision_mask(bars.index, HORIZON) & pf.notna().all(axis=1).to_numpy()
+    if with_new:
+        nf = new_features(bars.index, spot, load(root, symbol, "perp"), load(root, symbol, "prem"),
+                          load(root, symbol, "fund"), load(root, OTHER[symbol], "spot"))
+        dm &= nf.notna().all(axis=1).to_numpy()
     rows = np.flatnonzero(dm)
     idx = bars.index[rows]
     Xb = pf.iloc[rows][FEATURES]
-    Xn = pd.concat([Xb, nf.iloc[rows]], axis=1)
     L = lab.iloc[rows]
     y = L["dir"].to_numpy()
     label_end = pd.DatetimeIndex(L["label_end"])
-    folds = make_folds(DEV_TEST_START, DEV_END, st["step_months"], st["train_months"], st["calib_frac"])
-    models = {"referencia_precio": Xb, "precio_mas_bloque_nuevo": Xn}
+    folds = make_folds(test_start, test_end, st["step_months"], st["train_months"], st["calib_frac"])
+    models = {"referencia_precio": Xb}
+    if with_new:
+        models["precio_mas_bloque_nuevo"] = pd.concat([Xb, nf.iloc[rows]], axis=1)
     p_up = {m: np.full(len(rows), np.nan) for m in models}
     fold_id = np.full(len(rows), -1)
     notes = []
@@ -221,6 +228,8 @@ def run_symbol(symbol: str, root: Path, cfg: dict, n_boot: int = 1000, log=print
                                                      "hit_hi95", "breakeven", "pvalue", "ev", "ev_lo95", "ev_hi95",
                                                      "total", "max_drawdown", "positive_fold_frac",
                                                      "max_fold_profit_share", "by_fold")}
+    if not with_new:
+        return out
     # Log-loss en TODAS las decisiones de prueba sin empate (no solo en las operadas), mismo conjunto.
     nt = ~np.isnan(y[sub]) & (y[sub] != 0)
     yy = (y[sub][nt] == 1).astype(float)
@@ -259,6 +268,33 @@ def verdict(results: dict) -> dict:
              "c5_mejora": num(ll["mejora_lo95"], -1.0) > 0 and num(t["ev"], -9.0) >= num(b["ev"], -9.0)}
         out[s] = {**c, "p_holm": float(holm[i]), "pasa": all(c.values())}
     return out
+
+
+def run_study4(root: Path = Path("data/raw/estudio3"), out_dir: Path = Path("results/estudio4"),
+               n_boot: int = 1000, log=print) -> dict:
+    """Estudio 4 (pre-registro 0979078): ETH/USDT, solo precio, confirmación en 2025-09 → 2026-08."""
+    cfg = load_config("config/research.toml")
+    download(root, start="2024-08", end="2026-08", symbols=("ETHUSDT",), kinds=("spot",))
+    hold = run_symbol("ETHUSDT", root, cfg, n_boot, log, test_start="2025-09-01", test_end="2026-09-01",
+                      with_new=False)["modelos"]["referencia_precio"]
+    dev = json.loads((Path("results/estudio3") / "dev.json").read_text(encoding="utf-8"))
+    dev_m = dev["resultados"]["ETHUSDT"]["modelos"]["referencia_precio"]
+    c = {"wilson": bool(hold["hit_lo95"] is not None and hold["hit_lo95"] > hold["breakeven"]),
+         "ev_ic": bool(hold["ev_lo95"] is not None and hold["ev_lo95"] > 0),
+         "p": bool(hold["pvalue"] is not None and hold["pvalue"] < 0.05)}
+    wins, losses = hold.get("wins") or 0, hold.get("losses") or 0
+    n80 = wins + losses
+    lo80, _ = wilson(wins, n80) if n80 else (float("nan"), float("nan"))
+    report = {"estudio": "Estudio 4 — confirmación (pre-registro 0979078)", "git_sha": git_sha(),
+              "hipotesis": "ETH/USDT 15 min, logit solo precio, entrada 1 min después, política B",
+              "periodo": ["2025-09-01", "2026-09-01"], "resultado": hold, "criterios": c, "confirma": all(c.values()),
+              "deterioro_vs_desarrollo": bool((hold["ev"] or 0) < (dev_m["ev_lo95"] or 0)),
+              "desarrollo": {k: dev_m[k] for k in ("n_trades", "hit", "hit_lo95", "ev", "ev_lo95")},
+              "sensibilidad_pago_80": {"umbral": 1 / 1.8, "lo95": lo80, "supera": bool(lo80 > 1 / 1.8)}}
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "holdout.json").write_text(json.dumps(jsonable(report), indent=2, ensure_ascii=False), encoding="utf-8")
+    return report
 
 
 def run(root: Path = Path("data/raw/estudio3"), out_dir: Path = Path("results/estudio3"), n_boot: int = 1000,

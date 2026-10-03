@@ -181,6 +181,12 @@ def cmd_research_study3(a) -> int:
     from .research import study3
 
     root = Path(a.root)
+    if getattr(a, "study4", False):
+        rep = study3.run_study4(root, n_boot=a.n_boot)
+        r = rep["resultado"]
+        print(f"Estudio 4 (ETH 15 min): confirma={rep['confirma']} | criterios {rep['criterios']} | "
+              f"operaciones {r['n_trades']} | acierto {r['hit']} [{r['hit_lo95']}] | EV {r['ev']} [{r['ev_lo95']}]")
+        return 0
     if a.download:
         study3.download(root)
     rep = study3.run(root, Path(a.out), n_boot=a.n_boot)
@@ -355,6 +361,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--root", default="data/raw/estudio3")
     x.add_argument("--out", default="results/estudio3")
     x.add_argument("--download", action="store_true", help="descarga antes los archivos de Binance")
+    x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
     x = r.add_parser("report")
