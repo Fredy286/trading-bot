@@ -488,3 +488,69 @@ desarrollo (deterioro).
 
 **Conclusión:** ninguna configuración es predecible con 1 minuto de anticipación según la evidencia
 disponible. El modo manual queda en **«SIN SEÑAL»**. No se emiten señales manuales del Estudio 2.
+
+## Estudio 3 — información nueva para señales manuales (pre-registro, 2026-10-03, ANTES de calcularla)
+
+**Pregunta:** ¿la información que el sistema nunca usó (flujo de órdenes agresor de contado y de futuros,
+prima y financiación del perpetuo, y el otro activo) permite acertar la dirección a 15 minutos entrando
+1 minuto después de la señal? La revisión previa (docs/02, sección 6.3) anticipa que **probablemente no**.
+Expectativa declarada: «SIN SEÑAL».
+
+**Hipótesis (familia de 2, Holm entre ellas):**
+- **H3-BTC:** BTC/USDT.
+- **H3-ETH:** ETH/USDT.
+
+**Diseño común a las dos hipótesis:**
+- **Duración:** 15 minutos.
+- **Decisión:** al cierre de las velas que empiezan en minutos múltiplos de 15 (UTC).
+- **Entrada:** apertura de la vela `t+2`, es decir, 1 minuto después de la señal. Etiquetas con retraso 2.
+- **Precio de referencia:** contado de Binance.
+- **Contrato:** binaria, pago 85 %, empate reembolsado; p* = 54,05 %.
+- **Política:** B, es decir, EV estimado ≥ 0,02 con la probabilidad calibrada (isotónica por bins, como en
+  la Fase 1B).
+- **Modelo:** el `logit` del proyecto (estandarización + regresión logística, C = 1).
+  - Modelo de **referencia:** solo las variables de precio actuales (`FEATURES`).
+  - Modelo **de prueba:** las mismas variables más el bloque nuevo fijo, que se describe abajo.
+- **Validación:** walk-forward idéntico a la sección 8.
+  - Pruebas trimestrales del 2022-01-01 al 2025-08-31.
+  - Entrenamiento con los 12 meses anteriores: el 20 % final para calibrar y purga entre tramos.
+  - El periodo 2025-09 → 2026-08 no se usa en esta fase.
+
+**Bloque nuevo (17 variables, fijadas ahora).** Todas se calculan con datos de minutos que terminan en el
+cierre de la vela de decisión:
+
+| Grupo | Variables | Definición |
+|---|---|---|
+| Flujo agresor en contado | `tib_s_5`, `tib_s_15`, `tib_s_60`, `tib_s_240` | 2·Σ compras agresoras / Σ volumen − 1 en los últimos 5, 15, 60 y 240 min (columna `taker_buy_base`) |
+| Flujo agresor en el perpetuo USD-M | `tib_p_5`, `tib_p_15`, `tib_p_60`, `tib_p_240` | Lo mismo, con las velas del perpetuo |
+| Diferencia de flujo | `tib_d_15`, `tib_d_60` | Perpetuo menos contado, a 15 y 60 min |
+| Prima del perpetuo | `prem_c`, `prem_d15`, `prem_d60` | Cierre de la prima en la vela de decisión y su cambio en 15 y 60 min |
+| Financiación | `fund` | Última tasa liquidada con `calc_time` ≤ cierre de la vela de decisión |
+| Otro activo (ETH para BTC, BTC para ETH) | `x_r5`, `x_r15`, `x_r60` | Rendimientos del otro activo en 5, 15 y 60 min |
+| Diferencia con el otro activo | `x_rel15`, `x_rel60` | Rendimiento propio menos el del otro, en 15 y 60 min |
+
+**Criterios para «pasa la fase de desarrollo»** (los 5, para cada hipótesis):
+1. ≥ 300 operaciones.
+2. Límite inferior de Wilson 95 % > 54,05 %.
+3. p de Holm < 0,05 entre las 2 hipótesis.
+4. EV > 0 en ≥ 60 % de los trimestres y ningún trimestre aporta > 50 % del beneficio.
+5. **Mejora frente al modelo de referencia en las mismas decisiones.** Hacen falta las dos condiciones:
+   - IC 95 % por bootstrap de bloques diarios de la diferencia de log-loss (referencia − prueba) > 0;
+   - EV de la prueba ≥ EV de la referencia.
+
+   Sustituye a «supera la mejor referencia de reglas», porque aquí la pregunta es si la información
+   nueva aporta.
+
+**Si alguna pasa:**
+1. **Filtro no confirmatorio** en 2025-09 → 2026-08, periodo ya usado, declarado: se sigue solo si el
+   acierto puntual es > 54,05 % y el log-loss es mejor que el de referencia.
+2. **Confirmación limpia** con datos posteriores al 2026-09-01, evaluada con los archivos de Binance (sin
+   equipo encendido):
+   - muestra fija de 5 136 operaciones por hipótesis (potencia 80 % si el acierto real es ≥ 56 %);
+   - fecha límite 2027-09-30, y si no se completa, «no concluyente»;
+   - controles de inutilidad con 1 700 y 3 400 operaciones, solo para parar, nunca para aprobar antes.
+
+**Si ninguna pasa:** se cierra con «SIN SEÑAL».
+
+**Fuera de la familia (solo informativo):** GBM, duraciones de 5 y 60 min y efecto del cuarto de hora.
+Las divisas no entran (HistData no tiene volumen agresor).
