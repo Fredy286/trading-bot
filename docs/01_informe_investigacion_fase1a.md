@@ -384,3 +384,56 @@ Implementado en `config/observacion_en_vivo.json` (registro), `signals/monitor.p
 punto 7), `live/runner.py::run_live` (impone el registro) y `signals/registry.py::validation_status_for`
 (solo valida el veredicto del entrenamiento y la política registrados, con la muestra fija de 3 500 y
 el umbral p* del contrato registrado). Pruebas en `tests/test_alerts_system.py`.
+
+## Estudio 2 — señales manuales con 1 minuto de anticipación (pre-registro, 2026-10-03)
+
+**Motivo (decisión del usuario, 2026-10-03):** no automatizar. El usuario operará a mano en cualquier
+intermediario y necesita, para cada señal, la hora de apertura con su zona horaria, el instrumento, la
+duración y la dirección, con **al menos 1 minuto de anticipación**. Prioriza acertar y ganar; el
+instrumento y la duración pueden ser los que resulten más predecibles.
+
+**Equivalencia con el estudio.** La señal se calcula al cierre de la vela de decisión (minuto `t`) y la
+entrada ocurre en la apertura de la vela `t+2`, es decir, 60 s después. Es exactamente la política
+`B_lat60` ya calculada en la Fase 1B: EV estimado ≥ 0,02, binaria con pago 85 % y empate reembolsado,
+y etiquetas con retraso de entrada 2. En la Fase 1B era una política de **sensibilidad**, no elegible
+como candidata, así que estas hipótesis son **nuevas**.
+
+**Regla de selección (mecánica, solo con desarrollo, `results/dev/all_evaluations.csv`):** entre las
+48 configuraciones binarias `B_lat60` (6 instrumentos × 4 horizontes × 2 modelos), son hipótesis las
+que cumplen los 5 criterios de la sección 8, con Holm calculado **dentro de esas 48**. Resultado
+(calculado antes de este registro):
+
+| Hipótesis | Instrumento | Duración | Modelo | Desarrollo: operaciones, acierto, límite inferior 95 %, EV | Holm (48) |
+|---|---|---|---|---|---|
+| M1 | BTC/USDT | 15 min | logit | 30 856; 55,37 %; 54,82 %; +0,024 | 0,00008 |
+| M2 | BTC/USDT | 60 min | logit | 5 914; 56,48 %; 55,21 %; +0,045 | 0,0045 |
+
+AUD/USD a 15 y 5 min (gbm) tenían buen acierto, pero no superan Holm (p ajustado 0,15 y 0,21).
+**No** se incluyen.
+
+**Confirmación 1: periodo bloqueado (2025-09-01 a 2026-08-31).** Las filas `B_lat60` de M1 y M2 se
+calcularon en la ejecución del periodo bloqueado (`results/holdout/all_evaluations.csv`), pero **no se
+han leído para esta decisión**; se leen por primera vez después de este registro. Advertencia
+honesta: ese periodo ya se usó una vez para otras hipótesis y en sesiones anteriores se miraron otras
+de sus filas (USD/JPY 1 min y BTC 1 min con retraso). Por eso no es un periodo «virgen», aunque sí es
+fuera de muestra para estas dos hipótesis, elegidas sin él. Criterio estricto (Aclaración 1), para
+cada hipótesis: límite inferior de Wilson 95 % del acierto > p* = 54,05 %, límite inferior del IC 95 %
+del EV > 0 y p de Holm < 0,05 entre las 2. Se informa además si el EV cae por debajo del IC de
+desarrollo (deterioro).
+
+**Consecuencias:**
+1. La que no confirme queda descartada. Si ninguna confirma: «SIN SEÑAL» también para el modo manual.
+2. La que confirme pasa a **señales manuales experimentales**: formato «instrumento | ABRIR a las HH:MM:00
+   (hora de Colombia, UTC−5) | duración | ARRIBA/ABAJO», emitidas ~58 s antes de la apertura, solo para
+   **cuenta demo** mientras no esté validada en vivo. El usuario debe configurar su intermediario en
+   UTC−5 o convertir la hora.
+3. **Confirmación 2 (definitiva): observación en vivo sin dinero** con precios reales de Binance (entrada
+   en el precio a la hora indicada, vencimiento a la duración indicada). Antes de iniciarla se fijará
+   con fecha su tamaño de muestra mediante un cálculo de potencia. Advertencia anticipada: con efectos de
+   este tamaño (55–56 % frente a 54,05 %), una confirmación con 80 % de potencia requiere miles de
+   operaciones (≈ 11 000 para M1 y ≈ 3 300 para M2), es decir, **más de un año** al ritmo de desarrollo
+   (~23 y ~4,5 señales al día). La observación en vivo servirá sobre todo para detectar fallos graves
+   (feed, horario, ejecución), no para confirmar la ventaja con rapidez.
+4. Expectativa declarada: aunque confirme, el acierto esperado es **~55–56 %, no 80 %**, con una ganancia
+   esperada pequeña (+0,02 a +0,045 por unidad apostada) y medida con el precio de Binance, no con el del
+   intermediario donde se opere.
