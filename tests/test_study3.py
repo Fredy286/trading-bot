@@ -35,6 +35,22 @@ def test_new_features_are_causal_and_follow_the_registered_definitions():
     pd.testing.assert_series_equal(f.iloc[t], f2.iloc[t])
 
 
+def test_fit_predict_proba_uses_the_requested_features():
+    """Ítem 39: sin `features`, el ajuste usaba solo las variables de precio y el bloque nuevo se perdía."""
+    from tradingbot.research.features import FEATURES
+    from tradingbot.research.models import fit_predict_proba
+
+    rng = np.random.default_rng(0)
+    n = 3000
+    X = pd.DataFrame(rng.normal(size=(n, len(FEATURES))), columns=FEATURES)
+    X["nueva"] = rng.normal(size=n)
+    y = (X["nueva"] + 0.1 * rng.normal(size=n) > 0).astype(int).to_numpy()  # solo la nueva informa
+    _, (p_old,) = fit_predict_proba("logit", X, y, [X])
+    _, (p_new,) = fit_predict_proba("logit", X, y, [X], features=list(X.columns))
+    acc = lambda p: np.mean((p >= 0.5) == (y == 1))  # noqa: E731
+    assert acc(p_new) > 0.9 and acc(p_old) < 0.6
+
+
 def test_verdict_applies_all_registered_criteria():
     def res(p, lo, ev, ev_b, imp_lo, pos=0.8, share=0.3, n=1000):
         m = {"n_trades": n, "hit_lo95": lo, "breakeven": 0.5405, "pvalue": p, "ev": ev,

@@ -188,8 +188,10 @@ def run_symbol(symbol: str, root: Path, cfg: dict, n_boot: int = 1000, log=print
         fold_id[test] = fi
         y_fit, y_cal = (y[fit_nt] == 1).astype(int), (y[cal_nt] == 1).astype(int)
         for m, X in models.items():
+            # features explícitas: sin ellas, fit_predict_proba usaría solo las de precio (ítem 39).
             _, (pc_raw, pt_raw) = fit_predict_proba("logit", X[fit_nt], y_fit, [X[cal_nt], X[test]],
-                                                    seed=ec["seed"], max_rows=st["max_fit_rows"])
+                                                    seed=ec["seed"], max_rows=st["max_fit_rows"],
+                                                    features=list(X.columns))
             p_up[m][test] = Calibrator().fit(pc_raw, y_cal).transform(pt_raw)
         notes.append({"fold": fold.name, "skipped": False, "fit": int(fit_nt.sum()), "cal": int(cal_nt.sum()),
                       "test": int(test.sum())})
@@ -230,6 +232,10 @@ def run_symbol(symbol: str, root: Path, cfg: dict, n_boot: int = 1000, log=print
     acc_b = float(np.mean((p_up["referencia_precio"][sub][nt] >= 0.5) == (yy == 1)))
     acc_n = float(np.mean((p_up["precio_mas_bloque_nuevo"][sub][nt] >= 0.5) == (yy == 1)))
     out["acierto_todas_las_decisiones"] = {"referencia": acc_b, "prueba": acc_n}
+    # Control: los dos modelos deben diferir (si no, el bloque nuevo no llegó al ajuste; ítem 39).
+    out["predicciones_identicas"] = bool(np.allclose(p_up["referencia_precio"][sub], p_up["precio_mas_bloque_nuevo"][sub]))
+    if out["predicciones_identicas"]:
+        raise RuntimeError("El modelo con el bloque nuevo predice igual que el de referencia: revise el ajuste.")
     return out
 
 

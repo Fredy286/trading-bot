@@ -52,18 +52,20 @@ def make_prob_model(name: str, seed: int = 0):
 
 
 def fit_predict_proba(name: str, X_fit: pd.DataFrame, y_fit: np.ndarray, X_list: list[pd.DataFrame],
-                      seed: int = 0, max_rows: int = 400_000):
+                      seed: int = 0, max_rows: int = 400_000, features: list[str] | None = None):
     """Ajusta con (X_fit, y_fit) y devuelve P(sube) sin calibrar para cada matriz de X_list.
 
+    Usa las columnas `features` (por defecto, las variables de precio `FEATURES` del estudio original).
     Si el tramo de ajuste es muy grande se usa una submuestra regular (determinista) para acotar
     el tiempo de cómputo; se registra en los resultados.
     """
+    cols = list(features) if features is not None else FEATURES
     if len(X_fit) > max_rows:
         step = int(np.ceil(len(X_fit) / max_rows))
         X_fit, y_fit = X_fit.iloc[::step], y_fit[::step]
     model = make_prob_model(name, seed)
-    model.fit(X_fit[FEATURES].to_numpy(), y_fit)
-    return model, [model.predict_proba(X[FEATURES].to_numpy())[:, 1] for X in X_list]
+    model.fit(X_fit[cols].to_numpy(), y_fit)
+    return model, [model.predict_proba(X[cols].to_numpy())[:, 1] for X in X_list]
 
 
 def explain_logit(model, x_row: pd.Series, top: int = 4) -> list[tuple[str, float]]:
