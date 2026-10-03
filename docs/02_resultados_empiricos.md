@@ -94,9 +94,10 @@ Lectura honesta:
    desconexión simulada, 1 caducada.
 
 **Decisión:** estado `VALIDADO_HOLDOUT`. El sistema la muestra solo como «EXPERIMENTAL — NO OPERAR».
-Para pasar a `VALIDADO` debe superar la observación en vivo sin dinero (`tbot live` + `tbot live-verdict`,
-≥ 200 alertas, límite inferior de Wilson > 54,05 % y EV > 0) **midiendo precios reales de entrada y
-vencimiento**, que es precisamente donde se espera que falle.
+Para pasar a `VALIDADO` debe superar la observación en vivo sin dinero (`tbot live` + `tbot live-verdict`)
+con los criterios pre-registrados en la **Aclaración 2** del protocolo: muestra fija de las primeras
+3 500 alertas sin empate en un máximo de 8 semanas, límite inferior de Wilson > 54,05 % y EV > 0,
+**midiendo precios reales de entrada y vencimiento**, que es precisamente donde se espera que falle.
 
 ## 6. «Acertar» no es ganar: demostración
 

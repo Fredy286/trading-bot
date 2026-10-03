@@ -182,7 +182,9 @@ def cmd_live_verdict(a) -> int:
     from .execution.paper import read_rows
     from .live.runner import LIVE_METHOD, EventLog
     from .research.metrics import wilson
-    from .signals.monitor import LIVE_SAMPLE_N, fixed_sample, live_verdict
+    import pandas as pd
+
+    from .signals.monitor import LIVE_MAX_DAYS, LIVE_SAMPLE_N, fixed_sample, live_verdict
 
     path = Path(a.runtime) / "paper_ledger.jsonl"
     if not path.exists():
@@ -219,6 +221,18 @@ def cmd_live_verdict(a) -> int:
     else:
         be = 1 / (1 + payout)
     v = live_verdict(sample, be, symbol, a.model, LIVE_SAMPLE_N)
+    # Plazo máximo (Aclaración 2): la muestra debe completarse en 8 semanas desde la primera alerta evaluada.
+    times = [r["time"] for r in sample if r.get("time")]
+    if times:
+        t0, t_last = pd.Timestamp(times[0]), pd.Timestamp(times[-1])
+        limit = t0 + pd.Timedelta(days=LIVE_MAX_DAYS)
+        complete = v["n"] >= LIVE_SAMPLE_N
+        if complete and t_last > limit:
+            v["passed"] = False
+            v["reasons"].append(f"no concluyente: la muestra se completó después de {LIVE_MAX_DAYS} días")
+        elif not complete and pd.Timestamp.now(tz="UTC") > limit:
+            v["reasons"].append(f"no concluyente: pasaron {LIVE_MAX_DAYS} días sin completar la muestra")
+        v.update({"inicio": t0.isoformat(), "plazo_max": limit.isoformat()})
     # Secundario (no decide): solo las alertas que además pasaban el filtro de acierto histórico del grupo.
     sub = [r for r in sample if r.get("ic_filter_ok") and not r.get("tie")]
     sub_wins = sum(1 for r in sub if r.get("win"))

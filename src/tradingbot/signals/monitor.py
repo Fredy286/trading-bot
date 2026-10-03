@@ -60,7 +60,11 @@ def evaluate_monitor(outcomes: list[dict], breakeven: float, min_n: int = 50, wi
     return MonitorResult("OK", n, hit, hi, mean_p, z, "Sin deterioro detectado.")
 
 
-LIVE_SAMPLE_N = 200  # Aclaración 2: se juzga una sola vez, con las primeras 200 alertas sin empate
+# Aclaración 2 (corregida antes de iniciar la observación): se juzga una sola vez, con las primeras 3 500
+# alertas sin empate. Potencia ~80 % si la ventaja real fuera la del periodo bloqueado (56,4 %); con 200
+# era ~11 %. Falsos positivos ~2,3 % en ambos casos.
+LIVE_SAMPLE_N = 3500
+LIVE_MAX_DAYS = 56  # si la muestra no se completa en 8 semanas, el resultado es «no concluyente»
 
 
 def fixed_sample(rows: list[dict], n: int = LIVE_SAMPLE_N) -> list[dict]:
@@ -78,7 +82,8 @@ def fixed_sample(rows: list[dict], n: int = LIVE_SAMPLE_N) -> list[dict]:
     return out
 
 
-def live_verdict(ledger_rows: list[dict], breakeven: float, symbol: str, model: str, min_n: int = 200) -> dict:
+def live_verdict(ledger_rows: list[dict], breakeven: float, symbol: str, model: str,
+                 min_n: int = LIVE_SAMPLE_N) -> dict:
     """Veredicto de la observación en vivo SIN dinero (criterios fijos, no ajustables a posteriori):
     ≥ `min_n` alertas evaluadas sin empate, límite inferior de Wilson 95 % del acierto > umbral y
     EV medio > 0. Se evalúan TODAS las alertas del periodo, incluidas las malas.

@@ -85,7 +85,7 @@ tbot data download --symbols BTCUSDT --start 2025-09-01 --end 2026-10-01
 tbot train --symbol BTCUSDT --horizon 1 --model gbm        # estado: VALIDADO_HOLDOUT (no accionable)
 tbot live --symbol BTCUSDT --horizon 1 --model gbm --runtime runtime/live
 tbot serve --runtime runtime/live                          # en otra terminal
-tbot live-verdict --symbol BTCUSDT --horizon 1 --model gbm # tras ≥ 200 alertas evaluadas
+tbot live-verdict --symbol BTCUSDT --horizon 1 --model gbm # tras 3 500 alertas sin empate (~3 semanas)
 ```
 
 Durante la observación en vivo (semanas sin supervisión):
@@ -101,8 +101,9 @@ Durante la observación en vivo (semanas sin supervisión):
 - Si el bucle deja de actualizar, el panel lo indica con «DETENIDO» en rojo. Los errores, huecos y
   reinicios quedan en `runtime/live/events.jsonl`.
 - Los criterios están **pre-registrados** (Aclaración 2 del protocolo): se juzga una sola vez con las
-  **primeras 200 alertas sin empate** de un único entrenamiento, medidas con precio real; aprueba solo si
-  el límite inferior de Wilson 95 % supera 54,05 % y el EV medio es positivo. Consultar
+  **primeras 3 500 alertas sin empate** de un único entrenamiento, medidas con precio real, reunidas en
+  un máximo de 8 semanas; aprueba solo si el límite inferior de Wilson 95 % supera 54,05 % y el EV medio
+  es positivo. Consultar
   `tbot live-verdict` antes no cambia el resultado final. El comando informa cuántas filas excluyó y
   cuántas alertas quedaron «no evaluables» (sin precio, duración real fuera de 60 ± 10 s, reinicio…).
 - La decisión se toma 1 s después del cierre de cada vela (`TB_FEED_LATENCY_S=1` en `.env`). Cada hora

@@ -339,9 +339,19 @@ sintético con alertas forzadas, para probar la conexión; no aporta informació
    último negociado en Binance obtenido en ese ciclo; el de vencimiento, el del ciclo del minuto
    siguiente. La duración real entre ambos precios debe estar en 60 ± 10 s; si no, «no evaluable».
    Precio igual = empate (reembolso).
-4. **Muestra fija:** las **primeras 200 alertas sin empate** medidas con precio real, en orden de
+4. **Muestra fija:** las **primeras 3 500 alertas sin empate** medidas con precio real, en orden de
    tiempo. El veredicto se juzga **una sola vez** sobre esa muestra; antes de completarla es
-   «muestra insuficiente» y no puede aprobar. Consultarlo antes no cambia el resultado final.
+   «muestra insuficiente» y no puede aprobar. Consultarlo antes no cambia el resultado final. Si a
+   las **8 semanas** de iniciada la observación la muestra no está completa, el resultado es «no
+   concluyente» y no aprueba.
+
+   *Corrección del mismo día, antes de iniciar la observación y sin ningún dato en vivo:* la primera
+   redacción de esta aclaración fijaba 200 alertas, el valor que tenía el código. Al entrenar el
+   modelo real se calculó la potencia (simulación de 4 000 repeticiones, empates 1,5 %): con 200
+   alertas, una ventaja igual a la del periodo bloqueado (56,4 %) solo aprobaría el 11 % de las
+   veces; con 3 500, el 80 %. La probabilidad de aprobar sin ventaja es ~2,3 % en ambos casos. Con
+   ~153 alertas/día (ritmo de la política BN en el periodo bloqueado: 55 955 en 12 meses), 3 500 se
+   reúnen en ~3 semanas.
 5. **Criterio de aprobación (todos):** límite inferior de Wilson 95 % del acierto > p* = 1/(1+0,85) =
    54,05 %, y EV medio > 0 en la misma muestra (empates con PnL 0).
 6. **Pausa (sección 8):** si tras ≥ 50 señales el límite superior queda por debajo de p*, el monitor
@@ -358,4 +368,4 @@ sintético con alertas forzadas, para probar la conexión; no aporta informació
 
 Implementado en `signals/monitor.py::fixed_sample`, `cli.py::cmd_live_verdict` (sin opciones para cambiar
 la muestra ni el umbral) y `signals/registry.py::validation_status_for` (rechaza veredictos que no
-usen la muestra fija de 200 y un umbral ≥ p* del contrato). Pruebas en `tests/test_alerts_system.py`.
+usen la muestra fija de 3 500 y un umbral ≥ p* del contrato). Pruebas en `tests/test_alerts_system.py`.

@@ -24,7 +24,7 @@ from tradingbot.live.runner import EARLY_TOLERANCE_S, LIVE_METHOD, AlertLoop, Ru
 from tradingbot.notify import TelegramNotifier, WebhookNotifier, build_notifiers
 from tradingbot.signals.alert import EXPERIMENTAL, NO_SIGNAL, PAUSED, SIGNAL, Alert, fictitious_example
 from tradingbot.signals.engine import RiskState, SignalEngine
-from tradingbot.signals.monitor import evaluate_monitor
+from tradingbot.signals.monitor import LIVE_SAMPLE_N, evaluate_monitor
 from tradingbot.signals.registry import fit_bundle, validation_status_for
 
 
@@ -136,7 +136,7 @@ def test_validation_status_derived_from_files(tmp_path):
     hv.write_text(json.dumps({"passed": [{"symbol": "EURUSD", "horizon": 1, "model": "logit"}]}))
     lv = tmp_path / "live.json"
     ok = {"passed": True, "symbol": "EURUSD", "model": "logit", "horizon": 1, "muestra_fija": True,
-          "min_n": 200, "breakeven": 1 / 1.85, "payout": 0.85}
+          "min_n": LIVE_SAMPLE_N, "breakeven": 1 / 1.85, "payout": 0.85}
     lv.write_text(json.dumps({**ok, "horizon": 5}))
     assert validation_status_for("EURUSD", 1, "logit", fz, hv)[0] == "VALIDADO_HOLDOUT"
     # Un veredicto en vivo de otro horizonte no valida este modelo.
@@ -270,12 +270,13 @@ def test_live_verdict_requires_sample_and_edge():
     from tradingbot.signals.monitor import live_verdict
 
     few = [{"win": True, "tie": False, "pnl": 0.85}] * 50
-    assert not live_verdict(few, 0.5405, "EURUSD", "logit")["passed"]  # muestra insuficiente
+    assert not live_verdict(few, 0.5405, "EURUSD", "logit", min_n=200)["passed"]  # muestra insuficiente
     coin = [{"win": i % 2 == 0, "tie": False, "pnl": 0.85 if i % 2 == 0 else -1.0} for i in range(400)]
-    v = live_verdict(coin, 0.5405, "EURUSD", "logit")
+    v = live_verdict(coin, 0.5405, "EURUSD", "logit", min_n=200)
     assert not v["passed"] and v["reasons"]
     good = [{"win": i % 10 < 7, "tie": False, "pnl": 0.85 if i % 10 < 7 else -1.0} for i in range(400)]
-    assert live_verdict(good, 0.5405, "EURUSD", "logit")["passed"]
+    assert live_verdict(good, 0.5405, "EURUSD", "logit", min_n=200)["passed"]
+    assert not live_verdict(good, 0.5405, "EURUSD", "logit")["passed"]  # por defecto: muestra fija de 3 500
 
 
 class _LivePriceFeed(ReplayFeed):
@@ -746,6 +747,27 @@ def test_fixed_sample_makes_daily_checks_harmless():
     assert sum(1 for r in s if not r["tie"]) == 200 and s == sorted(s, key=lambda r: r["time"])
     assert fixed_sample(rows + [{"time": "2026-11-01T00:00", "win": True, "tie": False}], 200) == s
     assert len(fixed_sample(rows[:50], 200)) == 50  # aún no hay muestra: el veredicto será insuficiente
+
+
+def test_live_verdict_sample_completed_after_eight_weeks_does_not_pass(tmp_path):
+    from tradingbot.cli import main
+
+    mid = "SYNTH-h1-logit-2023-01-31-abc123"
+    t0 = pd.Timestamp("2026-10-03", tz="UTC")
+    rows = [{"model_id": mid, "method": LIVE_METHOD, "payout": 0.85, "tie_rule": "refund", "shadow": True,
+             "time": (t0 + pd.Timedelta(minutes=25 * i)).isoformat(),  # ~58 alertas/día → 60 días para 3 500
+             "win": i % 10 < 7, "tie": False, "pnl": 0.85 if i % 10 < 7 else -1.0} for i in range(LIVE_SAMPLE_N)]
+    (tmp_path / "paper_ledger.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    out = tmp_path / "v.json"
+    args = ["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path), "--out", str(out)]
+    assert main(args) == 0
+    v = json.loads(out.read_text(encoding="utf-8"))
+    assert v["n"] == LIVE_SAMPLE_N and v["hit_lo95"] > v["breakeven"] and not v["passed"]
+    assert any("no concluyente" in r for r in v["reasons"])
+    # La misma muestra reunida en 3 semanas sí aprobaría.
+    fast = [{**r, "time": (t0 + pd.Timedelta(minutes=9 * i)).isoformat()} for i, r in enumerate(rows)]
+    (tmp_path / "paper_ledger.jsonl").write_text("".join(json.dumps(r) + "\n" for r in fast), encoding="utf-8")
+    assert main(args) == 0 and json.loads(out.read_text(encoding="utf-8"))["passed"]
 
 
 def test_observed_model_replicates_validated_policy_without_extra_filter(bars_edge, bundle_edge):
