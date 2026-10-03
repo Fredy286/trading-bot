@@ -64,6 +64,7 @@ class Alert:
     # Observación en vivo: precio y hora REALES de entrada (no la apertura ideal de la vela).
     entry_price_live: float | None = None
     entry_time_live: datetime | None = None
+    clock_offset_s: float | None = None  # reloj de la fuente − reloj del PC al generar la alerta
 
     # ------------------------------------------------------------------ serialización
     def to_dict(self) -> dict:

@@ -113,6 +113,29 @@ Entradas **al azar** con objetivo de ganancia de 1σ y límite de pérdida de 10
 Un 80 % de «acierto» se fabrica fácilmente con salidas asimétricas y **pierde dinero**. Por eso el
 sistema exige EV neto positivo, no solo acierto alto.
 
+### 6.1 Martingala (duplicar tras cada pérdida) — cálculo exacto, añadido el 2026-10-03
+
+Estrategia que usan algunos pronosticadores de opciones de 1 minuto: si la operación pierde, se repite
+en el minuto siguiente con el doble, hasta 3 veces (apuestas 1, 2 y 4). Con pago del 85 %:
+
+| Acierto real por operación | Ciclos «ganados» | Pérdida si fallan los 3 pasos | EV por unidad apostada (con o sin martingala) |
+|---|---|---|---|
+| 50 % (al azar) | **87,5 %** | −7 unidades (12,5 % de los ciclos) | −0,075 |
+| 54,05 % (umbral) | 90,3 % | −7 unidades (9,7 %) | 0,000 |
+| 56,4 % (BTC, periodo bloqueado, entrada ideal) | 91,7 % | −7 unidades (8,3 %) | +0,043 |
+
+1. **No cambia el valor esperado por unidad apostada**: si cada operación pierde en promedio, la
+   martingala también pierde, solo que en ciclos más grandes.
+2. **Fabrica la ilusión de acierto alto**: lanzando una moneda, el 87,5 % de los ciclos terminan
+   «ganados»; la pérdida llega de golpe (−7) en el 12,5 % restante y se come todo lo anterior.
+3. **Con pago del 85 % duplicar no basta para recuperar**: ganar en el segundo paso deja +0,70 y en el
+   tercero +0,40. Para recuperar y ganar 1 unidad habría que multiplicar por ~2,18 en cada paso.
+4. **Los pasos 2 y 3 se apuestan sin señal**: el sistema solo alerta cuando el EV estimado lo justifica;
+   repetir «porque el minuto anterior perdió» es apostar sin ventaja (los minutos consecutivos no se
+   compensan entre sí).
+
+Decisión: la martingala **no** se incorpora al sistema ni a una eventual automatización.
+
 ## 7. Qué NO se pudo hacer
 
 - **Observación en vivo:** no se ejecutó (requiere días con un proceso encendido y acceso directo a la

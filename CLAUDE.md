@@ -56,10 +56,15 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    y timeouts, del lado del servidor; igual el 2026-10-02). Una auditoría del bucle en vivo halló y
    corrigió 10 fallos que habrían dañado la observación (ítems 11–20) y una revisión final otros 8
    (ítems 22–29). El feed real de Binance se probó con `run_live` (5 ciclos, sin errores).
-2. **Observación en vivo sin dinero de BTC 1 min** (2–4 semanas): ver README, sección 3 de uso
-   (`tbot train --model gbm`, `tbot live --model gbm`, `tbot serve`, luego `tbot live-verdict`). La
-   cuenta simulada usa precios reales de entrada y vencimiento. Esperado: la latencia real borra la
-   ventaja. Falta descargar los datos de BTC y entrenar el modelo real.
+2. **Observación en vivo sin dinero de BTC 1 min — EN CURSO desde 2026-10-03.** Criterios
+   pre-registrados en la Aclaración 2 (docs/01) y en `config/observacion_en_vivo.json`: modelo
+   `BTCUSDT-h1-gbm-2026-08-31-e436ef`, política BN impuesta sobre el `.env`, muestra fija de 3 500
+   alertas sin empate, máximo 8 semanas, decisión 1 s tras el cierre según el reloj de Binance.
+   Se inicia con `scripts\iniciar_observacion.bat` (carpeta `runtime/live`). Juzgar UNA vez con
+   `tbot live-verdict --symbol BTCUSDT --horizon 1 --model gbm` cuando la muestra esté completa.
+   **No reentrenar ni cambiar la política** durante la observación (invalidaría el registro).
+   Esperado: la latencia real borra la ventaja. La martingala se descartó (docs/02, sección 6.1).
+   No hay intermediario con API oficial para BTC a 1 min (Deriv: solo multiplicadores; docs/03, 2.1).
 3. **Repetir el estudio con Dukascopy (bid/ask reales)** en local (bloqueado mientras Dukascopy falle):
    `tbot data download --symbols EURUSD,... --source dukascopy` y `tbot research run --source dukascopy`.
    Es un estudio nuevo: registrar enmienda/nuevo pre-registro antes de mirar resultados.

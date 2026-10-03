@@ -159,6 +159,7 @@ function render() {
     ["Datos", m.synthetic ? "SINTÉTICOS (demostración)" : "reales"],
     ["Monitor", `${esc(mon.status)} — ${esc(mon.detail)}`],
     ["Conteo desde el arranque", esc(Object.entries(state.counts || {}).map(([k, v]) => `${k}: ${v}`).join(" · "))],
+    ...(state.eventos_no_escritos ? [["Eventos no escritos", `<span class="pill st-pause">${esc(state.eventos_no_escritos)}</span> <span class="note">¿events.jsonl abierto en otro programa?</span>`]] : []),
     ...(err ? [["Último error", `${esc(bog(err.time))} — ${esc(err.error)}` +
       (state.last_ok_at && Date.parse(state.last_ok_at) > Date.parse(err.time) ? ` <span class="note">(resuelto: después hubo ciclos correctos)</span>` : "")]] : []),
   ]);

@@ -10,7 +10,7 @@ Cada lectura devuelve la hora de recepción para registrar cuándo estuvo dispon
 from __future__ import annotations
 
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 import requests
@@ -34,10 +34,13 @@ class ReplayFeed:
 
 class BinancePollingFeed:
     URL = "https://api.binance.com/api/v3/klines"
+    HISTORY = 2000  # velas en memoria: el motor estima la tasa de empates con 1 440, como el estudio
 
     def __init__(self, symbol: str, session=None):
         self.symbol = symbol.upper()
         self.session = session or requests.Session()
+        self.offset_s = 0.0  # reloj de Binance − reloj del PC (lo actualiza clock_offset)
+        self._rows: dict[int, list] = {}  # open_time (ms) → fila de kline
 
     @staticmethod
     def parse(payload: list, now_utc: datetime) -> pd.DataFrame:
@@ -61,7 +64,12 @@ class BinancePollingFeed:
         r = self.session.get("https://api.binance.com/api/v3/time", timeout=5)
         t1 = time.time()
         r.raise_for_status()
-        return r.json()["serverTime"] / 1000 - (t0 + t1) / 2
+        self.offset_s = r.json()["serverTime"] / 1000 - (t0 + t1) / 2
+        return self.offset_s
+
+    def server_now(self) -> datetime:
+        """Hora actual según el reloj de Binance (PC + desfase medido)."""
+        return utcnow() + timedelta(seconds=self.offset_s)
 
     def current_price(self, now_utc: datetime | None = None) -> tuple[float, datetime]:
         """Último precio negociado (entrada/salida reales de la observación en vivo)."""
@@ -70,9 +78,26 @@ class BinancePollingFeed:
         r.raise_for_status()
         return float(r.json()["price"]), utcnow()
 
-    def get(self, now_utc: datetime | None = None, lookback: int = 1000) -> tuple[pd.DataFrame, datetime]:
-        r = self.session.get(self.URL, params={"symbol": self.symbol, "interval": "1m", "limit": lookback},
-                             timeout=10)
+    def _fetch(self, **params) -> list:
+        r = self.session.get(self.URL, params={"symbol": self.symbol, "interval": "1m", **params}, timeout=10)
         r.raise_for_status()
+        return r.json()
+
+    def get(self, now_utc: datetime | None = None, lookback: int = 1000) -> tuple[pd.DataFrame, datetime]:
+        """Velas cerradas según el reloj de Binance. La primera vez descarga ~2 000 velas (2 consultas);
+        después solo las 5 últimas, que se unen a las guardadas si no queda ningún hueco."""
+        recent = self._fetch(limit=5)
+        newest_cached = max(self._rows) if self._rows else None
+        if newest_cached is None or not recent or recent[0][0] > newest_cached + 60_000:
+            page = self._fetch(limit=1000)
+            older = self._fetch(limit=1000, endTime=page[0][0] - 1) if page else []
+            self._rows = {k[0]: k for k in older + page}
+        for k in recent:
+            self._rows[k[0]] = k  # la vela en curso se reemplaza en cada consulta
+        for t in sorted(self._rows)[:-self.HISTORY]:
+            del self._rows[t]
         received = utcnow()
-        return self.parse(r.json(), now_utc or received), received
+        # Qué vela está cerrada se decide con la hora de Binance, no con el reloj del PC.
+        now_srv = received + timedelta(seconds=self.offset_s)
+        rows = [self._rows[t] for t in sorted(self._rows)]
+        return self.parse(rows, now_srv), received

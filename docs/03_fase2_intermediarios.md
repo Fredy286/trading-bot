@@ -36,6 +36,30 @@
 | **Brókeres MetaTrader 5** | Paquete oficial `MetaTrader5` para Python (**solo Windows**) ([MQL5](https://www.mql5.com/en/docs/python_metatrader5)) | Permitida por la plataforma; depende del bróker | Sí | Forex/CFD | Terminal MT5 | Spread + comisión según bróker | Variable por bróker | Elegir bróker con regulación sólida; CFD apalancados |
 | **Derivados TRM (BVC) vía comisionista** | Normalmente sin API minorista | Manual | No | Futuros USD/COP | Mercado local | Comisiones del comisionista | **Sí, SFC** | Contratos grandes; horizonte de días |
 
+### 2.1 Verificación directa con la API de Deriv (2026-10-03)
+
+Consulta pública de solo lectura (sin cuenta ni token) a la API de opciones nueva
+(`wss://api.derivws.com/trading/v1/options/ws/public`, llamadas `active_symbols` y `contracts_for`; la
+dirección antigua `ws.derivws.com/websockets/v3` respondió HTTP 520):
+
+| Instrumento | Opciones «sube/baja» (CALL/PUT) | Duración mínima intradía |
+|---|---|---|
+| BTC/USD (`cryBTCUSD`) | **No**: solo multiplicadores (MULTUP/MULTDOWN, sin vencimiento) | — |
+| EUR/USD, USD/JPY | Sí | **15 min** |
+| Oro (XAU/USD) | Sí | **5 min** |
+
+Consecuencia: la única configuración con ventaja estadística (BTC/USDT a 1 minuto) **no tiene ningún
+intermediario con API oficial** donde operarse como opción de 1 minuto. Las plataformas que sí ofrecen
+BTC a 1 minuto (IQ Option, Quotex, Pocket Option, Olymp Trade, Binomo) no tienen API oficial, liquidan con
+su propio feed y no las supervisa la SFC. En divisas y oro, las duraciones de Deriv (5–15 min) ya se
+estudiaron: **sin señal** a 5 y 15 minutos.
+
+**Prueba con cuenta demo, mientras dura la observación:** solo puede ser manual y no cuenta para el
+veredicto (Aclaración 2, punto 9). Si el usuario sigue a mano alertas «EXPERIMENTAL — NO OPERAR» en
+una demo, conviene anotar para cada una: hora, dirección, precio de entrada y de cierre **de la
+plataforma**, pago ofrecido y resultado. Así se puede comparar después el feed de la plataforma con el
+de Binance (la limitación declarada en la sección 6 del informe).
+
 ## 3. Recomendación condicionada
 
 1. **Hoy no hay base para ejecutar automáticamente.** Primero debe existir una configuración

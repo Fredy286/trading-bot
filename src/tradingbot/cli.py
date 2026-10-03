@@ -177,75 +177,96 @@ def cmd_live(a) -> int:
                     runtime_dir=Path(a.runtime), iterations=a.iterations, model=a.model)
 
 
+def _quantiles(values: list) -> dict | None:
+    import numpy as np
+
+    v = np.array([x for x in values if x is not None], float)
+    if not len(v):
+        return None
+    return {"n": int(len(v)), "min": float(v.min()), "p5": float(np.percentile(v, 5)),
+            "mediana": float(np.median(v)), "p95": float(np.percentile(v, 95)), "max": float(v.max())}
+
+
 def cmd_live_verdict(a) -> int:
+    import pandas as pd
+
     from . import jsonutil
     from .execution.paper import read_rows
     from .live.runner import LIVE_METHOD, EventLog
     from .research.metrics import wilson
-    import pandas as pd
+    from .signals.monitor import fixed_sample, live_verdict
+    from .signals.registry import load_observation
 
-    from .signals.monitor import LIVE_MAX_DAYS, LIVE_SAMPLE_N, fixed_sample, live_verdict
-
+    # Aclaración 2: el entrenamiento, la política, la muestra y el plazo salen del REGISTRO, no del .env ni
+    # de opciones elegidas después de ver datos.
+    obs = load_observation(Path(a.observation))
+    if not obs:
+        print(f"No existe {a.observation}: la observación en vivo debe registrarse antes de iniciarla.")
+        return 2
+    if (a.symbol.upper(), a.horizon, a.model) != (obs["symbol"], obs["horizon"], obs["model"]):
+        print(f"La observación registrada es {obs['symbol']} h={obs['horizon']} {obs['model']}, no "
+              f"{a.symbol.upper()} h={a.horizon} {a.model}.")
+        return 2
+    mid, pol, n_target, max_days = obs["model_id"], obs["policy"], obs["sample_n"], obs["max_days"]
     path = Path(a.runtime) / "paper_ledger.jsonl"
     if not path.exists():
-        print(f"No hay alertas evaluadas en {path}. ¿Corrió «tbot live --runtime {a.runtime}» con el modelo "
-              "en observación (VALIDADO_HOLDOUT) o con TB_SHOW_EXPERIMENTAL=true?")
+        print(f"No hay alertas evaluadas en {path}. ¿Está corriendo «tbot live --runtime {a.runtime}»?")
         return 2
     rows, bad = read_rows(path)
-    symbol = a.symbol.upper()
-    prefix = f"{symbol}-h{a.horizon}-{a.model}-"
-    ids = sorted({r["model_id"] for r in rows if str(r.get("model_id") or "").startswith(prefix)})
-    if a.model_id:
-        ids = [m for m in ids if m == a.model_id]
-    if not ids:
-        print(f"Ninguna fila de {path} corresponde a {prefix}… (las filas sin modelo registrado no se cuentan).")
-        return 2
-    if len(ids) > 1:
-        print(f"Hay filas de varios entrenamientos: {', '.join(ids)}. Elija uno con --model-id; mezclarlos "
-              "no sería la observación de un único modelo.")
-        return 2
-    mid = ids[0]
-    sel = [r for r in rows if r.get("model_id") == mid and r.get("method") == LIVE_METHOD]
-    payouts = sorted({r.get("payout") for r in sel}, key=str)
-    tie_rules = sorted({r.get("tie_rule") or "refund" for r in sel})
-    if len(payouts) > 1 or len(tie_rules) > 1:
-        print(f"Las filas usan contratos distintos (pagos {payouts}, empates {tie_rules}). La observación "
-              "pre-registrada exige un único contrato durante toda la muestra (Aclaración 2).")
-        return 2
-    # Aclaración 2: muestra fija = primeras LIVE_SAMPLE_N alertas sin empate; umbral = p* del contrato.
-    sample = fixed_sample(sel, LIVE_SAMPLE_N)
-    payout = payouts[0] if payouts and payouts[0] else 0.85
-    q_ties = sum(1 for r in sample if r.get("tie")) / len(sample) if sample else 0.0
-    if tie_rules == ["loss"]:  # el empate pierde la apuesta: p* = 1/((1−q)(1+pago)), q = empates observados
-        be = 1 / ((1 - q_ties) * (1 + payout)) if q_ties < 1 else 1.0
-    else:
-        be = 1 / (1 + payout)
-    v = live_verdict(sample, be, symbol, a.model, LIVE_SAMPLE_N)
-    # Plazo máximo (Aclaración 2): la muestra debe completarse en 8 semanas desde la primera alerta evaluada.
+    of_model = [r for r in rows if r.get("model_id") == mid]
+    live = [r for r in of_model if r.get("method") == LIVE_METHOD]
+    sel = sorted((r for r in live if r.get("policy") == pol), key=lambda r: str(r.get("time", "")))
+    # Una vela de decisión cuenta una sola vez (la primera alerta que la usó).
+    seen, dedup, dups = set(), [], 0
+    for r in sel:
+        key = r.get("decision_time")
+        if key is not None and key in seen:
+            dups += 1
+            continue
+        seen.add(key)
+        dedup.append(r)
+    sample = fixed_sample(dedup, n_target)
+    be = 1 / (1 + pol["payout"])  # p* del contrato registrado (binaria, empate reembolsado)
+    v = live_verdict(sample, be, obs["symbol"], obs["model"], n_target)
+    # Plazo máximo: la muestra debe completarse en `max_days` desde la primera alerta evaluada.
     times = [r["time"] for r in sample if r.get("time")]
     if times:
         t0, t_last = pd.Timestamp(times[0]), pd.Timestamp(times[-1])
-        limit = t0 + pd.Timedelta(days=LIVE_MAX_DAYS)
-        complete = v["n"] >= LIVE_SAMPLE_N
+        limit = t0 + pd.Timedelta(days=max_days)
+        complete = v["n"] >= n_target
         if complete and t_last > limit:
             v["passed"] = False
-            v["reasons"].append(f"no concluyente: la muestra se completó después de {LIVE_MAX_DAYS} días")
+            v["reasons"].append(f"no concluyente: la muestra se completó después de {max_days} días")
         elif not complete and pd.Timestamp.now(tz="UTC") > limit:
-            v["reasons"].append(f"no concluyente: pasaron {LIVE_MAX_DAYS} días sin completar la muestra")
+            v["reasons"].append(f"no concluyente: pasaron {max_days} días sin completar la muestra")
         v.update({"inicio": t0.isoformat(), "plazo_max": limit.isoformat()})
     # Secundario (no decide): solo las alertas que además pasaban el filtro de acierto histórico del grupo.
     sub = [r for r in sample if r.get("ic_filter_ok") and not r.get("tie")]
     sub_wins = sum(1 for r in sub if r.get("win"))
     sub_lo, _ = wilson(sub_wins, len(sub)) if sub else (None, None)
-    v.update({"horizon": a.horizon, "model_id": mid, "payout": payouts[0] if len(payouts) == 1 else None,
-              "muestra_fija": True, "n_objetivo": LIVE_SAMPLE_N, "alertas_registradas": len(sel),
+    by_hour: dict = {}
+    for r in sample:
+        if r.get("tie") or r.get("hora_bogota") is None:
+            continue
+        h = by_hour.setdefault(int(r["hora_bogota"]), {"n": 0, "aciertos": 0})
+        h["n"] += 1
+        h["aciertos"] += 1 if r.get("win") else 0
+    q_ties = sum(1 for r in sample if r.get("tie")) / len(sample) if sample else 0.0
+    v.update({"horizon": obs["horizon"], "model_id": mid, "policy": pol, "payout": pol["payout"],
+              "tie_rule": pol["tie_rule"], "muestra_fija": True, "n_objetivo": n_target,
+              "alertas_registradas": len(sel), "empates_observados": q_ties,
               "secundario_filtro_ic": {"n": len(sub), "aciertos": sub_wins,
                                        "acierto": sub_wins / len(sub) if sub else None, "hit_lo95": sub_lo},
-              "tie_rule": tie_rules[0] if len(tie_rules) == 1 else None, "empates_observados": q_ties,
-              "excluidas": {"de_otro_modelo_o_sin_modelo": sum(1 for r in rows if r.get("model_id") != mid),
-                            "evaluadas_con_velas": sum(1 for r in rows if r.get("model_id") == mid
-                                                       and r.get("method") != LIVE_METHOD),
-                            "lineas_danadas": bad},
+              # Lo que la Aclaración 2 (punto 7) exige reportar siempre.
+              "medicion": {"duracion_real_s": _quantiles([r.get("duracion_real_s") for r in sample]),
+                           "retraso_vencimiento_s": _quantiles([r.get("retraso_s") for r in sample]),
+                           "entrada_tras_cierre_s": _quantiles([r.get("entrada_tras_cierre_s") for r in sample]),
+                           "desfase_reloj_s": _quantiles([r.get("desfase_reloj_s") for r in sample]),
+                           "por_hora_bogota": dict(sorted(by_hour.items()))},
+              "excluidas": {"de_otro_modelo_o_sin_modelo": len(rows) - len(of_model),
+                            "evaluadas_con_velas": len(of_model) - len(live),
+                            "politica_distinta_a_la_registrada": len(live) - len(sel),
+                            "vela_de_decision_repetida": dups, "lineas_danadas": bad},
               # Alertas generadas que nunca llegaron al libro (sin precio, duración fuera de rango, reinicio…).
               "no_evaluables": EventLog(Path(a.runtime)).no_evaluable_summary(mid)})
     out = Path(a.out)
@@ -355,8 +376,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--symbol", required=True)
     x.add_argument("--horizon", type=int, default=1)
     x.add_argument("--model", choices=["logit", "gbm"], required=True)
-    x.add_argument("--model-id", default=None, help="un entrenamiento concreto, si hubo varios")
-    # Sin opciones para cambiar la muestra ni el umbral: son fijos (Aclaración 2 del protocolo).
+    x.add_argument("--observation", default="config/observacion_en_vivo.json",
+                   help="registro de la observación (entrenamiento, política, muestra y plazo)")
+    # Sin opciones para cambiar el entrenamiento, la muestra ni el umbral: son fijos (Aclaración 2).
     x.add_argument("--runtime", default="runtime/live")
     x.add_argument("--out", default="results/live/verdict.json")
     x.set_defaults(func=cmd_live_verdict)

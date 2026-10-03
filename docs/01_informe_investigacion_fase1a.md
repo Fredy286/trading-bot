@@ -327,18 +327,26 @@ ningún resultado en vivo del modelo real**. La única ejecución contra Binance
 sintético con alertas forzadas, para probar la conexión; no aporta información sobre la ventaja.
 
 1. **Objeto:** BTC/USDT, horizonte 1 min, modelo `gbm` entrenado con
-   `tbot train --symbol BTCUSDT --horizon 1 --model gbm` (12 meses más recientes). Se observa **un
-   único entrenamiento**, identificado por su `model_id` con huella, durante toda la muestra.
+   `tbot train --symbol BTCUSDT --horizon 1 --model gbm` con los 12 meses completos disponibles
+   (2025-09-01 a 2026-08-31; el archivo de septiembre de Binance aún no estaba publicado). Se observa
+   **un único entrenamiento**, registrado antes de empezar en `config/observacion_en_vivo.json`:
+   `BTCUSDT-h1-gbm-2026-08-31-e436ef`. `tbot live` se niega a observar otro y `tbot live-verdict` solo
+   cuenta ese (no hay opción para elegir otro después).
 2. **Regla de decisión = la política validada** en el periodo bloqueado: alerta si el EV estimado con
    la probabilidad calibrada es ≥ 0,02 (pago supuesto 85 %, empate reembolsado), excluyendo las
    ventanas de publicación programada (BN). El filtro adicional del motor (límite inferior del acierto
    histórico de señales parecidas > p*) **no** formaba parte de la política validada: en la observación
    no bloquea. Se anota en cada alerta (`ic_filter_ok`) para un análisis **secundario** que no decide.
-3. **Medición:** la decisión se toma 1 s después del cierre de la vela (`TB_FEED_LATENCY_S=1`;
-   Binance publica la vela definitiva a ~0,3 s, medido el 2026-10-03). El precio de entrada es el
-   último negociado en Binance obtenido en ese ciclo; el de vencimiento, el del ciclo del minuto
-   siguiente. La duración real entre ambos precios debe estar en 60 ± 10 s; si no, «no evaluable».
-   Precio igual = empate (reembolso).
+   Los parámetros de la política (contrato binaria, pago 0,85, empate reembolsado, margen de EV 0,02,
+   horario 0–24 h, espera 1 s, antigüedad máxima de los datos 11 s) quedan en el mismo registro y
+   `tbot live` los **impone** sobre el `.env`. Cada fila del libro guarda la política con que se midió;
+   las filas con otra política no cuentan. El umbral p* sale del contrato registrado, no del `.env`.
+3. **Medición:** la decisión se toma 1 s después del cierre de la vela **según el reloj de Binance**
+   (el desfase del PC se mide cada hora y se corrige; Binance publica la vela definitiva a ~0,3 s,
+   medido el 2026-10-03). El precio de entrada es el último negociado en Binance obtenido en ese
+   ciclo; el de vencimiento, el del ciclo del minuto siguiente. La duración real entre ambos precios
+   debe estar en 60 ± 10 s; si no, «no evaluable». Precio igual = empate (reembolso). Si en un ciclo no
+   llega la vela nueva, no se repite la decisión anterior: cada vela cuenta una sola vez.
 4. **Muestra fija:** las **primeras 3 500 alertas sin empate** medidas con precio real, en orden de
    tiempo. El veredicto se juzga **una sola vez** sobre esa muestra; antes de completarla es
    «muestra insuficiente» y no puede aprobar. Consultarlo antes no cambia el resultado final. Si a
@@ -351,7 +359,12 @@ sintético con alertas forzadas, para probar la conexión; no aporta informació
    alertas, una ventaja igual a la del periodo bloqueado (56,4 %) solo aprobaría el 11 % de las
    veces; con 3 500, el 80 %. La probabilidad de aprobar sin ventaja es ~2,3 % en ambos casos. Con
    ~153 alertas/día (ritmo de la política BN en el periodo bloqueado: 55 955 en 12 meses), 3 500 se
-   reúnen en ~3 semanas.
+   reúnen en ~3 semanas. Conteo con el modelo registrado (solo cuántas alertas, sin mirar aciertos):
+   ~240/día de media en el tramo de calibración (mediana 141; los fines de semana triplican a los días
+   laborables), así que la muestra se completaría en ~2–4 semanas. Los empates observados en todos los
+   minutos son ~4–5 % (la simulación supuso 1,5 %); no cambian el tamaño, porque la muestra cuenta
+   alertas **sin** empate. El filtro adicional del punto 2 aprobó el 100 % de las alertas del modelo
+   registrado en esos conteos, así que el análisis secundario probablemente coincidirá con el principal.
 5. **Criterio de aprobación (todos):** límite inferior de Wilson 95 % del acierto > p* = 1/(1+0,85) =
    54,05 %, y EV medio > 0 en la misma muestra (empates con PnL 0).
 6. **Pausa (sección 8):** si tras ≥ 50 señales el límite superior queda por debajo de p*, el monitor
@@ -366,6 +379,8 @@ sintético con alertas forzadas, para probar la conexión; no aporta informació
 9. **Fuera de la observación:** las pruebas manuales que el usuario haga en cuentas demo de cualquier
    plataforma no cuentan para este veredicto, porque usan otro feed de precios y otra latencia.
 
-Implementado en `signals/monitor.py::fixed_sample`, `cli.py::cmd_live_verdict` (sin opciones para cambiar
-la muestra ni el umbral) y `signals/registry.py::validation_status_for` (rechaza veredictos que no
-usen la muestra fija de 3 500 y un umbral ≥ p* del contrato). Pruebas en `tests/test_alerts_system.py`.
+Implementado en `config/observacion_en_vivo.json` (registro), `signals/monitor.py::fixed_sample`,
+`cli.py::cmd_live_verdict` (sin opciones para cambiar entrenamiento, muestra ni umbral; informa lo del
+punto 7), `live/runner.py::run_live` (impone el registro) y `signals/registry.py::validation_status_for`
+(solo valida el veredicto del entrenamiento y la política registrados, con la muestra fija de 3 500 y
+el umbral p* del contrato registrado). Pruebas en `tests/test_alerts_system.py`.

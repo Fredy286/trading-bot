@@ -1,0 +1,20 @@
+{
+  "registro": "Aclaración 2 del protocolo (docs/01_informe_investigacion_fase1a.md), 2026-10-03, antes de iniciar la observación",
+  "symbol": "BTCUSDT",
+  "horizon": 1,
+  "model": "gbm",
+  "model_id": "BTCUSDT-h1-gbm-2026-08-31-e436ef",
+  "trained_from": "2025-09-01 04:00:00+00:00",
+  "trained_to": "2026-08-31 23:58:00+00:00",
+  "policy": {
+    "contract": "binaria",
+    "payout": 0.85,
+    "tie_rule": "refund",
+    "ev_margin": 0.02,
+    "allowed_hours_bogota": [0, 24],
+    "feed_latency_s": 1.0,
+    "max_staleness_s": 11.0
+  },
+  "sample_n": 3500,
+  "max_days": 56
+}

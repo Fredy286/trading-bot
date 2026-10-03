@@ -25,7 +25,7 @@ from tradingbot.notify import TelegramNotifier, WebhookNotifier, build_notifiers
 from tradingbot.signals.alert import EXPERIMENTAL, NO_SIGNAL, PAUSED, SIGNAL, Alert, fictitious_example
 from tradingbot.signals.engine import RiskState, SignalEngine
 from tradingbot.signals.monitor import LIVE_SAMPLE_N, evaluate_monitor
-from tradingbot.signals.registry import fit_bundle, validation_status_for
+from tradingbot.signals.registry import apply_policy, fit_bundle, policy_of, validation_status_for
 
 
 @pytest.fixture(scope="module")
@@ -45,6 +45,17 @@ def _engine(bundle, **kw):
     s = Settings(instruments=["SYNTH"], max_alerts_per_day=10_000, max_daily_loss=1e9,
                  max_consecutive_losses=10_000, **kw)
     return SignalEngine(bundle, s, get_instrument("SYNTH"), price_source="SINTÉTICO"), s
+
+
+POL = policy_of(Settings())  # política con la que corren las pruebas (la de _engine)
+
+
+def _register(tmp_path, model_id, symbol="SYNTH", policy=None):
+    """Registro de observación (como config/observacion_en_vivo.json) para las pruebas."""
+    p = tmp_path / "observacion.json"
+    p.write_text(json.dumps({"symbol": symbol, "horizon": 1, "model": "logit", "model_id": model_id,
+                             "policy": policy or POL, "sample_n": LIVE_SAMPLE_N, "max_days": 56}), encoding="utf-8")
+    return p
 
 
 def test_fictitious_example_format():
@@ -135,18 +146,22 @@ def test_validation_status_derived_from_files(tmp_path):
     hv = tmp_path / "holdout.json"
     hv.write_text(json.dumps({"passed": [{"symbol": "EURUSD", "horizon": 1, "model": "logit"}]}))
     lv = tmp_path / "live.json"
+    reg = _register(tmp_path, "M1", symbol="EURUSD")
     ok = {"passed": True, "symbol": "EURUSD", "model": "logit", "horizon": 1, "muestra_fija": True,
-          "min_n": LIVE_SAMPLE_N, "breakeven": 1 / 1.85, "payout": 0.85}
+          "min_n": LIVE_SAMPLE_N, "breakeven": 1 / 1.85, "payout": 0.85, "model_id": "M1", "policy": POL}
     lv.write_text(json.dumps({**ok, "horizon": 5}))
-    assert validation_status_for("EURUSD", 1, "logit", fz, hv)[0] == "VALIDADO_HOLDOUT"
+    assert validation_status_for("EURUSD", 1, "logit", fz, hv, observation_path=reg)[0] == "VALIDADO_HOLDOUT"
     # Un veredicto en vivo de otro horizonte no valida este modelo.
-    assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv)[0] == "VALIDADO_HOLDOUT"
-    # Criterios relajados (muestra menor, umbral menor que p* o sin muestra fija) tampoco validan.
-    for relaxed in ({"min_n": 30}, {"breakeven": 0.30}, {"muestra_fija": False}):
+    assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv, reg)[0] == "VALIDADO_HOLDOUT"
+    # Criterios relajados, otro entrenamiento u otra política (p. ej. pago 0,92 del .env) tampoco validan.
+    for relaxed in ({"min_n": 30}, {"breakeven": 0.30}, {"muestra_fija": False}, {"model_id": "otro"},
+                    {"policy": {**POL, "payout": 0.92}, "payout": 0.92, "breakeven": 1 / 1.92}):
         lv.write_text(json.dumps({**ok, **relaxed}))
-        assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv)[0] == "VALIDADO_HOLDOUT"
+        assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv, reg)[0] == "VALIDADO_HOLDOUT"
     lv.write_text(json.dumps(ok))
-    assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv)[0] == "VALIDADO"
+    assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv, tmp_path / "sin_registro.json")[0] == \
+        "VALIDADO_HOLDOUT"  # sin observación registrada no hay VALIDADO
+    assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv, reg)[0] == "VALIDADO"
 
 
 def _auth(tmp_path, **over):
@@ -536,27 +551,29 @@ def test_live_verdict_counts_only_one_model_with_real_prices(tmp_path, bars_edge
     from tradingbot.cli import main
 
     out = tmp_path / "verdict.json"
-    args = ["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path), "--out", str(out)]
+    reg = _register(tmp_path, bundle_edge.model_id)
+    args = ["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path), "--out", str(out),
+            "--observation", str(reg)]
     assert main(args) == 2  # sin libro: mensaje claro, no un error de Python
     assert "No hay alertas evaluadas" in capsys.readouterr().out
+    assert main([*args[:4], "gbm", *args[5:]]) == 2  # otro modelo distinto del registrado
     eng, s = _engine(bundle_edge, show_experimental=True)
     loop = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
     _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 60)
     n_real = sum(1 for t in loop.ledger.trades if not t["tie"])
     p = tmp_path / "paper_ledger.jsonl"
     other = {"model_id": "SYNTH-h1-gbm-2023-01-31", "method": LIVE_METHOD, "pnl": 0.85, "win": True, "tie": False,
-             "payout": 0.85, "shadow": True}
-    with open(p, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(other) + "\n" + json.dumps({**other, "model_id": None}) + "\n")
+             "payout": 0.85, "shadow": True, "policy": POL}
+    with open(p, "a", encoding="utf-8") as fh:  # otro modelo, sin modelo y otro entrenamiento del mismo modelo
+        fh.write("".join(json.dumps(r) + "\n" for r in (other, {**other, "model_id": None},
+                                                         {**other, "model_id": "SYNTH-h1-logit-2024-01-01"})))
     assert main(args) == 0
     v = json.loads(out.read_text(encoding="utf-8"))
     assert v["model_id"] == bundle_edge.model_id and v["n"] == n_real and v["horizon"] == 1
-    assert v["excluidas"]["de_otro_modelo_o_sin_modelo"] == 2
+    assert v["excluidas"]["de_otro_modelo_o_sin_modelo"] == 3
     assert v["breakeven"] == pytest.approx(1 / 1.85)
-    with open(p, "a", encoding="utf-8") as fh:  # otro entrenamiento del mismo modelo
-        fh.write(json.dumps({**other, "model_id": "SYNTH-h1-logit-2024-01-01"}) + "\n")
-    assert main(args) == 2 and "varios entrenamientos" in capsys.readouterr().out
-    assert main(args + ["--model-id", bundle_edge.model_id]) == 0
+    assert v["medicion"]["duracion_real_s"]["mediana"] == pytest.approx(60, abs=0.01)
+    assert sum(h["n"] for h in v["medicion"]["por_hora_bogota"].values()) == n_real
 
 
 def test_research_verdict_shows_holdout_result(tmp_path):
@@ -684,24 +701,109 @@ def test_ack_after_a_cut_line_is_not_lost(tmp_path, bars_edge, bundle_edge):
         srv.server_close()
 
 
-def test_live_verdict_threshold_follows_the_tie_rule(tmp_path, capsys):
+def test_live_verdict_uses_the_registered_contract_not_the_env(tmp_path):
+    """Si el .env cambiara el pago (p. ej. 0,92 de una plataforma), ni el umbral ni la muestra cambian."""
     from tradingbot.cli import main
 
     mid = "SYNTH-h1-logit-2023-01-31-abc123"
-    row = {"model_id": mid, "method": LIVE_METHOD, "payout": 0.85, "tie_rule": "loss", "shadow": True}
+    reg = _register(tmp_path, mid)
+    row = {"model_id": mid, "method": LIVE_METHOD, "shadow": True, "policy": POL, "payout": 0.85}
     rows = ([{**row, "win": True, "tie": False, "pnl": 0.85}] * 58 + [{**row, "win": False, "tie": False, "pnl": -1.0}] * 32
-            + [{**row, "win": False, "tie": True, "pnl": -1.0}] * 10)
+            + [{**row, "win": False, "tie": True, "pnl": 0.0}] * 10
+            + [{**row, "policy": {**POL, "payout": 0.92}, "payout": 0.92, "win": True, "tie": False, "pnl": 0.92}] * 40)
     (tmp_path / "paper_ledger.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
     out = tmp_path / "v.json"
     assert main(["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path),
-                 "--out", str(out)]) == 0
+                 "--out", str(out), "--observation", str(reg)]) == 0
     v = json.loads(out.read_text(encoding="utf-8"))
-    assert v["tie_rule"] == "loss" and v["breakeven"] == pytest.approx(1 / (0.9 * 1.85))
-    # Mezcla de reglas de empate: no se elige un umbral a ciegas.
-    with open(tmp_path / "paper_ledger.jsonl", "a", encoding="utf-8") as fh:
-        fh.write(json.dumps({**row, "tie_rule": "refund", "win": True, "tie": False, "pnl": 0.85}) + "\n")
-    assert main(["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path),
-                 "--out", str(out)]) == 2
+    assert v["breakeven"] == pytest.approx(1 / 1.85) and v["n"] == 90
+    assert v["excluidas"]["politica_distinta_a_la_registrada"] == 40
+
+
+def test_registered_policy_overrides_env():
+    s = Settings(payout=0.92, ev_margin=0.0, feed_latency_s=2.0, max_staleness_s=90.0)
+    reg = {**POL, "feed_latency_s": 1.0, "max_staleness_s": 11.0}
+    changes = apply_policy(s, reg)
+    assert policy_of(s) == reg and any(c.startswith("payout") for c in changes)
+    assert any(c.startswith("ev_margin") for c in changes) and len(changes) == 4
+
+
+class _FakeBinance:
+    """Sesión falsa de la API de klines: velas de 1 min hasta la hora de «Binance» (`server_now`)."""
+
+    def __init__(self, server_now):
+        self.server_now, self.calls = server_now, []
+
+    def get(self, url, params=None, timeout=None):
+        self.calls.append(dict(params or {}))
+        open_now = int(self.server_now.timestamp() // 60 * 60 * 1000)  # vela en curso
+        end = min(params.get("endTime", open_now), open_now)
+        last = end // 60000 * 60000
+        opens = [last - 60000 * i for i in range(params["limit"])][::-1]
+        rows = [[t, "100", "101", "99", "100.5", "2", t + 59999, "0", 5, "0", "0", "0"] for t in opens]
+
+        class R:
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return rows
+        return R()
+
+
+def test_binance_feed_keeps_history_and_uses_server_clock(monkeypatch):
+    from tradingbot.live import feeds
+
+    srv = pd.Timestamp("2026-10-03 15:00:01", tz="UTC")
+    fake = _FakeBinance(srv)
+    feed = BinancePollingFeed("BTCUSDT", session=fake)
+    feed.offset_s = 2.0  # el PC va 2 s atrasado: según su reloj aún son las 14:59:59
+    monkeypatch.setattr(feeds, "utcnow", lambda: (fake.server_now - pd.Timedelta(seconds=2)).to_pydatetime())
+    bars, _ = feed.get()
+    assert len(fake.calls) == 3 and len(bars) >= 1440  # primera vez: ~2 000 velas
+    assert bars.index[-1] == pd.Timestamp("2026-10-03 14:59", tz="UTC")  # cerrada según Binance
+    fake.server_now += pd.Timedelta(minutes=1)
+    bars, _ = feed.get()
+    assert len(fake.calls) == 4 and fake.calls[-1]["limit"] == 5  # después: solo las últimas velas
+    assert bars.index[-1] == pd.Timestamp("2026-10-03 15:00", tz="UTC")
+    fake.server_now += pd.Timedelta(minutes=30)  # hueco (p. ej. suspensión): se vuelve a descargar todo
+    bars, _ = feed.get()
+    assert len(fake.calls) == 7 and bars.index.to_series().diff().max() == pd.Timedelta(minutes=1)
+
+
+def test_repeated_decision_candle_is_not_counted_twice(tmp_path, bars_edge, bundle_edge):
+    """Si no llega la vela nueva, el motor repetiría la decisión anterior con 60 s de retraso."""
+
+    class _Frozen(_LivePriceFeed):
+        frozen = None
+
+        def get(self, now_utc, lookback=2000):
+            return super().get(self.frozen or now_utc, lookback)
+
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    feed = _Frozen(bars_edge, drift=0.0)
+    loop = AlertLoop(eng, feed, [], tmp_path, s)
+    t = pd.Timestamp("2023-02-06 13:00:03", tz="UTC")
+    for _ in range(240):
+        if loop.step(t.to_pydatetime()).status == EXPERIMENTAL:
+            break
+        t += pd.Timedelta(minutes=1)
+    feed.frozen = t.to_pydatetime()  # el minuto siguiente no llega la vela nueva
+    again = loop.step((t + pd.Timedelta(minutes=1)).to_pydatetime())
+    assert again.status == NO_SIGNAL and "decisión repetida" in again.no_signal_reason
+
+
+def test_event_log_never_raises(tmp_path, monkeypatch):
+    from tradingbot.live import runner
+
+    log = runner.EventLog(tmp_path)
+
+    def locked(*_a, **_k):
+        raise PermissionError("bloqueado")
+
+    monkeypatch.setattr(runner.jsonutil, "append_line", locked)
+    log.write("generated", extra=1)  # no debe lanzar
+    assert log.failed == 1
 
 
 def test_live_verdict_reports_unevaluable_alerts(tmp_path, bars_edge, bundle_edge):
@@ -721,8 +823,9 @@ def test_live_verdict_reports_unevaluable_alerts(tmp_path, bars_edge, bundle_edg
     _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 60)
     lost = sum(1 for a in loop.alerts if a.outcome and a.outcome["resultado"] == "no_evaluable")
     out = tmp_path / "v.json"
+    reg = _register(tmp_path, bundle_edge.model_id)
     assert main(["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path),
-                 "--out", str(out)]) == 0
+                 "--out", str(out), "--observation", str(reg)]) == 0
     v = json.loads(out.read_text(encoding="utf-8"))
     assert lost > 0 and v["no_evaluables"]["total"] == lost
 
@@ -754,12 +857,13 @@ def test_live_verdict_sample_completed_after_eight_weeks_does_not_pass(tmp_path)
 
     mid = "SYNTH-h1-logit-2023-01-31-abc123"
     t0 = pd.Timestamp("2026-10-03", tz="UTC")
-    rows = [{"model_id": mid, "method": LIVE_METHOD, "payout": 0.85, "tie_rule": "refund", "shadow": True,
+    rows = [{"model_id": mid, "method": LIVE_METHOD, "payout": 0.85, "policy": POL, "shadow": True,
              "time": (t0 + pd.Timedelta(minutes=25 * i)).isoformat(),  # ~58 alertas/día → 60 días para 3 500
              "win": i % 10 < 7, "tie": False, "pnl": 0.85 if i % 10 < 7 else -1.0} for i in range(LIVE_SAMPLE_N)]
     (tmp_path / "paper_ledger.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
     out = tmp_path / "v.json"
-    args = ["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path), "--out", str(out)]
+    args = ["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path), "--out", str(out),
+            "--observation", str(_register(tmp_path, mid))]
     assert main(args) == 0
     v = json.loads(out.read_text(encoding="utf-8"))
     assert v["n"] == LIVE_SAMPLE_N and v["hit_lo95"] > v["breakeven"] and not v["passed"]

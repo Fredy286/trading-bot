@@ -37,7 +37,7 @@ class PaperLedger:
         return bad
 
     def record(self, alert: Alert, pnl_units: float, tie: bool, win: bool, shadow: bool,
-               method: str | None = None) -> dict:
+               method: str | None = None, extra: dict | None = None) -> dict:
         """`shadow=True` marca operaciones hipotéticas (EXPERIMENTAL o PAUSADO), fuera del saldo."""
         pnl = pnl_units * self.stake
         if not shadow:
@@ -47,7 +47,7 @@ class PaperLedger:
                "payout": alert.payout, "tie_rule": (alert.costs or {}).get("regla_empate"),
                "breakeven": alert.breakeven, "method": method, "ic_filter_ok": alert.ic_filter_ok,
                "direction": alert.direction, "status": alert.status, "prob": alert.prob, "pnl": pnl,
-               "win": win, "tie": tie, "shadow": shadow, "balance": self.balance}
+               "win": win, "tie": tie, "shadow": shadow, "balance": self.balance, **(extra or {})}
         self.trades.append(row)
         jsonutil.append_line(self.path, json.dumps(row, ensure_ascii=False))
         return row

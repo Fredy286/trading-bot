@@ -26,10 +26,11 @@ from ..config import Settings, load_dotenv
 from ..execution.paper import PaperLedger, read_rows
 from ..instruments import get_instrument
 from ..research.contracts import BinaryContract
-from ..signals.alert import EXPERIMENTAL, PAUSED, SIGNAL, Alert
+from ..signals.alert import EXPERIMENTAL, NO_SIGNAL, PAUSED, SIGNAL, Alert
 from ..signals.engine import RiskState, SignalEngine
 from ..signals.monitor import evaluate_monitor
-from ..timeutil import utcnow
+from ..signals.registry import OBSERVED, apply_policy, load_observation, policy_of
+from ..timeutil import BOGOTA, utcnow
 
 LIVE_METHOD = "precio real de entrada y vencimiento"
 # Los ciclos despiertan con un desfase de milisegundos (y las consultas HTTP tardan distinto): el precio de
@@ -53,13 +54,18 @@ class EventLog:
         self.dir = Path(runtime_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
         self.path = self.dir / "events.jsonl"
+        self.failed = 0  # escrituras perdidas (archivo bloqueado por otro programa, disco lleno…)
 
     def write(self, event: str, alert: Alert | None = None, **extra) -> None:
+        """Nunca lanza: un evento perdido no debe detener el ciclo ni dejar una alerta a medio evaluar."""
         row = {"event": event, "time": utcnow().isoformat()}
         if alert is not None:
             row["alert_id"] = alert.alert_id
         row.update(extra)
-        jsonutil.append_line(self.path, jsonutil.dumps(row, default=str))
+        try:
+            jsonutil.append_line(self.path, jsonutil.dumps(row, default=str))
+        except OSError:
+            self.failed += 1
 
     def unevaluated_ids(self) -> list[str]:
         """Alertas generadas que debían evaluarse y no tienen evento «evaluated» (p. ej. tras un reinicio)."""
@@ -120,6 +126,8 @@ class AlertLoop:
         self.last_error: dict | None = None
         self.started_at = self.clock()
         self.status_counts: dict[str, int] = {}
+        self.policy = policy_of(settings)  # se anota en cada fila del libro (Aclaración 2)
+        self._decided: deque = deque(maxlen=120)  # velas ya usadas para una alerta evaluable
         self._resume()
 
     def _resume(self) -> None:
@@ -164,9 +172,16 @@ class AlertLoop:
             self.last_data_time = bars.index[-1] + pd.Timedelta(minutes=1)
         self._evaluate_pending(bars, now, live_px, px_time=px_time)
         alert = self.engine.evaluate(bars, now, self.risk, self.monitor.status)
+        if is_pending(alert) and alert.decision_time in self._decided:
+            # Faltó la vela nueva y el motor repetiría la decisión del minuto anterior con 60 s de retraso.
+            alert.status, alert.direction = NO_SIGNAL, None
+            alert.no_signal_reason = "decisión repetida: no llegó la vela nueva de este minuto"
+        if is_pending(alert):
+            self._decided.append(alert.decision_time)
         if is_pending(alert) and live_px is not None:
             # Hora en que se obtuvo el precio (incluye la demora de la consulta), no la del inicio del ciclo.
             alert.entry_price_live, alert.entry_time_live = float(live_px), px_time or now
+        alert.clock_offset_s = getattr(self.feed, "offset_s", None)
         alert.generated_at = now
         self.log.write("generated", alert, data_received_at=received_at, status=alert.status,
                        payload=alert.to_dict())
@@ -219,7 +234,15 @@ class AlertLoop:
                      "entrada": round(float(o), 6), "salida": round(float(c), 6), "pnl": round(pnl, 4),
                      **(extra or {})}
         shadow = a.status != SIGNAL
-        self.ledger.record(a, pnl, bool(tie), bool(win), shadow, method=method)
+        # Lo que la Aclaración 2 (punto 7) exige reportar viaja con cada fila del libro.
+        meas = {"policy": self.policy, "decision_time": a.decision_time.isoformat(),
+                "hora_bogota": a.decision_time.astimezone(BOGOTA).hour,
+                "duracion_real_s": (extra or {}).get("duracion_real_s"), "retraso_s": (extra or {}).get("retraso_s"),
+                "entrada_tras_cierre_s": (round((pd.Timestamp(a.entry_time_live) - pd.Timestamp(a.decision_time))
+                                                .total_seconds() + (a.clock_offset_s or 0.0), 3)
+                                          if a.entry_time_live else None),
+                "desfase_reloj_s": a.clock_offset_s}
+        self.ledger.record(a, pnl, bool(tie), bool(win), shadow, method=method, extra=meas)
         if not shadow:
             self.risk.register_outcome(pnl)
         self.outcomes.append({"win": bool(win), "tie": bool(tie), "prob": a.prob})
@@ -310,6 +333,7 @@ class AlertLoop:
             "monitor": self.monitor.to_dict(),
             "last_data_time": self.last_data_time.isoformat() if self.last_data_time is not None else None,
             "last_error": self.last_error,
+            "eventos_no_escritos": self.log.failed,
             "counts": counts,
             "paper": {"balance": self.ledger.balance, "n": sum(1 for t in trades if not t["shadow"]),
                       "shadow_n": sum(1 for t in trades if t["shadow"]),
@@ -402,15 +426,16 @@ def keep_awake(on: bool) -> bool:
 
 
 def check_clock(feed, log: EventLog, latency_s: float) -> float | None:
-    """Registra el desfase PC–Binance y avisa si se come el margen de espera tras el cierre de la vela."""
+    """Mide y registra el desfase PC–Binance. El bucle lo corrige (programa los ciclos y decide qué vela
+    está cerrada con la hora de Binance); si es grande, además avisa."""
     try:
         off = feed.clock_offset()
         log.write("clock_offset", segundos=round(off, 3))
-    except Exception:  # noqa: BLE001 — sin red: el ciclo ya lo registrará
+    except Exception:  # noqa: BLE001 — sin red: se conserva el último desfase medido
         return None
-    if abs(off) > latency_s / 2:
-        print(f"Aviso: el reloj del PC difiere {off:+.2f} s del de Binance. Sincronice la hora de Windows "
-              "(Configuración → Hora e idioma → Sincronizar ahora).", flush=True)
+    if abs(off) > 5:
+        print(f"Aviso: el reloj del PC difiere {off:+.1f} s del de Binance (se corrige, pero conviene "
+              "sincronizar la hora de Windows: Configuración → Hora e idioma → Sincronizar ahora).", flush=True)
     return off
 
 
@@ -440,6 +465,16 @@ def run_live(symbol: str, horizon: int, feed_name: str, models_dir: Path, runtim
         print("Por ahora el feed en vivo implementado es Binance (cripto). Para divisas se requiere una API con "
               "cuenta (Deriv, OANDA, MT5 o IB) — ver docs/03_fase2_intermediarios.md.")
         return 2
+    if bundle.validation_status in OBSERVED:
+        # Observación pre-registrada (Aclaración 2): entrenamiento exacto y política fija, no la del .env.
+        obs = load_observation()
+        if not obs or obs.get("model_id") != bundle.model_id:
+            print(f"El modelo {bundle.model_id} no es el registrado para la observación en vivo "
+                  f"({(obs or {}).get('model_id', 'no hay config/observacion_en_vivo.json')}). Si reentrenó, "
+                  "registre primero una enmienda con fecha (ver docs/01, Aclaración 2); si no, restaure el modelo.")
+            return 2
+        for change in apply_policy(s, obs["policy"]):
+            print(f"Política registrada aplicada (se ignora el .env): {change}")
     lock = RuntimeLock(runtime_dir)
     if not lock.acquire():
         print(f"Ya hay un «tbot live» usando la carpeta {runtime_dir}. Ciérrelo antes de abrir otro "
@@ -459,9 +494,10 @@ def run_live(symbol: str, horizon: int, feed_name: str, models_dir: Path, runtim
             print("Mientras esté abierto, Windows no se suspenderá por inactividad (deje el cargador conectado).")
         i = 0
         while iterations == 0 or i < iterations:
-            if i % 60 == 0:  # cada hora: la espera tras el cierre (TB_FEED_LATENCY_S) supone relojes sincronizados
+            if i % 60 == 0:  # cada hora se vuelve a medir el desfase del reloj del PC frente al de Binance
                 check_clock(feed, loop.log, s.feed_latency_s)
-            now = utcnow()
+            # El ciclo se programa con la hora de Binance: TB_FEED_LATENCY_S después del cierre de la vela.
+            now = feed.server_now()
             nxt = (now + timedelta(minutes=1)).replace(second=0, microsecond=0) + timedelta(seconds=s.feed_latency_s)
             time.sleep(max(0.0, (nxt - now).total_seconds()))
             try:

@@ -33,6 +33,36 @@ from ..timeutil import utcnow
 
 ACTIONABLE = {"VALIDADO"}
 OBSERVED = {"VALIDADO_HOLDOUT"}  # en observación en vivo: sus alertas se registran siempre como EXPERIMENTAL
+OBSERVATION_PATH = Path("config/observacion_en_vivo.json")
+POLICY_KEYS = ("contract", "payout", "tie_rule", "ev_margin", "allowed_hours_bogota", "feed_latency_s",
+               "max_staleness_s")
+
+
+def load_observation(path: Path = OBSERVATION_PATH) -> dict | None:
+    """Registro de la observación en vivo (Aclaración 2): entrenamiento exacto y política fijada."""
+    p = Path(path)
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def policy_of(settings) -> dict:
+    """Parámetros de la política vigentes, en el mismo formato que el registro."""
+    return {"contract": settings.contract, "payout": settings.payout, "tie_rule": settings.tie_rule,
+            "ev_margin": settings.ev_margin, "allowed_hours_bogota": list(settings.allowed_hours_bogota),
+            "feed_latency_s": float(settings.feed_latency_s), "max_staleness_s": float(settings.max_staleness_s)}
+
+
+def apply_policy(settings, policy: dict) -> list[str]:
+    """Impone la política registrada sobre la configuración (.env). Devuelve lo que se cambió."""
+    changes = []
+    current = policy_of(settings)
+    for k in POLICY_KEYS:
+        if current[k] != policy[k]:
+            changes.append(f"{k}: {current[k]} → {policy[k]}")
+    settings.contract, settings.payout, settings.tie_rule = policy["contract"], policy["payout"], policy["tie_rule"]
+    settings.ev_margin = policy["ev_margin"]
+    settings.allowed_hours_bogota = tuple(policy["allowed_hours_bogota"])
+    settings.feed_latency_s, settings.max_staleness_s = policy["feed_latency_s"], policy["max_staleness_s"]
+    return changes
 STATUS_ORDER = ["NO_VALIDADO", "CANDIDATO_DEV", "VALIDADO_HOLDOUT", "VALIDADO"]
 
 
@@ -84,7 +114,8 @@ class ModelBundle:
 
 def validation_status_for(symbol: str, horizon: int, model: str, frozen_path: Path,
                           holdout_verdict_path: Path | None = None,
-                          live_verdict_path: Path | None = None) -> tuple[str, dict]:
+                          live_verdict_path: Path | None = None,
+                          observation_path: Path = OBSERVATION_PATH) -> tuple[str, dict]:
     """Deriva el estado de validación a partir de los archivos generados por el estudio."""
     evidence: dict = {}
     frozen_path = Path(frozen_path)
@@ -109,12 +140,19 @@ def validation_status_for(symbol: str, horizon: int, model: str, frozen_path: Pa
             if live_verdict_path and Path(live_verdict_path).exists():
                 lv = json.loads(Path(live_verdict_path).read_text(encoding="utf-8"))
                 evidence["live"] = lv
-                # Criterios fijos (Aclaración 2): muestra fija de LIVE_SAMPLE_N y umbral ≥ p* del contrato.
-                p_star = 1 / (1 + (lv.get("payout") or 0.85))
-                fixed = (lv.get("muestra_fija") is True and (lv.get("min_n") or 0) >= LIVE_SAMPLE_N
+                # Solo la observación REGISTRADA (Aclaración 2) puede validar: mismo entrenamiento, misma
+                # política, muestra fija completa y umbral p* del contrato registrado (no el de .env).
+                obs = load_observation(observation_path) or {}
+                pol = obs.get("policy") or {}
+                p_star = 1 / (1 + pol["payout"]) if pol.get("payout") else 1.0
+                registered = (obs.get("symbol") == symbol and obs.get("horizon") == horizon
+                              and obs.get("model") == model and pol.get("tie_rule") == "refund")
+                fixed = (lv.get("muestra_fija") is True and lv.get("model_id") == obs.get("model_id")
+                         and lv.get("policy") == pol
+                         and (lv.get("min_n") or 0) >= max(LIVE_SAMPLE_N, obs.get("sample_n") or 0)
                          and (lv.get("breakeven") or 0) >= p_star - 1e-9)
-                if (lv.get("passed") and fixed and lv.get("model") == model and lv.get("symbol") == symbol
-                        and lv.get("horizon") == horizon):
+                if (lv.get("passed") and registered and fixed and lv.get("model") == model
+                        and lv.get("symbol") == symbol and lv.get("horizon") == horizon):
                     status = "VALIDADO"
     return status, evidence
 

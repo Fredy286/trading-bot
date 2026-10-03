@@ -88,6 +88,9 @@ tbot serve --runtime runtime/live                          # en otra terminal
 tbot live-verdict --symbol BTCUSDT --horizon 1 --model gbm # tras 3 500 alertas sin empate (~3 semanas)
 ```
 
+En Windows, `scripts\iniciar_observacion.bat` (doble clic) abre `tbot live` y el panel con estos mismos
+comandos; si se cierra o el PC se reinicia, basta con volver a abrirlo.
+
 Durante la observación en vivo (semanas sin supervisión):
 
 - El modelo `VALIDADO_HOLDOUT` se observa siempre: sus alertas salen como «EXPERIMENTAL — NO OPERAR»
