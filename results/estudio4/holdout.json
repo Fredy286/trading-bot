@@ -1,0 +1,60 @@
+{
+  "estudio": "Estudio 4 — confirmación (pre-registro 0979078)",
+  "git_sha": "41ec483b9be1559d391b8a26809f32fab19c071b",
+  "hipotesis": "ETH/USDT 15 min, logit solo precio, entrada 1 min después, política B",
+  "periodo": [
+    "2025-09-01",
+    "2026-09-01"
+  ],
+  "resultado": {
+    "n_trades": 3550,
+    "wins": 1876,
+    "losses": 1672,
+    "ties": 2,
+    "hit": 0.5287485907553551,
+    "hit_lo95": 0.512300980719605,
+    "hit_hi95": 0.5451340130030881,
+    "breakeven": 0.5405405405405405,
+    "pvalue": 0.9230407569320173,
+    "ev": -0.021802816901408457,
+    "ev_lo95": -0.05228223639844244,
+    "ev_hi95": 0.008685869605181085,
+    "total": -77.40000000000002,
+    "max_drawdown": 116.30000000000187,
+    "positive_fold_frac": 0.0,
+    "max_fold_profit_share": null,
+    "by_fold": {
+      "0": {
+        "n": 1129,
+        "hit": 0.5048715677590788,
+        "ev": -0.06598759964570416,
+        "sum": -74.5
+      },
+      "2": {
+        "n": 2421,
+        "hit": 0.5394465097067328,
+        "ev": -0.0011978521272201564,
+        "sum": -2.8999999999999986
+      }
+    }
+  },
+  "criterios": {
+    "wilson": false,
+    "ev_ic": false,
+    "p": false
+  },
+  "confirma": false,
+  "deterioro_vs_desarrollo": true,
+  "desarrollo": {
+    "n_trades": 32168,
+    "hit": 0.553466363664664,
+    "hit_lo95": 0.5480237749382915,
+    "ev": 0.023879321064411825,
+    "ev_lo95": 0.014209507438668958
+  },
+  "sensibilidad_pago_80": {
+    "umbral": 0.5555555555555556,
+    "lo95": 0.512300980719605,
+    "supera": false
+  }
+}

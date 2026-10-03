@@ -600,3 +600,14 @@ Se informa además el deterioro frente al desarrollo y la sensibilidad con pago 
   ABRIR a las HH:MM:00 (hora de Colombia, UTC−5) | 15 minutos | ARRIBA/ABAJO». Seguimiento con datos
   posteriores al 2026-09-01, evaluados con los archivos de Binance, sin necesidad de un equipo encendido.
 - **Si no confirma:** ETH también queda en «SIN SEÑAL».
+
+**Resultado (commit 41ec483, aplicado mecánicamente):**
+
+| Periodo | Operaciones | Acierto [lím. inf. 95 %] | EV [lím. inf. IC 95 %] |
+|---|---|---|---|
+| Desarrollo 2022-01 → 2025-08 | 32 168 | 55,35 % [54,80 %] | +0,024 [+0,014] |
+| Confirmación 2025-09 → 2026-08 | 3 550 | **52,87 % [51,23 %]** | **−0,022 [−0,052]** |
+
+**No confirma** (falla los tres criterios) y hay deterioro claro frente al desarrollo. **Estudio 4: SIN
+SEÑAL.** Es el mismo patrón que BTC en el Estudio 2: ventajas de ~55 % hasta 2025 que desaparecen en el
+último año.
