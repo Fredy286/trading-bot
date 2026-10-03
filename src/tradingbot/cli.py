@@ -174,26 +174,77 @@ def cmd_live(a) -> int:
     from .live.runner import run_live
 
     return run_live(symbol=a.symbol, horizon=a.horizon, feed_name=a.feed, models_dir=Path(a.models),
-                    runtime_dir=Path(a.runtime), iterations=a.iterations)
+                    runtime_dir=Path(a.runtime), iterations=a.iterations, model=a.model)
 
 
 def cmd_live_verdict(a) -> int:
-    from .signals.monitor import live_verdict
+    from . import jsonutil
+    from .execution.paper import read_rows
+    from .live.runner import LIVE_METHOD, EventLog
+    from .research.metrics import wilson
+    from .signals.monitor import LIVE_SAMPLE_N, fixed_sample, live_verdict
 
-    rows = [json.loads(l) for l in open(Path(a.runtime) / "paper_ledger.jsonl", encoding="utf-8")]
-    v = live_verdict(rows, a.breakeven, a.symbol.upper(), a.model, a.min_n)
+    path = Path(a.runtime) / "paper_ledger.jsonl"
+    if not path.exists():
+        print(f"No hay alertas evaluadas en {path}. ¿Corrió «tbot live --runtime {a.runtime}» con el modelo "
+              "en observación (VALIDADO_HOLDOUT) o con TB_SHOW_EXPERIMENTAL=true?")
+        return 2
+    rows, bad = read_rows(path)
+    symbol = a.symbol.upper()
+    prefix = f"{symbol}-h{a.horizon}-{a.model}-"
+    ids = sorted({r["model_id"] for r in rows if str(r.get("model_id") or "").startswith(prefix)})
+    if a.model_id:
+        ids = [m for m in ids if m == a.model_id]
+    if not ids:
+        print(f"Ninguna fila de {path} corresponde a {prefix}… (las filas sin modelo registrado no se cuentan).")
+        return 2
+    if len(ids) > 1:
+        print(f"Hay filas de varios entrenamientos: {', '.join(ids)}. Elija uno con --model-id; mezclarlos "
+              "no sería la observación de un único modelo.")
+        return 2
+    mid = ids[0]
+    sel = [r for r in rows if r.get("model_id") == mid and r.get("method") == LIVE_METHOD]
+    payouts = sorted({r.get("payout") for r in sel}, key=str)
+    tie_rules = sorted({r.get("tie_rule") or "refund" for r in sel})
+    if len(payouts) > 1 or len(tie_rules) > 1:
+        print(f"Las filas usan contratos distintos (pagos {payouts}, empates {tie_rules}). La observación "
+              "pre-registrada exige un único contrato durante toda la muestra (Aclaración 2).")
+        return 2
+    # Aclaración 2: muestra fija = primeras LIVE_SAMPLE_N alertas sin empate; umbral = p* del contrato.
+    sample = fixed_sample(sel, LIVE_SAMPLE_N)
+    payout = payouts[0] if payouts and payouts[0] else 0.85
+    q_ties = sum(1 for r in sample if r.get("tie")) / len(sample) if sample else 0.0
+    if tie_rules == ["loss"]:  # el empate pierde la apuesta: p* = 1/((1−q)(1+pago)), q = empates observados
+        be = 1 / ((1 - q_ties) * (1 + payout)) if q_ties < 1 else 1.0
+    else:
+        be = 1 / (1 + payout)
+    v = live_verdict(sample, be, symbol, a.model, LIVE_SAMPLE_N)
+    # Secundario (no decide): solo las alertas que además pasaban el filtro de acierto histórico del grupo.
+    sub = [r for r in sample if r.get("ic_filter_ok") and not r.get("tie")]
+    sub_wins = sum(1 for r in sub if r.get("win"))
+    sub_lo, _ = wilson(sub_wins, len(sub)) if sub else (None, None)
+    v.update({"horizon": a.horizon, "model_id": mid, "payout": payouts[0] if len(payouts) == 1 else None,
+              "muestra_fija": True, "n_objetivo": LIVE_SAMPLE_N, "alertas_registradas": len(sel),
+              "secundario_filtro_ic": {"n": len(sub), "aciertos": sub_wins,
+                                       "acierto": sub_wins / len(sub) if sub else None, "hit_lo95": sub_lo},
+              "tie_rule": tie_rules[0] if len(tie_rules) == 1 else None, "empates_observados": q_ties,
+              "excluidas": {"de_otro_modelo_o_sin_modelo": sum(1 for r in rows if r.get("model_id") != mid),
+                            "evaluadas_con_velas": sum(1 for r in rows if r.get("model_id") == mid
+                                                       and r.get("method") != LIVE_METHOD),
+                            "lineas_danadas": bad},
+              # Alertas generadas que nunca llegaron al libro (sin precio, duración fuera de rango, reinicio…).
+              "no_evaluables": EventLog(Path(a.runtime)).no_evaluable_summary(mid)})
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(v, indent=2, ensure_ascii=False))
-    print(json.dumps(v, indent=2, ensure_ascii=False))
+    out.write_text(jsonutil.dumps(v, indent=2), encoding="utf-8")
+    print(jsonutil.dumps(v, indent=2))
     return 0
 
 
 def cmd_serve(a) -> int:
     from .app.server import serve
 
-    serve(host=a.host, port=a.port, runtime_dir=Path(a.runtime), results_dir=Path(a.results))
-    return 0
+    return serve(host=a.host, port=a.port, runtime_dir=Path(a.runtime), results_dir=Path(a.results))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -279,6 +330,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--symbol", required=True)
     x.add_argument("--horizon", type=int, default=1)
     x.add_argument("--feed", choices=["binance"], default="binance")
+    x.add_argument("--model", choices=["logit", "gbm"], default=None,
+                   help="modelo a usar (obligatorio si hay varios entrenados para el símbolo y horizonte)")
     x.add_argument("--models", default="models")
     x.add_argument("--runtime", default="runtime/live")
     x.add_argument("--iterations", type=int, default=0, help="0 = sin límite")
@@ -286,9 +339,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     x = sub.add_parser("live-verdict", help="veredicto de la observación en vivo sin dinero (criterios fijos)")
     x.add_argument("--symbol", required=True)
-    x.add_argument("--model", default="logit")
-    x.add_argument("--breakeven", type=float, default=1 / 1.85, help="umbral de acierto del contrato")
-    x.add_argument("--min-n", type=int, default=200)
+    x.add_argument("--horizon", type=int, default=1)
+    x.add_argument("--model", choices=["logit", "gbm"], required=True)
+    x.add_argument("--model-id", default=None, help="un entrenamiento concreto, si hubo varios")
+    # Sin opciones para cambiar la muestra ni el umbral: son fijos (Aclaración 2 del protocolo).
     x.add_argument("--runtime", default="runtime/live")
     x.add_argument("--out", default="results/live/verdict.json")
     x.set_defaults(func=cmd_live_verdict)

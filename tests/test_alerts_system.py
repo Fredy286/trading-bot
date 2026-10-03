@@ -1,6 +1,8 @@
 """Pruebas del sistema de alertas: formato, motor, monitor, notificadores, guarda y panel."""
 
+import copy
 import json
+import os
 import threading
 import urllib.request
 from datetime import date, datetime, timezone
@@ -10,13 +12,15 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from tradingbot import jsonutil
 from tradingbot.config import Settings
 from tradingbot.data import synthetic
 from tradingbot.data.clean import to_canonical
 from tradingbot.execution.guard import CONSENT_PHRASE, ENV_FLAG, ENV_VALUE, RealMoneyBlocked, assert_real_money_allowed
 from tradingbot.instruments import get_instrument
+from tradingbot.execution.paper import PaperLedger, read_rows
 from tradingbot.live.feeds import BinancePollingFeed, ReplayFeed
-from tradingbot.live.runner import AlertLoop
+from tradingbot.live.runner import EARLY_TOLERANCE_S, LIVE_METHOD, AlertLoop, RuntimeLock
 from tradingbot.notify import TelegramNotifier, WebhookNotifier, build_notifiers
 from tradingbot.signals.alert import EXPERIMENTAL, NO_SIGNAL, PAUSED, SIGNAL, Alert, fictitious_example
 from tradingbot.signals.engine import RiskState, SignalEngine
@@ -87,7 +91,8 @@ def test_experimental_alert_has_all_required_fields(bars_edge, bundle_edge):
     a = found
     assert a.instrument and a.broker and a.price_source and a.decision_time and a.act_before
     assert a.direction in ("sube", "baja") and a.duration_min == 1
-    assert a.prob_lo <= a.prob <= a.prob_hi and a.prob_n > 0
+    # El IC90 es del acierto histórico del grupo de confianza parecida, no de `prob` (que puede quedar fuera).
+    assert a.prob_lo <= a.prob_bin_hit <= a.prob_hi and a.prob_n > 0
     assert a.payout == 0.85 and a.payout_verified is False and a.costs and a.ev >= s.ev_margin
     assert a.prob_lo > a.breakeven
     assert len(a.reasons) >= 3 and len(a.invalidators) >= 3
@@ -130,8 +135,17 @@ def test_validation_status_derived_from_files(tmp_path):
     hv = tmp_path / "holdout.json"
     hv.write_text(json.dumps({"passed": [{"symbol": "EURUSD", "horizon": 1, "model": "logit"}]}))
     lv = tmp_path / "live.json"
-    lv.write_text(json.dumps({"passed": True, "symbol": "EURUSD", "model": "logit"}))
+    ok = {"passed": True, "symbol": "EURUSD", "model": "logit", "horizon": 1, "muestra_fija": True,
+          "min_n": 200, "breakeven": 1 / 1.85, "payout": 0.85}
+    lv.write_text(json.dumps({**ok, "horizon": 5}))
     assert validation_status_for("EURUSD", 1, "logit", fz, hv)[0] == "VALIDADO_HOLDOUT"
+    # Un veredicto en vivo de otro horizonte no valida este modelo.
+    assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv)[0] == "VALIDADO_HOLDOUT"
+    # Criterios relajados (muestra menor, umbral menor que p* o sin muestra fija) tampoco validan.
+    for relaxed in ({"min_n": 30}, {"breakeven": 0.30}, {"muestra_fija": False}):
+        lv.write_text(json.dumps({**ok, **relaxed}))
+        assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv)[0] == "VALIDADO_HOLDOUT"
+    lv.write_text(json.dumps(ok))
     assert validation_status_for("EURUSD", 1, "logit", fz, hv, lv)[0] == "VALIDADO"
 
 
@@ -294,3 +308,469 @@ def test_live_evaluation_uses_real_entry_and_expiry_prices(tmp_path, bars_edge, 
     late = pd.Timestamp(a.entry_time_live) + pd.Timedelta(minutes=a.duration_min, seconds=45)
     loop._evaluate_pending(bars_edge.iloc[:0], late.to_pydatetime(), live_px=1.1)
     assert a.outcome["resultado"] == "no_evaluable"
+    # Un precio de vencimiento que llega bastante ANTES del minuto no se usa: la alerta sigue pendiente.
+    a.outcome = None
+    loop.pending = [a]
+    early = pd.Timestamp(a.entry_time_live) + pd.Timedelta(minutes=a.duration_min, seconds=-(EARLY_TOLERANCE_S + 3))
+    loop._evaluate_pending(bars_edge.iloc[:0], early.to_pydatetime(), live_px=1.1)
+    assert a.outcome is None and loop.pending == [a]
+
+
+# ---------------------------------------------------------------------- auditoría local (2026-09-30)
+def _steps(loop, start, n, jitter_s=None):
+    for i in range(n):
+        j = 0.0 if jitter_s is None else jitter_s[i % len(jitter_s)]
+        t = start + pd.Timedelta(minutes=i, seconds=3) + pd.Timedelta(microseconds=round(j * 1e6))
+        loop.step(t.to_pydatetime())
+
+
+def test_millisecond_jitter_does_not_drop_live_alerts(tmp_path, bars_edge, bundle_edge):
+    """Windows despierta el bucle con ±1 ms de desfase: antes ~50 % quedaban «no_evaluable (retraso 60 s)»."""
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 60, jitter_s=[-0.0007, 0.0004, -0.0012, 0.0001, -0.0003])
+    evaluated = [a for a in loop.alerts if a.outcome]
+    assert len(evaluated) >= 10
+    assert all(a.outcome["resultado"] != "no_evaluable" for a in evaluated)
+    assert all(abs(a.outcome["duracion_real_s"] - 60) < 0.01 for a in evaluated)
+    rows, bad = read_rows(tmp_path / "paper_ledger.jsonl")
+    assert len(rows) == len(evaluated) and bad == 0
+
+
+def test_state_json_is_strict_json_even_with_nan_evidence(tmp_path, bars_edge, bundle_edge):
+    """El veredicto del periodo bloqueado tiene NaN; el navegador rechaza NaN y el panel quedaba en blanco."""
+    from tradingbot.app.server import make_server
+
+    b = copy.copy(bundle_edge)
+    b.validation_status = "VALIDADO_HOLDOUT"
+    b.validation_evidence = {"holdout": {"verdict": "X", "passed": [], "details": [{"hit": float("nan")}]}}
+    eng, s = _engine(b, show_experimental=False)
+    loop = AlertLoop(eng, ReplayFeed(bars_edge), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 5)
+
+    def strict(c):
+        raise ValueError(c)
+
+    text = (tmp_path / "state.json").read_text(encoding="utf-8")
+    state = json.loads(text, parse_constant=strict)
+    assert state["model"]["validation_evidence"]["holdout"] == {"verdict": "X", "passed": []}
+    # Un state.json antiguo con NaN también se sirve como JSON válido.
+    (tmp_path / "state.json").write_text(text.replace('"passed": []', '"passed": [], "x": NaN'), encoding="utf-8")
+    srv = make_server("127.0.0.1", 0, tmp_path, tmp_path / "results")
+    th = threading.Thread(target=srv.serve_forever, daemon=True)
+    th.start()
+    try:
+        body = urllib.request.urlopen(f"http://127.0.0.1:{srv.server_address[1]}/api/state").read().decode()
+        assert json.loads(body, parse_constant=strict)["model"]["validation_evidence"]["holdout"]["x"] is None
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+def test_holdout_validated_model_is_observed_without_flag(bars_edge, bundle_edge):
+    """VALIDADO_HOLDOUT está «en observación»: con TB_SHOW_EXPERIMENTAL=false antes no se registraba nada."""
+    b = copy.copy(bundle_edge)
+    b.validation_status = "VALIDADO_HOLDOUT"
+    eng, s = _engine(b, show_experimental=False)
+    feed = ReplayFeed(bars_edge)
+    statuses = set()
+    for i in range(120):
+        now = (pd.Timestamp("2023-02-06 13:00", tz="UTC") + pd.Timedelta(minutes=i, seconds=3)).to_pydatetime()
+        a = eng.evaluate(feed.get(now)[0], now, RiskState())
+        statuses.add(a.status)
+        if a.status == NO_SIGNAL:
+            assert "sin validar" not in a.no_signal_reason
+    assert EXPERIMENTAL in statuses and SIGNAL not in statuses
+
+
+def test_paused_monitor_keeps_observing_would_be_alerts(tmp_path, bars_edge, bundle_edge):
+    """En pausa, las alertas que sí se habrían emitido se evalúan como hipotéticas (antes: «pendiente» eterno)."""
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    feed = ReplayFeed(bars_edge)
+    seen = {"con_direccion": 0, "sin_direccion": 0}
+    for i in range(45):
+        now = (pd.Timestamp("2023-02-06 13:00", tz="UTC") + pd.Timedelta(minutes=i, seconds=3)).to_pydatetime()
+        bars = feed.get(now)[0]
+        normal = eng.evaluate(bars, now, RiskState())
+        paused = eng.evaluate(bars, now, RiskState(), monitor_status="PAUSADO")
+        assert paused.status == PAUSED
+        if normal.status == EXPERIMENTAL:
+            assert paused.direction == normal.direction and "hipotética" in paused.no_signal_reason
+            seen["con_direccion"] += 1
+        else:
+            assert paused.direction is None
+            seen["sin_direccion"] += 1
+    assert seen["con_direccion"] and seen["sin_direccion"]
+    # En el bucle, la alerta hipotética queda pendiente, se evalúa y entra al libro como «shadow».
+    loop = AlertLoop(eng, ReplayFeed(bars_edge), [], tmp_path, s)
+    loop.monitor = evaluate_monitor([{"win": False, "tie": False, "prob": 0.6}] * 200, 0.5405)
+    assert loop.monitor.status == "PAUSADO"
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 30)
+    rows, _ = read_rows(tmp_path / "paper_ledger.jsonl")
+    assert rows and all(r["shadow"] for r in rows) and PAUSED in {r["status"] for r in rows}
+
+
+def test_restart_recovers_results_and_closes_orphan_alerts(tmp_path, bars_edge, bundle_edge):
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    start = pd.Timestamp("2023-02-06 13:00", tz="UTC")
+    i = 0
+    while i < 30 or not loop.pending:  # termina con al menos una alerta sin evaluar («se cierra el programa»)
+        loop.step((start + pd.Timedelta(minutes=i, seconds=3)).to_pydatetime())
+        i += 1
+        assert i < 300
+    orphans = {a.alert_id for a in loop.pending}
+    loop2 = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    assert len(loop2.ledger.trades) == len(loop.ledger.trades) > 0
+    assert loop2.monitor.n == loop.monitor.n and loop2.ledger.balance == loop.ledger.balance
+    events = [json.loads(l) for l in open(tmp_path / "events.jsonl", encoding="utf-8")]
+    closed = {e["alert_id"] for e in events if e["event"] == "evaluated"
+              and e["outcome"].get("motivo", "").startswith("reinicio")}
+    assert closed == orphans
+    # Una tercera instancia ya no encuentra alertas abiertas.
+    AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    events = [json.loads(l) for l in open(tmp_path / "events.jsonl", encoding="utf-8")]
+    assert sum(1 for e in events if e.get("outcome", {}).get("motivo", "").startswith("reinicio")) == len(orphans)
+
+
+def test_runtime_lock_blocks_second_live_instance(tmp_path):
+    a, b = RuntimeLock(tmp_path), RuntimeLock(tmp_path)
+    assert a.acquire()
+    try:
+        assert not b.acquire()
+    finally:
+        a.release()
+    assert b.acquire()
+    b.release()
+
+
+def test_ack_is_idempotent_and_survives_state_rewrite(tmp_path, bars_edge, bundle_edge):
+    from tradingbot.app.server import make_server
+
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, ReplayFeed(bars_edge), [], tmp_path, s)
+    start = pd.Timestamp("2023-02-06 13:00", tz="UTC")
+    _steps(loop, start, 10)
+    srv = make_server("127.0.0.1", 0, tmp_path, tmp_path / "results")
+    th = threading.Thread(target=srv.serve_forever, daemon=True)
+    th.start()
+    base = f"http://127.0.0.1:{srv.server_address[1]}"
+
+    def ack(aid):
+        req = urllib.request.Request(base + "/api/ack", data=json.dumps({"alert_id": aid}).encode(),
+                                     headers={"Content-Type": "application/json"}, method="POST")
+        return json.loads(urllib.request.urlopen(req).read())
+
+    try:
+        aid = json.loads(urllib.request.urlopen(base + "/api/state").read())["alerts"][0]["alert_id"]
+        before = (tmp_path / "state.json").read_bytes()
+        first = ack(aid)
+        second = ack(aid)
+        assert second["ya_recibida"] and second["received_at"] == first["received_at"]
+        assert (tmp_path / "state.json").read_bytes() == before  # el panel no escribe state.json
+        assert len(read_rows(tmp_path / "acks.jsonl")[0]) == 1
+        loop.step((start + pd.Timedelta(minutes=10, seconds=3)).to_pydatetime())  # tbot live reescribe el estado
+        st = json.loads(urllib.request.urlopen(base + "/api/state").read())
+        assert next(a for a in st["alerts"] if a["alert_id"] == aid)["received_at"] == first["received_at"]
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+@pytest.mark.skipif(os.name != "nt", reason="SO_REUSEADDR solo permite dos paneles en el mismo puerto en Windows")
+def test_second_panel_on_same_port_fails_on_windows(tmp_path):
+    from tradingbot.app.server import make_server
+
+    srv = make_server("127.0.0.1", 0, tmp_path, tmp_path)
+    try:
+        with pytest.raises(OSError):
+            make_server("127.0.0.1", srv.server_address[1], tmp_path, tmp_path).server_close()
+    finally:
+        srv.server_close()
+
+
+def test_damaged_ledger_line_is_skipped_and_isolated(tmp_path):
+    p = tmp_path / "paper_ledger.jsonl"
+    good = {"time": "t", "alert_id": "a", "model_id": "M", "pnl": 0.85, "win": True, "tie": False, "shadow": True}
+    p.write_text(json.dumps(good) + "\n" + '{"time": "t", "alert_id": "b", "pn', encoding="utf-8")  # apagón
+    rows, bad = read_rows(p)
+    assert len(rows) == 1 and bad == 1
+    a = Alert(instrument="X", status=EXPERIMENTAL, price_source="", broker="", duration_min=1, direction="sube",
+              decision_time=datetime(2026, 1, 1, tzinfo=timezone.utc), prob=0.6, model_id="M")
+    PaperLedger(p).record(a, -1.0, False, False, True, method=LIVE_METHOD)
+    rows, bad = read_rows(p)
+    assert len(rows) == 2 and bad == 1 and rows[-1]["model_id"] == "M" and rows[-1]["method"] == LIVE_METHOD
+
+
+def test_cycle_errors_and_gaps_are_recorded(tmp_path, bars_edge, bundle_edge):
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, ReplayFeed(bars_edge), [], tmp_path, s)
+    t0 = pd.Timestamp("2023-02-06 13:00:03", tz="UTC")
+    loop.step(t0.to_pydatetime())
+    loop.step((t0 + pd.Timedelta(minutes=6)).to_pydatetime())  # p. ej. el PC estuvo suspendido
+    loop.note_error(RuntimeError("red caída"), (t0 + pd.Timedelta(minutes=7)).to_pydatetime())
+    events = [json.loads(l) for l in open(tmp_path / "events.jsonl", encoding="utf-8")]
+    gap = next(e for e in events if e["event"] == "gap")
+    assert gap["segundos"] == 360
+    assert any(e["event"] == "cycle_failed" and "red caída" in e["error"] for e in events)
+    assert "red caída" in json.loads((tmp_path / "state.json").read_text(encoding="utf-8"))["last_error"]["error"]
+
+
+class _FlakyPriceFeed(_LivePriceFeed):
+    def current_price(self, now_utc):
+        raise ConnectionError("ticker caído")
+
+
+def test_live_mode_without_real_entry_price_is_not_evaluated_with_candles(tmp_path, bars_edge, bundle_edge):
+    """Antes se usaba el método optimista de velas y se mezclaba sin marca en el veredicto."""
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _FlakyPriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 40)
+    evaluated = [a for a in loop.alerts if a.outcome]
+    assert evaluated and all(a.outcome["motivo"].startswith("sin precio real de entrada") for a in evaluated)
+    assert not (tmp_path / "paper_ledger.jsonl").exists()
+
+
+def test_live_verdict_counts_only_one_model_with_real_prices(tmp_path, bars_edge, bundle_edge, capsys):
+    from tradingbot.cli import main
+
+    out = tmp_path / "verdict.json"
+    args = ["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path), "--out", str(out)]
+    assert main(args) == 2  # sin libro: mensaje claro, no un error de Python
+    assert "No hay alertas evaluadas" in capsys.readouterr().out
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 60)
+    n_real = sum(1 for t in loop.ledger.trades if not t["tie"])
+    p = tmp_path / "paper_ledger.jsonl"
+    other = {"model_id": "SYNTH-h1-gbm-2023-01-31", "method": LIVE_METHOD, "pnl": 0.85, "win": True, "tie": False,
+             "payout": 0.85, "shadow": True}
+    with open(p, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps(other) + "\n" + json.dumps({**other, "model_id": None}) + "\n")
+    assert main(args) == 0
+    v = json.loads(out.read_text(encoding="utf-8"))
+    assert v["model_id"] == bundle_edge.model_id and v["n"] == n_real and v["horizon"] == 1
+    assert v["excluidas"]["de_otro_modelo_o_sin_modelo"] == 2
+    assert v["breakeven"] == pytest.approx(1 / 1.85)
+    with open(p, "a", encoding="utf-8") as fh:  # otro entrenamiento del mismo modelo
+        fh.write(json.dumps({**other, "model_id": "SYNTH-h1-logit-2024-01-01"}) + "\n")
+    assert main(args) == 2 and "varios entrenamientos" in capsys.readouterr().out
+    assert main(args + ["--model-id", bundle_edge.model_id]) == 0
+
+
+def test_research_verdict_shows_holdout_result(tmp_path):
+    from tradingbot.app.server import research_verdict
+
+    fz = tmp_path / "frozen.json"
+    fz.write_text(json.dumps({"verdict": "HAY CANDIDATAS (pendiente periodo bloqueado)", "candidates": [{}]}))
+    (tmp_path / "holdout").mkdir()
+    (tmp_path / "holdout" / "verdict.json").write_text(
+        '{"verdict": "VALIDADAS", "n_candidates": 1, "passed": [{"symbol": "BTCUSDT"}], "details": [{"hit": NaN}]}')
+    r = research_verdict(tmp_path, fz)
+    assert r["holdout_verdict"] == "VALIDADAS" and r["holdout_passed"] == [{"symbol": "BTCUSDT"}]
+
+
+def test_alert_text_separates_probability_from_group_hit_rate():
+    a = Alert(instrument="BTC/USDT", status=EXPERIMENTAL, price_source="x", broker="y", duration_min=1,
+              decision_time=datetime(2026, 1, 1, 15, tzinfo=timezone.utc), direction="sube",
+              prob=0.716, prob_bin_hit=0.753, prob_lo=0.724, prob_hi=0.782, prob_n=900, payout=0.85)
+    assert "probabilidad: 71.6% | acierto histórico de señales parecidas: 75.3% [72.4%–78.2%]" in a.one_line()
+    assert "Acierto histórico de señales parecidas: 75.3% [72.4%–78.2%] (IC90, n=900)" in a.format_text()
+
+
+# ---------------------------------------------------------------------- revisión final (2026-10-02)
+def test_note_error_never_raises_even_if_the_log_is_locked(tmp_path, bars_edge, bundle_edge):
+    """Si events.jsonl está bloqueado por otro programa, el bucle debe seguir (antes se cerraba)."""
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, ReplayFeed(bars_edge), [], tmp_path, s)
+
+    def locked(*_a, **_k):
+        raise PermissionError("events.jsonl bloqueado")
+
+    loop.log.write = locked
+    loop.note_error(PermissionError("events.jsonl bloqueado"))  # no debe lanzar
+    assert "bloqueado" in loop.last_error["error"]
+
+
+def test_line_cut_inside_a_utf8_character_does_not_block_restart(tmp_path, bars_edge, bundle_edge):
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 30)
+    for name in ("paper_ledger.jsonl", "events.jsonl"):  # apagón a mitad de «—» (E2 80 94)
+        with open(tmp_path / name, "ab") as fh:
+            fh.write('{"status": "EXPERIMENTAL '.encode("utf-8") + "—".encode("utf-8")[:1])
+    rows, bad = read_rows(tmp_path / "paper_ledger.jsonl")
+    assert bad == 1 and len(rows) == len(loop.ledger.trades)
+    loop2 = AlertLoop(eng, _LivePriceFeed(bars_edge, drift=0.0), [], tmp_path, s)  # antes: UnicodeDecodeError
+    assert len(loop2.ledger.trades) == len(loop.ledger.trades)
+    events = [e for e in jsonutil.iter_jsonl(tmp_path / "events.jsonl")]
+    assert events.count(None) == 1 and any(e and e["event"] == "ledger_damaged_lines" for e in events)
+
+
+class _SlowEntryFeed(_LivePriceFeed):
+    """El precio llega con una demora HTTP distinta en cada ciclo (2,6 s y 0,4 s alternados)."""
+
+    def __init__(self, bars, delays):
+        super().__init__(bars, drift=0.0)
+        self.delays, self.i = delays, 0
+
+    def current_price(self, now_utc):
+        px, _ = super().current_price(now_utc)
+        d = self.delays[self.i % len(self.delays)]
+        self.i += 1
+        return px, now_utc + pd.Timedelta(seconds=d).to_pytimedelta()
+
+
+def test_variable_http_delay_does_not_drop_alerts(tmp_path, bars_edge, bundle_edge):
+    """La tolerancia se mide con el reloj del ciclo; la duración real (57,8–62,2 s) se anota."""
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _SlowEntryFeed(bars_edge, [2.6, 0.4]), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 60)
+    evaluated = [a for a in loop.alerts if a.outcome]
+    assert len(evaluated) >= 10 and all(a.outcome["resultado"] != "no_evaluable" for a in evaluated)
+    assert {round(abs(a.outcome["retraso_s"]), 1) for a in evaluated} == {2.2}
+    # Con 15 s de diferencia entre demoras, la duración real queda fuera de 60 ± 10 s: se dice así.
+    loop = AlertLoop(eng, _SlowEntryFeed(bars_edge, [15.0, 0.0]), [], tmp_path / "b", s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 60)
+    reasons = {a.outcome.get("motivo", "") for a in loop.alerts if a.outcome}
+    assert any(r.startswith("duración real") for r in reasons)
+
+
+def test_panel_stale_marker_ignores_failed_cycles(tmp_path, bars_edge, bundle_edge):
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, ReplayFeed(bars_edge), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 2)
+    ok = json.loads((tmp_path / "state.json").read_text(encoding="utf-8"))
+    loop.note_error(ConnectionError("red caída"))
+    after = json.loads((tmp_path / "state.json").read_text(encoding="utf-8"))
+    assert after["last_ok_at"] == ok["last_ok_at"] and after["updated_at"] >= ok["updated_at"]
+    assert "red caída" in after["last_error"]["error"]
+
+
+def test_holdout_verdict_of_another_study_is_ignored(tmp_path):
+    from tradingbot.app.server import research_verdict
+
+    fz = tmp_path / "frozen.json"
+    fz.write_text(json.dumps({"verdict": "HAY CANDIDATAS (pendiente periodo bloqueado)", "git_sha": "nuevo",
+                              "config_hash": "h", "candidates": [{"symbol": "EURUSD", "horizon": 1, "model": "logit"}]}))
+    (tmp_path / "holdout").mkdir()
+    hv = tmp_path / "holdout" / "verdict.json"
+    hv.write_text(json.dumps({"verdict": "VALIDADAS", "frozen_git_sha": "viejo", "config_hash": "h",
+                              "passed": [{"symbol": "EURUSD", "horizon": 1, "model": "logit"}]}))
+    r = research_verdict(tmp_path, fz)
+    assert r["holdout_other_study"] and "holdout_verdict" not in r
+    assert validation_status_for("EURUSD", 1, "logit", fz, hv)[0] == "CANDIDATO_DEV"
+
+
+def test_ack_after_a_cut_line_is_not_lost(tmp_path, bars_edge, bundle_edge):
+    from tradingbot.app.server import first_acks, make_server
+
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, ReplayFeed(bars_edge), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 3)
+    (tmp_path / "acks.jsonl").write_text('{"event": "received", "ti', encoding="utf-8")  # apagón
+    srv = make_server("127.0.0.1", 0, tmp_path, tmp_path / "results")
+    th = threading.Thread(target=srv.serve_forever, daemon=True)
+    th.start()
+    try:
+        aid = loop.alerts[0].alert_id
+        req = urllib.request.Request(f"http://127.0.0.1:{srv.server_address[1]}/api/ack",
+                                     data=json.dumps({"alert_id": aid}).encode(), method="POST")
+        first = json.loads(urllib.request.urlopen(req).read())
+        assert first_acks(tmp_path)[aid] == first["received_at"]
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+def test_live_verdict_threshold_follows_the_tie_rule(tmp_path, capsys):
+    from tradingbot.cli import main
+
+    mid = "SYNTH-h1-logit-2023-01-31-abc123"
+    row = {"model_id": mid, "method": LIVE_METHOD, "payout": 0.85, "tie_rule": "loss", "shadow": True}
+    rows = ([{**row, "win": True, "tie": False, "pnl": 0.85}] * 58 + [{**row, "win": False, "tie": False, "pnl": -1.0}] * 32
+            + [{**row, "win": False, "tie": True, "pnl": -1.0}] * 10)
+    (tmp_path / "paper_ledger.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    out = tmp_path / "v.json"
+    assert main(["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path),
+                 "--out", str(out)]) == 0
+    v = json.loads(out.read_text(encoding="utf-8"))
+    assert v["tie_rule"] == "loss" and v["breakeven"] == pytest.approx(1 / (0.9 * 1.85))
+    # Mezcla de reglas de empate: no se elige un umbral a ciegas.
+    with open(tmp_path / "paper_ledger.jsonl", "a", encoding="utf-8") as fh:
+        fh.write(json.dumps({**row, "tie_rule": "refund", "win": True, "tie": False, "pnl": 0.85}) + "\n")
+    assert main(["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path),
+                 "--out", str(out)]) == 2
+
+
+def test_live_verdict_reports_unevaluable_alerts(tmp_path, bars_edge, bundle_edge):
+    from tradingbot.cli import main
+
+    class _OneInThree(_LivePriceFeed):
+        n = 0
+
+        def current_price(self, now_utc):
+            self.n += 1
+            if self.n % 3 == 0:
+                raise ConnectionError("ticker caído")
+            return super().current_price(now_utc)
+
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    loop = AlertLoop(eng, _OneInThree(bars_edge, drift=0.0), [], tmp_path, s)
+    _steps(loop, pd.Timestamp("2023-02-06 13:00", tz="UTC"), 60)
+    lost = sum(1 for a in loop.alerts if a.outcome and a.outcome["resultado"] == "no_evaluable")
+    out = tmp_path / "v.json"
+    assert main(["live-verdict", "--symbol", "SYNTH", "--model", "logit", "--runtime", str(tmp_path),
+                 "--out", str(out)]) == 0
+    v = json.loads(out.read_text(encoding="utf-8"))
+    assert lost > 0 and v["no_evaluables"]["total"] == lost
+
+
+def test_model_id_identifies_the_training(bars_edge):
+    train = bars_edge[bars_edge.index < pd.Timestamp("2023-02-01", tz="UTC")]
+    a = fit_bundle(train, "SYNTH", 1, "logit", "synthetic", 1e-5, synthetic=True)
+    b = fit_bundle(train, "SYNTH", 1, "logit", "synthetic", 1e-5, synthetic=True)
+    c = fit_bundle(train[train.index >= pd.Timestamp("2023-01-12", tz="UTC")], "SYNTH", 1, "logit", "synthetic",
+                   1e-5, synthetic=True)  # otra ventana que termina el mismo día
+    assert a.trained_to[:10] == c.trained_to[:10]
+    assert a.model_id == b.model_id and a.model_id != c.model_id
+
+
+def test_fixed_sample_makes_daily_checks_harmless():
+    """Aclaración 2: el veredicto usa siempre las primeras 200 alertas sin empate, se consulte cuando se consulte."""
+    from tradingbot.signals.monitor import fixed_sample
+
+    rows = [{"time": f"2026-10-{d:02d}T{h:02d}:00", "win": (d * 24 + h) % 3 != 0, "tie": h == 5, "pnl": 0.0}
+            for d in range(4, 20) for h in range(24)]
+    s = fixed_sample(rows, 200)
+    assert sum(1 for r in s if not r["tie"]) == 200 and s == sorted(s, key=lambda r: r["time"])
+    assert fixed_sample(rows + [{"time": "2026-11-01T00:00", "win": True, "tie": False}], 200) == s
+    assert len(fixed_sample(rows[:50], 200)) == 50  # aún no hay muestra: el veredicto será insuficiente
+
+
+def test_observed_model_replicates_validated_policy_without_extra_filter(bars_edge, bundle_edge):
+    """La política validada (B/BN) no incluía el filtro prob_lo > umbral: en observación solo se anota."""
+    b = copy.copy(bundle_edge)
+    b.validation_status = "VALIDADO_HOLDOUT"
+    eng_obs, _ = _engine(b, show_experimental=False)
+    eng_demo, _ = _engine(bundle_edge, show_experimental=True)  # no validado: el filtro sigue bloqueando
+    feed = ReplayFeed(bars_edge)
+    flagged = 0
+    for i in range(240):
+        now = (pd.Timestamp("2023-02-06 13:00", tz="UTC") + pd.Timedelta(minutes=i, seconds=3)).to_pydatetime()
+        bars = feed.get(now)[0]
+        obs, demo = eng_obs.evaluate(bars, now, RiskState()), eng_demo.evaluate(bars, now, RiskState())
+        if obs.status == EXPERIMENTAL:
+            assert obs.ev >= 0.02 and obs.ic_filter_ok is not None
+            if not obs.ic_filter_ok:
+                flagged += 1
+                assert demo.status == NO_SIGNAL and "acierto histórico" in demo.no_signal_reason
+        if demo.status == EXPERIMENTAL:
+            assert obs.status == EXPERIMENTAL and demo.ic_filter_ok
+    assert flagged > 0
+
+
+def test_one_line_spot_contract_without_payout():
+    a = Alert(instrument="EUR/USD", status=NO_SIGNAL, price_source="x", broker="y", contract="contado",
+              payout_verified=True, decision_time=datetime(2026, 1, 1, tzinfo=timezone.utc), duration_min=1)
+    assert "pago: no aplica" in a.one_line()  # antes: TypeError en cada ciclo

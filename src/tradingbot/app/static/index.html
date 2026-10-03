@@ -32,6 +32,7 @@
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
   .kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 14px; }
   .kv dt { color: var(--muted); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+  .kv dd .pill { white-space: normal; border-radius: 8px; }
   .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
   .st-signal { color: var(--accent); background: var(--accent-soft); }
   .st-exp { color: var(--exp); background: var(--exp-soft); }
@@ -93,7 +94,8 @@
     <table>
       <thead><tr>
         <th>Hora (Bogotá)</th><th>Instrumento</th><th>Estado</th><th>Dirección</th>
-        <th>Probabilidad [IC90]</th><th>Umbral</th><th>EV</th><th>Vence</th><th>Resultado</th>
+        <th>Probabilidad</th><th title="Acierto, en calibración, de las señales de confianza parecida (IC90)">Acierto histórico de señales parecidas [IC90]</th>
+        <th>Umbral</th><th>EV</th><th>Entrar antes de</th><th>Resultado</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
@@ -123,46 +125,90 @@ let state = null, selected = null;
 
 function kv(el, pairs) { el.innerHTML = pairs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${v}</dd>`).join(""); }
 
+const signed = (x, d = 2) => x == null ? "—" : (x >= 0 ? "+" : "") + x.toFixed(d);
+const STALE_MS = 150000;  // tbot live escribe el estado cada minuto
+
 function render() {
   if (!state) return;
+  const m = state.model || {}, mon = state.monitor || {};
+  // Sin ciclos correctos recientes (cerrado, reinicio, suspensión o todos los ciclos fallando por la red),
+  // no se muestra «Ahora: …». last_ok_at solo avanza con ciclos completos; updated_at también con errores.
+  const lastOk = state.last_ok_at || state.updated_at;
+  const age = (iso) => Date.parse(state.server_time) - Date.parse(iso);
+  const stale = !state.missing && !m.synthetic && state.server_time && lastOk && age(lastOk) > STALE_MS;
+  const writing = stale && state.updated_at && age(state.updated_at) <= STALE_MS;  // abierto pero fallando
   $("updated").textContent = state.missing ? "Aún no hay datos: ejecute «tbot alerts demo» o «tbot live»." :
     "Actualizado: " + bog(state.updated_at) + " · últimos datos: " + bog(state.last_data_time);
   const last = (state.alerts || [])[0];
   const gs = last ? last.status : "SIN DATOS";
-  $("globalStatus").className = "pill " + cls(gs); $("globalStatus").textContent = "Ahora: " + gs;
-  const m = state.model || {}, mon = state.monitor || {};
+  if (stale) {
+    $("globalStatus").className = "pill st-pause";
+    $("globalStatus").textContent = writing
+      ? "SIN DATOS NUEVOS desde " + hm(lastOk) + " (tbot live abierto con errores)"
+      : "DETENIDO: tbot live no actualiza desde " + hm(lastOk);
+  } else {
+    $("globalStatus").className = "pill " + cls(gs);
+    $("globalStatus").textContent = (m.synthetic ? "Demostración: " : "Ahora: ") + gs;
+  }
+  const valCls = m.validation_status === "VALIDADO" ? "st-signal" : m.validation_status === "VALIDADO_HOLDOUT" ? "st-exp" : "st-none";
+  const err = state.last_error;
   kv($("sys"), [
     ["Modelo", esc(m.model_id)],
-    ["Validación", `<span class="pill ${m.validation_status === "VALIDADO" ? "st-signal" : "st-none"}">${esc(m.validation_status)}</span>`],
+    ["Validación", `<span class="pill ${valCls}">${esc(m.validation_status)}</span>` +
+      (m.validation_status === "VALIDADO_HOLDOUT" ? ` <span class="note">en observación: solo alertas «EXPERIMENTAL — NO OPERAR»</span>` : "")],
     ["Datos", m.synthetic ? "SINTÉTICOS (demostración)" : "reales"],
     ["Monitor", `${esc(mon.status)} — ${esc(mon.detail)}`],
-    ["Conteo", esc(Object.entries(state.counts || {}).map(([k, v]) => `${k}: ${v}`).join(" · "))],
+    ["Conteo desde el arranque", esc(Object.entries(state.counts || {}).map(([k, v]) => `${k}: ${v}`).join(" · "))],
+    ...(err ? [["Último error", `${esc(bog(err.time))} — ${esc(err.error)}` +
+      (state.last_ok_at && Date.parse(state.last_ok_at) > Date.parse(err.time) ? ` <span class="note">(resuelto: después hubo ciclos correctos)</span>` : "")]] : []),
   ]);
   const r = state.research || {};
-  kv($("research"), r.available ? [
-    ["Veredicto", `<span class="pill ${r.verdict === "SIN SEÑAL" ? "st-none" : "st-exp"}">${esc(r.verdict)}</span>`],
-    ["Candidatas", esc((r.candidates || []).length)],
-    ["Informe dev", r.dev_summary ? "results/dev/summary.md" : "—"],
-    ["Periodo bloqueado", r.holdout_summary ? "results/holdout/summary.md" : "pendiente"],
-  ] : [["Veredicto", "Aún no hay estudio completo (config/frozen.json)."]]);
+  let research;
+  if (!r.available) {
+    research = [["Veredicto", "Aún no hay estudio completo (config/frozen.json)."]];
+  } else if (r.holdout_verdict) {
+    // Agrupa las políticas que superaron el periodo bloqueado por instrumento, horizonte y modelo.
+    const groups = {};
+    (r.holdout_passed || []).forEach(c => {
+      const k = `${c.symbol} ${c.horizon} min ${c.model}`;
+      (groups[k] = groups[k] || []).push(c.policy);
+    });
+    const passed = Object.entries(groups).map(([k, ps]) => `${k} (política${ps.length > 1 ? "s" : ""} ${ps.join(", ")})`);
+    research = [
+      ["Veredicto", `<span class="pill ${passed.length ? "st-exp" : "st-none"}">${esc(r.holdout_verdict)}</span>`],
+      ["Superaron el periodo bloqueado", passed.length ? esc(passed.join(" · ")) : "ninguna"],
+      ["Candidatas de desarrollo", esc((r.candidates || []).length)],
+      ["Informes", "results/dev/summary.md · results/holdout/summary.md"],
+    ];
+  } else {
+    research = [
+      ["Veredicto", `<span class="pill ${r.verdict === "SIN SEÑAL" ? "st-none" : "st-exp"}">${esc(r.verdict)}</span>`],
+      ["Candidatas", esc((r.candidates || []).length)],
+      ["Informe dev", r.dev_summary ? "results/dev/summary.md" : "—"],
+      ["Periodo bloqueado", r.holdout_other_study ? "pendiente (results/holdout es de otro estudio)" : "pendiente"],
+    ];
+  }
+  kv($("research"), research);
   const p = state.paper || {};
   kv($("paper"), [
-    ["Saldo simulado", esc((p.balance ?? 0).toFixed(2)) + " unidades"],
-    ["Operaciones", esc(p.n ?? 0)],
-    ["Hipotéticas (experimentales)", `${esc(p.shadow_n ?? 0)} · PnL ${esc((p.shadow_pnl ?? 0).toFixed(2))}`],
+    ["Saldo simulado", esc((p.balance ?? 0).toFixed(2)) + " unidades (solo alertas SEÑAL)"],
+    ["Operaciones con saldo", esc(p.n ?? 0)],
+    ["Hipotéticas (sin operar)", `${esc(p.shadow_n ?? 0)} · PnL hipotético ${esc(signed(p.shadow_pnl ?? 0))} unidades de apuesta`],
   ]);
   const all = $("showAll").checked;
   const rows = (state.alerts || []).filter(a => all || a.status !== "SIN SEÑAL")
     .sort((a, b) => (b.ev ?? -1e9) - (a.ev ?? -1e9) || (b.prob ?? 0) - (a.prob ?? 0));
+  const result = (a) => a.outcome ? a.outcome.resultado : !a.direction ? "—" : stale ? "sin evaluar (bucle detenido)" : "pendiente";
   $("rows").innerHTML = rows.map(a => `<tr data-id="${esc(a.alert_id)}">
       <td class="num">${esc(hm(a.decision_time))}</td><td>${esc(a.instrument)}</td>
       <td><span class="pill ${cls(a.status)}">${esc(a.status)}</span></td>
       <td>${a.direction ? (a.direction === "sube" ? "▲ sube" : "▼ baja") : "—"}</td>
-      <td class="num">${a.prob == null ? "—" : `${pct(a.prob)} [${pct(a.prob_lo)}–${pct(a.prob_hi)}]`}</td>
+      <td class="num">${pct(a.prob)}</td>
+      <td class="num">${a.prob_lo == null ? "—" : `${pct(a.prob_bin_hit)} [${pct(a.prob_lo)}–${pct(a.prob_hi)}]`}</td>
       <td class="num">${pct(a.breakeven)}</td>
-      <td class="num">${a.ev == null ? "—" : (a.ev >= 0 ? "+" : "") + a.ev.toFixed(4)}</td>
+      <td class="num">${a.ev == null ? "—" : signed(a.ev, 4)}</td>
       <td class="num">${esc(hm(a.act_before))}</td>
-      <td>${esc(a.outcome ? a.outcome.resultado : (a.status === "SIN SEÑAL" ? "—" : "pendiente"))}</td></tr>`).join("");
+      <td>${esc(result(a))}</td></tr>`).join("");
   $("empty").style.display = rows.length ? "none" : "block";
   $("empty").textContent = all ? "Sin registros." : "SIN SEÑAL: ninguna configuración cumple los criterios en este momento.";
   document.querySelectorAll("#rows tr").forEach(tr => tr.onclick = () => { selected = tr.dataset.id; detail(); });
@@ -185,7 +231,8 @@ function detail() {
       <dt>Intermediario</dt><dd>${esc(a.broker)}</dd><dt>Fuente de precio</dt><dd>${esc(a.price_source)}</dd>
       <dt>Dirección</dt><dd>${esc(a.direction)}</dd><dt>Duración</dt><dd>${esc(a.duration_min)} min</dd>
       <dt>Actuar antes de</dt><dd>${esc(bog(a.act_before))}</dd>
-      <dt>Probabilidad</dt><dd>${a.prob == null ? "no calculada" : `${pct(a.prob)} (IC90 ${pct(a.prob_lo)}–${pct(a.prob_hi)}, n=${esc(a.prob_n)})`}</dd>
+      <dt>Probabilidad calibrada</dt><dd>${a.prob == null ? "no calculada" : pct(a.prob)}</dd>
+      <dt>Acierto histórico de señales parecidas</dt><dd>${a.prob_lo == null ? "—" : `${pct(a.prob_bin_hit)} (IC90 ${pct(a.prob_lo)}–${pct(a.prob_hi)}, n=${esc(a.prob_n)})`}</dd>
       <dt>Contrato</dt><dd>${esc(a.contract)} ${a.payout != null ? "· pago " + pct(a.payout, 0) + (a.payout_verified ? " (verificado)" : " (NO verificado)") : ""}</dd>
       <dt>Costos</dt><dd>${esc(costs)}</dd>
       <dt>Valor esperado</dt><dd>${a.ev == null ? "—" : esc(a.ev.toFixed(4) + " " + a.ev_units)}</dd>
@@ -198,15 +245,28 @@ function detail() {
 
 $("ackBtn").onclick = async () => {
   if (!selected) return;
-  const r = await fetch("/api/ack", {method: "POST", headers: {"Content-Type": "application/json"},
-                                     body: JSON.stringify({alert_id: selected})});
+  let r;
+  try {
+    r = await fetch("/api/ack", {method: "POST", headers: {"Content-Type": "application/json"},
+                                 body: JSON.stringify({alert_id: selected})});
+  } catch (e) { $("ackBtn").textContent = "No se registró (sin conexión): reintente"; return; }
   if (r.ok) load();
+  else $("ackBtn").textContent = `No se registró (código ${r.status}): reintente`;
 };
 $("showAll").onchange = render;
 
 async function load() {
-  try { state = await (await fetch("/api/state")).json(); render(); }
-  catch (e) { $("updated").textContent = "Sin conexión con el servidor local."; }
+  let r;
+  try { r = await fetch("/api/state"); }
+  catch (e) {
+    $("updated").textContent = "Sin conexión con el servidor local (¿se cerró «tbot serve»?).";
+    $("globalStatus").className = "pill st-pause"; $("globalStatus").textContent = "SIN CONEXIÓN con el panel";
+    return;
+  }
+  if (!r.ok) { $("updated").textContent = "El estado está ocupado; reintentando…"; return; }
+  try { state = await r.json(); }
+  catch (e) { $("updated").textContent = "El servidor envió un estado ilegible: " + e.message; return; }
+  render();
 }
 load(); setInterval(load, 5000);
 </script>

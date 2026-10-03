@@ -62,7 +62,10 @@ def run_demo(minutes: int = 240, runtime_dir: Path = Path("runtime/demo"), show_
     if shadow:
         pnl = sum(t["pnl"] for t in shadow)
         hits = sum(1 for t in shadow if t["win"])
-        print(f"Resultado hipotético de alertas experimentales (sin dinero): {hits}/{len(shadow)} aciertos, "
-              f"PnL {pnl:+.2f} unidades de apuesta")
+        ties = sum(1 for t in shadow if t["tie"])
+        n = len(shadow) - ties  # como el veredicto: los empates se reembolsan y no cuentan para el acierto
+        rate = f" ({hits / n:.1%})" if n else ""
+        print(f"Resultado hipotético de alertas experimentales (sin dinero): {hits}/{n} aciertos{rate} sin "
+              f"contar {ties} empate{'s' if ties != 1 else ''}, PnL {pnl:+.2f} unidades de apuesta")
     print(f"Estado para el panel: {runtime_dir / 'state.json'}  →  tbot serve --runtime {runtime_dir}")
     return 0

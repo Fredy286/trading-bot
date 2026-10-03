@@ -60,6 +60,24 @@ def evaluate_monitor(outcomes: list[dict], breakeven: float, min_n: int = 50, wi
     return MonitorResult("OK", n, hit, hi, mean_p, z, "Sin deterioro detectado.")
 
 
+LIVE_SAMPLE_N = 200  # Aclaración 2: se juzga una sola vez, con las primeras 200 alertas sin empate
+
+
+def fixed_sample(rows: list[dict], n: int = LIVE_SAMPLE_N) -> list[dict]:
+    """Primeras filas, en orden de tiempo, hasta completar `n` alertas sin empate (empates intermedios incluidos).
+
+    Con una muestra fija, consultar el veredicto a diario no cambia el resultado: no hay «parar en el primer
+    aprobado».
+    """
+    out, nontie = [], 0
+    for r in sorted(rows, key=lambda r: str(r.get("time", ""))):
+        if nontie >= n:
+            break
+        out.append(r)
+        nontie += 0 if r.get("tie") else 1
+    return out
+
+
 def live_verdict(ledger_rows: list[dict], breakeven: float, symbol: str, model: str, min_n: int = 200) -> dict:
     """Veredicto de la observación en vivo SIN dinero (criterios fijos, no ajustables a posteriori):
     ≥ `min_n` alertas evaluadas sin empate, límite inferior de Wilson 95 % del acierto > umbral y

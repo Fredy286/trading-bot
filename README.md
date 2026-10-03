@@ -81,13 +81,32 @@ tbot research report --stage dev                   # veredicto mecánico + confi
 
 # 3) Observación en vivo SIN dinero real (hoy: BTC/USDT vía API pública de Binance)
 copy .env.example .env        # macOS/Linux: cp .env.example .env
-#    en .env ponga TB_SHOW_EXPERIMENTAL=true para ver las alertas experimentales
 tbot data download --symbols BTCUSDT --start 2025-09-01 --end 2026-10-01
 tbot train --symbol BTCUSDT --horizon 1 --model gbm        # estado: VALIDADO_HOLDOUT (no accionable)
-tbot live --symbol BTCUSDT --horizon 1 --runtime runtime/live
+tbot live --symbol BTCUSDT --horizon 1 --model gbm --runtime runtime/live
 tbot serve --runtime runtime/live                          # en otra terminal
-tbot live-verdict --symbol BTCUSDT --model gbm             # tras ≥ 200 alertas evaluadas
+tbot live-verdict --symbol BTCUSDT --horizon 1 --model gbm # tras ≥ 200 alertas evaluadas
 ```
+
+Durante la observación en vivo (semanas sin supervisión):
+
+- El modelo `VALIDADO_HOLDOUT` se observa siempre: sus alertas salen como «EXPERIMENTAL — NO OPERAR»
+  y se evalúan con el precio real de Binance al entrar y al vencer. `TB_SHOW_EXPERIMENTAL` solo hace
+  falta para ver alertas de modelos no validados.
+- Deje el portátil **conectado al cargador**. Mientras `tbot live` está abierto, Windows no se suspende
+  por inactividad (no impide cerrar la tapa ni suspender a mano).
+- Si se cierra o el PC se reinicia, vuelva a lanzar el mismo `tbot live`: recupera los resultados ya
+  registrados de ese modelo y marca como «no_evaluable (reinicio)» las alertas que quedaron abiertas.
+  No se puede abrir dos veces sobre la misma carpeta (se contarían doble).
+- Si el bucle deja de actualizar, el panel lo indica con «DETENIDO» en rojo. Los errores, huecos y
+  reinicios quedan en `runtime/live/events.jsonl`.
+- Los criterios están **pre-registrados** (Aclaración 2 del protocolo): se juzga una sola vez con las
+  **primeras 200 alertas sin empate** de un único entrenamiento, medidas con precio real; aprueba solo si
+  el límite inferior de Wilson 95 % supera 54,05 % y el EV medio es positivo. Consultar
+  `tbot live-verdict` antes no cambia el resultado final. El comando informa cuántas filas excluyó y
+  cuántas alertas quedaron «no evaluables» (sin precio, duración real fuera de 60 ± 10 s, reinicio…).
+- La decisión se toma 1 s después del cierre de cada vela (`TB_FEED_LATENCY_S=1` en `.env`). Cada hora
+  se registra el desfase entre el reloj del PC y el de Binance; si supera 0,5 s, `tbot live` avisa.
 
 El estudio completo con datos reales también se puede lanzar desde GitHub: pestaña **Actions →
 «Estudio empírico» → Run workflow**.
@@ -102,13 +121,17 @@ no hay secretos en el código.
 ## Qué incluye cada alerta
 
 Instrumento, intermediario y fuente de precio, fecha y hora en America/Bogota, dirección prevista, hora
-límite para actuar, duración, probabilidad calibrada con su intervalo, umbral de rentabilidad, pago y
+límite para actuar, duración, probabilidad calibrada de la alerta y, aparte, el **acierto histórico de
+señales parecidas** con su intervalo (IC90) —es una tasa del grupo de confianza parecida en calibración,
+por eso la probabilidad de la alerta puede quedar fuera de ese intervalo—, umbral de rentabilidad, pago y
 costos considerados, valor esperado, razones cuantificables, factores que la invalidarían y estado de
-validación del modelo. Cada alerta registra cuándo se **generó, envió, recibió y evaluó**
-(`runtime/<dir>/events.jsonl`).
+validación del modelo. Cada alerta registra cuándo se **generó, envió y evaluó**
+(`runtime/<dir>/events.jsonl`, lo escribe `tbot live`) y cuándo se **recibió** (`runtime/<dir>/acks.jsonl`,
+lo escribe el panel al pulsar «Marcar como recibida»).
 
 Estados: `SEÑAL` (solo con modelo `VALIDADO`), `EXPERIMENTAL — NO OPERAR`, `SIN SEÑAL`, `PAUSADO`
-(el monitor detectó deterioro en vivo).
+(el monitor detectó deterioro en vivo; las que habrían sido alerta se siguen evaluando como hipotéticas,
+sin operar, para que la observación no se estanque).
 
 ## Arquitectura
 

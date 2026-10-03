@@ -6,8 +6,9 @@ Una alerta accionable («SEÑAL») exige TODO lo siguiente:
   3. sin ventanas de noticias programadas/calendario durante la operación y spread normal;
   4. EV neto estimado ≥ margen y límite inferior del intervalo de probabilidad > umbral de rentabilidad;
   5. límites de riesgo no alcanzados y monitor de deterioro sin pausa.
-Si falla cualquiera → «SIN SEÑAL» con el motivo (o «EXPERIMENTAL — NO OPERAR» si el usuario activó
-TB_SHOW_EXPERIMENTAL y el único fallo es la validación).
+Si falla cualquiera → «SIN SEÑAL» con el motivo, o «EXPERIMENTAL — NO OPERAR» si el único fallo es la
+validación y el modelo está en observación en vivo (VALIDADO_HOLDOUT) o el usuario activó TB_SHOW_EXPERIMENTAL.
+Con el monitor en pausa → «PAUSADO»; si habría sido alerta conserva la dirección y se evalúa como hipotética.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ from ..research.news import SCHEDULED_RELEASES, calendar_blackout, trade_overlap
 from ..research.simulate import max_age_for_horizon
 from ..timeutil import BOGOTA, fmt_bogota
 from .alert import EXPERIMENTAL, NO_SIGNAL, PAUSED, SIGNAL, Alert
-from .registry import ACTIONABLE, ModelBundle
+from .registry import ACTIONABLE, OBSERVED, ModelBundle
 
 MIN_HISTORY = 300
 
@@ -121,6 +122,7 @@ class SignalEngine:
         a.direction = "sube" if side > 0 else "baja"
         a.act_before = decision_time + timedelta(seconds=max_age)
         a.prob, a.prob_lo, a.prob_hi, a.prob_n = p_dir, lo, hi, n
+        a.prob_bin_hit = float(hist_hit)
 
         c_now = float(valid["c"].iloc[-1])
         spread_now = float(valid["spread_c"].iloc[-1])
@@ -167,7 +169,8 @@ class SignalEngine:
         a.invalidators.append(f"Precio de entrada a más de {0.5 * vol1:.{self._dec()}f} del cierre de referencia "
                               f"{c_now:.{self._dec()}f}.")
         sp_med = spread_now / x.iloc[0]["spread_rel"] if x.iloc[0]["spread_rel"] > 0 else spread_now
-        a.invalidators.append(f"Spread del intermediario mayor que {2 * sp_med:.{self._dec()}f}.")
+        if sp_med > 0:  # fuentes sin bid/ask (Binance): no hay spread de referencia con el que comparar
+            a.invalidators.append(f"Spread del intermediario mayor que {2 * sp_med:.{self._dec()}f}.")
         rel = _next_release_text(pd.Timestamp(decision_time), self.h + 15)
         if rel:
             a.invalidators.append(f"Publicación programada cercana: {rel}.")
@@ -197,15 +200,32 @@ class SignalEngine:
             blockers.append("demasiadas pérdidas consecutivas")
         if not ev_ok:
             blockers.append(f"EV estimado {ev:+.4f} por debajo del margen exigido")
-        if isinstance(self.contract, BinaryContract) and not lo > be:
-            blockers.append(f"límite inferior de la probabilidad {lo:.1%} ≤ umbral {be:.1%}")
+        if isinstance(self.contract, BinaryContract):
+            a.ic_filter_ok = bool(lo > be)
+            # En observación en vivo se replica la política validada (EV ≥ margen), sin este filtro extra.
+            if not a.ic_filter_ok and self.b.validation_status not in OBSERVED:
+                blockers.append(f"límite inferior del acierto histórico de señales parecidas {lo:.1%} ≤ umbral {be:.1%}")
         if isinstance(self.contract, SpotContract) and be > 1:
             blockers.append(f"costo ≥ movimiento medio: umbral de acierto {be:.0%} inalcanzable")
 
+        status_ok = self.b.validation_status in ACTIONABLE
+        # SIN_DATOS cuenta como OK: si no, un modelo VALIDADO nunca emitiría su primera SEÑAL.
+        validated = status_ok and monitor_status in ("OK", "SIN_DATOS")
+        # Se registran (como EXPERIMENTAL) los modelos en observación en vivo, los VALIDADO degradados por el
+        # monitor y, si el usuario lo pidió, los no validados.
+        observe = self.s.show_experimental or status_ok or self.b.validation_status in OBSERVED
         if monitor_status == "PAUSADO":
-            a.status, a.no_signal_reason = PAUSED, "monitor de deterioro: resultados en vivo por debajo del umbral"
+            a.status = PAUSED
+            a.no_signal_reason = "monitor de deterioro: resultados en vivo por debajo del umbral"
+            if blockers or not observe:
+                # No habría sido alerta: sin dirección, no se evalúa.
+                if blockers:
+                    a.no_signal_reason += "; " + "; ".join(blockers)
+                a.direction = None
+            else:
+                # Habría sido alerta: se evalúa como hipotética para que la observación siga acumulando datos.
+                a.no_signal_reason += " (alerta hipotética: se evalúa sin operar)"
             return a
-        validated = self.b.validation_status in ACTIONABLE and monitor_status == "OK"
         if blockers:
             a.status = NO_SIGNAL
             a.no_signal_reason = "; ".join(blockers)
@@ -216,7 +236,7 @@ class SignalEngine:
             a.status = SIGNAL
             risk.alerts_today += 1
             return a
-        if self.s.show_experimental:
+        if observe:
             a.status = EXPERIMENTAL
             return a
         a.status = NO_SIGNAL

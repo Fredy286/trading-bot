@@ -50,13 +50,17 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
 
 ## Qué falta (próximos pasos)
 
-1. **Instalar y verificar en local**: `pip install -e ".[dev]"`, `pytest -q` (55 pruebas),
-   `tbot data probe` para ver qué fuentes alcanza el PC del usuario (desde Colombia Binance API y
-   probablemente Dukascopy deberían funcionar; en la nube estaban bloqueadas).
+1. ~~Instalar y verificar en local~~ **Hecho (2026-10-01/02)**: mismas versiones que la nube, pruebas
+   en verde (79 tras las correcciones), demos idénticas. `tbot data probe` desde Colombia: Binance,
+   HistData, Yahoo, Deriv y ForexFactory responden; **Dukascopy no** (503 «No server is available»
+   y timeouts, del lado del servidor; igual el 2026-10-02). Una auditoría del bucle en vivo halló y
+   corrigió 10 fallos que habrían dañado la observación (ítems 11–20) y una revisión final otros 8
+   (ítems 22–29). El feed real de Binance se probó con `run_live` (5 ciclos, sin errores).
 2. **Observación en vivo sin dinero de BTC 1 min** (2–4 semanas): ver README, sección 3 de uso
-   (`tbot train --model gbm`, `tbot live`, `tbot serve`, luego `tbot live-verdict`). La cuenta
-   simulada usa precios reales de entrada y vencimiento. Esperado: la latencia real borra la ventaja.
-3. **Repetir el estudio con Dukascopy (bid/ask reales)** en local:
+   (`tbot train --model gbm`, `tbot live --model gbm`, `tbot serve`, luego `tbot live-verdict`). La
+   cuenta simulada usa precios reales de entrada y vencimiento. Esperado: la latencia real borra la
+   ventaja. Falta descargar los datos de BTC y entrenar el modelo real.
+3. **Repetir el estudio con Dukascopy (bid/ask reales)** en local (bloqueado mientras Dukascopy falle):
    `tbot data download --symbols EURUSD,... --source dukascopy` y `tbot research run --source dukascopy`.
    Es un estudio nuevo: registrar enmienda/nuevo pre-registro antes de mirar resultados.
 4. Investigar la baja cobertura de HistData 2023 (registro de errores, ítem 10).
@@ -71,3 +75,4 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
 - No cambiar `config/research.toml` ni reinterpretar resultados ya vistos; cualquier estudio nuevo
   se pre-registra primero (commit con fecha) y se evalúa en datos no usados.
 - Todo en UTC internamente; mostrar en America/Bogota.
+- PC del usuario: Windows 11. Git Bash falla («fork: Resource temporarily unavailable»): usar PowerShell.

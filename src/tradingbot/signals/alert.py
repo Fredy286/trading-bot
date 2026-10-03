@@ -33,10 +33,16 @@ class Alert:
     duration_min: int
     direction: str | None = None  # "sube" | "baja"
     act_before: datetime | None = None  # UTC
-    prob: float | None = None  # probabilidad calibrada de la dirección
+    prob: float | None = None  # probabilidad calibrada de la dirección (de ESTA alerta)
+    # Acierto histórico, en calibración, de las señales de confianza parecida (bin) y su IC90 de Wilson.
+    # Es una tasa del grupo, no un intervalo de `prob`: `prob` puede quedar fuera de [prob_lo, prob_hi].
+    prob_bin_hit: float | None = None
     prob_lo: float | None = None
     prob_hi: float | None = None
     prob_n: int | None = None  # señales comparables en calibración
+    # ¿Pasa el filtro adicional prob_lo > umbral? Bloquea en los demás estados; en la observación en vivo
+    # (VALIDADO_HOLDOUT) solo se anota, porque la política validada (B/BN) no lo incluía (Aclaración 2).
+    ic_filter_ok: bool | None = None
     breakeven: float | None = None
     contract: str = "binaria"
     payout: float | None = None
@@ -82,13 +88,24 @@ class Alert:
         return json.dumps(self.to_dict(), ensure_ascii=False)
 
     # ------------------------------------------------------------------ presentación
+    def bin_text(self, capital: bool = False) -> str | None:
+        """«acierto histórico de señales parecidas: 75.3% [72.4%–78.2%]» (None si no hay datos)."""
+        if self.prob_lo is None:
+            return None
+        hit = "—" if self.prob_bin_hit is None else f"{self.prob_bin_hit:.1%}"
+        lead = "Acierto" if capital else "acierto"
+        return f"{lead} histórico de señales parecidas: {hit} [{self.prob_lo:.1%}–{self.prob_hi:.1%}]"
+
     def one_line(self) -> str:
         hora = self.decision_time.astimezone(BOGOTA).strftime("%H:%M")
         prob = "no calculada" if self.prob is None else f"{self.prob:.1%}"
-        if self.prob is not None and self.prob_lo is not None:
-            prob += f" [{self.prob_lo:.1%}–{self.prob_hi:.1%}]"
-        pago = "no verificado" if not self.payout_verified else f"{self.payout:.0%}"
-        if self.payout is not None and not self.payout_verified:
+        if self.prob is not None and self.bin_text():
+            prob += f" | {self.bin_text()}"
+        if self.payout is None:  # contado/CFD no tiene pago fijo
+            pago = "no aplica" if self.contract != "binaria" else "no verificado"
+        elif self.payout_verified:
+            pago = f"{self.payout:.0%}"
+        else:
             pago = f"{self.payout:.0%} supuesto, no verificado"
         estado = "NO OPERAR" if self.status != SIGNAL else "SEÑAL (alerta, no orden)"
         if self.status == NO_SIGNAL:
@@ -108,8 +125,9 @@ class Alert:
             L.append(f"Actuar antes de: {fmt_bogota(self.act_before)}")
         if self.prob is not None:
             be = "—" if self.breakeven is None else f"{self.breakeven:.1%}"
-            ic = "" if self.prob_lo is None else f" (IC90 del bin: {self.prob_lo:.1%}–{self.prob_hi:.1%}, n={self.prob_n})"
-            L.append(f"Probabilidad calibrada: {self.prob:.1%}{ic} | Umbral de rentabilidad: {be}")
+            L.append(f"Probabilidad calibrada: {self.prob:.1%} | Umbral de rentabilidad: {be}")
+            if self.bin_text():
+                L.append(f"{self.bin_text(capital=True)} (IC90, n={self.prob_n})")
         else:
             L.append("Probabilidad: no calculada")
         if self.contract == "binaria":

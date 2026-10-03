@@ -315,3 +315,47 @@ informa si el EV del periodo bloqueado cae por debajo del IC de desarrollo (dete
 Observación registrada antes del periodo bloqueado: en desarrollo, las candidatas de BTC/USDT a 1 y
 5 minutos **pierden la ventaja con 60 s de retraso** en la entrada (sensibilidad `B_lat60`), por lo que
 serían inoperables con latencia humana aunque superen el periodo bloqueado.
+
+## Aclaración 2 — observación en vivo sin dinero (2026-10-03, ANTES de iniciarla)
+
+La sección 8 solo fijaba la regla de **pausa** en vivo. Los criterios para **aprobar** la observación
+(≥ 200 alertas, límite inferior > p*, EV > 0) estaban en el código, pero podían relajarse por línea de
+comandos. Además, consultar el veredicto cada día y parar en el primer «aprobado» infla los falsos
+positivos: en una simulación sin ventaja real (20 000 repeticiones, 28 días, 40–160 alertas/día) se
+aprueba por azar el 10,5–12,5 % de las veces, frente a 2,9 % con una muestra fija de 200. Se fijan aquí, **antes de ver
+ningún resultado en vivo del modelo real**. La única ejecución contra Binance hasta hoy usó un modelo
+sintético con alertas forzadas, para probar la conexión; no aporta información sobre la ventaja.
+
+1. **Objeto:** BTC/USDT, horizonte 1 min, modelo `gbm` entrenado con
+   `tbot train --symbol BTCUSDT --horizon 1 --model gbm` (12 meses más recientes). Se observa **un
+   único entrenamiento**, identificado por su `model_id` con huella, durante toda la muestra.
+2. **Regla de decisión = la política validada** en el periodo bloqueado: alerta si el EV estimado con
+   la probabilidad calibrada es ≥ 0,02 (pago supuesto 85 %, empate reembolsado), excluyendo las
+   ventanas de publicación programada (BN). El filtro adicional del motor (límite inferior del acierto
+   histórico de señales parecidas > p*) **no** formaba parte de la política validada: en la observación
+   no bloquea. Se anota en cada alerta (`ic_filter_ok`) para un análisis **secundario** que no decide.
+3. **Medición:** la decisión se toma 1 s después del cierre de la vela (`TB_FEED_LATENCY_S=1`;
+   Binance publica la vela definitiva a ~0,3 s, medido el 2026-10-03). El precio de entrada es el
+   último negociado en Binance obtenido en ese ciclo; el de vencimiento, el del ciclo del minuto
+   siguiente. La duración real entre ambos precios debe estar en 60 ± 10 s; si no, «no evaluable».
+   Precio igual = empate (reembolso).
+4. **Muestra fija:** las **primeras 200 alertas sin empate** medidas con precio real, en orden de
+   tiempo. El veredicto se juzga **una sola vez** sobre esa muestra; antes de completarla es
+   «muestra insuficiente» y no puede aprobar. Consultarlo antes no cambia el resultado final.
+5. **Criterio de aprobación (todos):** límite inferior de Wilson 95 % del acierto > p* = 1/(1+0,85) =
+   54,05 %, y EV medio > 0 en la misma muestra (empates con PnL 0).
+6. **Pausa (sección 8):** si tras ≥ 50 señales el límite superior queda por debajo de p*, el monitor
+   pausa. Las alertas que se habrían emitido se siguen evaluando como hipotéticas y cuentan para la
+   muestra (la pausa no detiene la observación ni la convierte en un resultado mejor).
+7. **Se reporta siempre:** alertas no evaluables por motivo, duración real y retraso medidos, desfase
+   del reloj, desglose por hora de Bogotá y el resultado secundario con el filtro adicional.
+8. **Consecuencia:** si aprueba → estado `VALIDADO` (procedimiento BTC/USDT h1 gbm, política BN) y
+   solo entonces podría considerarse la Fase 2, con autorización expresa del usuario. Si no aprueba →
+   BTC/USDT queda en «SIN SEÑAL». Expectativa declarada de antemano: la latencia real probablemente
+   borra la ventaja.
+9. **Fuera de la observación:** las pruebas manuales que el usuario haga en cuentas demo de cualquier
+   plataforma no cuentan para este veredicto, porque usan otro feed de precios y otra latencia.
+
+Implementado en `signals/monitor.py::fixed_sample`, `cli.py::cmd_live_verdict` (sin opciones para cambiar
+la muestra ni el umbral) y `signals/registry.py::validation_status_for` (rechaza veredictos que no
+usen la muestra fija de 200 y un umbral ≥ p* del contrato). Pruebas en `tests/test_alerts_system.py`.

@@ -2,12 +2,14 @@
 
 - ReplayFeed: reproduce velas históricas o sintéticas con un reloj simulado (demostraciones y pruebas).
 - BinancePollingFeed: API pública de Binance (sin credenciales). El análisis del formato está probado
-  con datos de ejemplo; la conexión real NO se probó desde el entorno de desarrollo (red bloqueada).
+  con datos de ejemplo. La conexión real se probó desde el PC del usuario (Colombia) el 2026-10-01:
+  5 ciclos de `run_live` con velas y precio en vivo, sin errores.
 Cada lectura devuelve la hora de recepción para registrar cuándo estuvo disponible el dato.
 """
 
 from __future__ import annotations
 
+import time
 from datetime import datetime
 
 import pandas as pd
@@ -52,6 +54,14 @@ class BinancePollingFeed:
         raw = raw[(close_time < pd.Timestamp(now_utc)).to_numpy()]  # solo velas ya cerradas
         bars, _ = to_canonical(raw)
         return bars
+
+    def clock_offset(self) -> float:
+        """Reloj de Binance − reloj del PC, en segundos (corregido por la mitad del tiempo de ida y vuelta)."""
+        t0 = time.time()
+        r = self.session.get("https://api.binance.com/api/v3/time", timeout=5)
+        t1 = time.time()
+        r.raise_for_status()
+        return r.json()["serverTime"] / 1000 - (t0 + t1) / 2
 
     def current_price(self, now_utc: datetime | None = None) -> tuple[float, datetime]:
         """Último precio negociado (entrada/salida reales de la observación en vivo)."""
