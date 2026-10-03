@@ -53,6 +53,42 @@ class HistoricalPriceFeed(ReplayFeed):
         return float(self._px[i]), (pd.Timestamp(target + 1, unit="s", tz="UTC")).to_pydatetime()
 
 
+def delay_sensitivity(rows: list[dict], closes_1s: pd.Series, delays=(1, 2, 3, 5, 10, 30),
+                      payouts=(0.85, 0.80), point: float = 0.01, max_gap_s: int = 5) -> list[dict]:
+    """Sensibilidad informativa (Enmienda 2): las MISMAS alertas, con entrada a +d s del cierre de la
+    vela y vencimiento 60 s después, medidas con las velas de 1 s. No decide nada."""
+    from ..research.metrics import wilson
+
+    idx = closes_1s.index if closes_1s.index.unit == "ns" else closes_1s.index.as_unit("ns")
+    sec, px = idx.asi8 // 10**9, closes_1s.to_numpy(float)
+
+    def price_before(t: int) -> float | None:  # último negociado antes del segundo t
+        i = int(np.searchsorted(sec, t - 1, side="right")) - 1
+        return float(px[i]) if i >= 0 and (t - 1) - sec[i] <= max_gap_s else None
+
+    out = []
+    for d in delays:
+        wins = losses = ties = missing = 0
+        for r in rows:
+            t0 = int(pd.Timestamp(r["decision_time"]).value // 10**9)
+            o, c = price_before(t0 + d), price_before(t0 + d + 60)
+            if o is None or c is None:
+                missing += 1
+                continue
+            mv = np.sign(round((c - o) / (point / 2)))
+            side = 1 if r["direction"] == "sube" else -1
+            ties += mv == 0
+            wins += mv == side
+            losses += mv == -side
+        n = wins + losses
+        lo, _ = wilson(wins, n) if n else (float("nan"), float("nan"))
+        for b in payouts:
+            out.append({"entrada_s": d, "pago": b, "n": n, "aciertos": wins, "empates": ties, "sin_precio": missing,
+                        "acierto": wins / n if n else None, "lo95": lo, "umbral": 1 / (1 + b),
+                        "ev": (wins * b - losses) / (n + ties) if n + ties else None})
+    return out
+
+
 def run_replay(symbol: str, horizon: int, model: str, start: date, end: date, runtime_dir: Path,
                models_dir: Path = Path("models"), data_root: Path = Path("data/raw"),
                entry_delay_s: float = 2.0, observation_path: Path | None = None, progress: bool = True) -> int:
@@ -91,6 +127,7 @@ def run_replay(symbol: str, horizon: int, model: str, start: date, end: date, ru
     engine = SignalEngine(bundle, s, inst, price_source="Binance spot (reproducción con velas de 1 s)")
     first_now = pd.Timestamp(start, tz="UTC") + pd.Timedelta(minutes=1, seconds=CYCLE_OFFSET_S)
     loop = AlertLoop(engine, feed, [], runtime_dir, s, clock=lambda: first_now.to_pydatetime())
+    loop.state_every = 1440  # estado del panel una vez por día simulado (no cambia ninguna medición)
     loop.log.write("started", model_id=bundle.model_id, validation_status=bundle.validation_status,
                    modo="reproducción histórica (Enmienda 2)", entry_delay_s=entry_delay_s,
                    inicio=str(start), fin=str(end))
@@ -103,6 +140,7 @@ def run_replay(symbol: str, horizon: int, model: str, start: date, end: date, ru
             day = t.date()
             print(f"  {day}: {loop.status_counts}", flush=True)
         t += pd.Timedelta(minutes=1)
+    loop.write_state()
     loop.log.write("stopped", motivo="fin de la reproducción")
     print(f"Reproducción terminada: {loop.status_counts}; alertas evaluadas: {len(loop.ledger.trades)}")
     return 0

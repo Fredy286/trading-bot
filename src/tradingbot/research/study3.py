@@ -50,7 +50,7 @@ NEW_FEATURES = ["tib_s_5", "tib_s_15", "tib_s_60", "tib_s_240", "tib_p_5", "tib_
 
 
 def _months(start: str, end: str) -> list[str]:
-    return [f"{p:%Y-%m}" for p in pd.period_range(start, end, freq="M")]
+    return [p.strftime("%Y-%m") for p in pd.period_range(start, end, freq="M")]
 
 
 def _read_klines(csv: bytes) -> pd.DataFrame:

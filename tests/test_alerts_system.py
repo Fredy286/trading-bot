@@ -821,6 +821,12 @@ def test_historical_price_feed_uses_registered_timing(bars_edge, bundle_edge, tm
     ev = [a for a in loop.alerts if a.outcome and a.outcome.get("metodo")]
     assert ev and all(a.outcome["duracion_real_s"] == 60 for a in ev)
     assert all(r["entrada_tras_cierre_s"] == 2 for r in loop.ledger.trades)
+    # La sensibilidad con entrada a +2 s reproduce exactamente el resultado del bucle.
+    from tradingbot.live.replay import delay_sensitivity
+
+    sens = delay_sensitivity(loop.ledger.trades, long_closes, delays=(2,), payouts=(0.85,), point=1e-5)[0]
+    assert sens["aciertos"] == sum(r["win"] for r in loop.ledger.trades)
+    assert sens["empates"] == sum(r["tie"] for r in loop.ledger.trades)
 
 
 def test_event_log_never_raises(tmp_path, monkeypatch):

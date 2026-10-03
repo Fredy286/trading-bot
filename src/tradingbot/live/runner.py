@@ -127,6 +127,8 @@ class AlertLoop:
         self.started_at = self.clock()
         self.status_counts: dict[str, int] = {}
         self.policy = policy_of(settings)  # se anota en cada fila del libro (Aclaración 2)
+        self.state_every = 1  # en una reproducción histórica no hace falta el estado del panel cada minuto
+        self._steps = 0
         self._decided: deque = deque(maxlen=120)  # velas ya usadas para una alerta evaluable
         self._resume()
 
@@ -207,7 +209,9 @@ class AlertLoop:
         self.status_counts[alert.status] = self.status_counts.get(alert.status, 0) + 1
         self.alerts.appendleft(alert)
         self.last_ok_at = utcnow()
-        self.write_state()
+        self._steps += 1
+        if self._steps % self.state_every == 0:
+            self.write_state()
         return alert
 
     def note_error(self, exc: Exception, now: datetime | None = None) -> None:
