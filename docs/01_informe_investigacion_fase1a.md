@@ -559,3 +559,44 @@ Registro de errores, ítem 38.
 
 **Fuera de la familia (solo informativo):** GBM, duraciones de 5 y 60 min y efecto del cuarto de hora.
 Las divisas no entran (HistData no tiene volumen agresor).
+
+**Resultado de la fase de desarrollo (commit 86faa7c; la primera ejecución no vale, ítem 39):**
+
+| Hipótesis | Modelo | Operaciones | Acierto [lím. inf. 95 %] | EV [IC 95 %] | Trimestres EV > 0 | Mejora de log-loss [IC 95 %] |
+|---|---|---|---|---|---|---|
+| H3-BTC | solo precio (referencia) | 30 837 | 55,67 % [55,12 %] | +0,030 [+0,020; +0,041] | 87 % | — |
+| H3-BTC | precio + bloque nuevo | 33 855 | 55,11 % [54,58 %] | +0,020 [+0,010; +0,029] | 67 % | −0,00009 [−0,00030; +0,00011] |
+| H3-ETH | solo precio (referencia) | 32 168 | 55,35 % [54,80 %] | +0,024 [+0,014; +0,034] | 87 % | — |
+| H3-ETH | precio + bloque nuevo | 29 234 | 55,29 % [54,72 %] | +0,023 [+0,012; +0,033] | 79 % | −0,00020 [−0,00041; −0,00001] |
+
+**Veredicto: ninguna hipótesis pasa.** Falla el criterio 5: la información nueva no mejora la predicción
+(en ETH la empeora de forma significativa) ni la ganancia esperada. **Estudio 3: SIN SEÑAL.**
+
+## Estudio 4 — ETH/USDT a 15 min, solo precio, 1 min de anticipación (pre-registro, 2026-10-03)
+
+**Origen:** en la fase de desarrollo del Estudio 3, el modelo de **referencia** de ETH (solo variables de
+precio) cumplió los criterios 1–4 de la sección 8 con entrada 1 minuto después de la señal. Para
+ETH/USDT el periodo 2025-09-01 → 2026-08-31 **nunca se usó**: ni en la Fase 1B (que no incluía ETH) ni
+en los Estudios 2–3. Es, para esta hipótesis, un periodo de confirmación limpio. Advertencia
+declarada: la combinación análoga de BTC (Estudio 2, M1) bajó de 55,4 % en desarrollo a 54,15 % en ese
+periodo.
+
+**Hipótesis única H4-ETH:** ETH/USDT, 15 min, decisión al cierre de las velas de minutos múltiplos de 15
+(UTC), entrada en la apertura de `t+2` (1 min después), `logit` con solo `FEATURES`, etiquetas con
+retraso 2, política B (EV ≥ 0,02), binaria 85 % con empate reembolsado. Mismo código que el Estudio 3
+(`research/study3.py`, modelo de referencia).
+
+**Confirmación:** walk-forward trimestral en 2025-09-01 → 2026-08-31 (12 meses de entrenamiento
+anteriores, 20 % de calibración, purga). Para confirmar debe cumplir los tres criterios estrictos
+(Aclaración 1):
+- límite inferior de Wilson 95 % > 54,05 %;
+- límite inferior del IC 95 % del EV > 0;
+- p < 0,05 (una sola hipótesis).
+
+Se informa además el deterioro frente al desarrollo y la sensibilidad con pago del 80 %.
+
+**Consecuencias:**
+- **Si confirma:** señales manuales **experimentales, solo para cuenta demo**, con el formato «ETH/USD |
+  ABRIR a las HH:MM:00 (hora de Colombia, UTC−5) | 15 minutos | ARRIBA/ABAJO». Seguimiento con datos
+  posteriores al 2026-09-01, evaluados con los archivos de Binance, sin necesidad de un equipo encendido.
+- **Si no confirma:** ETH también queda en «SIN SEÑAL».
