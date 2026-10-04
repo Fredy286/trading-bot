@@ -64,11 +64,13 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    `results/live/verdict.json` y `sensibilidad.json`. Muestra fija 3 500, criterios de la Aclaración 2.
    Solo sería útil para una automatización, que el usuario hoy NO quiere.
    **Resultado (2026-10-04): APRUEBA** — 57,63 % (lím. inf. 55,98 %), EV +0,060 con entrada a +2 s;
-   se apaga con el retraso (+10 s ≈ 56,4 %, +30 s no supera). **PENDIENTE: completar la verificación
-   adversaria** (workflow `verify-positive-replay`, reanudable con resumeFromRunId wf_d801d837-c7f; se
-   detuvo cuando el usuario apagó el PC). Si se confirma: preparar modo de señal manual «entrar ya, antes
-   de 10 s» para BTC/USD 1 min, solo en cuenta DEMO, con advertencias (precio del bróker ≠ Binance,
-   empate debe reembolsarse, pago ≥ 80 %).
+   se apaga con el retraso (+10 s ≈ 56,4 %, +30 s no supera). **Verificación adversaria (2026-10-04):
+   sin fuga ni errores** (probabilidades y resultados recalculados coinciden al 100 %; placebo 50,3 %),
+   pero la ventaja se debilita: después de la muestra fija 54,1 % (EV +0,001), todo el periodo 56,3 %,
+   entre semana 54,1 %, fin de semana 58,4 % (*post hoc*). **Estudio 5 pre-registrado** (docs/01):
+   datos desde 2026-10-04, entrada +10 s (manual realista); H5a todas las horas (3 500), H5b solo fin
+   de semana UTC (2 500), Holm; plazo 2026-12-13. Evaluar con `replay.yml` (`--entry-delay-s 10`)
+   cuando haya datos suficientes (~3 semanas). Señales manuales en demo solo si aprueba.
 2b. **Decisión del usuario (2026-10-03): señales MANUALES**, con ≥ 1 min de anticipación, en el
    instrumento y la duración más predecibles; formato: hora de apertura en UTC−5, instrumento, duración,
    dirección. Resultados, todos pre-registrados y aplicados mecánicamente (docs/01):

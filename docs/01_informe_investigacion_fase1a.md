@@ -434,8 +434,28 @@ evaluables. Según el criterio registrado, **aprueba**. Sensibilidad informativa
 +5 a +10 s → 56,4–56,5 % (límite inferior ≈ 54,7 %); +30 s → 55,4 % (límite inferior 53,8 %, no
 supera). Ese EV supone empate reembolsado; con empate = pérdida sería negativo (empates 8,9 %). Las 103
 alertas en vivo del 2026-10-03 (informativas): 81 sin empate, 61,7 % [50,8–71,6 %].
-**Antes de usarlo** se está verificando con agentes escépticos (fuga de información, cálculo de precios,
-estadística); la verificación quedó a medias el 2026-10-04 y debe completarse.
+**Verificación adversaria (2026-10-04, independiente del código de la reproducción; script fuera del
+repositorio sobre el libro del artefacto del run 37178839251):**
+- **Fuga de información: no hay.** La probabilidad recalculada con la serie completa de septiembre (incluido
+  el futuro) en la vela que cierra en el instante de decisión coincide con la del libro (diferencia máxima
+  1e-15); con la vela siguiente no coincide (diferencia mediana 0,05). Placebo con dirección aleatoria sobre
+  las mismas alertas: 50,32 %.
+- **Precios y resultados: correctos.** Entrada y vencimiento recalculados desde las velas de 1 s coinciden
+  con el libro en el 100 % de las 6 229 alertas; muestra fija 57,63 %, EV +0,060, igual que el veredicto.
+- **Pero la ventaja es menor y menos estable que el titular:**
+  | Tramo (entrada +2 s, pago 85 %, empate reembolsado) | n sin empate | Acierto [IC95] | EV |
+  |---|---|---|---|
+  | Muestra fija (1–~16 sep, la que decide) | 3 500 | 57,63 % [55,98–59,26] | +0,060 |
+  | Después de la muestra (~16 sep – 2 oct, control) | 2 219 | 54,12 % [52,04–56,19] | +0,001 |
+  | Todo el periodo | 5 719 | 56,27 % [54,98–57,55] | +0,038 |
+  | Fin de semana / laborable (todo el periodo) | 2 885 / 2 834 | 58,37 % / 54,13 % | +0,069 / +0,001 |
+  Intervalo bootstrap por días (32 días): 54,32–57,81 %. 12 de 32 días por debajo de 54,05 %. Un tercio
+  de las alertas son de minutos consecutivos. Entrada a +0/+1/+5/+10/+30/+60 s (todo el periodo):
+  54,6/55,7/55,5/55,2/53,8/52,4 %.
+- **Conclusión:** el resultado registrado es **auténtico** (no es un error) y el criterio se cumple, pero la
+  estimación honesta para el futuro es **~55–56 % con entrada inmediata, cerca del punto de equilibrio
+  entre semana y en la segunda mitad de septiembre**. El desglose por fin de semana es *post hoc*: no se
+  usa como regla sin confirmarlo en datos nuevos (Estudio 5). No se recomienda operar con dinero real.
 
 **Limitaciones declaradas:**
 - Supone que el bucle habría funcionado todos los minutos, sin cortes.
@@ -627,3 +647,38 @@ Se informa además el deterioro frente al desarrollo y la sensibilidad con pago 
 **No confirma** (falla los tres criterios) y hay deterioro claro frente al desarrollo. **Estudio 4: SIN
 SEÑAL.** Es el mismo patrón que BTC en el Estudio 2: ventajas de ~55 % hasta 2025 que desaparecen en el
 último año.
+
+## Estudio 5 — confirmación en datos nuevos, con entrada manual realista (pre-registro, 2026-10-04)
+
+**Origen:** la Enmienda 2 aprobó y la verificación adversaria confirmó que no hay errores, pero la ventaja
+cae a ~54 % en la segunda mitad de septiembre y entre semana. El desglose por fin de semana surgió
+*después* de mirar los datos, así que solo vale como hipótesis nueva. El usuario operaría **a mano**: la
+alerta aparece ~1,5 s después del cierre y necesita unos segundos para pulsar. Por eso se evalúa con
+entrada a **+10 s**.
+
+**Datos:** solo velas de Binance (1 min y 1 s) **desde el 2026-10-04 00:00 UTC**, que nadie ha visto (el
+libro de septiembre termina el 2026-10-02 y las 103 alertas en vivo son del 2026-10-03). Se evalúan con
+la misma reproducción de GitHub Actions (`tbot replay --entry-delay-s 10`), sin el portátil.
+
+**Sin cambios:** modelo `BTCUSDT-h1-gbm-2026-08-31-e436ef` (mismo SHA-256), política registrada (EV ≥ 0,02,
+todas las horas), duración 60 s, pago 85 %, empate reembolsado, código de la Enmienda 2.
+
+**Hipótesis (corrección de Holm, α = 0,05, pruebas binomiales unilaterales frente a 54,05 %):**
+- **H5a (todas las horas):** muestra fija = las primeras **3 500** alertas sin empate desde el 2026-10-04.
+- **H5b (solo sábado y domingo, en UTC):** muestra fija = las primeras **2 500** alertas sin empate de fin
+  de semana desde el 2026-10-04, tomadas del mismo libro.
+
+Cada hipótesis aprueba si, además de Holm, cumple: límite inferior de Wilson 95 % > 54,05 % y EV > 0. Se
+informa sin decidir: entrada a +2, +5 y +20 s, pago del 80 % y desglose por día.
+
+**Plazo:** si al **2026-12-13** (10 semanas) no se completa una muestra, esa hipótesis queda «no
+concluyente».
+
+**Consecuencias:**
+- **Si aprueba H5a:** señales manuales experimentales para **cuenta demo**, a cualquier hora, con el
+  formato «BTC/USD | ENTRAR YA (antes de 10 s) | 1 minuto | ARRIBA/ABAJO | hora de Colombia».
+- **Si solo aprueba H5b:** lo mismo, pero solo sábados y domingos.
+- **Si no aprueba ninguna:** BTC a 1 minuto queda «SIN SEÑAL» también para uso manual.
+
+En ningún caso se usa dinero real sin autorización expresa. Antes, una prueba en demo debe comprobar que
+el precio del intermediario sigue al de Binance, que el empate se reembolsa y que el pago es ≥ 85 %.
