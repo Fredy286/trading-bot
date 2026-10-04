@@ -1,0 +1,178 @@
+{
+  "symbol": "BTCUSDT",
+  "model": "gbm",
+  "n": 3500,
+  "wins": 2017,
+  "hit": 0.5762857142857143,
+  "hit_lo95": 0.5598397506906299,
+  "hit_hi95": 0.5925643990860039,
+  "ev": 0.060210718002081165,
+  "breakeven": 0.5405405405405405,
+  "min_n": 3500,
+  "passed": true,
+  "reasons": [],
+  "inicio": "2026-10-04T05:05:58.862934+00:00",
+  "plazo_max": "2026-11-29T05:05:58.862934+00:00",
+  "horizon": 1,
+  "model_id": "BTCUSDT-h1-gbm-2026-08-31-e436ef",
+  "policy": {
+    "contract": "binaria",
+    "payout": 0.85,
+    "tie_rule": "refund",
+    "ev_margin": 0.02,
+    "allowed_hours_bogota": [
+      0,
+      24
+    ],
+    "feed_latency_s": 1.0,
+    "max_staleness_s": 11.0
+  },
+  "payout": 0.85,
+  "tie_rule": "refund",
+  "muestra_fija": true,
+  "n_objetivo": 3500,
+  "alertas_registradas": 6229,
+  "empates_observados": 0.08949011446409989,
+  "secundario_filtro_ic": {
+    "n": 3500,
+    "aciertos": 2017,
+    "acierto": 0.5762857142857143,
+    "hit_lo95": 0.5598397506906299
+  },
+  "medicion": {
+    "duracion_real_s": {
+      "n": 3844,
+      "min": 60.0,
+      "p5": 60.0,
+      "mediana": 60.0,
+      "p95": 60.0,
+      "max": 60.0
+    },
+    "retraso_vencimiento_s": {
+      "n": 3844,
+      "min": 0.0,
+      "p5": 0.0,
+      "mediana": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+    },
+    "entrada_tras_cierre_s": {
+      "n": 3844,
+      "min": 2.0,
+      "p5": 2.0,
+      "mediana": 2.0,
+      "p95": 2.0,
+      "max": 2.0
+    },
+    "desfase_reloj_s": null,
+    "por_hora_bogota": {
+      "0": {
+        "n": 155,
+        "aciertos": 94
+      },
+      "1": {
+        "n": 177,
+        "aciertos": 94
+      },
+      "2": {
+        "n": 165,
+        "aciertos": 97
+      },
+      "3": {
+        "n": 133,
+        "aciertos": 82
+      },
+      "4": {
+        "n": 162,
+        "aciertos": 102
+      },
+      "5": {
+        "n": 147,
+        "aciertos": 89
+      },
+      "6": {
+        "n": 144,
+        "aciertos": 89
+      },
+      "7": {
+        "n": 139,
+        "aciertos": 76
+      },
+      "8": {
+        "n": 174,
+        "aciertos": 86
+      },
+      "9": {
+        "n": 107,
+        "aciertos": 57
+      },
+      "10": {
+        "n": 111,
+        "aciertos": 69
+      },
+      "11": {
+        "n": 91,
+        "aciertos": 62
+      },
+      "12": {
+        "n": 110,
+        "aciertos": 61
+      },
+      "13": {
+        "n": 147,
+        "aciertos": 82
+      },
+      "14": {
+        "n": 139,
+        "aciertos": 93
+      },
+      "15": {
+        "n": 114,
+        "aciertos": 60
+      },
+      "16": {
+        "n": 180,
+        "aciertos": 101
+      },
+      "17": {
+        "n": 121,
+        "aciertos": 71
+      },
+      "18": {
+        "n": 180,
+        "aciertos": 100
+      },
+      "19": {
+        "n": 197,
+        "aciertos": 98
+      },
+      "20": {
+        "n": 143,
+        "aciertos": 77
+      },
+      "21": {
+        "n": 143,
+        "aciertos": 90
+      },
+      "22": {
+        "n": 145,
+        "aciertos": 80
+      },
+      "23": {
+        "n": 176,
+        "aciertos": 107
+      }
+    }
+  },
+  "excluidas": {
+    "de_otro_modelo_o_sin_modelo": 0,
+    "evaluadas_con_velas": 0,
+    "politica_distinta_a_la_registrada": 0,
+    "vela_de_decision_repetida": 0,
+    "lineas_danadas": 0
+  },
+  "no_evaluables": {
+    "total": 0,
+    "por_motivo": {}
+  }
+}
