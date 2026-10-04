@@ -63,6 +63,12 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    registrado `config/modelos/BTCUSDT_h1_gbm.pkl` (SHA-256 en `config/observacion_en_vivo.json`) y guarda
    `results/live/verdict.json` y `sensibilidad.json`. Muestra fija 3 500, criterios de la Aclaración 2.
    Solo sería útil para una automatización, que el usuario hoy NO quiere.
+   **Resultado (2026-10-04): APRUEBA** — 57,63 % (lím. inf. 55,98 %), EV +0,060 con entrada a +2 s;
+   se apaga con el retraso (+10 s ≈ 56,4 %, +30 s no supera). **PENDIENTE: completar la verificación
+   adversaria** (workflow `verify-positive-replay`, reanudable con resumeFromRunId wf_d801d837-c7f; se
+   detuvo cuando el usuario apagó el PC). Si se confirma: preparar modo de señal manual «entrar ya, antes
+   de 10 s» para BTC/USD 1 min, solo en cuenta DEMO, con advertencias (precio del bróker ≠ Binance,
+   empate debe reembolsarse, pago ≥ 80 %).
 2b. **Decisión del usuario (2026-10-03): señales MANUALES**, con ≥ 1 min de anticipación, en el
    instrumento y la duración más predecibles; formato: hora de apertura en UTC−5, instrumento, duración,
    dirección. Resultados, todos pre-registrados y aplicados mecánicamente (docs/01):

@@ -427,6 +427,16 @@ inspeccionaron** y no cuentan. La ejecución oficial se hace en GitHub Actions
 (`.github/workflows/replay.yml`) con el mismo código y el modelo registrado copiado en
 `config/modelos/BTCUSDT_h1_gbm.pkl`. Su SHA-256 queda en el registro y la reproducción lo verifica.
 
+**Resultado (GitHub Actions, run 37178839251, commit 66bd077) — PENDIENTE DE VERIFICACIÓN ADVERSARIA:**
+muestra fija de 3 500 alertas sin empate (1–~16 de septiembre de 2026), acierto **57,63 %** (límite inferior
+95 % 55,98 % > 54,05 %), EV **+0,060**, entrada a +2,0 s y duración de 60,0 s en todas, sin alertas no
+evaluables. Según el criterio registrado, **aprueba**. Sensibilidad informativa: +1 a +3 s → 56,8–57,6 %;
++5 a +10 s → 56,4–56,5 % (límite inferior ≈ 54,7 %); +30 s → 55,4 % (límite inferior 53,8 %, no
+supera). Ese EV supone empate reembolsado; con empate = pérdida sería negativo (empates 8,9 %). Las 103
+alertas en vivo del 2026-10-03 (informativas): 81 sin empate, 61,7 % [50,8–71,6 %].
+**Antes de usarlo** se está verificando con agentes escépticos (fuga de información, cálculo de precios,
+estadística); la verificación quedó a medias el 2026-10-04 y debe completarse.
+
 **Limitaciones declaradas:**
 - Supone que el bucle habría funcionado todos los minutos, sin cortes.
 - Mide con el precio de Binance, no con el del intermediario.
