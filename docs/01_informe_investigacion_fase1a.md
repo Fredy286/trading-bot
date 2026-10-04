@@ -421,6 +421,12 @@ y las 103 alertas en vivo del 2026-10-03, cuyos resultados no se miraron.
 automatización**, que el usuario hoy no quiere y que exigiría su autorización expresa. Si no aprueba,
 BTC/USDT a 1 minuto queda en «SIN SEÑAL».
 
+**Ejecución:** la primera reproducción en el portátil se interrumpió el 2026-10-03 a las 21:44 UTC
+(consola cerrada, con el equipo en batería), en el minuto simulado 2026-09-12 08:38. Sus resultados **no se
+inspeccionaron** y no cuentan. La ejecución oficial se hace en GitHub Actions
+(`.github/workflows/replay.yml`) con el mismo código y el modelo registrado copiado en
+`config/modelos/BTCUSDT_h1_gbm.pkl`. Su SHA-256 queda en el registro y la reproducción lo verifica.
+
 **Limitaciones declaradas:**
 - Supone que el bucle habría funcionado todos los minutos, sin cortes.
 - Mide con el precio de Binance, no con el del intermediario.

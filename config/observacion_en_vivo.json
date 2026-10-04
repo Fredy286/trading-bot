@@ -4,6 +4,8 @@
   "horizon": 1,
   "model": "gbm",
   "model_id": "BTCUSDT-h1-gbm-2026-08-31-e436ef",
+  "model_file": "config/modelos/BTCUSDT_h1_gbm.pkl",
+  "model_sha256": "b5e1de6439574e59bd42777eb575dc83fe359322b97db4fdd286578471f5a198",
   "trained_from": "2025-09-01 04:00:00+00:00",
   "trained_to": "2026-08-31 23:58:00+00:00",
   "policy": {

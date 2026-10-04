@@ -1,0 +1,61 @@
+name: Reproducción histórica (Enmienda 2)
+
+# Evalúa el modelo registrado (config/observacion_en_vivo.json) reproduciendo el bucle en vivo con velas
+# de 1 s de Binance, en los servidores de GitHub: no hace falta dejar ningún equipo encendido.
+# Se ejecuta a mano (Actions → «Reproducción histórica» → Run workflow) o con un commit cuyo mensaje
+# contenga [replay]. Guarda el veredicto y la sensibilidad en results/live/ con un commit automático.
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "Primer día (UTC)"
+        default: "2026-09-01"
+      end:
+        description: "Día final, excluido"
+        default: "2026-10-03"
+  push:
+
+jobs:
+  replay:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[replay]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+    env:
+      START: ${{ github.event.inputs.start || '2026-09-01' }}
+      END: ${{ github.event.inputs.end || '2026-10-03' }}
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e .
+      - name: Velas de 1 min de agosto (calentamiento de las variables)
+        run: tbot data download --symbols BTCUSDT --start 2026-08-01 --end 2026-09-01
+      - name: Reproducción (modelo y política registrados)
+        run: tbot replay --symbol BTCUSDT --horizon 1 --model gbm --start "$START" --end "$END" --runtime runtime/replay --models config/modelos
+      - name: Veredicto (criterios fijos de la Aclaración 2)
+        run: tbot live-verdict --symbol BTCUSDT --horizon 1 --model gbm --runtime runtime/replay --out results/live/verdict.json
+      - name: Sensibilidad (informativa)
+        run: tbot replay-sensitivity --runtime runtime/replay --start "$START" --end "$END" --out results/live/sensibilidad.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: replay-runtime
+          path: |
+            runtime/replay/paper_ledger.jsonl
+            runtime/replay/events.jsonl
+            results/live/
+      - name: Guardar resultados en la rama
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/live/
+          git commit -m "Resultado de la reproducción (Enmienda 2) — run ${{ github.run_id }} [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((i * 5))
+          done

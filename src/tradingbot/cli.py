@@ -197,6 +197,36 @@ def cmd_research_study3(a) -> int:
     return 0
 
 
+def cmd_replay_sensitivity(a) -> int:
+    """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
+    from datetime import timedelta
+
+    from . import jsonutil
+    from .data.binance import download_days
+    from .execution.paper import read_rows
+    from .instruments import get_instrument
+    from .live.replay import delay_sensitivity
+    from .live.runner import LIVE_METHOD
+    from .signals.monitor import fixed_sample
+    from .signals.registry import load_observation
+
+    obs = load_observation()
+    rows, _ = read_rows(Path(a.runtime) / "paper_ledger.jsonl")
+    sel = [r for r in rows if r.get("model_id") == obs["model_id"] and r.get("method") == LIVE_METHOD
+           and r.get("policy") == obs["policy"]]
+    sample = fixed_sample(sel, obs["sample_n"])
+    inst = get_instrument(obs["symbol"])
+    closes = download_days(inst, _d(a.start), _d(a.end) + timedelta(days=1), "1s",
+                           cache_dir=Path(a.root) / "binance_daily", progress=False)
+    res = {"muestra": len(sample), "nota": "informativo; no decide (Enmienda 2)",
+           "resultados": delay_sensitivity(sample, closes, point=inst.point)}
+    out = Path(a.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(jsonutil.dumps(res, indent=2), encoding="utf-8")
+    print(jsonutil.dumps(res, indent=2))
+    return 0
+
+
 def cmd_replay(a) -> int:
     from .live.replay import run_replay
 
@@ -418,6 +448,14 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--models", default="models")
     x.add_argument("--root", default="data/raw")
     x.set_defaults(func=cmd_replay)
+
+    x = sub.add_parser("replay-sensitivity", help="sensibilidad al retraso de entrada (informativa, Enmienda 2)")
+    x.add_argument("--runtime", required=True)
+    x.add_argument("--start", required=True)
+    x.add_argument("--end", required=True)
+    x.add_argument("--root", default="data/raw")
+    x.add_argument("--out", default="results/live/sensibilidad.json")
+    x.set_defaults(func=cmd_replay_sensitivity)
 
     x = sub.add_parser("live-verdict", help="veredicto de la observación en vivo sin dinero (criterios fijos)")
     x.add_argument("--symbol", required=True)

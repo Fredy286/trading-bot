@@ -75,13 +75,14 @@ def delay_sensitivity(rows: list[dict], closes_1s: pd.Series, delays=(1, 2, 3, 5
             if o is None or c is None:
                 missing += 1
                 continue
-            mv = np.sign(round((c - o) / (point / 2)))
+            mv = int(np.sign(round((c - o) / (point / 2))))
             side = 1 if r["direction"] == "sube" else -1
-            ties += mv == 0
-            wins += mv == side
-            losses += mv == -side
+            ties += int(mv == 0)
+            wins += int(mv == side)
+            losses += int(mv == -side)
         n = wins + losses
         lo, _ = wilson(wins, n) if n else (float("nan"), float("nan"))
+        lo = float(lo)
         for b in payouts:
             out.append({"entrada_s": d, "pago": b, "n": n, "aciertos": wins, "empates": ties, "sin_precio": missing,
                         "acierto": wins / n if n else None, "lo95": lo, "umbral": 1 / (1 + b),
@@ -106,6 +107,14 @@ def run_replay(symbol: str, horizon: int, model: str, start: date, end: date, ru
     if not p.exists():
         print(f"No existe {p}.")
         return 2
+    obs_reg = (load_observation(observation_path) if observation_path else load_observation()) or {}
+    if obs_reg.get("model_sha256"):
+        import hashlib
+
+        digest = hashlib.sha256(p.read_bytes()).hexdigest()
+        if digest != obs_reg["model_sha256"]:
+            print(f"{p} no es el archivo registrado (SHA-256 {digest[:12]}… ≠ {obs_reg['model_sha256'][:12]}…).")
+            return 2
     bundle = ModelBundle.load(p)
     s = Settings()
     if bundle.validation_status in OBSERVED:
