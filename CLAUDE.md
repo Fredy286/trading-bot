@@ -56,15 +56,23 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    y timeouts, del lado del servidor; igual el 2026-10-02). Una auditoría del bucle en vivo halló y
    corrigió 10 fallos que habrían dañado la observación (ítems 11–20) y una revisión final otros 8
    (ítems 22–29). El feed real de Binance se probó con `run_live` (5 ciclos, sin errores).
-2. **Observación en vivo sin dinero de BTC 1 min — EN CURSO desde 2026-10-03.** Criterios
-   pre-registrados en la Aclaración 2 (docs/01) y en `config/observacion_en_vivo.json`: modelo
-   `BTCUSDT-h1-gbm-2026-08-31-e436ef`, política BN impuesta sobre el `.env`, muestra fija de 3 500
-   alertas sin empate, máximo 8 semanas, decisión 1 s tras el cierre según el reloj de Binance.
-   Se inicia con `scripts\iniciar_observacion.bat` (carpeta `runtime/live`). Juzgar UNA vez con
-   `tbot live-verdict --symbol BTCUSDT --horizon 1 --model gbm` cuando la muestra esté completa.
-   **No reentrenar ni cambiar la política** durante la observación (invalidaría el registro).
-   Esperado: la latencia real borra la ventaja. La martingala se descartó (docs/02, sección 6.1).
-   No hay intermediario con API oficial para BTC a 1 min (Deriv: solo multiplicadores; docs/03, 2.1).
+2. **BTC 1 min con entrada automática (+2 s): se evalúa con datos históricos de 1 s (Enmienda 2), no en
+   vivo** — el usuario NO puede dejar el portátil encendido semanas. La observación en vivo se detuvo el
+   2026-10-03 (datos en `runtime/live`, sin inspeccionar). La reproducción oficial corre en GitHub
+   Actions (`.github/workflows/replay.yml`, se dispara con `[replay]` en el commit) con el modelo
+   registrado `config/modelos/BTCUSDT_h1_gbm.pkl` (SHA-256 en `config/observacion_en_vivo.json`) y guarda
+   `results/live/verdict.json` y `sensibilidad.json`. Muestra fija 3 500, criterios de la Aclaración 2.
+   Solo sería útil para una automatización, que el usuario hoy NO quiere.
+2b. **Decisión del usuario (2026-10-03): señales MANUALES**, con ≥ 1 min de anticipación, en el
+   instrumento y la duración más predecibles; formato: hora de apertura en UTC−5, instrumento, duración,
+   dirección. Resultados, todos pre-registrados y aplicados mecánicamente (docs/01):
+   - Estudio 2 (B_lat60 de la Fase 1B): BTC 15 y 60 min no confirman → SIN SEÑAL.
+   - Estudio 3 (flujo de órdenes, perpetuo, cruce BTC/ETH): no mejora → SIN SEÑAL.
+   - Estudio 4 (ETH 15 min solo precio, periodo limpio para ETH): 52,87 % → SIN SEÑAL.
+   Patrón: ventajas de ~55 % hasta 2025 que desaparecen en el último año. **No emitir señales manuales
+   sin un estudio nuevo pre-registrado que confirme.** Martingala descartada (docs/02, 6.1). No hay
+   intermediario con API oficial para BTC a 1 min (Deriv: solo multiplicadores; docs/03, 2.1).
+   Evaluaciones largas: usar datos históricos o GitHub Actions, nunca el portátil encendido días.
 3. **Repetir el estudio con Dukascopy (bid/ask reales)** en local (bloqueado mientras Dukascopy falle):
    `tbot data download --symbols EURUSD,... --source dukascopy` y `tbot research run --source dukascopy`.
    Es un estudio nuevo: registrar enmienda/nuevo pre-registro antes de mirar resultados.
