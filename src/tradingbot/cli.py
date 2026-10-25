@@ -286,6 +286,21 @@ def cmd_research_study13(a) -> int:
     return 0
 
 
+def cmd_research_study15(a) -> int:
+    from .research import study15
+
+    if a.step == "download":
+        study15.download()
+        return 0
+    rep = study15.run(n_boot=a.n_boot)
+    pol, m = rep["politica_b"], rep["mejora_logloss"]
+    print(f"Estudio 15: pasa={rep['pasa']} | {rep['criterios']}")
+    print(f"  mejora de log-loss {m['media']:+.6f} {m['ic95']} | acierto todas {rep['acierto_todas_las_decisiones']}")
+    for k, v in pol.items():
+        print(f"  {k}: operaciones {v['operaciones']} | acierto {v['acierto']} [{v['lo95']}] | EV {v['ev']}")
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -524,6 +539,10 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study15", help="Estudio 15: presión dentro del minuto con velas de 1 s (P1)")
+    x.add_argument("step", choices=["download", "run"])
+    x.add_argument("--n-boot", type=int, default=1000)
+    x.set_defaults(func=cmd_research_study15)
     x = r.add_parser("study13", help="Estudio 13: selector multimoneda (fase de desarrollo)")
     x.add_argument("--root3", default="data/raw/estudio3")
     x.add_argument("--out", default="results/estudio13")
