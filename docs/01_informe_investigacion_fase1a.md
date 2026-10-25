@@ -1324,3 +1324,56 @@ horario de verano).
 - El ORB simple de Zarattini y Aziz, informativo, quedó en −0,1 a −0,7 puntos básicos netos por día,
   con 49–51 % de días positivos. Es coherente con la réplica que lo deja en cero tras costos.
 - HistData no tiene NSXUSD a partir de 2026-05. No hizo falta la fase B.
+
+## Estudio 12 — ¿el movimiento reciente de ETH ayuda a predecir el minuto siguiente de BTC? (pre-registro, 2026-10-25, ANTES de ver datos posteriores al 2026-10-25)
+
+**Origen:** en el Estudio 7, la herramienta T7-ETH fue la única con una mejora puntual positiva frente al GBM:
+- log-loss +0,00026, con un IC 98,75 % de [−0,00048; +0,00101];
+- política B con 57,0 % de acierto frente a 55,8 %.
+
+Como esa lectura se hizo **después** de ver los datos, solo puede confirmarse con datos que nadie ha visto.
+
+**Por qué podría existir (mecanismo):**
+- **Adelanto entre activos muy relacionados:** cuando llega información común, uno de los dos mercados
+  reacciona segundos o minutos antes. Pasa por diferencias de liquidez, de participantes o de latencia de
+  los algoritmos de arbitraje.
+- **Por qué podría no existir o desaparecer:** ese arbitraje es fácil para los operadores rápidos. Si el
+  adelanto fuera grande, ya lo habrían eliminado.
+
+**Hipótesis única H12:** añadir `eth_r1` y `eth_r5` al GBM de BTC a 1 minuto mejora la predicción de la
+dirección de la vela siguiente. Las dos variables son rendimientos logarítmicos de ETH/USDT a 1 y 5 min
+divididos por su vol60 (la de 5 min por √5), con la definición del Estudio 7.
+
+**Diseño:**
+- **Modelos:** GBM del proyecto (`make_prob_model("gbm")`, mismos parámetros).
+  - **Referencia:** `FEATURES`.
+  - **Prueba:** `FEATURES` + `eth_r1` + `eth_r5`.
+  - Mismas filas para los dos.
+- **Entrenamiento (una vez):** contado de Binance de BTC y ETH de 1 min, del 2026-10-26 − 12 meses al
+  2026-10-25 23:59 UTC. El último 20 % se usa para la calibración isotónica, con purga.
+- **Evaluación:** todas las decisiones de 1 min de BTC del **2026-10-26 00:00 UTC al 2027-01-18 00:00 UTC**
+  (12 semanas, ~120 000 decisiones).
+  - Etiqueta: dirección de la vela siguiente (`make_labels(h = 1, d = 1)`), binaria al 85 %, empate
+    reembolsado.
+  - Se calcula **una sola vez**, después del 2027-01-18, con los archivos públicos de Binance. No hace
+    falta el portátil encendido.
+
+**Criterios (los dos):**
+1. Límite inferior **unilateral del 95 %** (cuantil 5 % del bootstrap de bloques diarios) de la mejora de
+   log-loss (referencia − prueba), en las decisiones sin empate, > 0.
+2. EV de la política B (EV estimado ≥ 0,02, tasa de empates causal de la Fase 1B) de la prueba ≥ EV de la
+   referencia, en las mismas decisiones.
+
+**Potencia declarada:**
+- Con la variabilidad del Estudio 7, el error estándar de la mejora en ~120 000 decisiones es ≈ 0,0001.
+- Si la mejora real fuera la vista (+0,00026), se detectaría con ≈ 85 % de probabilidad.
+- Si es menor, lo más probable es «no pasa».
+
+**Solo informativo:**
+- acierto y EV de los dos modelos a +10 s de entrada, medidos con velas de 1 s;
+- desglose entre semana y fin de semana UTC.
+
+**Consecuencias:**
+- **Si pasa:** ETH se incorpora como candidata al modelo registrado. Su efecto en la operación manual
+  (+10 s) se confirma con una reproducción pre-registrada aparte, antes de cambiar las señales.
+- **Si no pasa:** no se incorpora.
