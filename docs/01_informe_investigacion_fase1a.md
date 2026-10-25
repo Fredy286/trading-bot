@@ -944,3 +944,88 @@ de cada combinación, desglose entre semana y fin de semana UTC.
   ya está aprobado hasta entonces.
 - **Si ninguna pasa:** las cuatro quedan en «SIN SEÑAL» y no se incorporan.
 - Nada de esto autoriza dinero real.
+
+## Estudio 8 — «Golden BIAS 200» reconstruido en oro (pre-registro, 2026-10-25, ANTES de calcularlo)
+
+**Origen:** el usuario encontró en TradingView el indicador «Golden BIAS 200» v6.4. Es de solo
+invitación: se paga 50 USD por Telegram y el código es cerrado. Su descripción publica estas reglas
+para XAU/USD:
+- tendencia: SMA 15 y SMA 200, con el precio por encima de ambas para comprar (debajo para vender);
+- distancia mínima entre las medias («minDistance»);
+- la vela debe mantener la dirección durante el minuto;
+- entrada solo si el precio toca un retroceso («offset») desde la SMA 15;
+- sesiones en hora de México: 08:00–12:00, 17:30–23:00 y 01:00–07:00;
+- panel multitemporal de M5 a H4 («si todas las flechas coinciden, alta probabilidad»);
+- TP y SL dibujados al entrar.
+
+No publica parámetros ni resultados verificables. Se reconstruye con parámetros fijados **ahora**, sin
+mirar datos de oro con estas reglas. El proyecto ya sabe que el oro no tuvo señal con sus modelos
+(Fase 1B).
+
+**Expectativa declarada:** «SIN SEÑAL». Las reglas de medias móviles no superaron al azar tras costos en
+oro (H4 de la Fase 1B). Un TP y un SL simétricos dan un acierto cercano al 50 % menos los costos.
+
+**Datos:** XAU/USD HistData M1 BID, la fuente de la Fase 1B (Enmienda 1). Se usan velas medias = BID +
+spread supuesto / 2, con `to_canonical(fill_gaps=True)`. Costo por operación de contado: spread supuesto
+0,25 + comisión 0,07 = **0,32 USD/oz** ida y vuelta, el escenario optimista del proyecto.
+
+**Reglas reconstruidas (velas de 1 min; todo con información hasta el cierre de t):**
+- SMA15 y SMA200 de los cierres; ATR14 = media de 14 rangos verdaderos.
+- **Compra** si se cumplen todas (venta: simétrico):
+  1. `c_t > SMA15_t`, `c_t > SMA200_t` y `SMA15_t > SMA200_t`;
+  2. `SMA15_t − SMA200_t ≥ 1,0 · ATR14_t` (distancia mínima);
+  3. vela t alcista: `c_t > o_t` (dirección mantenida durante el minuto);
+  4. cierre de t dentro de una sesión en hora de Ciudad de México (`America/Mexico_City`):
+     [08:00, 12:00), [17:30, 23:00) o [01:00, 07:00).
+- **Multitemporal (MTF)**, solo en las variantes que lo dicen: en 5, 15, 60 y 240 min, la última vela
+  **cerrada** de ese marco (cortes en UTC) cierra por encima de la SMA20 de sus cierres, para comprar
+  (por debajo, para vender). Las cuatro deben coincidir.
+- **Una operación a la vez:** no hay señal nueva mientras haya una orden pendiente o una posición abierta.
+
+**Ejecución de contado / CFD (hipótesis H8a y H8b):**
+- **Orden límite** en `L = SMA15_t + 0,25·ATR14_t` para compras (`SMA15_t − 0,25·ATR14_t` para ventas),
+  válida en las velas t+1 … t+10.
+  - Se llena en la primera vela con `l ≤ L` (compra), al precio `min(L, apertura)`.
+  - Si `L ≥ c_t`, se entra a mercado en la apertura de t+1.
+  - Si no se llena, no hay operación.
+- **Salidas:** SL a 1,5·ATR14_t y TP a 1,5·ATR14_t desde la entrada, o cierre a mercado 60 velas después
+  de entrar.
+  - Si SL y TP caen en la misma vela, cuenta el SL (conservador).
+  - Los cierres parciales no se modelan.
+- **Resultado:** `(salida − entrada) · lado − 0,32` USD/oz. También se informa en múltiplos del riesgo (R).
+
+**Versión binaria (H8c y H8d):**
+- Misma señal; dirección = lado.
+- **Entrada:** apertura de t+2, es decir, 1 min después, como operación manual.
+- **Vencimiento:** 5 min (`make_labels(h = 5, d = 2)`).
+- Pago 85 %, empate reembolsado.
+- Sin solapamiento: tras una señal, no hay otra hasta que vence.
+
+**Hipótesis (familia de 4, Bonferroni α = 0,0125 cada una):**
+- **H8a:** contado, sin MTF.
+- **H8b:** contado, con MTF.
+- **H8c:** binaria a 5 min, sin MTF.
+- **H8d:** binaria a 5 min, con MTF.
+
+**Fase A, prueba directa sin ajuste** (las reglas no se entrenan), 2022-01-01 → 2025-08-31. Pasa si:
+- **contado:**
+  - ≥ 300 operaciones;
+  - límite inferior del IC 98,75 % (bootstrap por días) del resultado neto medio > 0;
+  - resultado > 0 en ≥ 60 % de los trimestres;
+- **binaria:**
+  - ≥ 300 operaciones;
+  - p unilateral < 0,0125 frente a 54,05 %;
+  - Wilson 95 % > 54,05 %;
+  - EV > 0.
+
+**Fase B**, solo para las que pasen A: 2025-09-01 → 2026-08-31, con los mismos criterios. Ese periodo nunca
+se usó con esta estrategia; sí con los modelos de oro de la Fase 1B, y así se declara. Si pasa, la
+confirmación final se hará con datos posteriores al 2026-09-01.
+
+**Solo informativo:** «winrate» (porcentaje de TP antes que SL), que es lo que muestra la tabla del
+indicador; resultado por sesión y por año; operaciones sin llenar.
+
+**Consecuencias:**
+- Si alguna pasa las dos fases, se propone su confirmación con datos nuevos.
+- Si ninguna pasa, SIN SEÑAL y **no se recomienda pagar el indicador**.
+- Nada de esto autoriza dinero real.
