@@ -263,6 +263,17 @@ def cmd_research_study10(a) -> int:
     return 0
 
 
+def cmd_research_study11(a) -> int:
+    from .research import study11
+
+    rep = study11.run(Path(a.root), Path(a.out), n_boot=a.n_boot)
+    for phase, f in rep["fases"].items():
+        for h, r in f["resultados"].items():
+            print(f"Fase {phase} {h}: pasa={r.get('pasa')} | operaciones {r.get('operaciones')} | TP {r.get('winrate_tp')} "
+                  f"| R neto {r.get('R_neto_medio')} {r.get('ic98_33')} | ORB simple {r.get('orb_simple_informativo')}")
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -501,6 +512,11 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study11", help="Estudio 11: regla de la primera vela (ORB 9:30 NY + FVG + envolvente)")
+    x.add_argument("--root", default="data/raw")
+    x.add_argument("--out", default="results/estudio11")
+    x.add_argument("--n-boot", type=int, default=2000)
+    x.set_defaults(func=cmd_research_study11)
     x = r.add_parser("study10", help="Estudio 10: oro con correlación y zonas del índice del dólar")
     x.add_argument("--root", default="data/raw")
     x.add_argument("--out", default="results/estudio10")
