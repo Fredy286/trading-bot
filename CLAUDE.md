@@ -111,6 +111,8 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      las sesiones y en todos los años (contado −0,34 USD/oz; binaria 49,1 %).
    - **Estudio 9 (regla de Facebook: RSI 1D+W sobrecomprado → ventas, 4H, 15M):** SIN SEÑAL, acierta 46–49 %
      en BTC/ETH/oro/EUR.
+   - **Estudio 10 (oro + correlación con DXY aproximado + zonas):** SIN SEÑAL (48,2 % / 49,9 %); el filtro
+     quita por igual perdedoras y ganadoras. Divisas de HistData descargadas: EUR, JPY, GBP hasta 2025-08.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.

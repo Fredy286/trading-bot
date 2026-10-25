@@ -1190,3 +1190,24 @@ operaciones perdedoras de la regla sola que el filtro evita.
 *Nota de implementación (2026-10-25, antes de ver ningún acierto).* «Velas» son las de 15 min con datos en
 el oro y en el DXY*, como en TradingView. La primera ejecución usó la rejilla del calendario, con fines de
 semana y la pausa diaria del oro, y no produjo ninguna operación (registro de errores, ítem 40).
+
+**Resultado (commit 24ac3c0, aplicado mecánicamente; `results/estudio10/resultado.json`):**
+- En 2022–2025, la correlación de 20 velas entre el oro y el DXY* fue negativa el **79 %** del tiempo
+  (media −0,40). La relación existe.
+
+| Hipótesis | Operaciones (semanas) | Acierto [lím. inf. 95 %] | EV [IC 97,5 % semanal] |
+|---|---|---|---|
+| H10a, 15 min | 1 106 (180) | **48,2 %** [45,3 %] | −0,108 [−0,164; −0,053] |
+| H10b, 60 min | 862 (179) | **49,9 %** [46,6 %] | −0,076 [−0,150; −0,004] |
+
+**Veredicto:** ninguna pasa. **Estudio 10: SIN SEÑAL.**
+
+**Lo que afirma el video («la mayoría de tus operaciones perdedoras las podrías haber evitado»):**
+- **Regla de zonas del oro sola:** 7 167 operaciones a 15 min, 50,0 % de acierto (60 min: 50,2 %).
+- **El filtro de correlación + DXY:**
+  - evita el **89 %** de las perdedoras de la regla sola, pero también elimina el **90 %** de las
+    ganadoras;
+  - las operaciones que deja pasar aciertan 47,6 %; las que quita, 50,3 %;
+  - diferencia: −2,7 puntos [IC 95 %: −6,1; +0,9].
+- **Conclusión:** el filtro no selecciona mejores operaciones. Solo opera menos. «Evitar perdedoras» no
+  sirve si se evitan las ganadoras en la misma proporción.

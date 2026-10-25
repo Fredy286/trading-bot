@@ -1,0 +1,140 @@
+{
+  "estudio": "Estudio 10 — oro, correlación y zonas del DXY (pre-registro 41f987b)",
+  "git_sha": "24ac3c06e318cca19224b697faad15472f26ce88",
+  "periodo": [
+    "2022-01-01",
+    "2025-09-01"
+  ],
+  "dxy": "aprox. EUR/JPY/GBP con pesos ICE renormalizados",
+  "correlacion_media": -0.40220966738792363,
+  "fraccion_corr_negativa": 0.7882821584976619,
+  "resultados": {
+    "H10a": {
+      "vencimiento_min": 15,
+      "operaciones": 1106,
+      "sin_empate": 1104,
+      "aciertos": 532,
+      "acierto": 0.48188405797101447,
+      "lo95": 0.45252279143446156,
+      "hi95": 0.5113709637738642,
+      "p": 0.9999581352931285,
+      "ev": -0.10831826401446655,
+      "ev_ic97_5": [
+        -0.16421674000043363,
+        -0.05313165956149538
+      ],
+      "semanas": 180,
+      "criterios": {
+        "min_300": true,
+        "p_bonferroni": false,
+        "wilson": false,
+        "ev_ic_semanal": false
+      },
+      "pasa": false,
+      "estado": "no pasa"
+    },
+    "H10b": {
+      "vencimiento_min": 60,
+      "operaciones": 862,
+      "sin_empate": 861,
+      "aciertos": 430,
+      "acierto": 0.4994192799070848,
+      "lo95": 0.46609783086641465,
+      "hi95": 0.5327458880296236,
+      "p": 0.9928958255413604,
+      "ev": -0.07598607888631093,
+      "ev_ic97_5": [
+        -0.15012772797713828,
+        -0.004317859048396166
+      ],
+      "semanas": 179,
+      "criterios": {
+        "min_300": true,
+        "p_bonferroni": false,
+        "wilson": false,
+        "ev_ic_semanal": false
+      },
+      "pasa": false,
+      "estado": "no pasa"
+    }
+  },
+  "informativo": {
+    "H10a": {
+      "regla_de_zonas_sola": {
+        "operaciones": 7167,
+        "sin_empate": 7146,
+        "aciertos": 3571,
+        "acierto": 0.4997201231458158,
+        "lo95": 0.4881304239959886,
+        "hi95": 0.511310123050536,
+        "p": 0.9999999999978175,
+        "ev": -0.0752964978373099,
+        "ev_ic97_5": [
+          -0.09961526552040575,
+          -0.05113242938904808
+        ],
+        "semanas": 191,
+        "criterios": {
+          "min_300": true,
+          "p_bonferroni": false,
+          "wilson": false,
+          "ev_ic_semanal": false
+        },
+        "pasa": false,
+        "estado": "no pasa"
+      },
+      "efecto_del_filtro": {
+        "operaciones_regla_sola": 7146,
+        "acierto_regla_sola": 0.4997201231458158,
+        "pasan_filtro": 778,
+        "acierto_pasan": 0.4755784061696658,
+        "acierto_quitadas": 0.5026695979899497,
+        "diferencia_ic95": [
+          -0.061179928000413976,
+          0.008809660626864252
+        ],
+        "perdedoras_evitadas": 0.8858741258741258,
+        "ganadoras_perdidas": 0.8963875665079809
+      }
+    },
+    "H10b": {
+      "regla_de_zonas_sola": {
+        "operaciones": 3972,
+        "sin_empate": 3966,
+        "aciertos": 1991,
+        "acierto": 0.5020171457387796,
+        "lo95": 0.48646141361488215,
+        "hi95": 0.5175689738947857,
+        "p": 0.9999994603622615,
+        "ev": -0.07116062437059416,
+        "ev_ic97_5": [
+          -0.10722810027564382,
+          -0.0364186134217111
+        ],
+        "semanas": 191,
+        "criterios": {
+          "min_300": true,
+          "p_bonferroni": false,
+          "wilson": false,
+          "ev_ic_semanal": false
+        },
+        "pasa": false,
+        "estado": "no pasa"
+      },
+      "efecto_del_filtro": {
+        "operaciones_regla_sola": 3966,
+        "acierto_regla_sola": 0.5020171457387796,
+        "pasan_filtro": 392,
+        "acierto_pasan": 0.47959183673469385,
+        "acierto_quitadas": 0.5044767767207611,
+        "diferencia_ic95": [
+          -0.08428996084096738,
+          0.03238049856589501
+        ],
+        "perdedoras_evitadas": 0.8967088607594936,
+        "ganadoras_perdidas": 0.9055750878955299
+      }
+    }
+  },
+  "pasa_alguna": false
+}
