@@ -1,0 +1,255 @@
+{
+  "estudio": "Estudio 5 (pre-registro 53344b4, enmienda Bonferroni 2026-10-24)",
+  "model_id": "BTCUSDT-h1-gbm-2026-08-31-e436ef",
+  "policy": {
+    "contract": "binaria",
+    "payout": 0.85,
+    "tie_rule": "refund",
+    "ev_margin": 0.02,
+    "allowed_hours_bogota": [
+      0,
+      24
+    ],
+    "feed_latency_s": 1.0,
+    "max_staleness_s": 11.0
+  },
+  "entrada_s": 10.0,
+  "inicio": "2026-10-04T00:00:00+00:00",
+  "plazo_fin_excluido": "2026-12-14T00:00:00+00:00",
+  "datos_hasta_excluido": "2026-10-25T00:00:00+00:00",
+  "objetivo": {
+    "H5a": 3500,
+    "H5b": 2500
+  },
+  "alfa": 0.025,
+  "sin_empate_en_muestra": {
+    "H5a": 3500,
+    "H5b": 2286
+  },
+  "completa": {
+    "H5a": true,
+    "H5b": false
+  },
+  "excluidas": {
+    "de_otro_modelo_o_metodo": 0,
+    "politica_distinta": 0,
+    "fuera_del_periodo": 0,
+    "vela_de_decision_repetida": 0
+  },
+  "estado": "parcial",
+  "hipotesis": {
+    "H5a": {
+      "n": 3500,
+      "aciertos": 1964,
+      "empates": 481,
+      "acierto": 0.5611428571428572,
+      "lo95": 0.5446439969307284,
+      "hi95": 0.5775076437142139,
+      "ev": 0.033509168550613914,
+      "p": 0.007521737537707527,
+      "umbral": 0.5405405405405405,
+      "estado": "aprueba",
+      "por_dia_utc": {
+        "2026-10-04": {
+          "n": 388,
+          "aciertos": 233
+        },
+        "2026-10-05": {
+          "n": 171,
+          "aciertos": 105
+        },
+        "2026-10-06": {
+          "n": 184,
+          "aciertos": 94
+        },
+        "2026-10-07": {
+          "n": 158,
+          "aciertos": 85
+        },
+        "2026-10-08": {
+          "n": 148,
+          "aciertos": 80
+        },
+        "2026-10-09": {
+          "n": 202,
+          "aciertos": 104
+        },
+        "2026-10-10": {
+          "n": 540,
+          "aciertos": 314
+        },
+        "2026-10-11": {
+          "n": 359,
+          "aciertos": 205
+        },
+        "2026-10-12": {
+          "n": 157,
+          "aciertos": 88
+        },
+        "2026-10-13": {
+          "n": 136,
+          "aciertos": 67
+        },
+        "2026-10-14": {
+          "n": 90,
+          "aciertos": 43
+        },
+        "2026-10-15": {
+          "n": 99,
+          "aciertos": 53
+        },
+        "2026-10-16": {
+          "n": 130,
+          "aciertos": 67
+        },
+        "2026-10-17": {
+          "n": 394,
+          "aciertos": 225
+        },
+        "2026-10-18": {
+          "n": 290,
+          "aciertos": 174
+        },
+        "2026-10-19": {
+          "n": 54,
+          "aciertos": 27
+        }
+      },
+      "por_dia_semana_utc": {
+        "0": {
+          "n": 382,
+          "aciertos": 220
+        },
+        "1": {
+          "n": 320,
+          "aciertos": 161
+        },
+        "2": {
+          "n": 248,
+          "aciertos": 128
+        },
+        "3": {
+          "n": 247,
+          "aciertos": 133
+        },
+        "4": {
+          "n": 332,
+          "aciertos": 171
+        },
+        "5": {
+          "n": 934,
+          "aciertos": 539
+        },
+        "6": {
+          "n": 1037,
+          "aciertos": 612
+        }
+      },
+      "sensibilidad": [
+        {
+          "entrada_s": 2,
+          "pago": 0.85,
+          "n": 3495,
+          "aciertos": 2031,
+          "empates": 486,
+          "sin_precio": 0,
+          "acierto": 0.5811158798283261,
+          "lo95": 0.5646782880684384,
+          "umbral": 0.5405405405405405,
+          "ev": 0.06590052750565183
+        },
+        {
+          "entrada_s": 2,
+          "pago": 0.8,
+          "n": 3495,
+          "aciertos": 2031,
+          "empates": 486,
+          "sin_precio": 0,
+          "acierto": 0.5811158798283261,
+          "lo95": 0.5646782880684384,
+          "umbral": 0.5555555555555556,
+          "ev": 0.04039186134137156
+        },
+        {
+          "entrada_s": 5,
+          "pago": 0.85,
+          "n": 3516,
+          "aciertos": 2005,
+          "empates": 465,
+          "sin_precio": 0,
+          "acierto": 0.570250284414107,
+          "lo95": 0.5538190156848685,
+          "umbral": 0.5405405405405405,
+          "ev": 0.04854307962823411
+        },
+        {
+          "entrada_s": 5,
+          "pago": 0.8,
+          "n": 3516,
+          "aciertos": 2005,
+          "empates": 465,
+          "sin_precio": 0,
+          "acierto": 0.570250284414107,
+          "lo95": 0.5538190156848685,
+          "umbral": 0.5555555555555556,
+          "ev": 0.023360964581763375
+        },
+        {
+          "entrada_s": 10,
+          "pago": 0.85,
+          "n": 3500,
+          "aciertos": 1964,
+          "empates": 481,
+          "sin_precio": 0,
+          "acierto": 0.5611428571428572,
+          "lo95": 0.5446439969307284,
+          "umbral": 0.5405405405405405,
+          "ev": 0.03350916855061539
+        },
+        {
+          "entrada_s": 10,
+          "pago": 0.8,
+          "n": 3500,
+          "aciertos": 1964,
+          "empates": 481,
+          "sin_precio": 0,
+          "acierto": 0.5611428571428572,
+          "lo95": 0.5446439969307284,
+          "umbral": 0.5555555555555556,
+          "ev": 0.008841999497613676
+        },
+        {
+          "entrada_s": 20,
+          "pago": 0.85,
+          "n": 3499,
+          "aciertos": 1940,
+          "empates": 482,
+          "sin_precio": 0,
+          "acierto": 0.5544441268933981,
+          "lo95": 0.5379244618912717,
+          "umbral": 0.5405405405405405,
+          "ev": 0.02260738507912585
+        },
+        {
+          "entrada_s": 20,
+          "pago": 0.8,
+          "n": 3499,
+          "aciertos": 1940,
+          "empates": 482,
+          "sin_precio": 0,
+          "acierto": 0.5544441268933981,
+          "lo95": 0.5379244618912717,
+          "umbral": 0.5555555555555556,
+          "ev": -0.0017583521728208992
+        }
+      ]
+    },
+    "H5b": {
+      "estado": "pendiente",
+      "sin_empate": 2286,
+      "objetivo": 2500
+    }
+  },
+  "conclusion": "Aprueba H5a: señales manuales experimentales en cuenta DEMO, a cualquier hora.",
+  "nota": "Nunca dinero real sin autorización expresa; antes, prueba en demo del precio, el empate y el pago."
+}
