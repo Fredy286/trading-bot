@@ -113,6 +113,11 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      en BTC/ETH/oro/EUR.
    - **Estudio 10 (oro + correlación con DXY aproximado + zonas):** SIN SEÑAL (48,2 % / 49,9 %); el filtro
      quita por igual perdedoras y ganadoras. Divisas de HistData descargadas: EUR, JPY, GBP hasta 2025-08.
+   - **Estudio 11 (regla de la primera vela: ORB 9:30 NY + FVG + envolvente, 3:1):** SIN SEÑAL en Nasdaq 100,
+     S&P 500 y oro (−0,18 / −0,09 / −0,34 R). Instrumentos NSXUSD y SPXUSD (HistData) añadidos; HistData no
+     tiene NSXUSD desde 2026-05. HistData también tiene UDXUSD (índice del dólar real), aún sin usar.
+   - **docs/07_tradingview.md:** cómo usar TradingView (ideas, paper trading, gráfico BINANCE:BTCUSDT) y
+     trampas de su backtest; sus datos NO se pueden usar en procesos automáticos (términos de uso).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.

@@ -1285,3 +1285,20 @@ horario de verano).
 **Consecuencias:**
 - Si alguna pasa las dos fases, se pre-registra su confirmación con datos posteriores a 2026-09.
 - Si no, SIN SEÑAL.
+
+**Resultado de la fase A (2022-01 → 2025-08, commit a3d039f, aplicado mecánicamente;
+`results/estudio11/resultado.json`):**
+
+| Instrumento | Operaciones | TP / SL | R neto medio [IC 98,33 % semanal] | Trimestres positivos |
+|---|---|---|---|---|
+| Nasdaq 100 | 588 | 22,8 % / 76,7 % | **−0,18 R** [−0,35; −0,03] | 27 % |
+| S&P 500 | 524 | 28,1 % / 71,2 % | **−0,09 R** [−0,26; +0,11] | 47 % |
+| Oro | 616 | 22,7 % / 76,6 % | **−0,34 R** [−0,50; −0,18] | 0 % |
+
+**Veredicto:** ninguna pasa la fase A. **Estudio 11: SIN SEÑAL.**
+- Con 3:1 hace falta ganar más del 25 % de las veces solo para cubrir los costos. El TP se alcanzó en
+  el 23–28 % de los casos.
+- En el 30–38 % de los días no hubo entrada.
+- El ORB simple de Zarattini y Aziz, informativo, quedó en −0,1 a −0,7 puntos básicos netos por día,
+  con 49–51 % de días positivos. Es coherente con la réplica que lo deja en cero tras costos.
+- HistData no tiene NSXUSD a partir de 2026-05. No hizo falta la fase B.
