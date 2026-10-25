@@ -131,8 +131,10 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      Sin confirmación según el pre-registro; cualquier variante es hipótesis nueva solo con datos nuevos.
      Probabilidades por moneda en data/processed/estudio13/.
    - **Estudio 14 (selector por EV diario + XRP sola):** pre-registro 1868a92; SOLO datos 2026-10-26 → 2027-01-18.
-   - **Estudio 15 (P1: presión dentro del minuto con velas de 1 s):** pre-registro 85b82bb, código 4e9a70b;
-     `tbot research study15 download|run` (resúmenes por minuto en data/processed/estudio15/seg/).
+   - **Estudio 15 (P1: presión dentro del minuto con velas de 1 s):** PASA el desarrollo (58,56 % vs 56,89 %,
+     104 813 vs 51 386 operaciones, EV +0,079 vs +0,048; log-loss +0,0021). Verificación: sin fuga (alineación
+     100 %), pero la ventaja extra vive en 1–2 s (+1 s 57,3 %, +5 s 55,3 %, +10 s ≈ 0). Confirmación pre-registrada
+     con 2026-10-26 → 2027-01-18. Camino a 57–60 %: entrar en ≤ 2 s (automatización).
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).

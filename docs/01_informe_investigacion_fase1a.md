@@ -1568,3 +1568,41 @@ volumen 0.
 
 **Consecuencia:** solo si confirma, el bloque se incorpora al modelo registrado. Antes, una reproducción
 pre-registrada mide su efecto con entrada manual.
+
+**Resultado de la fase de desarrollo (commit 4e9a70b, aplicado mecánicamente; `results/estudio15/dev.json`).**
+Prueba 2024-07 → 2025-08, 26 meses de velas de 1 s de Binance, entrada en la apertura de la vela siguiente:
+
+| Modelo | Operaciones política B | Acierto [lím. inf. 95 %] | EV | Acierto en todas las decisiones |
+|---|---|---|---|---|
+| Referencia (`FEATURES`) | 51 386 | 56,89 % [56,44 %] | +0,048 | 52,00 % |
+| **Prueba (+ bloque de 1 s)** | **104 813** | **58,56 % [58,25 %]** | **+0,079** | 52,82 % |
+
+- Mejora de log-loss: **+0,00206** [IC 95 %: +0,00182; +0,00230], unas 7 veces la importancia de `clpos`.
+- **Veredicto: PASA los 5 criterios.**
+- La ejecución se repitió para guardar las predicciones y dio resultados idénticos.
+
+**Verificación adversaria (informativa; `scripts/verificacion_estudio15.py` → `results/estudio15/verificacion.json`):**
+
+**Sin fuga:** el cierre del segundo 59 coincide con el de la vela de 1 min en el **100 %** de los minutos.
+Con un desfase de un minuto coincidiría solo el 2,7 %.
+
+**Etiqueta recalculada solo con velas de 1 s, por retraso de entrada** (políticas B de cada modelo):
+
+| Entrada tras el cierre | Referencia: acierto / EV | Prueba: acierto / EV |
+|---|---|---|
+| +1 s | 55,99 % / +0,033 | **57,31 % / +0,057** |
+| +2 s | 55,69 % / +0,028 | 56,69 % / +0,046 |
+| +5 s | 54,93 % / +0,015 | 55,34 % / +0,023 |
+| +10 s | 53,96 % / −0,002 | 54,11 % / +0,001 |
+| +20 s | 53,26 % / −0,013 | 52,66 % / −0,024 |
+| +30 s | 52,55 % / −0,025 | 51,93 % / −0,037 |
+
+**Lectura:**
+- El bloque de 1 s **añade información real** y duplica las oportunidades. Pero su ventaja extra, como la
+  del modelo base, vive en los **primeros segundos**.
+- Con entrada en ≤ 2 s: 56,7–57,3 % y EV casi el doble que la referencia.
+- A +5 s la ventaja es pequeña. A +10 s, en este periodo, desaparece en los dos modelos.
+- El H5a de octubre de 2026 (56,1 % a +10 s) muestra que eso cambia según el periodo. La confirmación
+  pre-registrada decide.
+- **Implicación:** el camino a 57–60 % pasa por **entrar en 1–2 segundos**, lo que en la práctica exige
+  automatizar.

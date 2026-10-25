@@ -1,0 +1,83 @@
+{
+  "estudio": "Estudio 15 — velas de 1 s, fase de desarrollo (pre-registro 85b82bb)",
+  "git_sha": "1244f801f45065159693447f85454d8a3a6d4679",
+  "periodo_prueba": [
+    "2024-07-01",
+    "2025-09-01"
+  ],
+  "bloque": [
+    "s_r5",
+    "s_r10",
+    "s_r20",
+    "s_tib10",
+    "s_vol10",
+    "s_n10"
+  ],
+  "folds": [
+    {
+      "fold": "2024-07",
+      "ajuste": 398507,
+      "prueba": 132479
+    },
+    {
+      "fold": "2024-10",
+      "ajuste": 407304,
+      "prueba": 132479
+    },
+    {
+      "fold": "2025-01",
+      "ajuste": 410000,
+      "prueba": 129599
+    },
+    {
+      "fold": "2025-04",
+      "ajuste": 410527,
+      "prueba": 131039
+    },
+    {
+      "fold": "2025-07",
+      "ajuste": 413197,
+      "prueba": 89279
+    }
+  ],
+  "decisiones": 614875,
+  "politica_b": {
+    "referencia": {
+      "operaciones": 51386,
+      "sin_empate": 46987,
+      "aciertos": 26732,
+      "acierto": 0.5689233192159533,
+      "lo95": 0.5644399954857495,
+      "ev": 0.048013077491923864,
+      "trimestres_ev_positivo": 1.0
+    },
+    "prueba": {
+      "operaciones": 104813,
+      "sin_empate": 99530,
+      "aciertos": 58282,
+      "acierto": 0.5855721892896614,
+      "lo95": 0.5825084343010843,
+      "ev": 0.07910946161258624,
+      "trimestres_ev_positivo": 1.0
+    }
+  },
+  "acierto_todas_las_decisiones": {
+    "referencia": 0.5199947883258499,
+    "prueba": 0.5282081863373957
+  },
+  "mejora_logloss": {
+    "media": 0.002057343408800417,
+    "ic95": [
+      0.001815327190077796,
+      0.002301979782508137
+    ]
+  },
+  "criterios": {
+    "min_300": true,
+    "wilson": true,
+    "mejora_logloss": true,
+    "ev_no_menor": true,
+    "trimestres_60": true
+  },
+  "pasa": true
+}

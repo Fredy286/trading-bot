@@ -178,4 +178,7 @@ def run(root3: Path = Path("data/raw/estudio3"), work: Path = WORK, out_dir: Pat
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "dev.json").write_text(json.dumps(jsonable(report), indent=2, ensure_ascii=False), encoding="utf-8")
+    # Predicciones de prueba, para la verificación adversaria (fugas y retraso de entrada).
+    pd.DataFrame({"p_ref": p["referencia"][sel], "p_prueba": p["prueba"][sel], "dir": y[sel], "q": q_hat[sel]},
+                 index=times).to_parquet(Path(work).parent / "predicciones_dev.parquet")
     return report
