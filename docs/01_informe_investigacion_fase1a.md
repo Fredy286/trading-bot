@@ -1606,3 +1606,78 @@ Con un desfase de un minuto coincidiría solo el 2,7 %.
   pre-registrada decide.
 - **Implicación:** el camino a 57–60 % pasa por **entrar en 1–2 segundos**, lo que en la práctica exige
   automatizar.
+
+## Estudio 16 — señal anticipada para que el clic manual caiga al cierre (propuesta P8) (pre-registro, 2026-10-25, ANTES de calcular nada)
+
+**Origen:**
+- la ventaja de BTC a 1 minuto vive en los primeros 1–2 s después del cierre de la vela (Estudio 15:
+  57,3 % a +1 s, 54,1 % a +10 s);
+- no hay plataforma legal con API para automatizar la entrada (docs/03, 2.2).
+
+**Idea:** el bot decide **antes** del cierre, en el segundo k de la vela t, con la información disponible
+hasta ese segundo. El usuario hace clic L segundos después; la entrada cae en t + k + L y el contrato vence
+60 s más tarde. Con k + L = 60, el clic cae justo al cierre.
+
+**Por qué podría funcionar:** la presión que continúa después del cierre ya está en marcha en los segundos
+50–59.
+
+**Por qué podría fallar:** lo que ocurra entre el segundo k y el cierre es información que el modelo ya no
+ve. Si la ventaja depende de los últimos segundos exactos, se pierde.
+
+**Expectativa declarada:** acierto menor que con entrada inmediata, pero quizá mayor que el de avisar al
+cierre y entrar a +10 s (54,1 % en el desarrollo del Estudio 15).
+
+**Hipótesis (familia de 2, Bonferroni α = 0,025):**
+- **H16a:** decisión en el segundo **k = 55**, clic con latencia **L = 5 s**.
+- **H16b:** decisión en el segundo **k = 50**, clic con latencia **L = 10 s**.
+
+**Datos:** velas de 1 s de BTC/USDT de Binance (cierre, volumen, compras agresoras y operaciones) de
+2023-07 a 2025-08, y velas de 1 min de contado.
+
+**Variables (todas con información hasta el segundo k de la vela t):**
+- `FEATURES` de la vela **t−1** (ya cerrada);
+- **bloque parcial**, con `P_j` = último precio negociado antes del segundo j de la vela t y `vol60` de
+  t−1:
+
+| Variable | Definición |
+|---|---|
+| `p_ret` | ln(`P_k` / apertura de t) / (`vol60` · √(k/60)) |
+| `p_clpos` | (`P_k` − mín. parcial) / (máx. parcial − mín. parcial) en los segundos 0…k−1 (0,5 si el rango es 0) |
+| `p_range` | ln(máx. parcial / mín. parcial) / `vol60` |
+| `p_r5`, `p_r10`, `p_r20` | ln(`P_k` / `P_{k−j}`) / (`vol60` · √(j/60)), con j = 5, 10, 20 |
+| `p_tib10` | 2 · Σ compras agresoras / Σ volumen − 1 en los segundos k−10…k−1 (0 sin volumen) |
+| `p_vol10` | Volumen de los segundos k−10…k−1 / volumen de los segundos 0…k−1 |
+| `p_n10` | Ídem con el número de operaciones |
+
+Si faltan más de 10 velas de 1 s entre los segundos 0…k−1, no hay decisión.
+
+**Etiqueta (específica de cada hipótesis):**
+- entrada = último precio negociado antes de t + k + L;
+- salida = último precio negociado antes de t + k + L + 60 s;
+- dirección con el redondeo a medio tick del proyecto; empate si no se mueve.
+- El modelo se entrena con esa misma etiqueta.
+
+**Modelo y validación:**
+- GBM del proyecto, política B (EV estimado ≥ 0,02, binaria 85 %, empate reembolsado).
+- Tasa de empates causal: media de 1 440 min de la etiqueta, desplazada 3 minutos.
+- Walk-forward trimestral con pruebas del 2024-07-01 al 2025-08-31, 12 meses de entrenamiento, 20 % de
+  calibración isotónica y purga.
+
+**Criterios por hipótesis (todos):**
+1. ≥ 300 operaciones;
+2. p binomial unilateral < 0,025 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. límite inferior del IC 97,5 % del EV (bootstrap semanal) > 0;
+5. EV > 0 en ≥ 60 % de los trimestres.
+
+**Comparación informativa:** el modelo de prueba del Estudio 15 avisando al cierre con entrada a +10 s,
+en el mismo periodo: 54,11 %, EV +0,001.
+
+**Solo informativo:** sensibilidad a la latencia real. El modelo de cada hipótesis se evalúa con
+L ∈ {0, 3, 5, 8, 10, 15} s.
+
+**Confirmación, solo si alguna pasa:**
+- se entrena con los 12 meses hasta el 2026-10-25;
+- se evalúa una sola vez con todos los minutos del 2026-10-26 al 2027-01-18;
+- mismos criterios 2–4, con IC unilateral 97,5 %.
+- Antes de usarla en la demo hay que medir la latencia real del usuario.
