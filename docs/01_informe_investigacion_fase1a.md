@@ -1058,3 +1058,53 @@ todos los años, de 2022 a 2025.
 
 El desglose por sesión y por año se añadió después de la primera ejecución, porque el pre-registro lo
 pedía y faltaba en el código. Es informativo y no cambia ningún criterio.
+
+## Estudio 9 — regla «RSI diario y semanal + estructura 4H + entrada en 15M» de redes sociales (pre-registro, 2026-10-25, ANTES de calcularla)
+
+**Origen:** consejo publicado en un comentario de Facebook que mostró el usuario: «si el RSI toca la línea de
+sobrecompra en el gráfico 1D y W, solo dedícate a meter operaciones a la venta y viceversa, confirma la
+estructura de 4H y opera en 15M».
+
+**Expectativa declarada:** «SIN SEÑAL». La literatura sobre momentum (Moskowitz, Ooi y Pedersen, 2012)
+encuentra que las subidas fuertes tienden a **continuar** durante meses, lo contrario de lo que asume la
+regla. Además, los periodos con RSI extremo en diario y semanal son pocos, así que habrá pocos episodios
+independientes.
+
+**Instrumentos (familia de 4, Bonferroni α = 0,0125):**
+- **H9-BTC** y **H9-ETH:** contado de Binance (`data/raw/estudio3`);
+- **H9-XAU** y **H9-EUR:** HistData M1 BID (Enmienda 1).
+
+**Reglas (todo con velas ya cerradas en el momento de decidir):**
+- **RSI14 de Wilder** sobre los cierres de la última vela diaria (día UTC) y semanal (lunes a domingo,
+  UTC) **completas**.
+  - Sobrecompra: los dos ≥ 70 → solo ventas.
+  - Sobreventa: los dos ≤ 30 → solo compras.
+- **Estructura 4H** (velas de 4 h con cortes en UTC), con la última vela de 4 h cerrada (X) frente a
+  la anterior (X−1):
+  - **venta:** máximo de X < máximo de X−1 y cierre de X < cierre de X−1 (máximo más bajo y cierre más
+    bajo);
+  - **compra:** mínimo de X > mínimo de X−1 y cierre de X > cierre de X−1.
+- **Ejecución en 15M:**
+  - decisión al cierre de las velas de minutos múltiplos de 15 (UTC);
+  - binaria a 15 min, entrada en la apertura de t+2 (1 min después, manual): `make_labels(h = 15, d = 2)`;
+  - pago 85 %, empate reembolsado;
+  - sin solapamiento.
+
+**Periodo:** 2022-01-01 → 2025-08-31. Es una prueba directa: la regla no se entrena. Se necesitan 250 días
+de historia previa para el RSI semanal, que se toman de 2021.
+
+**Criterios (cada instrumento):**
+1. ≥ 300 operaciones;
+2. p binomial unilateral < 0,0125 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. límite inferior del IC 98,75 % del EV por bootstrap de bloques **semanales** > 0 (las operaciones de
+   un mismo episodio no son independientes).
+
+**Solo informativo:**
+- número de semanas con operaciones (episodios);
+- la misma regla sin la confirmación 4H;
+- la regla al revés (seguir la tendencia).
+
+**Consecuencias:**
+- Si alguna pasa, se pre-registra su confirmación con datos posteriores al 2026-09-01.
+- Si ninguna pasa, SIN SEÑAL.
