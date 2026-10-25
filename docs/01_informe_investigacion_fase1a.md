@@ -878,3 +878,69 @@ resultados: el Estudio 4 se reprodujo idéntico). Detalles que el texto dejaba a
 En EUR/USD, el acierto sobre todas las decisiones coincidió en los dos modelos (51,00 %). Se comprobó que
 no es el fallo del ítem 39: los modelos eligen lados distintos en el 12 % de las decisiones (correlación
 de probabilidades 0,85).
+
+## Estudio 7 — herramientas de «Kronos» y del video del usuario (pre-registro, 2026-10-25, ANTES de calcularlas)
+
+**Origen:** el usuario vio un video sobre «Kronos AI». El video describe esta estrategia:
+1. cada vela se convierte en 6 dimensiones y se traduce a tokens binarios;
+2. se buscan en el historial los momentos más parecidos al actual y se promedia lo que pasó después;
+3. un filtro de Kalman y otros activos afinan la proyección;
+4. se dibujan las próximas 12 velas y, si el retorno supera un umbral, se marca señal larga o corta.
+
+**Qué es Kronos** (revisión del 2026-10-25, detalles en docs/05, sección 8):
+- modelo de Tsinghua (arXiv 2508.02739, AAAI 2026), código MIT: `shiyu-coder/Kronos`, commit `67b630e`;
+- tokeniza OHLCV + importe (6 dimensiones) con cuantización binaria esférica (2 × 10 bits);
+- preentrenado con más de 12 000 millones de velas, **hasta junio de 2024**, incluidas velas de 1 min de
+  perpetuos de Binance;
+- en cripto, su correlación de rango con el rendimiento siguiente es ≈ 0,03–0,04. Eso equivale, como
+  mucho, a ~51 % de acierto direccional. No publica acierto direccional ni pruebas en cripto.
+
+**Pregunta:** cada una de cuatro herramientas, ¿mejora la probabilidad del modelo GBM del proyecto para
+la dirección de BTC/USDT a 1 minuto? Es la configuración que aprobó H5a.
+
+**Expectativa declarada:** «SIN SEÑAL» en las cuatro. El GBM ya usa los rendimientos recientes, de los
+que dependen el análogo y el Kalman. La correlación publicada de Kronos es baja. El adelanto de ETH sobre
+BTC en 1 minuto no está documentado.
+
+**Herramientas (familia de 4; corrección de Bonferroni):**
+
+| ID | Herramienta | Definición fija (todo causal, con velas que cierran en t) |
+|---|---|---|
+| T7-KRONOS | Kronos-small, sin reentrenar | `NeoQuasar/Kronos-small` + `Kronos-Tokenizer-base`, contexto de 512 velas de 1 min (OHLCV, importe = volumen × media de OHLC, como el código oficial), 1 vela predicha, T = 0,6, top-p = 0,9, 5 muestras promediadas, semilla fija por bloque. Variable: `ln(cierre predicho de t+1 / cierre reconstruido de t) / vol60`, ambos del mismo decodificado. Sin 512 velas completas, no hay decisión |
+| T7-ANALOG | Momentos más parecidos | Patrón = 12 últimos rendimientos de 1 min / vol60. Biblioteca = los minutos del tramo de entrenamiento del trimestre (mismos 12 meses y purga que el GBM). Se toman los 100 vecinos más cercanos (distancia euclídea). Variable: media del signo del minuto siguiente de esos vecinos (empates = 0) |
+| T7-KALMAN | Kalman de tendencia | Filtro de Kalman estacionario de nivel y pendiente (equivale a Holt) sobre el logaritmo del cierre, ganancias fijas α = 0,3, β = 0,05. Variable: pendiente / vol60 |
+| T7-ETH | Otro activo | Rendimientos de ETH/USDT de 1 y 5 min (contado de Binance) / vol60 de ETH: dos variables |
+
+**Diseño:**
+- **Etiqueta:** dirección de la vela t+1 (entrada en su apertura, salida en su cierre). Es `make_labels(h = 1,
+  d = 1)` de la Fase 1B, binaria al 85 %, empate reembolsado.
+- **Referencia:** GBM del proyecto con `FEATURES`, en walk-forward trimestral: pruebas del 2024-10-01 al
+  2025-08-31, entrenamiento con los 12 meses previos, 20 % final para calibración isotónica y purga.
+  Sale una probabilidad calibrada `p` para cada minuto.
+- **Conjunto de evaluación E:** 20 000 minutos sorteados al azar (semilla 20261025), uniformes en
+  2024-10-01 → 2025-08-31, entre los que tienen `p`, etiqueta y todas las variables de las cuatro
+  herramientas. Kronos se calcula solo en E, por su costo (~0,7 s por decisión en este PC).
+  - El periodo empieza **3 meses después** del fin del preentrenamiento de Kronos, que no vio estos datos.
+  - El GBM y las otras herramientas solo usan datos anteriores a cada trimestre.
+- **Combinador:** regresión logística (C = 1, variables estandarizadas con el tramo de ajuste).
+  - **Base:** `[logit(p)]`, que es solo recalibración.
+  - **Prueba de cada herramienta:** `[logit(p), variables de la herramienta]`.
+  - **Ajuste expansivo:** con las decisiones de E sin empate de los trimestres anteriores. Para probar
+    2025-T1 se usa 2024-T4; para 2025-T2, 2024-T4 + 2025-T1; para 2025-07/08, todo lo anterior.
+  - **Prueba:** las decisiones de E del 2025-01-01 al 2025-08-31.
+
+**Criterios (cada herramienta pasa si cumple los dos):**
+1. Límite inferior del IC **98,75 %** (Bonferroni 0,05/4) por bootstrap de bloques diarios de la mejora de
+   log-loss (base − prueba), en las decisiones de prueba sin empate, > 0.
+2. EV de la política B (EV estimado ≥ 0,02 con la probabilidad combinada y la tasa de empates causal de
+   la Fase 1B) **≥** el de la base, en las mismas decisiones.
+
+**Solo informativo:** acierto de cada herramienta sola (signo de su variable), acierto y EV de la base y
+de cada combinación, desglose entre semana y fin de semana UTC.
+
+**Consecuencias:**
+- **Si alguna pasa:** es candidata a incorporarse al modelo. Su confirmación se pre-registra **antes** de
+  mirar datos posteriores al 2026-10-26, con la entrada a +10 s del Estudio 5. No cambia nada de lo que
+  ya está aprobado hasta entonces.
+- **Si ninguna pasa:** las cuatro quedan en «SIN SEÑAL» y no se incorporan.
+- Nada de esto autoriza dinero real.
