@@ -88,6 +88,12 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
 5. Feeds en vivo para divisas: requieren cuenta demo con API (Deriv, OANDA, MT5 en Windows o IBKR);
    pedir credenciales al usuario y guardarlas solo en `.env`.
 6. Fase 2 solo si algo llega a `VALIDADO` y con autorización expresa del usuario.
+7. **Análisis del PDF «El secreto del trading profesional» (2026-10-24)**: `docs/05_...`. El «90 %» de los
+   grupos se explica con repeticiones tras perder (al azar: 87,4 % con 2, 93,7 % con 3; EV −0,08) y con
+   selección de canales (`scripts/simulacion_grupos_senales.py` → `results/grupos_senales.json`). Propuestas:
+   código de evaluación del Estudio 5 (H5a/H5b, +10 s, Holm), **Estudio 6 «zonas»** (Osler: números
+   redondos, máx./mín. del día anterior; borrador en docs/05, sección 6, NO congelado), auditor de señales de
+   terceros y gestión/diario para la demo.
 
 ## Cómo trabajar aquí
 
@@ -96,4 +102,4 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
 - No cambiar `config/research.toml` ni reinterpretar resultados ya vistos; cualquier estudio nuevo
   se pre-registra primero (commit con fecha) y se evalúa en datos no usados.
 - Todo en UTC internamente; mostrar en America/Bogota.
-- PC del usuario: Windows 11. Git Bash falla («fork: Resource temporarily unavailable»): usar PowerShell.
+- PC del usuario: Ubuntu 26.04 (desde 2026-10-12; Windows 11 queda en arranque dual). Proyecto en `~/proyectos/trading-bot`, entorno `.venv` (Python 3.14): `.venv/bin/tbot`, `.venv/bin/pytest -q`. Observación en vivo + panel: `scripts/iniciar_observacion.sh` (Ctrl+C detiene ambos; en Windows era `iniciar_observacion.bat`).

@@ -1,0 +1,146 @@
+{
+  "datos": "BTC/USDT 1 min, Binance, 2025-09-01 a 2026-08-31",
+  "minutos": 525600,
+  "empates": 0.03480213089802131,
+  "contrato": {
+    "pago": 0.85,
+    "empate": "reembolsado"
+  },
+  "semilla": 20261024,
+  "reintentos": {
+    "sin_reintento": {
+      "apuestas": [
+        1
+      ],
+      "ciclos": 200000,
+      "acierto_por_ciclo": 0.499315,
+      "gana_en_intento": {
+        "1": 0.499315
+      },
+      "pierde_todo": 0.500685,
+      "perdida_si_pierde_todo": -1.0,
+      "ganancia_media_por_ciclo": -0.07626725000000001,
+      "ev_por_unidad_apostada": -0.07626725000000001
+    },
+    "1_reintento_x2": {
+      "apuestas": [
+        1,
+        2
+      ],
+      "ciclos": 200000,
+      "acierto_por_ciclo": 0.746945,
+      "gana_en_intento": {
+        "1": 0.4989,
+        "2": 0.248045
+      },
+      "pierde_todo": 0.253055,
+      "perdida_si_pierde_todo": -3.0,
+      "ganancia_media_por_ciclo": -0.16146850000000007,
+      "ev_por_unidad_apostada": -0.08064553990610332
+    },
+    "2_reintentos_x2": {
+      "apuestas": [
+        1,
+        2,
+        4
+      ],
+      "ciclos": 200000,
+      "acierto_por_ciclo": 0.873545,
+      "gana_en_intento": {
+        "1": 0.500285,
+        "2": 0.246865,
+        "3": 0.126395
+      },
+      "pierde_todo": 0.126455,
+      "perdida_si_pierde_todo": -7.0,
+      "ganancia_media_por_ciclo": -0.23657925000000007,
+      "ev_por_unidad_apostada": -0.0785760903139666
+    },
+    "3_reintentos_x2": {
+      "apuestas": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "ciclos": 200000,
+      "acierto_por_ciclo": 0.93696,
+      "gana_en_intento": {
+        "1": 0.50021,
+        "2": 0.24566,
+        "3": 0.12791,
+        "4": 0.06318
+      },
+      "pierde_todo": 0.06304,
+      "perdida_si_pierde_todo": -15.0,
+      "ganancia_media_por_ciclo": -0.3099315000000001,
+      "ev_por_unidad_apostada": -0.07698516590244074
+    },
+    "2_reintentos_x2.18": {
+      "apuestas": [
+        1,
+        2.18,
+        4.75
+      ],
+      "ciclos": 200000,
+      "acierto_por_ciclo": 0.873745,
+      "gana_en_intento": {
+        "1": 0.498745,
+        "2": 0.24865,
+        "3": 0.12635
+      },
+      "pierde_todo": 0.126255,
+      "perdida_si_pierde_todo": -7.93,
+      "ganancia_media_por_ciclo": -0.2568253250000001,
+      "ev_por_unidad_apostada": -0.07800053826605292
+    }
+  },
+  "mil_canales_sin_reintento": {
+    "canales": 1000,
+    "senales_por_mes": 300,
+    "apuestas": [
+      1
+    ],
+    "acierto_mes1": {
+      "mediana": 0.5,
+      "p95": 0.5466666666666666,
+      "maximo": 0.5866666666666667,
+      "canales_con_90_o_mas": 0
+    },
+    "canales_con_ganancia_mes1": 74,
+    "mejor_canal_mes1": {
+      "acierto": 0.5866666666666667,
+      "neto": 25.599999999999994
+    },
+    "mismo_canal_mes2": {
+      "acierto": 0.4666666666666667,
+      "neto": -41.0
+    },
+    "neto_medio_por_canal_mes1": -22.692400000000003
+  },
+  "mil_canales_2_reintentos": {
+    "canales": 1000,
+    "senales_por_mes": 300,
+    "apuestas": [
+      1,
+      2,
+      4
+    ],
+    "acierto_mes1": {
+      "mediana": 0.8733333333333333,
+      "p95": 0.9034999999999999,
+      "maximo": 0.9366666666666666,
+      "canales_con_90_o_mas": 124
+    },
+    "canales_con_ganancia_mes1": 55,
+    "mejor_canal_mes1": {
+      "acierto": 0.9366666666666666,
+      "neto": 78.1
+    },
+    "mismo_canal_mes2": {
+      "acierto": 0.8833333333333333,
+      "neto": -51.85000000000001
+    },
+    "neto_medio_por_canal_mes1": -68.47195
+  }
+}

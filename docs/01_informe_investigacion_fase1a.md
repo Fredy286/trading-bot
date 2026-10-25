@@ -682,3 +682,97 @@ concluyente».
 
 En ningún caso se usa dinero real sin autorización expresa. Antes, una prueba en demo debe comprobar que
 el precio del intermediario sigue al de Binance, que el empate se reembolsa y que el pago es ≥ 85 %.
+
+## Estudio 6 — zonas de precio (pre-registro, 2026-10-24, ANTES de calcular ninguna variable de zona)
+
+**Origen:** análisis del PDF «El secreto del trading profesional» (docs/05). La única idea del PDF con
+respaldo académico que el proyecto no ha probado son las **zonas**:
+- números redondos, máximo y mínimo del día anterior y extremos recientes;
+- Osler (2000): rebote en niveles publicados del 60,8 % frente al 56,2 % en niveles arbitrarios;
+- Osler (2003): toma de ganancias en números redondos y stop-loss justo después.
+
+El modelo actual no sabe dónde están esos niveles. Nadie ha calculado estas variables sobre datos reales.
+
+**Expectativa declarada:** «SIN SEÑAL». Si existe efecto, lo plausible es 52–55 %.
+
+**Pregunta:** ¿saber dónde están las zonas mejora la predicción de la dirección a 15 minutos, entrando
+1 minuto después de la señal?
+
+**Hipótesis (familia de 2, Holm entre ellas):**
+- **H6-BTC:** BTC/USDT, contado de Binance (`research/study3.py`: `spot_bars` sobre `data/raw/estudio3`);
+  número redondo = múltiplo de **1 000 USD**.
+- **H6-EUR:** EUR/USD, HistData M1 BID, la fuente de la Fase 1B (Enmienda 1); número redondo = múltiplo
+  de **0,0100**. Es el mercado de los estudios de Osler.
+
+**Diseño común (el del Estudio 3, para que la comparación sea limpia):**
+- **Duración:** 15 minutos.
+- **Decisión:** al cierre de las velas que empiezan en minutos múltiplos de 15 (UTC).
+- **Entrada:** apertura de `t+2`, con etiquetas con retraso 2 en el ajuste y en la evaluación.
+- **Contrato:** binaria, pago 85 %, empate reembolsado; p* = 54,05 %.
+- **Política:** B (EV estimado ≥ 0,02 con la probabilidad calibrada).
+- **Ejecución simulada:** la del Estudio 3 (`simulate` con los parámetros de `config/research.toml`).
+- **Modelo:** `logit` del proyecto.
+  - **Referencia:** solo `FEATURES`.
+  - **Prueba:** `FEATURES` más el bloque de zonas.
+  - Las dos usan las **mismas decisiones**: filas donde existen todas las variables de los dos.
+- **Desarrollo:** walk-forward de la sección 8.
+  - Pruebas trimestrales del 2022-01-01 al 2025-08-31.
+  - Entrenamiento con los 12 meses anteriores: el 20 % final para calibrar y purga entre tramos.
+
+**Bloque de zonas (10 variables, fijadas ahora).** Fila t usa solo velas hasta el cierre de t.
+
+Notación:
+- `c`, `h`, `l`: cierre, máximo y mínimo de cada vela de 1 minuto;
+- `σ` = `vol60 · √15`, donde `vol60` es la desviación de los rendimientos logarítmicos de 1 minuto en
+  60 velas, igual que en `compute_features` (sin `σ` > 0 no hay decisión);
+- `paso` = 1 000 (BTC) o 0,0100 (EUR/USD);
+- `R` = `round(c / paso) · paso`, el número redondo más cercano;
+- «distancia a X» = `(ln c − ln X) / σ`.
+
+| Variable | Definición |
+|---|---|
+| `z_rn` | Distancia a `R` |
+| `z_rn_x15` | `signo(floor(c_t / paso) − floor(c_{t−15} / paso))`: +1 si en 15 min cruzó un número redondo hacia arriba, −1 hacia abajo, 0 si no |
+| `z_rn_n` | Minutos desde la última vela de 1 min cuyo intervalo [`l`, `h`] contiene un múltiplo de `paso` (0 si es la vela t; tope 240) |
+| `z_pdh`, `z_pdl` | Distancia al máximo `h` y al mínimo `l` del día UTC anterior completo (NaN si ese día tiene < 720 velas) |
+| `z_hi240`, `z_lo240` | Distancia a `H` = máx. de `h` y a `L` = mín. de `l` en las velas t−239 … t−15 |
+| `z_t_hi`, `z_t_lo` | Número de velas en t−239 … t−15 con `(ln H − ln h) ≤ 0,25·σ` (resp. `(ln l − ln L) ≤ 0,25·σ`): «toques» del extremo |
+| `z_rej15` | `(c − mín l) / (máx h − mín l)` en las velas t−14 … t (0,5 si el rango es 0) |
+
+**Criterios para «pasa la fase de desarrollo»** (los 5 del Estudio 3, para cada hipótesis):
+1. ≥ 300 operaciones.
+2. Límite inferior de Wilson 95 % > 54,05 %.
+3. p de Holm < 0,05 entre las 2 hipótesis.
+4. EV > 0 en ≥ 60 % de los trimestres y ningún trimestre aporta > 50 % del beneficio.
+5. **Mejora frente a la referencia en las mismas decisiones:**
+   - IC 95 % por bootstrap de bloques diarios de la diferencia de log-loss (referencia − prueba) > 0,
+     medida en todas las decisiones sin empate;
+   - EV de la prueba ≥ EV de la referencia.
+
+**Control obligatorio (ítem 39):** si los dos modelos predicen igual, la ejecución se aborta y no vale.
+
+**Si alguna pasa:**
+1. **Filtro no confirmatorio** en 2025-09 → 2026-08, periodo ya usado y así declarado: se sigue solo si el
+   acierto puntual es > 54,05 % y el log-loss mejora frente a la referencia.
+2. **Confirmación limpia** con datos desde el **2026-09-01**:
+   - mismo walk-forward trimestral, continuado (12 meses de entrenamiento anteriores a cada trimestre);
+   - evaluada en GitHub Actions, sin el portátil;
+   - muestra fija = las primeras **5 136 operaciones sin empate** por hipótesis (potencia 80 % si el
+     acierto real es ≥ 56 %);
+   - aprueba si cumple, con Holm entre las hipótesis que lleguen: Wilson 95 % > 54,05 %, límite
+     inferior del IC 95 % del EV > 0 y p de Holm < 0,05;
+   - **inutilidad**, solo para parar y nunca para aprobar antes: con 1 700 y con 3 400 operaciones, si el
+     límite **superior** de Wilson 95 % es < 54,05 %, esa hipótesis termina en «SIN SEÑAL»;
+   - plazo **2027-09-30**: si no se completa la muestra, «no concluyente».
+
+**Si ninguna pasa:** se cierra con «SIN SEÑAL».
+
+**Consecuencias:**
+- **Si confirma:** señales manuales experimentales **solo en cuenta demo**, con el formato «instrumento |
+  ABRIR a las HH:MM (hora de Colombia, UTC−5) | 15 minutos | ARRIBA/ABAJO».
+- **Si no confirma:** SIN SEÑAL.
+- Nunca dinero real sin autorización expresa.
+
+**Fuera de la familia (solo informativo):** GBM, duraciones de 5 y 60 min, otros pasos de número redondo
+(500 USD; 0,0050), y la frecuencia de «rebote» al estilo de Osler (no cruzar el nivel en 15 min) en
+números redondos frente a niveles desplazados medio paso.
