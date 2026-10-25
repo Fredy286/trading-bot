@@ -1,0 +1,58 @@
+{
+  "periodo_prueba": "2025-01-01 → 2025-08-31",
+  "decisiones": 338467,
+  "logloss_base": 0.6909568989804985,
+  "acierto_todas_las_decisiones": 0.524636079735986,
+  "grupos": {
+    "último minuto (r0)": {
+      "aumento_logloss": 0.00024976267714638123,
+      "min": 0.00021896604921789464,
+      "max": 0.0002671643670528745
+    },
+    "minutos 2 a 5 (r1–r4)": {
+      "aumento_logloss": 0.00016970799631021993,
+      "min": 0.0001174064065820879,
+      "max": 0.0002323338384211393
+    },
+    "tendencia 5–240 min (cum)": {
+      "aumento_logloss": 0.0002010444359922999,
+      "min": 0.00015922850471794536,
+      "max": 0.00023006440835782183
+    },
+    "volatilidad (niveles y cociente)": {
+      "aumento_logloss": 0.0014644022151811449,
+      "min": 0.0014013715071444777,
+      "max": 0.001526772761602735
+    },
+    "tamaño de la última vela (range)": {
+      "aumento_logloss": 8.67656905717921e-05,
+      "min": 7.938154643449824e-05,
+      "max": 9.817625083397008e-05
+    },
+    "dónde cerró la última vela en su rango (clpos)": {
+      "aumento_logloss": 0.002941422809760693,
+      "min": 0.002886694413527069,
+      "max": 0.002978440253154746
+    },
+    "medias, RSI, Bollinger": {
+      "aumento_logloss": 0.0005404193973076454,
+      "min": 0.000438992332649879,
+      "max": 0.0006142838551291829
+    },
+    "volumen, spread, sin operaciones": {
+      "aumento_logloss": 1.1538536017911364e-05,
+      "min": -5.325776322173681e-06,
+      "max": 3.0252940536712458e-05
+    },
+    "hora y día": {
+      "aumento_logloss": 4.596632670443116e-05,
+      "min": 3.795541377393796e-05,
+      "max": 5.2661636597006733e-05
+    },
+    "calendario de noticias": {
+      "aumento_logloss": -2.9595917170703126e-06,
+      "min": -5.451295104763609e-06,
+      "max": 1.8883230833433018e-06
+    }
+  }
+}

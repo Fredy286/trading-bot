@@ -117,6 +117,16 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      tiene NSXUSD desde 2026-05. HistData también tiene UDXUSD (índice del dólar real), aún sin usar.
    - **docs/07_tradingview.md:** cómo usar TradingView (ideas, paper trading, gráfico BINANCE:BTCUSDT) y
      trampas de su backtest; sus datos NO se pueden usar en procesos automáticos (términos de uso).
+   - **Enfoque (2026-10-25, del usuario):** no probar herramientas para copiarlas; DESARMARLAS (datos, lógica)
+     y extraer la pieza con información real, validarla fuera de muestra e integrarla. El bot debe vigilar
+     TODAS las monedas y elegir la de mayor probabilidad (Estudio 13).
+   - **docs/08_conocimiento_y_mejoras.md:** por qué funcionan o fallan las estrategias, disección de cada
+     herramienta y propuestas P1–P7. Hallazgo: la ventaja del GBM de BTC 1 min sale sobre todo de `clpos`
+     (continuación de la presión del final de la vela: 52,8 % si cierra arriba; 55,4 % con volatilidad baja),
+     luego del nivel de volatilidad (`scripts/analisis_importancia_btc.py`). P1 (velas de 1 s dentro del
+     minuto) es la propuesta más prometedora.
+   - **Estudio 12 (ETH → BTC 1 min):** pre-registrado (b6f22fa); evaluar una sola vez después del 2027-01-18.
+   - **Estudio 13 (selector multimoneda BTC/ETH/SOL/BNB/XRP/DOGE/ADA):** pre-registro ad2e7c3, código c2afdae.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
