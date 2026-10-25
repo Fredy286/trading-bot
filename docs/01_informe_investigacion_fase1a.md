@@ -1509,3 +1509,62 @@ Por eso **solo cuentan datos nuevos**. Ninguna cifra de 2022–2025 sirve como e
   inmediata, antes se mide su efecto con entrada manual en una reproducción pre-registrada aparte.
 - **Si solo H14b aprueba:** XRP se añade a BTC en demo, con la misma condición.
 - **Si no aprueba ninguna:** sigue solo BTC.
+
+## Estudio 15 — presión dentro del minuto con velas de 1 segundo (mejora P1) (pre-registro, 2026-10-25, ANTES de descargar las velas de 1 s)
+
+**Origen:** según el análisis de docs/08 (sección 2), la ventaja del GBM de BTC a 1 minuto sale sobre todo de
+`clpos`, dónde cerró la vela dentro de su rango. Es la continuación de la presión de los últimos segundos,
+más fuerte con volatilidad baja. El modelo la ve solo de forma indirecta. Las velas de 1 s de Binance
+(gratuitas, con volumen comprador agresor) permiten medirla directamente.
+
+**Mecanismo:** las órdenes grandes repartidas en pedazos (flujo con memoria) siguen empujando al inicio del
+minuto siguiente. Cuanto más concentrada y unilateral sea la presión al final de la vela, más probable es
+que continúe.
+
+**Por qué podría no mejorar:** `clpos` y `r0` ya capturan la mayor parte. Lo que queda puede ser ruido de
+segundos.
+
+**Expectativa declarada:** mejora pequeña o nula.
+
+**Hipótesis única H15:** añadir al GBM de BTC/USDT a 1 minuto un bloque fijo de 6 variables medidas
+**dentro** de la vela de decisión mejora la predicción de la dirección de la vela siguiente.
+
+**Bloque nuevo.** Todo con las velas de 1 s de la vela de decisión t, segundos 0–59:
+
+| Variable | Definición |
+|---|---|
+| `s_r5`, `s_r10`, `s_r20` | ln(cierre del segundo 59 / cierre del segundo 59−k), dividido por `vol60 · √(k/60)`, con k = 5, 10, 20 |
+| `s_tib10` | 2 · Σ compras agresoras / Σ volumen − 1, en los segundos 50–59 (0 si no hubo volumen) |
+| `s_vol10` | Volumen de los segundos 50–59 / volumen del minuto |
+| `s_n10` | Operaciones de los segundos 50–59 / operaciones del minuto |
+
+`vol60` es el de `compute_features`. Si al minuto le faltan más de 10 velas de 1 s, sus variables valen
+NaN y no hay decisión **en ninguno de los dos modelos**. Cada segundo sin vela toma el cierre anterior y
+volumen 0.
+
+**Diseño (fase de desarrollo):**
+- **Modelos:** GBM del proyecto. Referencia `FEATURES`; prueba `FEATURES` + el bloque nuevo. Mismas
+  decisiones.
+- **Etiquetas:** `h = 1`, `d = 1`, binaria al 85 %, empate reembolsado, política B (EV estimado ≥ 0,02).
+- **Walk-forward trimestral:** pruebas del 2024-07-01 al 2025-08-31 (5 trimestres), entrenamiento con los
+  12 meses anteriores, 20 % de calibración isotónica, purga. Hacen falta velas de 1 s desde 2023-07.
+
+**Criterios (todos):**
+1. ≥ 300 operaciones del modelo de prueba;
+2. Wilson 95 % > 54,05 %;
+3. IC 95 % de la mejora de log-loss (bootstrap de bloques diarios, en todas las decisiones sin empate) con
+   límite inferior > 0;
+4. EV de la política B del modelo de prueba ≥ el de la referencia;
+5. EV > 0 en ≥ 60 % de los trimestres.
+
+**Control obligatorio (ítem 39):** si los dos modelos predicen igual, la ejecución se aborta.
+
+**Confirmación, solo si pasa la fase de desarrollo:**
+- los dos modelos se entrenan con los 12 meses hasta el 2026-10-25;
+- se evalúan una sola vez con todos los minutos del 2026-10-26 al 2027-01-18 (velas de 1 s de Binance);
+- criterios: cuantil 5 % del bootstrap diario de la mejora de log-loss > 0 y EV de la prueba ≥ el de la
+  referencia;
+- informativo: entrada a +10 s.
+
+**Consecuencia:** solo si confirma, el bloque se incorpora al modelo registrado. Antes, una reproducción
+pre-registrada mide su efecto con entrada manual.
