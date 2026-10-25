@@ -1029,3 +1029,10 @@ indicador; resultado por sesión y por año; operaciones sin llenar.
 - Si alguna pasa las dos fases, se propone su confirmación con datos nuevos.
 - Si ninguna pasa, SIN SEÑAL y **no se recomienda pagar el indicador**.
 - Nada de esto autoriza dinero real.
+
+*Nota de implementación (2026-10-25, antes de ejecutar).* Código: `research/study8.py` y
+`tbot research study8`. Detalles que el texto dejaba abiertos:
+- **Vela de entrada:** solo se comprueba el SL. Dentro de esa vela no se sabe si el máximo llegó antes
+  o después de la entrada, así que el TP se comprueba desde la vela siguiente (conservador).
+- **Minutos sin datos:** se saltan. La salida por tiempo usa el último cierre conocido.
+- **Orden no llenada:** bloquea nuevas señales durante sus 10 velas de vigencia.

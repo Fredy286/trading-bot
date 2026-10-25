@@ -228,6 +228,18 @@ def cmd_research_study7(a) -> int:
     return 0
 
 
+def cmd_research_study8(a) -> int:
+    from .research import study8
+
+    rep = study8.run(Path(a.root), Path(a.out), n_boot=a.n_boot)
+    for phase, f in rep["fases"].items():
+        for h, r in (f.get("resultados") or {}).items():
+            print(f"Fase {phase} {h}: pasa={r['pasa']} | " + ", ".join(
+                f"{k}={r.get(k)}" for k in ("operaciones", "winrate_tp", "neto_medio_usd_oz", "ic98_75", "acierto",
+                                            "lo95", "ev") if k in r))
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -466,6 +478,11 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study8", help="Estudio 8: «Golden BIAS 200» reconstruido en XAU/USD")
+    x.add_argument("--root", default="data/raw")
+    x.add_argument("--out", default="results/estudio8")
+    x.add_argument("--n-boot", type=int, default=2000)
+    x.set_defaults(func=cmd_research_study8)
     x = r.add_parser("study7", help="Estudio 7 (Kronos, análogos, Kalman, ETH), fase de desarrollo")
     x.add_argument("step", choices=["prepare", "evaluate"])
     x.add_argument("--root3", default="data/raw/estudio3")
