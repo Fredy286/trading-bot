@@ -1,9 +1,10 @@
 name: Estudio 5 (confirmación a +10 s)
 
 # Pre-registro: docs/01, «Estudio 5». Reproduce el modelo registrado desde el 2026-10-04 con entrada a +10 s
-# (velas de 1 s de Binance, en los servidores de GitHub) y aplica el veredicto H5a/H5b con Holm.
-# Mientras falte alguna muestra y no haya vencido el plazo (2026-12-13), solo informa conteos, nunca aciertos,
-# y no guarda el libro. Se ejecuta a mano: Actions → «Estudio 5» → Run workflow.
+# (velas de 1 s de Binance, en los servidores de GitHub) y aplica el veredicto H5a/H5b (Bonferroni, α = 0,025
+# cada una; enmienda del 2026-10-24). Cada hipótesis se evalúa en cuanto su muestra está completa; de las
+# incompletas solo se informa el conteo. El libro solo se guarda con las dos evaluadas.
+# Se ejecuta a mano: Actions → «Estudio 5» → Run workflow.
 
 on:
   workflow_dispatch:

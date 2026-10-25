@@ -4,18 +4,19 @@ datos nuevos y entrada manual realista (+10 s).
 Se evalúa el libro de una reproducción (`tbot replay --entry-delay-s 10`) que empieza el 2026-10-04:
 - H5a: primeras 3 500 alertas sin empate, a cualquier hora;
 - H5b: primeras 2 500 alertas sin empate de sábado y domingo (UTC), del mismo libro.
-Holm entre las dos (pruebas binomiales unilaterales frente a p*), y cada una aprueba si además el límite
-inferior de Wilson 95 % > p* y el EV > 0. Si la muestra no se completa al 2026-12-13, «no concluyente».
+Enmienda del 2026-10-24 (antes de reproducir datos nuevos): Bonferroni en lugar de Holm, cada hipótesis con
+p unilateral < 0,025 frente a p*, evaluada por separado en cuanto su muestra está completa (o vence el plazo).
+Cada una aprueba si además el límite inferior de Wilson 95 % > p* y el EV > 0. Si la muestra no se completa
+al 2026-12-13, «no concluyente».
 
-Para que mirar a medias no cambie nada, mientras falte alguna muestra y no haya vencido el plazo solo se
-informan los conteos, nunca los aciertos.
+Mientras la muestra de una hipótesis esté incompleta y no haya vencido el plazo, solo se informa su conteo.
 """
 
 from __future__ import annotations
 
 import pandas as pd
 
-from ..research.metrics import binom_pvalue_greater, holm, wilson
+from ..research.metrics import binom_pvalue_greater, wilson
 from ..signals.monitor import fixed_sample
 from .runner import LIVE_METHOD
 
@@ -24,7 +25,7 @@ START = pd.Timestamp("2026-10-04", tz="UTC")
 DEADLINE_END = pd.Timestamp("2026-12-14", tz="UTC")
 ENTRY_DELAY_S = 10.0
 SAMPLE_N = {"H5a": 3500, "H5b": 2500}
-ALPHA = 0.05
+ALPHA = 0.025  # por hipótesis (Bonferroni, 2 hipótesis): error de familia ≤ 5 %
 
 
 def is_weekend(row: dict) -> bool:
@@ -81,7 +82,7 @@ def evaluate(rows: list[dict], obs: dict, data_end: pd.Timestamp, sensitivity=No
     """Veredicto del Estudio 5. `data_end` = fin (excluido) de los datos reproducidos.
 
     `sensitivity(sample)` (opcional) devuelve la sensibilidad informativa de una muestra: entrada a otros
-    segundos y pago del 80 %. Solo se llama si hay veredicto final.
+    segundos y pago del 80 %. Solo se llama para las hipótesis evaluadas.
     """
     elig, excl = eligible_rows(rows, obs)
     bad = [r.get("entrada_tras_cierre_s") for r in elig
@@ -93,35 +94,37 @@ def evaluate(rows: list[dict], obs: dict, data_end: pd.Timestamp, sensitivity=No
     samples = {h: fixed_sample(pools[h], SAMPLE_N[h]) for h in SAMPLE_N}
     counts = {h: sum(1 for r in samples[h] if not r.get("tie")) for h in SAMPLE_N}
     complete = {h: counts[h] >= SAMPLE_N[h] for h in SAMPLE_N}
-    base = {"estudio": "Estudio 5 (pre-registro 53344b4)", "model_id": obs["model_id"], "policy": obs["policy"],
-            "entrada_s": ENTRY_DELAY_S, "inicio": START.isoformat(), "plazo_fin_excluido": DEADLINE_END.isoformat(),
-            "datos_hasta_excluido": pd.Timestamp(data_end).isoformat(), "objetivo": SAMPLE_N,
+    base = {"estudio": "Estudio 5 (pre-registro 53344b4, enmienda Bonferroni 2026-10-24)",
+            "model_id": obs["model_id"], "policy": obs["policy"], "entrada_s": ENTRY_DELAY_S,
+            "inicio": START.isoformat(), "plazo_fin_excluido": DEADLINE_END.isoformat(),
+            "datos_hasta_excluido": pd.Timestamp(data_end).isoformat(), "objetivo": SAMPLE_N, "alfa": ALPHA,
             "sin_empate_en_muestra": counts, "completa": complete, "excluidas": excl}
-    if not all(complete.values()) and pd.Timestamp(data_end) < DEADLINE_END:
-        return {**base, "estado": "pendiente",
-                "nota": "Faltan muestras y no ha vencido el plazo: no se calculan aciertos (se evalúa una sola vez)."}
-
+    expired = pd.Timestamp(data_end) >= DEADLINE_END
     be = 1 / (1 + obs["policy"]["payout"])
-    stats = {h: _stats(samples[h], be) for h in SAMPLE_N}
-    # Una muestra incompleta al vencer el plazo no puede aprobar: entra en Holm con p = 1.
-    p_holm = dict(zip(SAMPLE_N, holm([stats[h]["p"] if complete[h] else 1.0 for h in SAMPLE_N])))
     hyps = {}
     for h in SAMPLE_N:
-        s = stats[h]
+        if not complete[h] and not expired:
+            hyps[h] = {"estado": "pendiente", "sin_empate": counts[h], "objetivo": SAMPLE_N[h]}
+            continue
+        s = _stats(samples[h], be)
         if not complete[h]:
             estado = "no concluyente"
         else:
-            ok = p_holm[h] < ALPHA and s["lo95"] > be and (s["ev"] or 0) > 0
-            estado = "aprueba" if ok else "no aprueba"
-        hyps[h] = {**s, "p_holm": p_holm[h], "umbral": be, "estado": estado,
+            estado = "aprueba" if s["p"] < ALPHA and s["lo95"] > be and (s["ev"] or 0) > 0 else "no aprueba"
+        hyps[h] = {**s, "umbral": be, "estado": estado,
                    "por_dia_utc": _by(samples[h], lambda r: pd.Timestamp(r["decision_time"]).strftime("%Y-%m-%d")),
                    "por_dia_semana_utc": _by(samples[h], lambda r: pd.Timestamp(r["decision_time"]).dayofweek),
                    "sensibilidad": sensitivity(samples[h]) if sensitivity else None}
-    if hyps["H5a"]["estado"] == "aprueba":
+    st = {h: hyps[h]["estado"] for h in hyps}
+    if st["H5a"] == "aprueba":
         conclusion = "Aprueba H5a: señales manuales experimentales en cuenta DEMO, a cualquier hora."
-    elif hyps["H5b"]["estado"] == "aprueba":
+    elif st["H5b"] == "aprueba":
         conclusion = "Solo aprueba H5b: señales manuales experimentales en cuenta DEMO, solo sábados y domingos."
+    elif "pendiente" in st.values():
+        conclusion = "Sin decisión todavía: " + ", ".join(f"{h} {e}" for h, e in st.items()) + "."
     else:
         conclusion = "No aprueba ninguna: BTC a 1 minuto queda SIN SEÑAL también para uso manual."
-    return {**base, "estado": "final", "hipotesis": hyps, "conclusion": conclusion,
+    n_pend = sum(e == "pendiente" for e in st.values())
+    estado = "pendiente" if n_pend == len(st) else ("parcial" if n_pend else "final")
+    return {**base, "estado": estado, "hipotesis": hyps, "conclusion": conclusion,
             "nota": "Nunca dinero real sin autorización expresa; antes, prueba en demo del precio, el empate y el pago."}

@@ -26,10 +26,20 @@ def _rows(start="2026-10-04", end="2026-10-12", hit_every=10, wins_per=6, entry=
 
 def test_pending_shows_counts_but_never_hit_rates():
     v = study5.evaluate(_rows(end="2026-10-06"), OBS, pd.Timestamp("2026-10-06", tz="UTC"))
-    assert v["estado"] == "pendiente" and "hipotesis" not in v
-    assert v["completa"] == {"H5a": False, "H5b": False}
+    assert v["estado"] == "pendiente" and v["completa"] == {"H5a": False, "H5b": False}
+    assert {h["estado"] for h in v["hipotesis"].values()} == {"pendiente"}
     text = json.dumps(v)
     assert not any(f'"{k}":' in text for k in ("aciertos", "acierto", "ev", "lo95", "p"))
+
+
+def test_h5a_is_evaluated_alone_while_h5b_is_pending():
+    """Enmienda Bonferroni: H5a se decide sin esperar a H5b, y de H5b solo se ve el conteo."""
+    rows = [r for r in _rows() if pd.Timestamp(r["decision_time"]) < pd.Timestamp("2026-10-07", tz="UTC")]
+    v = study5.evaluate(rows, OBS, pd.Timestamp("2026-10-07", tz="UTC"))
+    a, b = v["hipotesis"]["H5a"], v["hipotesis"]["H5b"]
+    assert v["estado"] == "parcial" and a["estado"] == "aprueba" and a["n"] == 3500
+    assert b == {"estado": "pendiente", "sin_empate": v["sin_empate_en_muestra"]["H5b"], "objetivo": 2500}
+    assert "cualquier hora" in v["conclusion"]
 
 
 def test_final_verdict_with_both_samples_complete():
@@ -38,10 +48,24 @@ def test_final_verdict_with_both_samples_complete():
     a, b = v["hipotesis"]["H5a"], v["hipotesis"]["H5b"]
     assert a["n"] == 3500 and b["n"] == 2500
     assert a["estado"] == "aprueba" and b["estado"] == "aprueba"
-    assert a["p_holm"] >= a["p"] and a["umbral"] == pytest.approx(1 / 1.85)
-    assert "H5a" in v["conclusion"] or "cualquier hora" in v["conclusion"]
+    assert v["alfa"] == 0.025 and a["umbral"] == pytest.approx(1 / 1.85)
     # H5b solo usa sábados y domingos UTC.
     assert all(pd.Timestamp(d).dayofweek >= 5 for d in b["por_dia_utc"])
+
+
+def test_bonferroni_threshold_is_stricter_than_5_percent():
+    """Una ventaja que daría p entre 0,025 y 0,05 ya no aprueba."""
+    from tradingbot.research.metrics import binom_pvalue_greater
+
+    be = 1 / 1.85
+    k = next(k for k in range(1890, 2000) if binom_pvalue_greater(k, 3500, be) < 0.05)
+    assert binom_pvalue_greater(k, 3500, be) >= 0.025
+    rows = _rows()
+    nt = [r for r in rows if not r["tie"]][:3500]
+    for i, r in enumerate(nt):  # exactamente k aciertos en la muestra de H5a
+        r["win"], r["pnl"] = i < k, 0.85 if i < k else -1.0
+    v = study5.evaluate(rows, OBS, pd.Timestamp("2026-10-12", tz="UTC"))
+    assert v["hipotesis"]["H5a"]["aciertos"] == k and v["hipotesis"]["H5a"]["estado"] == "no aprueba"
 
 
 def test_no_edge_does_not_pass():
@@ -51,12 +75,11 @@ def test_no_edge_does_not_pass():
 
 
 def test_incomplete_sample_after_deadline_is_inconclusive():
-    """Al vencer el plazo con una muestra incompleta: «no concluyente» y entra en Holm con p = 1."""
     rows = [r for r in _rows() if pd.Timestamp(r["decision_time"]).dayofweek < 5 or
             pd.Timestamp(r["decision_time"]) < pd.Timestamp("2026-10-04 12:00", tz="UTC")]
     v = study5.evaluate(rows, OBS, pd.Timestamp("2026-12-14", tz="UTC"))
     assert v["estado"] == "final" and v["hipotesis"]["H5b"]["estado"] == "no concluyente"
-    assert v["hipotesis"]["H5a"]["p_holm"] == pytest.approx(min(1.0, 2 * v["hipotesis"]["H5a"]["p"]))
+    assert v["hipotesis"]["H5a"]["estado"] == "aprueba"
 
 
 def test_only_registered_model_policy_period_and_one_row_per_candle():

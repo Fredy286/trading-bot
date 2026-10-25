@@ -701,6 +701,25 @@ La sensibilidad informativa usa entradas a +2, +5, +10 y +20 s y pagos del 85 % 
 reproducción descarga las velas de 1 min desde 3 días antes del inicio, para el calentamiento de las
 variables (antes dependía del histórico mensual, que no cubre el 1–3 de octubre).
 
+**Enmienda al Estudio 5 (2026-10-24, a pedido del usuario, ANTES de reproducir datos posteriores al
+2026-10-03).**
+- **Motivo:** la muestra de fin de semana (H5b) no se completa hasta ~2026-11-22. La de todas las horas
+  (H5a) estaría completa ya.
+- **Cambio:** la corrección de Holm se sustituye por **Bonferroni**. Cada hipótesis se prueba con
+  α = 0,025: p unilateral < 0,025 frente a p* = 54,05 %.
+- **Por qué es válido:** Bonferroni controla el error de familia igual que Holm (≤ 5 %) y es algo más
+  exigente. Permite evaluar cada hipótesis **por separado**, en cuanto su muestra fija esté completa o
+  vence el plazo, sin esperar a la otra.
+- **Sin cambios:** muestras (3 500 y 2 500), límite inferior de Wilson 95 % > p*, EV > 0, plazo y
+  consecuencias.
+- **Consecuencias:**
+  - si H5a aprueba, las señales experimentales en demo valen para todas las horas (H5b se evalúa
+    igual cuando se complete y se informa);
+  - si H5a no aprueba, se espera a H5b (solo fines de semana);
+  - si ninguna aprueba, SIN SEÑAL.
+- **Una sola evaluación:** cada hipótesis se evalúa una vez. Mientras la muestra de una hipótesis esté
+  incompleta, el comando solo informa su conteo.
+
 ## Estudio 6 — zonas de precio (pre-registro, 2026-10-24, ANTES de calcular ninguna variable de zona)
 
 **Origen:** análisis del PDF «El secreto del trading profesional» (docs/05). La única idea del PDF con

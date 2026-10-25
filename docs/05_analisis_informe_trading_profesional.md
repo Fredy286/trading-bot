@@ -178,15 +178,12 @@ que la muestra de **H5a** (3 500, todas las horas) se completa hacia **finales d
 solo fines de semana UTC) hacia el **2026-11-22**, antes del plazo del 2026-12-13. Son estimaciones; el
 conteo real lo dará la reproducción.
 
-**Código listo (2026-10-24):**
-- `tbot study5-verdict` y el flujo `.github/workflows/estudio5.yml` (Actions → «Estudio 5» → Run
-  workflow, con el día final excluido);
-- reproduce desde el 2026-10-04 con entrada a +10 s y aplica H5a/H5b con Holm;
-- mientras falte una muestra, solo informa conteos, nunca aciertos.
+**Código listo (2026-10-24):** `tbot study5-verdict` y el flujo `.github/workflows/estudio5.yml` (Actions →
+«Estudio 5» → Run workflow, con el día final excluido). Reproduce desde el 2026-10-04 con entrada a +10 s.
 
-**Ejecutarlo una vez, con `end` = 2026-11-24 o posterior** (datos hasta el 23 de noviembre). Si para
-entonces falta la muestra de fin de semana, se repite unos días después: con muestra fija, repetirlo no
-cambia el resultado.
+**Enmienda del mismo día (antes de ver datos nuevos):** Bonferroni (α = 0,025 por hipótesis) en lugar de
+Holm. Así **H5a se evalúa en cuanto su muestra está completa**, sin esperar a H5b. De una hipótesis
+incompleta solo se informa el conteo. H5b se evalúa cuando se complete, hacia el 2026-11-24.
 
 ### 5.2 Estudio 6: zonas (pre-registrado; resumen en la sección 6)
 

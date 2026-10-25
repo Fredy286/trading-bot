@@ -235,7 +235,7 @@ def cmd_replay(a) -> int:
 
 
 def cmd_study5_verdict(a) -> int:
-    """Estudio 5: veredicto H5a/H5b (Holm) sobre el libro de una reproducción con entrada a +10 s."""
+    """Estudio 5: veredicto H5a/H5b (Bonferroni) sobre el libro de una reproducción con entrada a +10 s."""
     from datetime import timedelta
 
     import pandas as pd
@@ -266,9 +266,12 @@ def cmd_study5_verdict(a) -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(jsonutil.dumps(v, indent=2), encoding="utf-8")
     print(jsonutil.dumps({k: v[k] for k in v if k != "hipotesis"}, indent=2))
-    for h, r in (v.get("hipotesis") or {}).items():
-        print(f"{h}: {r['estado']} | {r['aciertos']}/{r['n']} = {r['acierto']} [lím. inf. {r['lo95']:.4f}] | "
-              f"EV {r['ev']} | p Holm {r['p_holm']:.4g}")
+    for h, r in v["hipotesis"].items():
+        if r["estado"] == "pendiente":
+            print(f"{h}: pendiente ({r['sin_empate']} de {r['objetivo']} alertas sin empate)")
+        else:
+            print(f"{h}: {r['estado']} | {r['aciertos']}/{r['n']} = {r['acierto']} [lím. inf. {r['lo95']:.4f}] | "
+                  f"EV {r['ev']} | p {r['p']:.4g} (aprueba si < {v['alfa']})")
     return 0
 
 
