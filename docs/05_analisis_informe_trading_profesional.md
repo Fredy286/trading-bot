@@ -282,6 +282,27 @@ acierta?», sino «¿nuestro modelo acierta más si le añadimos Kronos, los an�
   recientes y la correlación publicada de Kronos es baja. Si alguna mejora, se confirma con datos nuevos
   antes de tocar las señales.
 
+## 7b. «Golden BIAS 200» (indicador de oro de TradingView) — resultado: SIN SEÑAL (2026-10-25)
+
+- **Qué es:** indicador de solo invitación. Cuesta 50 USD, se paga por Telegram, el código es cerrado y
+  no tiene estadísticas verificables. Promete «alta precisión» con SMA 15 + SMA 200, distancia mínima,
+  entrada en retroceso, tres sesiones (hora de México), confirmación multitemporal y TP/SL.
+- **Cómo se probó:** se reconstruyeron sus reglas publicadas con parámetros fijados antes de mirar datos
+  (Estudio 8, docs/01). Se aplicaron a 4 años de oro minuto a minuto (2022–2025), como contado con
+  costos y como binaria a 5 minutos entrando 1 minuto después.
+
+| Versión | Operaciones | «Winrate» / acierto | Resultado |
+|---|---|---|---|
+| Contado | 30 169 | 48,8 % de TP | −0,34 USD/oz por operación; 0 % de trimestres positivos |
+| Contado + flechas multitemporales | 11 516 | 48,6 % | −0,34 USD/oz |
+| Binaria 5 min | 54 743 | 49,1 % | −9 centavos por dólar apostado |
+| Binaria 5 min + flechas | 21 347 | 49,3 % | −9 centavos |
+
+Pierde en las tres sesiones y en los cuatro años. Antes de costos ya no gana nada, y después pierde el
+costo completo. **No conviene pagarlo.** De sus ideas, la tendencia con medias móviles y la confirmación
+multitemporal ya están en nuestro modelo (medias de 20 y 60, rendimientos de 5 a 240 min), y en oro no
+dieron señal (Fase 1B).
+
 ## 8. Fuentes consultadas (2026-10-24 y 2026-10-25)
 
 - Osler, C. (2000). *Support for Resistance: Technical Analysis and Intraday Exchange Rates*. FRBNY
@@ -306,6 +327,9 @@ acierta?», sino «¿nuestro modelo acierta más si le añadimos Kronos, los an�
   https://digitechbytes.com/?p=48934 y https://huggingface.co/sahil007123/kronos-nse-1d.
 - Herramientas análogas en TradingView: https://kr.tradingview.com/script/TiOb6SUA-K-NN-Pattern-Forecast/
   (análogos) y https://vn.tradingview.com/script/OxYmisSS-Kalman-Filter-Loxx (Kalman).
+- Golden BIAS 200: descripción pegada por el usuario (TradingView, solo invitación); no aparece en el buscador
+  público. Indicador parecido público: https://www.tradingview.com/script/8bpA7WAD-The-Golden-Trigger.
+  Comentario sobre pruebas de oro que «halagan»: https://www.mql5.com/en/blogs/post/774275.
 - Formato de señales con «gale» en grupos de Telegram: ejemplos de encargos y de indicadores públicos
   (https://www.workana.com/job/criacao-de-sala-de-sinais-automatica-para-telegram,
   https://es.tradingview.com/script/c3PBuxF5). No se encontró una definición estándar de «M2/M3»; el

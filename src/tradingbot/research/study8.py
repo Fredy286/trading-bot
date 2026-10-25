@@ -60,6 +60,25 @@ def mtf_arrows(bars: pd.DataFrame, tf: int) -> np.ndarray:
     return np.where(pos >= 0, vals[np.clip(pos, 0, None)], np.nan)
 
 
+def session_of(times: pd.Series) -> np.ndarray:
+    """Nombre de la sesión (hora de México) del cierre de cada vela; solo para el desglose informativo."""
+    close = (pd.DatetimeIndex(times) + pd.Timedelta(minutes=1)).tz_convert("America/Mexico_City")
+    m = (close.hour * 60 + close.minute).to_numpy()
+    names = np.array(["Nueva York 08-12", "Asia 17:30-23", "Londres 01-07"])
+    out = np.full(len(m), "fuera", dtype=object)
+    for (a, b), nm in zip(SESSIONS_MX, names):
+        out[(m >= a) & (m < b)] = nm
+    return out
+
+
+def _breakdown(times: pd.Series, value: np.ndarray, win: np.ndarray) -> dict:
+    """Informativo (pre-registro): por sesión y por año."""
+    t = pd.DatetimeIndex(times)
+    df = pd.DataFrame({"v": value, "w": win, "ses": session_of(times), "anio": t.year})
+    return {k: {str(g): {"n": int(len(x)), "medio": float(x["v"].mean()), "acierto": float(x["w"].mean())}
+                for g, x in df.groupby(k)} for k in ("ses", "anio")}
+
+
 def signals(bars: pd.DataFrame, ind: pd.DataFrame, mtf: bool) -> np.ndarray:
     c, o = bars["c"].to_numpy(), bars["o"].to_numpy()
     s15, s200, atr = ind["sma15"].to_numpy(), ind["sma200"].to_numpy(), ind["atr"].to_numpy()
@@ -168,7 +187,8 @@ def evaluate_spot(tr: pd.DataFrame, n_boot: int = 2000) -> dict:
     return {"senales": int(len(tr)), "operaciones": int(len(f)), "sin_llenar": int((~tr["llenada"]).sum()),
             "winrate_tp": float((f["motivo"] == "TP").mean()), "salidas": f["motivo"].value_counts().to_dict(),
             "neto_medio_usd_oz": b["mean"], "ic98_75": [b["lo"], b["hi"]], "R_medio_bruto": float(f["R"].mean()),
-            "trimestres_positivos": pos_q, "criterios": crit, "pasa": all(crit.values())}
+            "trimestres_positivos": pos_q, "criterios": crit, "pasa": all(crit.values()),
+            "desglose": _breakdown(f["time"], f["neto"].to_numpy(), (f["motivo"] == "TP").to_numpy())}
 
 
 def evaluate_binary(tr: pd.DataFrame) -> dict:
@@ -182,7 +202,8 @@ def evaluate_binary(tr: pd.DataFrame) -> dict:
     ev = float(tr["pnl"].mean())
     crit = {"min_300": len(tr) >= 300, "p_bonferroni": p < ALPHA, "wilson": lo > be, "ev_positivo": ev > 0}
     return {"operaciones": int(len(tr)), "sin_empate": n, "aciertos": w, "acierto": w / n if n else None,
-            "lo95": float(lo), "hi95": float(hi), "p": p, "ev": ev, "criterios": crit, "pasa": all(crit.values())}
+            "lo95": float(lo), "hi95": float(hi), "p": p, "ev": ev, "criterios": crit, "pasa": all(crit.values()),
+            "desglose": _breakdown(tr["time"], tr["pnl"].to_numpy(), (tr["resultado"] > 0).to_numpy())}
 
 
 def run(root: Path = Path("data/raw"), out_dir: Path = Path("results/estudio8"), n_boot: int = 2000) -> dict:

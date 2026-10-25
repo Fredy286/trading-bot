@@ -1036,3 +1036,25 @@ indicador; resultado por sesión y por año; operaciones sin llenar.
   o después de la entrada, así que el TP se comprueba desde la vela siguiente (conservador).
 - **Minutos sin datos:** se saltan. La salida por tiempo usa el último cierre conocido.
 - **Orden no llenada:** bloquea nuevas señales durante sus 10 velas de vigencia.
+
+**Resultado de la fase A (2022-01 → 2025-08, commit 952d2d9, aplicado mecánicamente;
+`results/estudio8/resultado.json`):**
+
+| Hipótesis | Operaciones | «Winrate» (TP antes que SL) / acierto | Resultado | Trimestres positivos |
+|---|---|---|---|---|
+| H8a contado | 30 169 (12 126 órdenes sin llenar) | 48,8 % | **−0,34 USD/oz** por operación [IC 98,75 %: −0,36; −0,32]; bruto −0,02 R | 0 % |
+| H8b contado + MTF | 11 516 | 48,6 % | **−0,34 USD/oz** [−0,37; −0,31] | 0 % |
+| H8c binaria 5 min | 54 743 | **49,1 %** [lím. inf. 48,7 %] | EV −0,091 | — |
+| H8d binaria 5 min + MTF | 21 347 | **49,3 %** [48,6 %] | EV −0,087 | — |
+
+**Veredicto: ninguna pasa la fase A** (no hay fase B). Las cuatro pierden en todas las sesiones y en
+todos los años, de 2022 a 2025.
+- **Contado:** antes de costos, las reglas no ganan nada (−0,02 R). El costo optimista de 0,32 USD/oz
+  se lleva el resto.
+- **Binaria:** la dirección después de la señal acierta **menos** del 50 %; el oro tiende a revertir un
+  poco tras una vela a favor de la tendencia.
+- La confirmación multitemporal no cambia nada.
+- **Estudio 8: SIN SEÑAL. No se recomienda pagar el indicador.**
+
+El desglose por sesión y por año se añadió después de la primera ejecución, porque el pre-registro lo
+pedía y faltaba en el código. Es informativo y no cambia ningún criterio.

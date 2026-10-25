@@ -102,6 +102,13 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        (lanzar con `end` = 2026-10-26).
    - **Estudio 6 «zonas»:** pre-registrado (bc97dc0), código congelado (37fdd3f) y ejecutado: **SIN SEÑAL**.
      En BTC las zonas no mejoran el log-loss y bajan el EV (55,61 % → 55,19 %). En EUR/USD empeoran.
+   - **Estudio 7 (Kronos, análogos, Kalman, ETH como mejoras del GBM de BTC 1 min):** pre-registro 1492079,
+     código de8de82. `tbot research study7 prepare` ya hecho (data/processed/estudio7/E.parquet). Kronos lo
+     corre el USUARIO (el clasificador de permisos bloquea ejecutar código descargado):
+     `~/proyectos/kronos-externo/.venv/bin/python -I scripts/estudio7_kronos.py --kronos ~/proyectos/kronos-externo`
+     (~4 h, reanudable). Luego: `tbot research study7 evaluate`.
+   - **Estudio 8 («Golden BIAS 200» de oro, TradingView):** SIN SEÑAL. Pierde en las 4 versiones, en todas
+     las sesiones y en todos los años (contado −0,34 USD/oz; binaria 49,1 %).
    - **Pendientes:** auditor de señales de terceros y gestión/diario para la demo.
 
 ## Cómo trabajar aquí
