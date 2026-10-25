@@ -94,7 +94,12 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    - **Estudio 5:** código listo (`tbot study5-verdict`, `.github/workflows/estudio5.yml`, manual).
      - Enmienda 2026-10-24: Bonferroni α = 0,025 por hipótesis. Cada una se evalúa en cuanto su muestra está
        completa; de las incompletas solo se informa el conteo.
-     - H5a se lanzó con `end` = 2026-10-25. H5b, con `end` ≥ 2026-11-24.
+     - **H5a APRUEBA (2026-10-25, run 40160162254):** 56,11 % [54,46 %], EV +0,034, p = 0,0075.
+       Entre semana 53,2 %; fin de semana 58,4 % (descriptivo). Con pago 80 % a +10 s, EV +0,009.
+       Consecuencia: señales manuales experimentales SOLO en demo (falta construir ese modo y verificar
+       el precio, el empate y el pago del intermediario).
+     - H5b: 2 286 de 2 500 al 2026-10-24; se completaría con el fin de semana del 25 de octubre
+       (lanzar con `end` = 2026-10-26).
    - **Estudio 6 «zonas»:** pre-registrado (bc97dc0), código congelado (37fdd3f) y ejecutado: **SIN SEÑAL**.
      En BTC las zonas no mejoran el log-loss y bajan el EV (55,61 % → 55,19 %). En EUR/USD empeoran.
    - **Pendientes:** auditor de señales de terceros y gestión/diario para la demo.

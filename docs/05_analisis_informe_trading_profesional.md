@@ -113,7 +113,7 @@ Medido con la regla de ellos (2 repeticiones), cualquier sistema, incluso uno al
 |---|---|---|---|
 | Divisas y oro, 1–60 min | 50,5–51,3 % | No | SIN SEÑAL |
 | BTC 1 min, entrada automática +2 s (Enmienda 2, sep. 2026) | **57,63 %** [lím. inf. 55,98 %] | **Sí** | Aprobó; ventaja debilitada después (54,1 %) |
-| BTC 1 min, entrada +10 s (manual realista) | ≈ 56,4 % en sep. 2026 | Sí, por poco | **Estudio 5** en curso (datos desde 2026-10-04) |
+| BTC 1 min, entrada +10 s (manual realista), datos nuevos oct. 2026 | **56,11 %** [lím. inf. 54,46 %], EV +0,034 | **Sí** | **Estudio 5, H5a APRUEBA** (2026-10-25): solo demo. Entre semana 53,2 %, fin de semana 58,4 % |
 | BTC 15/60 min, ETH 15 min, flujo de órdenes (Estudios 2–4) | 52,9–54,2 % | No | SIN SEÑAL |
 | Mejor canal al azar en un mes (sección 2.2) | 58,7 % | Por suerte | Al mes siguiente, 46,7 % |
 

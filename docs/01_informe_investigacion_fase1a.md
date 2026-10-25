@@ -720,6 +720,41 @@ variables (antes dependía del histórico mensual, que no cubre el 1–3 de octu
 - **Una sola evaluación:** cada hipótesis se evalúa una vez. Mientras la muestra de una hipótesis esté
   incompleta, el comando solo informa su conteo.
 
+**Resultado de H5a (run 40160162254 de GitHub Actions, datos 2026-10-04 → 2026-10-24, aplicado
+mecánicamente; `results/estudio5/verdict.json`):**
+
+| | Valor |
+|---|---|
+| Muestra fija | 3 500 alertas sin empate (2026-10-04 → 2026-10-19), más 481 empates |
+| Aciertos | 1 964 = **56,11 %** [IC 95 %: 54,46 %; 57,75 %] |
+| Umbral p* | 54,05 % (pago 85 %, empate reembolsado) |
+| EV por unidad apostada | **+0,034** |
+| p unilateral | 0,0075 (< 0,025) |
+| **Veredicto** | **H5a APRUEBA** |
+
+**Sensibilidad (informativa, no decide):**
+
+| Entrada tras el cierre | +2 s | +5 s | +10 s | +20 s |
+|---|---|---|---|---|
+| Acierto | 58,1 % | 57,0 % | 56,1 % | 55,4 % |
+| EV con pago 85 % | +0,066 | +0,049 | +0,034 | +0,023 |
+| EV con pago 80 % | +0,040 | +0,023 | +0,009 | −0,002 |
+
+**Desglose descriptivo (no es una prueba; el de fin de semana es la hipótesis H5b, aún incompleta):**
+- **entre semana:** 813/1 529 = **53,2 %** [50,7 %; 55,7 %], por debajo del umbral;
+- **sábado y domingo UTC:** 1 151/1 971 = **58,4 %** [56,2 %; 60,6 %].
+
+La ventaja de la muestra se concentra en el fin de semana, como en la verificación adversaria de la
+Enmienda 2.
+
+**Control interno:** la sensibilidad a +10 s, calculada por otro camino de código (directamente sobre
+las velas de 1 s), reproduce exactamente el resultado del bucle: 1 964 aciertos y 481 empates.
+
+**Consecuencia pre-registrada:** señales manuales experimentales **solo en cuenta demo**, a cualquier
+hora. Antes, la prueba en demo debe comprobar que el precio del intermediario sigue al de Binance, que
+el empate se reembolsa y que el pago es ≥ 85 % (con 80 % el EV a +10 s es casi nulo). H5b
+(2 286 de 2 500) se evalúa en cuanto se complete. Nunca dinero real sin autorización expresa.
+
 ## Estudio 6 — zonas de precio (pre-registro, 2026-10-24, ANTES de calcular ninguna variable de zona)
 
 **Origen:** análisis del PDF «El secreto del trading profesional» (docs/05). La única idea del PDF con
