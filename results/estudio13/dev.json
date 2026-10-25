@@ -1,0 +1,164 @@
+{
+  "estudio": "Estudio 13 — selector multimoneda, fase de desarrollo (pre-registro ad2e7c3)",
+  "git_sha": "768d5ea2c9e50b632814c57195ab9f9fc54c4115",
+  "universo": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "ADAUSDT"
+  ],
+  "periodo_prueba": [
+    "2022-01-01",
+    "2025-09-01"
+  ],
+  "selector": {
+    "operaciones": 640735,
+    "sin_empate": 542623,
+    "aciertos": 307776,
+    "acierto": 0.5672004319757916,
+    "lo95": 0.5658816474275514,
+    "hi95": 0.5685182650149663,
+    "ev": 0.0417685938804654,
+    "ev_ic95": [
+      0.0354035918725485,
+      0.04752746467973592
+    ],
+    "trimestres_ev_positivo": 0.8666666666666667,
+    "operaciones_por_dia": 478.51755041075427,
+    "ev_total_por_dia": 19.987005227781925,
+    "elecciones_por_moneda": {
+      "XRPUSDT": 304209,
+      "BTCUSDT": 158048,
+      "BNBUSDT": 97046,
+      "ETHUSDT": 49259,
+      "DOGEUSDT": 20663,
+      "ADAUSDT": 6006,
+      "SOLUSDT": 5504
+    }
+  },
+  "cada_moneda_sola": {
+    "BTCUSDT": {
+      "operaciones": 219856,
+      "sin_empate": 203936,
+      "aciertos": 115431,
+      "acierto": 0.5660158088812176,
+      "lo95": 0.5638634864449756,
+      "hi95": 0.568165644247455,
+      "ev": 0.04371656902699948,
+      "ev_ic95": [
+        0.03598991772612775,
+        0.05089598200888791
+      ],
+      "trimestres_ev_positivo": 0.8666666666666667,
+      "operaciones_por_dia": 164.3168908819133,
+      "ev_total_por_dia": 7.183370702541105
+    },
+    "ETHUSDT": {
+      "operaciones": 80714,
+      "sin_empate": 77217,
+      "aciertos": 42781,
+      "acierto": 0.5540360283357292,
+      "lo95": 0.5505273731332642,
+      "hi95": 0.5575393071449265,
+      "ev": 0.02388495180513913,
+      "ev_ic95": [
+        0.01372520686520657,
+        0.0340628501074213
+      ],
+      "trimestres_ev_positivo": 0.9230769230769231,
+      "operaciones_por_dia": 69.70120898100173,
+      "ev_total_por_dia": 1.6648100172711569
+    },
+    "SOLUSDT": {
+      "operaciones": 10407,
+      "sin_empate": 9779,
+      "aciertos": 5388,
+      "acierto": 0.5509765824726455,
+      "lo95": 0.5411000011498537,
+      "hi95": 0.5608131280579216,
+      "ev": 0.018141635437686168,
+      "ev_ic95": [
+        -0.0006770005634619894,
+        0.03753508925874077
+      ],
+      "trimestres_ev_positivo": 0.5,
+      "operaciones_por_dia": 10.34493041749503,
+      "ev_total_por_dia": 0.1876739562624254
+    },
+    "BNBUSDT": {
+      "operaciones": 185632,
+      "sin_empate": 125198,
+      "aciertos": 68837,
+      "acierto": 0.5498250770779086,
+      "lo95": 0.5470677101761895,
+      "hi95": 0.5525793863885627,
+      "ev": 0.011584478969143247,
+      "ev_ic95": [
+        0.0015434264202210618,
+        0.022637301812144465
+      ],
+      "trimestres_ev_positivo": 0.9,
+      "operaciones_por_dia": 219.42316784869976,
+      "ev_total_por_dia": 2.5419030732860515
+    },
+    "XRPUSDT": {
+      "operaciones": 341985,
+      "sin_empate": 285225,
+      "aciertos": 163899,
+      "acierto": 0.574630554825138,
+      "lo95": 0.5728151334355056,
+      "hi95": 0.5764439658939502,
+      "ev": 0.052599236808631954,
+      "ev_ic95": [
+        0.043481058056803065,
+        0.06127456445404675
+      ],
+      "trimestres_ev_positivo": 0.8,
+      "operaciones_por_dia": 263.4707241910632,
+      "ev_total_por_dia": 13.858359013867487
+    },
+    "DOGEUSDT": {
+      "operaciones": 33248,
+      "sin_empate": 29276,
+      "aciertos": 15958,
+      "acierto": 0.5450881267932778,
+      "lo95": 0.5393783500061577,
+      "hi95": 0.5507860721948148,
+      "ev": 0.0074079643888354104,
+      "ev_ic95": [
+        -0.0037387214822231663,
+        0.01998038649227753
+      ],
+      "trimestres_ev_positivo": 0.6923076923076923,
+      "operaciones_por_dia": 30.81371640407785,
+      "ev_total_por_dia": 0.22826691380908223
+    },
+    "ADAUSDT": {
+      "operaciones": 11534,
+      "sin_empate": 10220,
+      "aciertos": 5419,
+      "acierto": 0.5302348336594912,
+      "lo95": 0.5205490772339437,
+      "hi95": 0.5398978686577062,
+      "ev": -0.016893532165770768,
+      "ev_ic95": [
+        -0.035491037642274445,
+        0.0010420928270268614
+      ],
+      "trimestres_ev_positivo": 0.4,
+      "operaciones_por_dia": 13.47429906542056,
+      "ev_total_por_dia": -0.22762850467289725
+    }
+  },
+  "criterios": {
+    "min_300": true,
+    "wilson": true,
+    "ev_ic_semanal": true,
+    "trimestres_60": true,
+    "no_peor_que_btc": false
+  },
+  "pasa": false
+}

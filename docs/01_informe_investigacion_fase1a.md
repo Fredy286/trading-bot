@@ -1432,3 +1432,31 @@ La validación fuera de muestra decide.
 - informativo: entrada a +10 s con velas de 1 s.
 
 **Consecuencia:** solo si confirma, el bot pasa a vigilar las 7 monedas, en modo experimental y en demo.
+
+**Resultado de la fase de desarrollo (commit c2afdae, aplicado mecánicamente; `results/estudio13/dev.json`).**
+Prueba 2022-01 → 2025-08, entrada en la apertura de la vela siguiente:
+
+| | Operaciones (por día) | Acierto [lím. inf. 95 %] | EV por operación [IC 95 % semanal] | Trimestres EV > 0 | EV total por día |
+|---|---|---|---|---|---|
+| **Selector** | 640 735 (478,5) | 56,72 % [56,59 %] | +0,0418 [+0,0354; +0,0475] | 87 % | **+19,99** |
+| BTC sola | 219 856 (164,3) | 56,60 % [56,39 %] | **+0,0437** [+0,0360; +0,0509] | 87 % | +7,18 |
+| XRP sola | 341 985 (263,5) | 57,46 % [57,28 %] | +0,0526 [+0,0435; +0,0613] | 80 % | +13,86 |
+| ETH sola | 80 714 (69,7) | 55,40 % | +0,0239 | 92 % | +1,66 |
+| BNB sola | 185 632 (219,4) | 54,98 % | +0,0116 | 90 % | +2,54 |
+| SOL sola | 10 407 (10,3) | 55,10 % | +0,0181 | 50 % | +0,19 |
+| DOGE sola | 33 248 (30,8) | 54,51 % | +0,0074 | 69 % | +0,23 |
+| ADA sola | 11 534 (13,5) | 53,02 % | −0,0169 | 40 % | −0,23 |
+
+Elecciones del selector: XRP 47 %, BTC 25 %, BNB 15 %, ETH 8 %, DOGE 3 %, ADA 1 %, SOL 1 %.
+
+**Veredicto: no pasa.** Cumple los criterios 1–4, pero falla el 5: el EV por operación del selector
+(+0,0418) es algo **menor** que el de BTC sola (+0,0437). Según el pre-registro, no hay fase de
+confirmación.
+
+**Lectura:**
+- El selector multiplica por 2,8 el EV total por día porque encuentra muchas más oportunidades, sobre
+  todo en XRP. Pero el criterio fijado era por operación, y no se cambia después de mirar.
+- XRP sola parece la más fuerte. Es una observación posterior a ver los datos.
+- Las dos ideas (juzgar el selector por EV diario y probar XRP sola) solo pueden probarse como
+  **hipótesis nuevas con datos nuevos**.
+- Todo esto es con entrada en la apertura de la vela siguiente; con entrada manual a +10 s será menor.

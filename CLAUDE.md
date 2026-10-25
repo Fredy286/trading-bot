@@ -126,7 +126,10 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      luego del nivel de volatilidad (`scripts/analisis_importancia_btc.py`). P1 (velas de 1 s dentro del
      minuto) es la propuesta más prometedora.
    - **Estudio 12 (ETH → BTC 1 min):** pre-registrado (b6f22fa); evaluar una sola vez después del 2027-01-18.
-   - **Estudio 13 (selector multimoneda BTC/ETH/SOL/BNB/XRP/DOGE/ADA):** pre-registro ad2e7c3, código c2afdae.
+   - **Estudio 13 (selector multimoneda BTC/ETH/SOL/BNB/XRP/DOGE/ADA):** NO PASA (falla el criterio 5 por poco:
+     EV por operación 0,0418 vs BTC 0,0437), pero el EV por día es 2,8 veces mayor; XRP sola 57,46 % (post hoc).
+     Sin confirmación según el pre-registro; cualquier variante es hipótesis nueva solo con datos nuevos.
+     Probabilidades por moneda en data/processed/estudio13/.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
