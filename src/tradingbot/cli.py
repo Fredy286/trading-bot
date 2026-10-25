@@ -251,6 +251,18 @@ def cmd_research_study9(a) -> int:
     return 0
 
 
+def cmd_research_study10(a) -> int:
+    from .research import study10
+
+    rep = study10.run(Path(a.root), Path(a.out), n_boot=a.n_boot)
+    for h, r in rep["resultados"].items():
+        z = rep["informativo"][h]
+        print(f"{h} ({r['vencimiento_min']} min): {r['estado']} | operaciones {r['operaciones']} | acierto {r.get('acierto')} "
+              f"[{r.get('lo95')}] | EV {r.get('ev')} | zonas solas {z['regla_de_zonas_sola'].get('acierto')} | "
+              f"filtro {z['efecto_del_filtro']}")
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -489,6 +501,11 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study10", help="Estudio 10: oro con correlación y zonas del índice del dólar")
+    x.add_argument("--root", default="data/raw")
+    x.add_argument("--out", default="results/estudio10")
+    x.add_argument("--n-boot", type=int, default=2000)
+    x.set_defaults(func=cmd_research_study10)
     x = r.add_parser("study9", help="Estudio 9: regla de redes RSI diario/semanal + 4H + 15M")
     x.add_argument("--root3", default="data/raw/estudio3")
     x.add_argument("--root", default="data/raw")
