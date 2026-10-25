@@ -144,6 +144,15 @@ Todas siguen el mismo camino:
 | **P6** | Régimen de volatilidad visible en la alerta | La continuación es más fuerte con volatilidad baja (55,4 % frente a 50,3 %) | Ya lo usa el GBM. Como filtro explícito debe pre-registrarse y confirmarse con datos nuevos: es una lectura *post hoc* | Propuesta, prioridad media |
 | **P7** | Variables de régimen de cripto: interés abierto y ratio largo/corto cada 5 min | Apalancamiento acumulado → más volatilidad | Estudio nuevo; esperable que no mejore la dirección a 1 min | Baja prioridad |
 
+| **P8** | **Anticipar la señal** (aviso en el segundo 50–55 con la información hasta ese segundo) | La ventaja vive en 1–2 s tras el cierre y no hay plataforma legal con API para automatizar (docs/03, 2.2). Avisar antes convierte la latencia humana en anticipación | Estudio nuevo con velas de 1 s: modelo con decisión en el segundo 50/55, entrada al cierre ± 2 s, walk-forward 2024–2025 y luego datos nuevos | **Propuesta prioritaria** (2026-10-25) |
+| **P9** | Operar solo los minutos de máxima confianza | En el desarrollo del Estudio 15, el 1 % de mayor confianza acertó 65 % a +1 s (*post hoc*) | El umbral debe fijarse con datos de entrenamiento (no con cuantiles de la prueba) y confirmarse con datos nuevos | Propuesta |
+
+**Ejecución (2026-10-25, docs/03, 2.2):**
+- comprar o vender BTC de verdad (futuros, multiplicadores) **no sirve**: la ventaja es de +0,47 pb por
+  operación y la comisión, de 4–10 pb;
+- solo un contrato de pago fijo convierte la dirección en ganancia, y a 1 minuto en BTC solo existe en
+  plataformas sin API oficial.
+
 **Lo que no se propone:** martingala; reglas sueltas de análisis técnico; indicadores de pago; cualquier
 cambio en las señales sin confirmación con datos nuevos.
 

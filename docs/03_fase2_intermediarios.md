@@ -60,6 +60,50 @@ una demo, conviene anotar para cada una: hora, dirección, precio de entrada y d
 plataforma**, pago ofrecido y resultado. Así se puede comparar después el feed de la plataforma con el
 de Binance (la limitación declarada en la sección 6 del informe).
 
+### 2.2 Revisión del 2026-10-25: ¿dónde entrar en 1–2 segundos de forma automática y legal?
+
+**Motivo:** la ventaja de BTC a 1 minuto, con y sin el bloque de 1 s del Estudio 15, se concentra en los
+**primeros 1–2 segundos** después del cierre de la vela:
+- referencia: 56,0 % a +1 s y 54,0 % a +10 s;
+- con el bloque de 1 s: 57,3 % a +1 s y 54,1 % a +10 s.
+
+Para usarla hace falta automatizar la entrada.
+
+**Primer filtro, el tipo de contrato.** En las operaciones de la política B (desarrollo del Estudio 15), el
+movimiento medio **a favor** en 60 s es **+0,47 pb** a +1 s; en el 1 % de mayor confianza, +0,70 pb. El
+movimiento absoluto medio es de 2,8 pb.
+- Una comisión de 4–10 pb hace imposible ganar comprando o vendiendo el activo: el costo es 10–20 veces
+  la ventaja.
+- **Solo un contrato de pago fijo** (sube/baja) convierte acertar la dirección en ganancia, porque paga
+  igual sin importar el tamaño del movimiento.
+
+| Opción | ¿Pago fijo a 1 min en BTC? | API oficial y demo | Legal desde Colombia | Veredicto |
+|---|---|---|---|---|
+| Binance USDⓈ-M Futures | No (lineal) | Sí: API oficial y red de pruebas | Uso por iniciativa propia; sin supervisión de la SFC | **No sirve:** comisión 0,02 % + 0,02 % (dando liquidez) a 0,05 % + 0,05 % (tomándola) = 4–10 pb frente a +0,47 pb de ventaja |
+| **Deriv**: multiplicadores de BTC/ETH | No (lineal apalancado) | Sí (API WebSocket; consultada hoy) | Igual que arriba | **No sirve:** comisión consultada con `proposal` = 0,82 USD por 10 USD con multiplicador 100 = **8,2 pb** de lo expuesto |
+| **Deriv**: Rise/Fall | **No para cripto**: verificado hoy, BTC y ETH solo tienen MULTUP/MULTDOWN; Rise/Fall en divisas (15 min) y oro (5 min) | Sí | Igual | Sin señal a esas duraciones (Fase 1B) |
+| Polymarket: «Bitcoin Up or Down» de 5 y 15 min | Pago fijo, pero a **5 o 15 min**, no a 1 | Sí (API CLOB oficial) | **No recomendable:** Coljuegos ordenó bloquearla en Colombia (sept. 2025) por considerarla juego; no está en la lista de bloqueo propia de Polymarket | No sirve: nuestra ventaja es de 1 min (a 5–15 min no hay señal); comisión del tomador de ~2 % cerca de 50/50; problema legal |
+| Kalshi, Nadex, Crypto.com NA | Contratos de eventos | Sí | **Solo residentes en EE. UU.** | No aplica |
+| IQ Option, Quotex, Pocket Option, Olymp Trade, Binomo | **Sí**, desde 1 min | **No hay API oficial** | Del exterior, sin supervisión de la SFC | Automatizar exige herramientas no oficiales: viola términos y expone credenciales. **Solo manual** |
+
+**Conclusión (2026-10-25):** hoy **no existe** una vía legal, con API oficial y accesible desde Colombia,
+para automatizar un contrato de pago fijo de 1 minuto sobre BTC. Quedan tres caminos:
+1. **Anticipar la señal** para que el clic manual caiga justo al cierre. En vez de avisar después del
+   cierre, el bot avisaría unos segundos **antes** (p. ej., en el segundo 50–55) con la información
+   disponible hasta ese momento. Así la latencia humana se convierte en anticipación. Es una hipótesis
+   nueva que debe pre-registrarse y validarse con las velas de 1 s (propuesta en docs/08).
+2. **Ejecución manual lo más rápida posible** en la demo de una plataforma de 1 minuto. Hay que medir el
+   tiempo real de clic y comprobar el precio, el empate y el pago (Estudio 5).
+3. **Vigilar nuevos productos:** la investigación diaria (docs/09) debe revisar si Deriv, Binance u otro
+   intermediario regulado lanza contratos de pago fijo cortos sobre cripto con API.
+
+Fuentes: comisiones de Binance Futures (https://www.binance.com/es/support/articles/360033544231 ;
+https://www.finder.com/binance-futures-fees); API de Deriv, consulta pública `active_symbols`,
+`contracts_for` y `proposal` del 2026-10-25 en `wss://api.derivws.com/trading/v1/options/ws/public`;
+Polymarket, comisiones (https://unchainedcrypto.com/polymarket-introduces-taker-fees-in-15-minute-markets/ ;
+https://bitquery.io/investigations/polymarket-five-minute-casino) y bloqueo en Colombia
+(https://docs.polymarket.com/developers/CLOB/geoblock ; https://startpolymarket.com/countries/colombia/).
+
 ## 3. Recomendación condicionada
 
 1. **Hoy no hay base para ejecutar automáticamente.** Primero debe existir una configuración

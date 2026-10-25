@@ -135,6 +135,10 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      104 813 vs 51 386 operaciones, EV +0,079 vs +0,048; log-loss +0,0021). Verificación: sin fuga (alineación
      100 %), pero la ventaja extra vive en 1–2 s (+1 s 57,3 %, +5 s 55,3 %, +10 s ≈ 0). Confirmación pre-registrada
      con 2026-10-26 → 2027-01-18. Camino a 57–60 %: entrar en ≤ 2 s (automatización).
+   - **Ejecución rápida (docs/03, 2.2, 2026-10-25):** no hay vía legal con API oficial desde Colombia para pago
+     fijo de 1 min en BTC. Deriv: BTC/ETH solo multiplicadores (8,2 pb de comisión); Binance Futures 4–10 pb vs
+     ventaja de +0,47 pb; Polymarket 5/15 min bloqueada por Coljuegos. Camino: P8 (anticipar la señal al
+     segundo 50–55) y ejecución manual rápida en demo.
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).
