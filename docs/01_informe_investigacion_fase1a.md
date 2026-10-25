@@ -1211,3 +1211,77 @@ semana y la pausa diaria del oro, y no produjo ninguna operación (registro de e
   - diferencia: −2,7 puntos [IC 95 %: −6,1; +0,9].
 - **Conclusión:** el filtro no selecciona mejores operaciones. Solo opera menos. «Evitar perdedoras» no
   sirve si se evitan las ganadoras en la misma proporción.
+
+## Estudio 11 — «regla de la primera vela» con FVG y envolvente, 3:1 (pre-registro, 2026-10-25, ANTES de calcularla)
+
+**Origen:** video de redes que mostró el usuario. Las capturas de comentarios que lo acompañan usan el mismo
+lenguaje del «Smart Money Concept»: barridos de liquidez, CHoCH, FVG y retesteo. La regla del video:
+1. a las 9:30 de Nueva York, marcar el máximo y el mínimo de la primera vela de 5 min (9:30–9:35);
+2. en 1 min, esperar a que el precio **rompa** uno de esos niveles dejando un **FVG** (hueco entre las
+   mechas de tres velas);
+3. esperar a que el precio **vuelva al FVG** y forme una **vela envolvente**;
+4. entrar con riesgo/beneficio fijo **3:1**;
+5. el autor dice operar una sola vez al día.
+
+**Evidencia previa:**
+- Zarattini y Aziz (SSRN 4416622): un ORB de 5 min en QQQ (2016–2023) da alfa alto antes de spread y
+  deslizamiento.
+- Una réplica práctica en CFD de índices (2015–2026) reproduce el bruto, pero queda en **cero neto** tras
+  costos (blog de MQL5).
+- Para los FVG solo hay estudios de vendedores, sin control con placebo publicado.
+
+**Expectativa declarada:** «SIN SEÑAL» tras costos.
+
+**Instrumentos (familia de 3, Bonferroni α = 0,0167):**
+- **H11-NQ:** Nasdaq 100 (HistData NSXUSD; spread supuesto 1,0 punto);
+- **H11-SPX:** S&P 500 (SPXUSD; 0,5 punto);
+- **H11-XAU:** oro (XAUUSD; 0,25 + comisión 0,07 USD/oz), el mercado de la mayoría de las capturas.
+
+Se usan velas medias de 1 min (BID + spread / 2) y la hora de Nueva York (`America/New_York`, con su
+horario de verano).
+
+**Reglas exactas:**
+- **Rango:** máximo (ORH) y mínimo (ORL) de las velas de 1 min de 9:30 a 9:34. Si falta alguna, no se
+  opera ese día.
+- **Ruptura con FVG alcista** en la vela k (k ≥ 9:37 y antes de las 11:00):
+  - `máx[k−2] < mín[k]`, que es el hueco;
+  - `cierre[k−1] > ORH`: la vela del medio rompe el nivel.
+  - Zona FVG = [`máx[k−2]`, `mín[k]`]. Bajista: simétrico, con `mín[k−2] > máx[k]` y `cierre[k−1] < ORL`.
+- **Retesteo y envolvente:** en una vela j > k (antes de las 11:00):
+  - **alcista:**
+    - `mín[j] ≤ mín[k]` (toca el FVG);
+    - la vela j−1 es bajista y la j es alcista;
+    - `apertura[j] ≤ cierre[j−1]` y `cierre[j] ≥ apertura[j−1]` (envuelve el cuerpo).
+  - **Cancelación:** el FVG se cancela si, antes, alguna vela cierra por debajo de `máx[k−2]`.
+  - Bajista: simétrico.
+- **Entrada:** cierre de j.
+  - **SL** = mínimo entre `mín[j]` y `máx[k−2]` (en ventas, el máximo de los simétricos).
+  - **TP** = entrada + 3 × (entrada − SL).
+- **Salida:**
+  - TP o SL, desde la vela j+1; si los dos caen en la misma vela, cuenta el SL;
+  - si no se toca ninguno, cierre a las 16:00 de Nueva York.
+- **Una operación por día:** la del primer FVG que llegue a entrada, en cualquier dirección. Mientras haya
+  un FVG pendiente se siguen buscando otros; vale el primero que cumpla.
+- **Resultado:**
+  - en R (múltiplos del riesgo inicial), neto del costo: `(salida − entrada)·lado − costo`, dividido por
+    el riesgo;
+  - si el riesgo es menor que el costo, el día no se opera (operación irreal).
+
+**Periodo:**
+- **Fase A:** 2022-01-01 → 2025-08-31. Es una prueba directa; la regla no se entrena.
+- **Fase B:** 2025-09-01 → 2026-08-31, solo para las que pasen A.
+
+**Criterios (cada instrumento):**
+1. ≥ 200 operaciones;
+2. límite inferior del IC 98,33 % (bootstrap por semanas) del R neto medio > 0;
+3. R neto > 0 en ≥ 60 % de los trimestres.
+
+**Solo informativo:**
+- «winrate» (porcentaje de TP);
+- días sin operación;
+- el ORB simple de Zarattini y Aziz: dirección de la primera vela de 5 min, entrada a las 9:35, salida a
+  las 16:00, con el mismo costo.
+
+**Consecuencias:**
+- Si alguna pasa las dos fases, se pre-registra su confirmación con datos posteriores a 2026-09.
+- Si no, SIN SEÑAL.
