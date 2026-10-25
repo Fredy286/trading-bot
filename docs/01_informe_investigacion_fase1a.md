@@ -887,7 +887,7 @@ de probabilidades 0,85).
 3. un filtro de Kalman y otros activos afinan la proyección;
 4. se dibujan las próximas 12 velas y, si el retorno supera un umbral, se marca señal larga o corta.
 
-**Qué es Kronos** (revisión del 2026-10-25, detalles en docs/05, sección 8):
+**Qué es Kronos** (revisión del 2026-10-25, detalles en docs/05, sección 7):
 - modelo de Tsinghua (arXiv 2508.02739, AAAI 2026), código MIT: `shiyu-coder/Kronos`, commit `67b630e`;
 - tokeniza OHLCV + importe (6 dimensiones) con cuantización binaria esférica (2 × 10 bits);
 - preentrenado con más de 12 000 millones de velas, **hasta junio de 2024**, incluidas velas de 1 min de

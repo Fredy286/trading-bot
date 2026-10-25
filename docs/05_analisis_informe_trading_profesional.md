@@ -234,7 +234,55 @@ sus toques) **no añaden información** a lo que el modelo ya sabe del precio. E
 «rebotes» en divisas de 1996–1998. No aparece como ventaja de dirección a 15 minutos en 2022–2025. Como no
 pasó el desarrollo, no hay fase de confirmación.
 
-## 7. Fuentes consultadas el 2026-10-24
+## 7. Kronos y la estrategia del video (2026-10-25)
+
+### 7.1 Qué es Kronos, con datos verificados
+
+- **Origen:** modelo de investigación de la Universidad Tsinghua (arXiv 2508.02739), aceptado en AAAI 2026,
+  con código abierto (licencia MIT) y modelos públicos en Hugging Face: mini 4,1 M, small 24,7 M y base
+  102,3 M de parámetros; large 499 M no es público.
+- **Cómo funciona:** convierte cada vela en **6 números** (apertura, máximo, mínimo, cierre, volumen e
+  importe) y los comprime en **tokens binarios** de 2 × 10 bits. Después un modelo tipo GPT predice el
+  siguiente «token-vela», igual que un chatbot predice la siguiente palabra. Es exactamente lo que
+  describe el video en su primera parte.
+- **Datos de entrenamiento:** más de 12 000 millones de velas de 45 bolsas, incluidas velas de 1 minuto de
+  perpetuos de Binance, **hasta junio de 2024**.
+- **Resultados publicados por los autores:** miden correlación de rango (RankIC), no porcentaje de acierto.
+  - En cripto, la correlación con el rendimiento siguiente es **≈ 0,03–0,04**. Eso equivale, como mucho,
+    a **~51 % de acierto en dirección**.
+  - La única prueba de inversión es con acciones chinas a 5 días.
+- **Pruebas independientes:** son pocas y no revisadas.
+  - Una de BTC a 5 minutos (497 operaciones) no encontró ventaja sobre un paseo aleatorio.
+  - Un ajuste fino en acciones de la India mejoró la calibración pero no dio ganancia.
+- **El propio repositorio advierte** que su ejemplo «no es un sistema de trading listo para producción».
+
+### 7.2 La estrategia del video, pieza por pieza
+
+El video mezcla Kronos con tres herramientas clásicas. No se encontró el código exacto del video. Las
+partes se reconocen así:
+
+| Pieza del video | Qué es en términos técnicos | ¿El proyecto la tenía? |
+|---|---|---|
+| «Cada vela en 6 dimensiones → tokens binarios» | Tokenizador de Kronos | No |
+| «Busca en el historial los momentos más parecidos y promedia lo que pasó después» | Pronóstico por análogos (vecinos más cercanos) | No |
+| «Kalman afina la proyección» | Filtro de Kalman de tendencia (nivel + pendiente) | No (el modelo usa medias móviles) |
+| «Otros activos afinan» | Información cruzada (ETH para BTC) | Solo a 15 min (Estudio 3, sin mejora) |
+| «Dibuja 12 velas; si el retorno supera el umbral, señal larga o corta» | Umbral sobre el rendimiento previsto | Sí: la política B hace lo mismo con la ganancia esperada |
+
+### 7.3 Cómo se prueban: Estudio 7 (pre-registrado, commit 1492079)
+
+Se tratan como **herramientas para mejorar nuestro modelo**, como pediste. La pregunta no es «¿Kronos
+acierta?», sino «¿nuestro modelo acierta más si le añadimos Kronos, los análogos, el Kalman o ETH?».
+- **Instrumento:** BTC a 1 minuto, el que aprobó H5a.
+- **Periodo:** 20 000 minutos sorteados entre octubre de 2024 y agosto de 2025. Empieza **3 meses después**
+  del fin del entrenamiento de Kronos, para que no «recuerde» los datos.
+- **Criterio:** cada herramienta debe mejorar la predicción con un margen estricto (corrección por
+  probar 4 a la vez) y no bajar la ganancia esperada.
+- **Expectativa declarada:** probablemente ninguna mejore, porque el modelo ya usa los movimientos
+  recientes y la correlación publicada de Kronos es baja. Si alguna mejora, se confirma con datos nuevos
+  antes de tocar las señales.
+
+## 8. Fuentes consultadas (2026-10-24 y 2026-10-25)
 
 - Osler, C. (2000). *Support for Resistance: Technical Analysis and Intraday Exchange Rates*. FRBNY
   Economic Policy Review, julio de 2000. https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.html
@@ -253,6 +301,11 @@ pasó el desarrollo, no hay fase de confirmación.
   y https://dspace.kaist.ac.kr/handle/10203/284836 (solo resúmenes).
 - ESMA (2018). *ESMA agrees to prohibit binary options and restrict CFDs to protect retail investors*.
   https://www.esma.europa.eu/node/84933
+- Kronos: https://arxiv.org/html/2508.02739v1 (leído: tokenizador, datos hasta junio de 2024, tablas de cripto),
+  https://github.com/shiyu-coder/Kronos (licencia, modelos, advertencias). Pruebas independientes (no verificadas):
+  https://digitechbytes.com/?p=48934 y https://huggingface.co/sahil007123/kronos-nse-1d.
+- Herramientas análogas en TradingView: https://kr.tradingview.com/script/TiOb6SUA-K-NN-Pattern-Forecast/
+  (análogos) y https://vn.tradingview.com/script/OxYmisSS-Kalman-Filter-Loxx (Kalman).
 - Formato de señales con «gale» en grupos de Telegram: ejemplos de encargos y de indicadores públicos
   (https://www.workana.com/job/criacao-de-sala-de-sinais-automatica-para-telegram,
   https://es.tradingview.com/script/c3PBuxF5). No se encontró una definición estándar de «M2/M3»; el
