@@ -32,8 +32,8 @@ def binom_pvalue_greater(k: int, n: int, p0: float) -> float:
 
 
 def block_bootstrap_mean(values: np.ndarray, blocks: np.ndarray, n_boot: int = 1000,
-                         seed: int = 12345) -> dict:
-    """IC 95 % de la media remuestreando bloques completos (p. ej., días) para respetar dependencia.
+                         seed: int = 12345, level: float = 0.95) -> dict:
+    """IC (95 % por defecto) de la media remuestreando bloques completos (p. ej., días) para respetar dependencia.
 
     Devuelve media, IC y p-valor unilateral aproximado de H0: media ≤ 0.
     """
@@ -48,7 +48,8 @@ def block_bootstrap_mean(values: np.ndarray, blocks: np.ndarray, n_boot: int = 1
     idx = rng.integers(0, k, size=(n_boot, k))
     bs = sums[idx].sum(axis=1) / np.maximum(cnts[idx].sum(axis=1), 1)
     mean = values.mean()
-    lo, hi = np.quantile(bs, [0.025, 0.975])
+    q = [0.025, 0.975] if level == 0.95 else [(1 - level) / 2, (1 + level) / 2]  # 0,95: cuantiles exactos de siempre
+    lo, hi = np.quantile(bs, q)
     # p-valor por desplazamiento: distribución centrada en 0 bajo H0.
     p = float((np.sum(bs - mean >= mean) + 1) / (n_boot + 1))
     return {"mean": float(mean), "lo": float(lo), "hi": float(hi), "p_le_0": p}

@@ -210,6 +210,24 @@ def cmd_research_study6(a) -> int:
     return 0
 
 
+def cmd_research_study7(a) -> int:
+    from .research import study7
+
+    if a.step == "prepare":
+        study7.prepare(Path(a.root3))
+        print("Siguiente: ~/proyectos/kronos-externo/.venv/bin/python -I scripts/estudio7_kronos.py "
+              "--kronos ~/proyectos/kronos-externo")
+        return 0
+    rep = study7.evaluate(n_boot=a.n_boot)
+    b = rep["base"]
+    print(f"Base (solo GBM): log-loss {b['logloss']:.5f} | política B {b['politica_b']}")
+    ic_key = f"ic{rep['nivel_ic']:.4f}"
+    for k, r in rep["herramientas"].items():
+        print(f"{k}: pasa={r['pasa']} | mejora log-loss {r['mejora_logloss']:+.6f} {r[ic_key]} | "
+              f"EV {r['politica_b']['ev']} vs base {b['politica_b']['ev']} | sola {r['sola_acierto_signo']:.4f}")
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -448,6 +466,11 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study7", help="Estudio 7 (Kronos, análogos, Kalman, ETH), fase de desarrollo")
+    x.add_argument("step", choices=["prepare", "evaluate"])
+    x.add_argument("--root3", default="data/raw/estudio3")
+    x.add_argument("--n-boot", type=int, default=2000)
+    x.set_defaults(func=cmd_research_study7)
     x = r.add_parser("study6", help="Estudio 6 (zonas), fase de desarrollo (pre-registro en docs/01)")
     x.add_argument("--root3", default="data/raw/estudio3", help="velas de contado de Binance (BTC)")
     x.add_argument("--root", default="data/raw", help="almacén con EUR/USD de HistData")
