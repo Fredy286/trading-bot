@@ -140,6 +140,10 @@ def run(root: Path = Path("data/raw"), out_dir: Path = Path("results/estudio10")
     gold15 = to_15m(gold1["o"], gold1["h"], gold1["l"], gold1["c"])
     g = dxy1.resample("15min", label="left", closed="left")  # OHLC de los cierres de 1 min del DXY*
     dxy15 = pd.DataFrame({"o": g.first(), "h": g.max(), "l": g.min(), "c": g.last()}).reindex(gold15.index)
+    # «Velas» = las que existen en los dos activos, como en TradingView. La rejilla de 15 min incluye fines de
+    # semana y la pausa diaria del oro: con ellas, ninguna ventana de 96 velas estaba completa (ítem 40).
+    both = gold15.notna().all(axis=1) & dxy15.notna().all(axis=1)
+    gold15, dxy15 = gold15[both], dxy15[both]
     sd = sides(gold15, dxy15)
     test = sd.index >= pd.Timestamp(START, tz="UTC")
     sd = sd[test]

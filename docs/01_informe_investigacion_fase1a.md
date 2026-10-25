@@ -1186,3 +1186,7 @@ operaciones perdedoras de la regla sola que el filtro evita.
 - Si alguna pasa, se pre-registra su confirmación con datos posteriores, cuando haya divisas de HistData
   después de 2025-08.
 - Si no, SIN SEÑAL.
+
+*Nota de implementación (2026-10-25, antes de ver ningún acierto).* «Velas» son las de 15 min con datos en
+el oro y en el DXY*, como en TradingView. La primera ejecución usó la rejilla del calendario, con fines de
+semana y la pausa diaria del oro, y no produjo ninguna operación (registro de errores, ítem 40).
