@@ -1126,3 +1126,63 @@ Informativo:
 - **Al revés (seguir la tendencia):** 50,7–54,1 %, con EV entre −0,061 y 0,000. Es coherente con el
   momentum, pero no gana y se basa en solo 9–17 semanas. Si se quisiera probar, sería una hipótesis
   nueva con datos nuevos.
+
+## Estudio 10 — oro con correlación negativa y zonas del índice del dólar (pre-registro, 2026-10-25, ANTES de calcularlo)
+
+**Origen:** estrategia de redes que mostró el usuario.
+1. Abrir el oro y el índice del dólar (DXY), y ponerle al oro el «coeficiente de correlación» con el DXY.
+2. Si la correlación está por debajo de 0 y el oro entra en una zona de demanda mientras el DXY
+   **reacciona** en una zona de oferta, buscar compras de oro (al revés, ventas). Si el DXY no ha llegado
+   a su zona, esperar.
+3. El video afirma: «la mayoría de tus operaciones perdedoras las podrías haber evitado si hubieras
+   mirado antes la correlación».
+
+**Base real:** el oro y el dólar suelen moverse en sentido contrario, pero esa relación cambia con el tiempo
+y entre regímenes (p. ej., estudio con datos de 5 min de 2017–2019, PMC8566682). Ver que se mueven al revés
+en el mismo momento no implica poder anticipar el siguiente movimiento.
+
+**Expectativa declarada:** «SIN SEÑAL». Puede que el filtro mejore algo el acierto de la regla de zonas sola,
+pero difícilmente por encima de 54,05 %.
+
+**Datos (velas de 1 min; prueba directa sin ajuste, 2022-01-01 → 2025-08-31, calentamiento desde 2021):**
+- **Oro:** XAU/USD de HistData, velas medias (BID + spread supuesto / 2).
+- **DXY aproximado:** el índice oficial no está en las fuentes gratuitas de velas de 1 min del proyecto.
+  - Se construye con los cierres de 1 min de EUR/USD, USD/JPY y GBP/USD (HistData):
+    `ln DXY* = (−0,576·ln EURUSD + 0,136·ln USDJPY − 0,119·ln GBPUSD) / 0,831`.
+  - Son los pesos oficiales del ICE de esas tres monedas (83 % del índice), renormalizados. Faltan CAD,
+    SEK y CHF (17 %).
+  - Solo se usan los minutos con las tres monedas.
+- **Velas de 15 min (cortes UTC):** OHLC del oro; para el DXY*, OHLC de sus cierres de 1 min.
+
+**Reglas (velas de 15 min; decisión al cierre de la vela t):**
+- **Correlación:** Pearson entre los **cierres** del oro y del DXY* en las 20 últimas velas, como
+  `ta.correlation` de TradingView. Condición: < 0.
+- **ATR14** de 15 min, para cada activo.
+- **Zona de demanda del oro:** L = mínimo de los mínimos de las 96 velas anteriores (24 h, sin incluir t).
+  El oro está en la zona si `mín_t ≤ L + 0,5·ATR` y `cierre_t ≥ L`. Zona de oferta: simétrica, con H =
+  máximo de los máximos.
+- **El DXY* respeta su zona de oferta:** con H' = máximo de sus 96 velas anteriores,
+  `máx'_t ≥ H' − 0,5·ATR'`, `cierre'_t < H'` y vela bajista. Demanda: simétrica.
+- **Compra de oro:** correlación < 0, oro en zona de demanda y DXY* respetando su oferta. Venta: simétrica.
+
+**Ejecución:**
+- binaria; entrada en la apertura del minuto que empieza **1 min después** del cierre de la vela de
+  15 min (manual);
+- vencimiento de 15 min (**H10a**) o de 60 min (**H10b**);
+- pago 85 %, empate reembolsado, sin solapamiento.
+
+**Criterios (cada hipótesis; Bonferroni α = 0,025):**
+1. ≥ 300 operaciones; si hay menos, «insuficiente» y no pasa;
+2. p binomial unilateral < 0,025 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. límite inferior del IC 97,5 % del EV por bootstrap de bloques semanales > 0.
+
+**Comprobación de lo que afirma el video (pre-registrada, informativa):** con el mismo vencimiento, el
+acierto de la regla completa frente a la **regla de zonas del oro sola** (comprar en demanda, vender en
+oferta, sin correlación ni DXY). Se informa la diferencia con IC 95 % por bootstrap semanal y la parte de
+operaciones perdedoras de la regla sola que el filtro evita.
+
+**Consecuencias:**
+- Si alguna pasa, se pre-registra su confirmación con datos posteriores, cuando haya divisas de HistData
+  después de 2025-08.
+- Si no, SIN SEÑAL.
