@@ -301,6 +301,21 @@ def cmd_research_study15(a) -> int:
     return 0
 
 
+def cmd_research_study16(a) -> int:
+    from .research import study16
+
+    if a.step == "download":
+        study16.download()
+        return 0
+    rep = study16.run(n_boot=a.n_boot)
+    for h, r in rep["hipotesis"].items():
+        print(f"{h} (k={r['k']}, clic +{r['latencia']} s): pasa={r['pasa']} | {r['criterios']}")
+        print(f"  operaciones {r['operaciones']} | acierto {r['acierto']} [{r['lo95']}] | EV {r['ev']} {r['ev_ic97_5']}")
+        print("  latencia: " + ", ".join(f"{L}: {v['acierto'] and round(v['acierto'], 4)} / EV {v['ev'] and round(v['ev'], 4)}"
+                                       for L, v in r["sensibilidad_latencia"].items()))
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -539,6 +554,10 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study16", help="Estudio 16: señal anticipada en el segundo 50/55 (P8)")
+    x.add_argument("step", choices=["download", "run"])
+    x.add_argument("--n-boot", type=int, default=1000)
+    x.set_defaults(func=cmd_research_study16)
     x = r.add_parser("study15", help="Estudio 15: presión dentro del minuto con velas de 1 s (P1)")
     x.add_argument("step", choices=["download", "run"])
     x.add_argument("--n-boot", type=int, default=1000)
