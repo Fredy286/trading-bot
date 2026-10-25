@@ -21,7 +21,7 @@
    de 1 000 canales al azar llega a 58,7 % en un mes… y al mes siguiente cae a 46,7 %.
 4. **Del PDF se puede aprovechar** sobre todo una idea que el proyecto nunca probó: las **zonas** (soportes,
    resistencias, máximos/mínimos del día anterior y **números redondos**), que tienen respaldo académico
-   (Osler, Reserva Federal de Nueva York). Se pre-registró un **Estudio 6** (sección 6). También
+   (Osler, Reserva Federal de Nueva York). Se pre-registró y ejecutó un **Estudio 6** (sección 6): **no mejora**, SIN SEÑAL. También
    se adoptan las partes de **gestión y diario**, útiles para la prueba en cuenta demo.
 5. Lo que **no** se adopta: la martingala/reentradas para recuperar pérdidas y cualquier promesa de
    80–90 %.
@@ -127,7 +127,7 @@ con datos nuevos y con una entrada que el usuario pueda hacer.
 |---|---|---|---|
 | Análisis multitemporal (H1 contexto, M15 preparación, M5 entrada) | Recomendación de IG/CME, sin cifras | **Sí**: el modelo usa rendimientos de 1 a 240 min, medias de 20 y 60, posición en el rango (Fase 1B) | Ya incluido; en divisas no dio señal |
 | Indicadores (medias, RSI, Bollinger, volatilidad) | — | **Sí** (H4): no superan al azar tras costos en divisas/oro | Ya incluido |
-| **Zonas: soportes/resistencias, máximos/mínimos del día anterior, números redondos** | **Osler 2000 y 2003** (4.1); barreras en múltiplos de 1 000 en BTC (estudios con datos diarios) | **No** | **Sí: candidata a Estudio 6** |
+| **Zonas: soportes/resistencias, máximos/mínimos del día anterior, números redondos** | **Osler 2000 y 2003** (4.1); barreras en múltiplos de 1 000 en BTC (estudios con datos diarios) | **Sí** (Estudio 6, 2026-10-24) | **No**: no mejoran; SIN SEÑAL |
 | Flujo de órdenes (desequilibrio del libro) | Cont et al. 2014; Kolm et al. 2023 (4.2) | **Parcial**: Estudio 3 (flujo agresor por minuto) no mejoró | No para señales manuales (horizonte de segundos) |
 | Noticias y calendario | La dirección depende de la sorpresa, que no se conoce antes | **Sí** (H5): el filtro de noticias reduce caídas | Ya incluido (política BN) |
 | Posicionamiento COT (CFTC) | Publicación semanal con datos del martes | No | No a 1–15 min (llega con días de retraso) |
@@ -185,7 +185,7 @@ conteo real lo dará la reproducción.
 Holm. Así **H5a se evalúa en cuanto su muestra está completa**, sin esperar a H5b. De una hipótesis
 incompleta solo se informa el conteo. H5b se evalúa cuando se complete, hacia el 2026-11-24.
 
-### 5.2 Estudio 6: zonas (pre-registrado; resumen en la sección 6)
+### 5.2 Estudio 6: zonas — ejecutado, SIN SEÑAL (sección 6)
 
 Es la única idea del PDF con respaldo académico que el proyecto no ha probado.
 
@@ -219,15 +219,20 @@ registradas de antemano, eso sí sería información útil para el proyecto.
 - Anunciar un acierto que no salga de una muestra fija evaluada en datos nuevos.
 - Operar con dinero real sin autorización expresa y específica del usuario.
 
-## 6. Estudio 6: zonas de precio
+## 6. Estudio 6: zonas de precio — resultado: SIN SEÑAL
 
-**Pre-registrado** el 2026-10-24 en docs/01, sección «Estudio 6», con las definiciones exactas de las
-10 variables, los criterios y los plazos. El pre-registro se congeló con commit **antes** de calcular
-cualquier variable de zona. Resumen:
-- BTC/USDT (números redondos de 1 000 USD) y EUR/USD (0,0100), a 15 minutos, entrando 1 minuto después;
-- `logit` de precio frente a `logit` de precio + zonas, en las mismas decisiones;
-- confirmación con datos desde el 2026-09-01, con 5 136 operaciones por hipótesis y plazo 2027-09-30.
-Con el ritmo de BTC en el Estudio 3 (~9 000 operaciones por año), la muestra tardaría **~7 meses**.
+Pre-registrado el 2026-10-24 en docs/01 (commit bc97dc0). El código se congeló antes de ejecutarlo
+(37fdd3f). Fase de desarrollo 2022-01 → 2025-08, a 15 minutos, entrando 1 minuto después:
+
+| Instrumento | Acierto solo precio | Acierto precio + zonas | ¿Las zonas mejoran la predicción? |
+|---|---|---|---|
+| BTC/USDT | 55,61 % (EV +0,029) | 55,19 % (EV +0,021) | **No** (IC del log-loss incluye 0; la ganancia baja) |
+| EUR/USD | 53,76 % (EV −0,005) | 51,64 % (EV −0,044) | **No** (empeora) |
+
+Las zonas que describe el PDF (números redondos, máximo y mínimo del día anterior, extremos recientes y
+sus toques) **no añaden información** a lo que el modelo ya sabe del precio. El efecto de Osler era sobre
+«rebotes» en divisas de 1996–1998. No aparece como ventaja de dirección a 15 minutos en 2022–2025. Como no
+pasó el desarrollo, no hay fase de confirmación.
 
 ## 7. Fuentes consultadas el 2026-10-24
 

@@ -824,3 +824,22 @@ resultados: el Estudio 4 se reprodujo idéntico). Detalles que el texto dejaba a
 - **Lunes de EUR/USD:** el «día anterior» es el domingo UTC, que casi nunca tiene 720 velas. Por eso
   esas decisiones quedan fuera **en los dos modelos**, como dicta la definición.
 - **Tolerancia de redondeo:** 1e-9 al dividir por el paso, para que un toque exacto de 1,1000 cuente.
+
+**Resultado de la fase de desarrollo (commit 37fdd3f, aplicado mecánicamente; `results/estudio6/dev.json`):**
+
+| Hipótesis | Modelo | Operaciones | Acierto [lím. inf. 95 %] | EV [IC 95 %] | Trimestres EV > 0 | Mejora de log-loss [IC 95 %] |
+|---|---|---|---|---|---|---|
+| H6-BTC | solo precio (referencia) | 30 320 | 55,61 % [55,05 %] | +0,029 [+0,018; +0,040] | 93 % | — |
+| H6-BTC | precio + zonas | 33 016 | 55,19 % [54,65 %] | +0,021 [+0,010; +0,031] | 80 % | +0,00002 [−0,00015; +0,00019] |
+| H6-EUR | solo precio (referencia) | 1 411 | 53,76 % [51,14 %] | −0,005 [−0,054; +0,041] | 60 % | — |
+| H6-EUR | precio + zonas | 1 380 | 51,64 % [48,99 %] | −0,044 [−0,091; +0,003] | 0 % | −0,00008 [−0,00027; +0,00010] |
+
+**Veredicto: ninguna hipótesis pasa.**
+- **BTC:** cumple los criterios 1–4 (como ya los cumplía el modelo de solo precio), pero falla el 5: las
+  zonas no mejoran la predicción (el IC del log-loss incluye 0) y **bajan** la ganancia esperada.
+- **EUR/USD:** falla 2–5.
+- **Estudio 6: SIN SEÑAL.**
+
+En EUR/USD, el acierto sobre todas las decisiones coincidió en los dos modelos (51,00 %). Se comprobó que
+no es el fallo del ítem 39: los modelos eligen lados distintos en el 12 % de las decisiones (correlación
+de probabilidades 0,85).

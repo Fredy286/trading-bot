@@ -95,8 +95,8 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - Enmienda 2026-10-24: Bonferroni α = 0,025 por hipótesis. Cada una se evalúa en cuanto su muestra está
        completa; de las incompletas solo se informa el conteo.
      - H5a se lanzó con `end` = 2026-10-25. H5b, con `end` ≥ 2026-11-24.
-   - **Estudio 6 «zonas»:** pre-registrado en docs/01 (commit bc97dc0). Falta escribir su código
-     (`research/study6.py`), congelarlo y ejecutar la fase de desarrollo.
+   - **Estudio 6 «zonas»:** pre-registrado (bc97dc0), código congelado (37fdd3f) y ejecutado: **SIN SEÑAL**.
+     En BTC las zonas no mejoran el log-loss y bajan el EV (55,61 % → 55,19 %). En EUR/USD empeoran.
    - **Pendientes:** auditor de señales de terceros y gestión/diario para la demo.
 
 ## Cómo trabajar aquí
