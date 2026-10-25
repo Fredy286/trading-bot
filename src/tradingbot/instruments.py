@@ -44,6 +44,17 @@ INSTRUMENTS: dict[str, Instrument] = {
     # Añadido para el Estudio 3 (2026-10-03); no forma parte del estudio de la Fase 1B.
     "ETHUSDT": Instrument("ETHUSDT", "binance", 1e-2, 1.0, 1, (300.0, 15_000.0), 0.0, commission_bps=20.0,
                           display="ETH/USDT"),
+    # Añadidos para el Estudio 13 (2026-10-25): selector multimoneda. `point` = tick de precio de Binance.
+    "SOLUSDT": Instrument("SOLUSDT", "binance", 1e-2, 1.0, 1, (1.0, 2_000.0), 0.0, commission_bps=20.0,
+                          display="SOL/USDT"),
+    "BNBUSDT": Instrument("BNBUSDT", "binance", 1e-2, 1.0, 1, (10.0, 5_000.0), 0.0, commission_bps=20.0,
+                          display="BNB/USDT"),
+    "XRPUSDT": Instrument("XRPUSDT", "binance", 1e-4, 1e-2, 1, (0.05, 20.0), 0.0, commission_bps=20.0,
+                          display="XRP/USDT"),
+    "DOGEUSDT": Instrument("DOGEUSDT", "binance", 1e-5, 1e-3, 1, (0.001, 5.0), 0.0, commission_bps=20.0,
+                           display="DOGE/USDT"),
+    "ADAUSDT": Instrument("ADAUSDT", "binance", 1e-4, 1e-2, 1, (0.01, 10.0), 0.0, commission_bps=20.0,
+                          display="ADA/USDT"),
     # Añadidos para el Estudio 11 (2026-10-25): índices de EE. UU. de HistData (CFD, BID). Spread SUPUESTO
     # optimista de cuenta ECN (Nasdaq 100: 1,0 punto; S&P 500: 0,5), sin comisión aparte.
     "NSXUSD": Instrument("NSXUSD", "histdata", 1e-2, 1.0, 1_000, (5_000.0, 40_000.0), 0.0, display="Nasdaq 100",

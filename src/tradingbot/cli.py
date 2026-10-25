@@ -274,6 +274,18 @@ def cmd_research_study11(a) -> int:
     return 0
 
 
+def cmd_research_study13(a) -> int:
+    from .research import study13
+
+    rep = study13.run(Path(a.root3), Path(a.out), n_boot=a.n_boot)
+    s, b = rep["selector"], rep["cada_moneda_sola"]["BTCUSDT"]
+    print(f"Selector: pasa={rep['pasa']} | {rep['criterios']}")
+    print(f"  operaciones {s['operaciones']} ({s['operaciones_por_dia']:.1f}/día) | acierto {s['acierto']} [{s['lo95']}] "
+          f"| EV {s['ev']} {s['ev_ic95']} | elecciones {s['elecciones_por_moneda']}")
+    print(f"  BTC sola: operaciones {b['operaciones']} | acierto {b['acierto']} | EV {b['ev']}")
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -512,6 +524,11 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study13", help="Estudio 13: selector multimoneda (fase de desarrollo)")
+    x.add_argument("--root3", default="data/raw/estudio3")
+    x.add_argument("--out", default="results/estudio13")
+    x.add_argument("--n-boot", type=int, default=2000)
+    x.set_defaults(func=cmd_research_study13)
     x = r.add_parser("study11", help="Estudio 11: regla de la primera vela (ORB 9:30 NY + FVG + envolvente)")
     x.add_argument("--root", default="data/raw")
     x.add_argument("--out", default="results/estudio11")
