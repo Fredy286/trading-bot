@@ -1460,3 +1460,52 @@ confirmación.
 - Las dos ideas (juzgar el selector por EV diario y probar XRP sola) solo pueden probarse como
   **hipótesis nuevas con datos nuevos**.
 - Todo esto es con entrada en la apertura de la vela siguiente; con entrada manual a +10 s será menor.
+
+## Estudio 14 — selector multimoneda juzgado por ganancia diaria y XRP sola (pre-registro, 2026-10-25, ANTES de existir datos posteriores al 2026-10-25)
+
+**Origen y advertencia:** las dos hipótesis nacen de **mirar** la fase de desarrollo del Estudio 13:
+- el selector multiplicó por 2,8 el EV total por día, aunque su EV por operación fue algo menor que el de
+  BTC sola;
+- XRP sola fue la más fuerte: 57,46 %, EV +0,0526.
+
+Por eso **solo cuentan datos nuevos**. Ninguna cifra de 2022–2025 sirve como evidencia para ellas.
+
+**Por qué podrían ser reales:**
+- la pieza que explica la ventaja de BTC (continuación de la presión del final de la vela, docs/08)
+  debería existir en otras monedas;
+- XRP tiene un tick grande respecto de su precio, lo que puede volver la presión de corto plazo más
+  persistente.
+
+**Por qué podrían fallar:**
+- maldición del ganador: XRP pudo ser la mejor por suerte entre 7;
+- las ventajas de 2022–2025 se debilitaron en el último año en otros estudios.
+
+**Común a las dos hipótesis:**
+- **Universo, modelo, etiquetas y política:** los del Estudio 13 (GBM con `FEATURES`, `h = 1`, `d = 1`, EV
+  estimado ≥ 0,02, binaria al 85 %, empate reembolsado).
+- **Entrenamiento (una vez):** por moneda, con los 12 meses hasta el 2026-10-25 23:59 UTC. El 20 % final se
+  usa para la calibración isotónica.
+- **Evaluación:** todos los minutos del **2026-10-26 00:00 UTC al 2027-01-18 00:00 UTC**, con los archivos
+  públicos de Binance. Se calcula una sola vez, después del 2027-01-18. Es la misma ventana que los
+  Estudios 12 y 13.
+- **Corrección:** Bonferroni, α = 0,025 por hipótesis.
+
+**Hipótesis y criterios:**
+- **H14a, selector:**
+  1. Wilson 95 % > 54,05 %;
+  2. cuantil 2,5 % del bootstrap semanal del EV por operación > 0;
+  3. EV total por día del selector ≥ el de BTC sola en el mismo periodo.
+- **H14b, XRP sola:**
+  1. Wilson 95 % > 54,05 %;
+  2. cuantil 2,5 % del bootstrap semanal del EV por operación > 0.
+
+**Solo informativo:**
+- entrada a +10 s, con velas de 1 s de cada moneda elegida;
+- reparto de las elecciones por moneda;
+- entre semana frente a fin de semana.
+
+**Consecuencias:**
+- **Si H14a aprueba:** el bot pasa a vigilar las 7 monedas en demo. Como sigue siendo con entrada
+  inmediata, antes se mide su efecto con entrada manual en una reproducción pre-registrada aparte.
+- **Si solo H14b aprueba:** XRP se añade a BTC en demo, con la misma condición.
+- **Si no aprueba ninguna:** sigue solo BTC.
