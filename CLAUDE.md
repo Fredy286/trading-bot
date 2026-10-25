@@ -130,6 +130,12 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      EV por operación 0,0418 vs BTC 0,0437), pero el EV por día es 2,8 veces mayor; XRP sola 57,46 % (post hoc).
      Sin confirmación según el pre-registro; cualquier variante es hipótesis nueva solo con datos nuevos.
      Probabilidades por moneda en data/processed/estudio13/.
+   - **Estudio 14 (selector por EV diario + XRP sola):** pre-registro 1868a92; SOLO datos 2026-10-26 → 2027-01-18.
+   - **Estudio 15 (P1: presión dentro del minuto con velas de 1 s):** pre-registro 85b82bb, código 4e9a70b;
+     `tbot research study15 download|run` (resúmenes por minuto en data/processed/estudio15/seg/).
+   - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
+     corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
+     Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
