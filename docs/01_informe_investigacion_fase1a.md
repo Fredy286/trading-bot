@@ -1108,3 +1108,21 @@ de historia previa para el RSI semanal, que se toman de 2021.
 **Consecuencias:**
 - Si alguna pasa, se pre-registra su confirmación con datos posteriores al 2026-09-01.
 - Si ninguna pasa, SIN SEÑAL.
+
+**Resultado (commit a166394, aplicado mecánicamente; `results/estudio9/resultado.json`):**
+
+| Instrumento | Operaciones (episodios: semanas) | Acierto [lím. inf. 95 %] | EV [IC 98,75 % semanal] |
+|---|---|---|---|
+| BTC/USDT | 1 224 (17) | **47,7 %** [44,9 %] | −0,117 [−0,161; −0,056] |
+| ETH/USDT | 592 (9) | **45,9 %** [42,0 %] | −0,150 [−0,234; −0,072] |
+| XAU/USD | 594 (15) | **48,0 %** [44,0 %] | −0,112 [−0,206; −0,022] |
+| EUR/USD | 524 (11) | **49,3 %** [45,0 %] | −0,086 [−0,164; −0,021] |
+
+**Veredicto:** ninguna pasa. Las cuatro aciertan **menos del 50 %** y pierden con un IC entero por debajo
+de 0. **Estudio 9: SIN SEÑAL.**
+
+Informativo:
+- **Sin la confirmación 4H:** 47,1–49,6 %; la confirmación no ayuda.
+- **Al revés (seguir la tendencia):** 50,7–54,1 %, con EV entre −0,061 y 0,000. Es coherente con el
+  momentum, pero no gana y se basa en solo 9–17 semanas. Si se quisiera probar, sería una hipótesis
+  nueva con datos nuevos.

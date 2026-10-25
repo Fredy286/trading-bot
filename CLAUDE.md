@@ -109,6 +109,11 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      (~4 h, reanudable). Luego: `tbot research study7 evaluate`.
    - **Estudio 8 («Golden BIAS 200» de oro, TradingView):** SIN SEÑAL. Pierde en las 4 versiones, en todas
      las sesiones y en todos los años (contado −0,34 USD/oz; binaria 49,1 %).
+   - **Estudio 9 (regla de Facebook: RSI 1D+W sobrecomprado → ventas, 4H, 15M):** SIN SEÑAL, acierta 46–49 %
+     en BTC/ETH/oro/EUR.
+   - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
+     estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
+     piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
    - **Pendientes:** auditor de señales de terceros y gestión/diario para la demo.
 
 ## Cómo trabajar aquí

@@ -1,0 +1,319 @@
+{
+  "estudio": "Estudio 9 — RSI diario/semanal + 4H + 15M (pre-registro 1548ecb)",
+  "git_sha": "a166394b1d06abff28f6f7a5c25b9341a135de91",
+  "periodo": [
+    "2022-01-01",
+    "2025-09-01"
+  ],
+  "resultados": {
+    "H9-BTC": {
+      "simbolo": "BTCUSDT",
+      "regla": {
+        "operaciones": 1224,
+        "sin_empate": 1224,
+        "aciertos": 584,
+        "acierto": 0.477124183006536,
+        "lo95": 0.4492573692764886,
+        "hi95": 0.5051341418109352,
+        "p": 0.9999961207282304,
+        "ev": -0.1173202614379085,
+        "ev_ic98_75": [
+          -0.16074574376806353,
+          -0.055793973590470336
+        ],
+        "semanas_con_operaciones": 17,
+        "ventas": 1088,
+        "compras": 136,
+        "criterios": {
+          "min_300": true,
+          "p_bonferroni": false,
+          "wilson": false,
+          "ev_ic_semanal": false
+        },
+        "pasa": false
+      },
+      "informativo": {
+        "sin_confirmacion_4h": {
+          "operaciones": 3456,
+          "sin_empate": 3455,
+          "aciertos": 1713,
+          "acierto": 0.49580318379160637,
+          "lo95": 0.4791451419080042,
+          "hi95": 0.5124705481542411,
+          "p": 0.9999999370504413,
+          "ev": -0.08274016203703705,
+          "ev_ic98_75": [
+            -0.10739734299516876,
+            -0.0496058530133633
+          ],
+          "semanas_con_operaciones": 17,
+          "ventas": 3120,
+          "compras": 336,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        },
+        "al_reves_seguir_tendencia": {
+          "operaciones": 1224,
+          "sin_empate": 1224,
+          "aciertos": 640,
+          "acierto": 0.5228758169934641,
+          "lo95": 0.49486585818906503,
+          "hi95": 0.5507426307235115,
+          "p": 0.8976667857136389,
+          "ev": -0.032679738562091505,
+          "ev_ic98_75": [
+            -0.0942060264095297,
+            0.010745743768063587
+          ],
+          "semanas_con_operaciones": 17,
+          "ventas": 136,
+          "compras": 1088,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        }
+      }
+    },
+    "H9-ETH": {
+      "simbolo": "ETHUSDT",
+      "regla": {
+        "operaciones": 592,
+        "sin_empate": 592,
+        "aciertos": 272,
+        "acierto": 0.4594594594594595,
+        "lo95": 0.4197044713308272,
+        "hi95": 0.4997372057860442,
+        "p": 0.9999671868681641,
+        "ev": -0.15000000000000002,
+        "ev_ic98_75": [
+          -0.23357142857142857,
+          -0.07180991812928085
+        ],
+        "semanas_con_operaciones": 9,
+        "ventas": 448,
+        "compras": 144,
+        "criterios": {
+          "min_300": true,
+          "p_bonferroni": false,
+          "wilson": false,
+          "ev_ic_semanal": false
+        },
+        "pasa": false
+      },
+      "informativo": {
+        "sin_confirmacion_4h": {
+          "operaciones": 2256,
+          "sin_empate": 2255,
+          "aciertos": 1090,
+          "acierto": 0.48337028824833705,
+          "lo95": 0.4627902186242727,
+          "hi95": 0.5040069219986023,
+          "p": 0.9999999759389575,
+          "ev": -0.10571808510638298,
+          "ev_ic98_75": [
+            -0.14211592983471372,
+            -0.055450427827380896
+          ],
+          "semanas_con_operaciones": 9,
+          "ventas": 1728,
+          "compras": 528,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        },
+        "al_reves_seguir_tendencia": {
+          "operaciones": 592,
+          "sin_empate": 592,
+          "aciertos": 320,
+          "acierto": 0.5405405405405406,
+          "lo95": 0.5002627942139559,
+          "hi95": 0.5802955286691729,
+          "p": 0.5168874006670239,
+          "ev": -1.50030138462859e-17,
+          "ev_ic98_75": [
+            -0.0781900818707192,
+            0.08357142857142848
+          ],
+          "semanas_con_operaciones": 9,
+          "ventas": 144,
+          "compras": 448,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        }
+      }
+    },
+    "H9-XAU": {
+      "simbolo": "XAUUSD",
+      "regla": {
+        "operaciones": 594,
+        "sin_empate": 590,
+        "aciertos": 283,
+        "acierto": 0.47966101694915253,
+        "lo95": 0.43961041209497775,
+        "hi95": 0.5199747702162648,
+        "p": 0.998663557175805,
+        "ev": -0.11186868686868687,
+        "ev_ic98_75": [
+          -0.20621722027972036,
+          -0.022361500014249882
+        ],
+        "semanas_con_operaciones": 15,
+        "ventas": 594,
+        "compras": 0,
+        "criterios": {
+          "min_300": true,
+          "p_bonferroni": false,
+          "wilson": false,
+          "ev_ic_semanal": false
+        },
+        "pasa": false
+      },
+      "informativo": {
+        "sin_confirmacion_4h": {
+          "operaciones": 2018,
+          "sin_empate": 2012,
+          "aciertos": 947,
+          "acierto": 0.470675944333996,
+          "lo95": 0.4489421341624369,
+          "hi95": 0.4925215205215422,
+          "p": 0.9999999998486638,
+          "ev": -0.12886521308225968,
+          "ev_ic98_75": [
+            -0.16756187553832882,
+            -0.08127798880472133
+          ],
+          "semanas_con_operaciones": 17,
+          "ventas": 2018,
+          "compras": 0,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        },
+        "al_reves_seguir_tendencia": {
+          "operaciones": 594,
+          "sin_empate": 590,
+          "aciertos": 307,
+          "acierto": 0.5203389830508475,
+          "lo95": 0.48002522978373513,
+          "hi95": 0.5603895879050222,
+          "p": 0.8475274584428901,
+          "ev": -0.03712121212121212,
+          "ev_ic98_75": [
+            -0.1269443256953945,
+            0.05752219190979283
+          ],
+          "semanas_con_operaciones": 15,
+          "ventas": 0,
+          "compras": 594,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        }
+      }
+    },
+    "H9-EUR": {
+      "simbolo": "EURUSD",
+      "regla": {
+        "operaciones": 524,
+        "sin_empate": 513,
+        "aciertos": 253,
+        "acierto": 0.49317738791423,
+        "lo95": 0.4501251278860978,
+        "hi95": 0.5363310706861532,
+        "p": 0.9858710556841899,
+        "ev": -0.08578244274809158,
+        "ev_ic98_75": [
+          -0.16417836174242448,
+          -0.02111149296675194
+        ],
+        "semanas_con_operaciones": 11,
+        "ventas": 276,
+        "compras": 248,
+        "criterios": {
+          "min_300": true,
+          "p_bonferroni": false,
+          "wilson": false,
+          "ev_ic_semanal": false
+        },
+        "pasa": false
+      },
+      "informativo": {
+        "sin_confirmacion_4h": {
+          "operaciones": 1388,
+          "sin_empate": 1367,
+          "aciertos": 670,
+          "acierto": 0.49012435991221653,
+          "lo95": 0.4636884945700882,
+          "hi95": 0.5166155755719326,
+          "p": 0.9999153496548394,
+          "ev": -0.09185878962536025,
+          "ev_ic98_75": [
+            -0.1490004664179103,
+            -0.01732826266519806
+          ],
+          "semanas_con_operaciones": 11,
+          "ventas": 624,
+          "compras": 764,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        },
+        "al_reves_seguir_tendencia": {
+          "operaciones": 524,
+          "sin_empate": 513,
+          "aciertos": 260,
+          "acierto": 0.50682261208577,
+          "lo95": 0.46366892931384673,
+          "hi95": 0.549874872113902,
+          "p": 0.9424109601440593,
+          "ev": -0.061068702290076333,
+          "ev_ic98_75": [
+            -0.12461978457728376,
+            0.015479604184709209
+          ],
+          "semanas_con_operaciones": 11,
+          "ventas": 248,
+          "compras": 276,
+          "criterios": {
+            "min_300": true,
+            "p_bonferroni": false,
+            "wilson": false,
+            "ev_ic_semanal": false
+          },
+          "pasa": false
+        }
+      }
+    }
+  },
+  "pasa_alguna": false
+}
