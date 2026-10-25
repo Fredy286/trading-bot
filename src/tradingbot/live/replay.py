@@ -127,7 +127,10 @@ def run_replay(symbol: str, horizon: int, model: str, start: date, end: date, ru
     hist = store.load(Path(data_root), inst, source="binance")
     hist = hist[hist.index >= pd.Timestamp(start, tz="UTC") - pd.Timedelta(days=3)]
     daily_cache = Path(data_root) / "binance_daily"
-    new = download_days(inst, start, end + timedelta(days=1), "1m", cache_dir=daily_cache, progress=progress)
+    # Desde 3 días antes: si el periodo no empieza a comienzo de mes (Estudio 5: 2026-10-04), el histórico
+    # mensual no cubre el calentamiento de las variables.
+    new = download_days(inst, start - timedelta(days=3), end + timedelta(days=1), "1m", cache_dir=daily_cache,
+                        progress=progress)
     raw = pd.concat([hist, new]).sort_index()
     raw = raw[~raw.index.duplicated(keep="last")]
     bars, _ = to_canonical(raw)

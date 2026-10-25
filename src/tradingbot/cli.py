@@ -234,6 +234,44 @@ def cmd_replay(a) -> int:
                       models_dir=Path(a.models), data_root=Path(a.root), entry_delay_s=a.entry_delay_s)
 
 
+def cmd_study5_verdict(a) -> int:
+    """Estudio 5: veredicto H5a/H5b (Holm) sobre el libro de una reproducción con entrada a +10 s."""
+    from datetime import timedelta
+
+    import pandas as pd
+
+    from . import jsonutil
+    from .data.binance import download_days
+    from .execution.paper import read_rows
+    from .instruments import get_instrument
+    from .live import study5
+    from .live.replay import delay_sensitivity
+    from .signals.registry import load_observation
+
+    obs = load_observation(Path(a.observation))
+    path = Path(a.runtime) / "paper_ledger.jsonl"
+    if not obs or not path.exists():
+        print(f"Falta {a.observation} o {path}.")
+        return 2
+    rows, _ = read_rows(path)
+    inst = get_instrument(obs["symbol"])
+
+    def sensitivity(sample: list[dict]) -> list[dict]:  # informativa: no decide (pre-registro del Estudio 5)
+        closes = download_days(inst, study5.START.date(), _d(a.end) + timedelta(days=1), "1s",
+                               cache_dir=Path(a.root) / "binance_daily", progress=False)
+        return delay_sensitivity(sample, closes, delays=(2, 5, 10, 20), payouts=(0.85, 0.80), point=inst.point)
+
+    v = study5.evaluate(rows, obs, pd.Timestamp(a.end, tz="UTC"), sensitivity=sensitivity)
+    out = Path(a.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(jsonutil.dumps(v, indent=2), encoding="utf-8")
+    print(jsonutil.dumps({k: v[k] for k in v if k != "hipotesis"}, indent=2))
+    for h, r in (v.get("hipotesis") or {}).items():
+        print(f"{h}: {r['estado']} | {r['aciertos']}/{r['n']} = {r['acierto']} [lím. inf. {r['lo95']:.4f}] | "
+              f"EV {r['ev']} | p Holm {r['p_holm']:.4g}")
+    return 0
+
+
 def _quantiles(values: list) -> dict | None:
     import numpy as np
 
@@ -456,6 +494,15 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--root", default="data/raw")
     x.add_argument("--out", default="results/live/sensibilidad.json")
     x.set_defaults(func=cmd_replay_sensitivity)
+
+    x = sub.add_parser("study5-verdict", help="Estudio 5: veredicto H5a/H5b sobre una reproducción a +10 s")
+    x.add_argument("--runtime", required=True, help="carpeta de la reproducción (tbot replay --entry-delay-s 10)")
+    x.add_argument("--end", required=True, help="día final de la reproducción, excluido")
+    x.add_argument("--observation", default="config/observacion_en_vivo.json")
+    x.add_argument("--root", default="data/raw")
+    # Sin opciones para la muestra, el plazo ni el umbral: son los del pre-registro.
+    x.add_argument("--out", default="results/estudio5/verdict.json")
+    x.set_defaults(func=cmd_study5_verdict)
 
     x = sub.add_parser("live-verdict", help="veredicto de la observación en vivo sin dinero (criterios fijos)")
     x.add_argument("--symbol", required=True)

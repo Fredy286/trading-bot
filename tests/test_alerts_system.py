@@ -829,6 +829,23 @@ def test_historical_price_feed_uses_registered_timing(bars_edge, bundle_edge, tm
     assert sens["empates"] == sum(r["tie"] for r in loop.ledger.trades)
 
 
+def test_replay_loop_with_manual_entry_delay(bars_edge, bundle_edge, tmp_path):
+    """Estudio 5: con entrada a +10 s el bucle sigue evaluando (sin descartar por antigüedad del precio)."""
+    from tradingbot.live.replay import HistoricalPriceFeed, delay_sensitivity
+
+    t0 = pd.Timestamp("2023-02-06 13:00", tz="UTC")
+    eng, s = _engine(bundle_edge, show_experimental=True)
+    closes = pd.Series(np.linspace(1.1, 1.2, 4 * 3600), index=pd.date_range(t0, periods=4 * 3600, freq="s"))
+    loop = AlertLoop(eng, HistoricalPriceFeed(bars_edge, closes, entry_delay_s=10), [], tmp_path, s)
+    for i in range(60):
+        loop.step((t0 + pd.Timedelta(minutes=i + 1, seconds=1)).to_pydatetime())
+    trades = loop.ledger.trades
+    assert trades and all(r["entrada_tras_cierre_s"] == 10 for r in trades)
+    assert all(r["duracion_real_s"] == 60 for r in trades)
+    sens = delay_sensitivity(trades, closes, delays=(10,), payouts=(0.85,), point=1e-5)[0]
+    assert sens["aciertos"] == sum(r["win"] for r in trades) and sens["empates"] == sum(r["tie"] for r in trades)
+
+
 def test_event_log_never_raises(tmp_path, monkeypatch):
     from tradingbot.live import runner
 

@@ -90,10 +90,12 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
 6. Fase 2 solo si algo llega a `VALIDADO` y con autorización expresa del usuario.
 7. **Análisis del PDF «El secreto del trading profesional» (2026-10-24)**: `docs/05_...`. El «90 %» de los
    grupos se explica con repeticiones tras perder (al azar: 87,4 % con 2, 93,7 % con 3; EV −0,08) y con
-   selección de canales (`scripts/simulacion_grupos_senales.py` → `results/grupos_senales.json`). Propuestas:
-   código de evaluación del Estudio 5 (H5a/H5b, +10 s, Holm), **Estudio 6 «zonas»** (Osler: números
-   redondos, máx./mín. del día anterior; borrador en docs/05, sección 6, NO congelado), auditor de señales de
-   terceros y gestión/diario para la demo.
+   selección de canales (`scripts/simulacion_grupos_senales.py` → `results/grupos_senales.json`).
+   - **Estudio 5:** código listo (`tbot study5-verdict`, `.github/workflows/estudio5.yml`, manual). Ejecutar
+     UNA vez con `end` ≥ 2026-11-24. Mientras falte una muestra, solo da conteos.
+   - **Estudio 6 «zonas»:** pre-registrado en docs/01 (commit bc97dc0). Falta escribir su código
+     (`research/study6.py`), congelarlo y ejecutar la fase de desarrollo.
+   - **Pendientes:** auditor de señales de terceros y gestión/diario para la demo.
 
 ## Cómo trabajar aquí
 

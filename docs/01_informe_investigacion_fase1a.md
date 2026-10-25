@@ -683,6 +683,24 @@ concluyente».
 En ningún caso se usa dinero real sin autorización expresa. Antes, una prueba en demo debe comprobar que
 el precio del intermediario sigue al de Binance, que el empate se reembolsa y que el pago es ≥ 85 %.
 
+*Nota de implementación (2026-10-24, antes de reproducir ningún dato posterior al 2026-10-03).* Código:
+`tbot study5-verdict` (`live/study5.py`) y el flujo `.github/workflows/estudio5.yml`, que se ejecuta a
+mano. Se precisan cinco puntos que el texto dejaba abiertos:
+1. **Fin de semana:** sábado o domingo en UTC según la vela de decisión (hora de la alerta).
+2. **Plazo:** cuentan las alertas de todo el 2026-12-13 (UTC), es decir, hasta el 2026-12-14 excluido.
+3. **Alertas válidas:**
+   - solo el modelo, el método y la política registrados;
+   - una alerta por vela de decisión;
+   - entrada a +10 s (si el libro tiene otra, el código se detiene).
+4. **Muestra incompleta al vencer el plazo:** esa hipótesis es «no concluyente» y entra en Holm con p = 1.
+5. **Una sola evaluación:** mientras falte alguna muestra y no haya vencido el plazo, el comando solo
+   informa conteos (nunca aciertos) y el flujo no guarda el libro. El veredicto se calcula una vez, con las
+   dos muestras completas o al vencer el plazo.
+
+La sensibilidad informativa usa entradas a +2, +5, +10 y +20 s y pagos del 85 % y 80 %. Además, la
+reproducción descarga las velas de 1 min desde 3 días antes del inicio, para el calentamiento de las
+variables (antes dependía del histórico mensual, que no cubre el 1–3 de octubre).
+
 ## Estudio 6 — zonas de precio (pre-registro, 2026-10-24, ANTES de calcular ninguna variable de zona)
 
 **Origen:** análisis del PDF «El secreto del trading profesional» (docs/05). La única idea del PDF con

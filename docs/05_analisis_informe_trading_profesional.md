@@ -176,10 +176,17 @@ encendido o servidor). El usuario hoy no quiere automatizar, así que queda arch
 Ya está pre-registrado (docs/01). Con el ritmo de septiembre (~177 alertas sin empate por día), se estima
 que la muestra de **H5a** (3 500, todas las horas) se completa hacia **finales de octubre de 2026** y la de **H5b** (2 500,
 solo fines de semana UTC) hacia el **2026-11-22**, antes del plazo del 2026-12-13. Son estimaciones; el
-conteo real lo dará la reproducción. **Falta código:** el flujo `replay.yml` no tiene aún la entrada a
-+10 s por defecto, el filtro de fin de semana ni la prueba de Holm entre H5a y H5b. Hay que escribirlo y
-congelarlo **antes** de ejecutar la reproducción, y ejecutarla una sola vez cuando las dos muestras estén
-completas.
+conteo real lo dará la reproducción.
+
+**Código listo (2026-10-24):**
+- `tbot study5-verdict` y el flujo `.github/workflows/estudio5.yml` (Actions → «Estudio 5» → Run
+  workflow, con el día final excluido);
+- reproduce desde el 2026-10-04 con entrada a +10 s y aplica H5a/H5b con Holm;
+- mientras falte una muestra, solo informa conteos, nunca aciertos.
+
+**Ejecutarlo una vez, con `end` = 2026-11-24 o posterior** (datos hasta el 23 de noviembre). Si para
+entonces falta la muestra de fin de semana, se repite unos días después: con muestra fija, repetirlo no
+cambia el resultado.
 
 ### 5.2 Estudio 6: zonas (pre-registrado; resumen en la sección 6)
 

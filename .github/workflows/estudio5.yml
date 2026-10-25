@@ -1,0 +1,58 @@
+name: Estudio 5 (confirmación a +10 s)
+
+# Pre-registro: docs/01, «Estudio 5». Reproduce el modelo registrado desde el 2026-10-04 con entrada a +10 s
+# (velas de 1 s de Binance, en los servidores de GitHub) y aplica el veredicto H5a/H5b con Holm.
+# Mientras falte alguna muestra y no haya vencido el plazo (2026-12-13), solo informa conteos, nunca aciertos,
+# y no guarda el libro. Se ejecuta a mano: Actions → «Estudio 5» → Run workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      end:
+        description: "Día final de los datos, excluido (el archivo diario de Binance del día anterior debe existir)"
+        required: true
+
+jobs:
+  estudio5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+    env:
+      END: ${{ github.event.inputs.end }}
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e .
+      - name: Velas de 1 min de septiembre (histórico base; el calentamiento usa además los 3 días previos)
+        run: tbot data download --symbols BTCUSDT --start 2026-09-01 --end 2026-10-01
+      - name: Reproducción (modelo y política registrados, entrada a +10 s)
+        run: tbot replay --symbol BTCUSDT --horizon 1 --model gbm --start 2026-10-04 --end "$END" --runtime runtime/estudio5 --models config/modelos --entry-delay-s 10
+      - name: Veredicto (criterios fijos del pre-registro)
+        id: verdict
+        run: |
+          tbot study5-verdict --runtime runtime/estudio5 --end "$END" --out results/estudio5/verdict.json
+          echo "estado=$(python -c "import json; print(json.load(open('results/estudio5/verdict.json', encoding='utf-8'))['estado'])")" >> "$GITHUB_OUTPUT"
+      # El libro (con aciertos) solo se guarda cuando hay veredicto final.
+      - if: steps.verdict.outputs.estado == 'final'
+        uses: actions/upload-artifact@v4
+        with:
+          name: estudio5-runtime
+          path: |
+            runtime/estudio5/paper_ledger.jsonl
+            runtime/estudio5/events.jsonl
+            results/estudio5/
+      - name: Guardar resultados en la rama
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/estudio5/
+          git commit -m "Estudio 5: ${{ steps.verdict.outputs.estado }} — run ${{ github.run_id }} [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((i * 5))
+          done
