@@ -39,7 +39,7 @@ entretenido u optimista, no lo que funciona. Por eso aquí nada se acepta sin pr
 | PDF «El secreto del trading profesional» | Zonas: números redondos, máx./mín. del día anterior, toques | 6 | SIN SEÑAL: no mejora el modelo (BTC, EUR/USD) |
 | PDF | Flujo de órdenes y desequilibrio | 3 | SIN SEÑAL a 15 min |
 | PDF y grupos de señales | Reentradas M2/M3 (martingala) | docs/02 §6.1, docs/05 §2 | Descartada: no cambia la ganancia esperada |
-| Video de «Kronos AI» | Kronos, análogos, Kalman, otro activo (ETH) | 7 | **En curso** (Kronos corriendo en el PC) |
+| Video de «Kronos AI» | Kronos, análogos, Kalman, otro activo (ETH) | 7 | SIN SEÑAL: Kronos solo acierta 50,03 %; análogos y Kalman no aportan. ETH, prometedora (57,0 % frente a 55,8 %) pero no significativa: hipótesis para datos nuevos |
 | TradingView «Golden BIAS 200» | SMA15/SMA200, retroceso, sesiones, flechas multitemporales | 8 | SIN SEÑAL: pierde en las 4 versiones |
 | Comentario de Facebook (Danny Roggers) | RSI diario + semanal, estructura 4H, entrada 15M | 9 | SIN SEÑAL: acierta < 50 % |
 | Video de redes: oro + índice del dólar | Correlación negativa (< 0) + oro en zona de demanda + DXY respetando su zona de oferta | 10 | SIN SEÑAL: 48,2 % a 15 min y 49,9 % a 60 min. El filtro evita el 89 % de las perdedoras… y el 90 % de las ganadoras |

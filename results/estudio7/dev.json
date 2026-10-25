@@ -1,0 +1,214 @@
+{
+  "estudio": "Estudio 7 — fase de desarrollo (pre-registro 1492079)",
+  "git_sha": "545f18ed805174dff97ac29f3c54d9fc3cab2a5b",
+  "conjunto_E": {
+    "n": 20000,
+    "inicio": "2024-10-01 01:01:00+00:00",
+    "fin": "2025-08-31 23:53:00+00:00",
+    "semilla": 20261025
+  },
+  "prueba": {
+    "desde": "2025-01-01 00:00:00+00:00",
+    "decisiones": 14444,
+    "sin_empate": 13943
+  },
+  "nivel_ic": 0.9875,
+  "base": {
+    "logloss": 0.6910937969354997,
+    "politica_b": {
+      "operaciones": 1322,
+      "sin_empate": 1180,
+      "aciertos": 658,
+      "acierto": 0.5576271186440678,
+      "lo95": 0.5291467293381803,
+      "ev": 0.02821482602118002
+    },
+    "acierto_todas": 0.528365488058524,
+    "por_tipo_de_dia": {
+      "entre_semana": {
+        "operaciones": 665,
+        "sin_empate": 620,
+        "aciertos": 349,
+        "acierto": 0.5629032258064516,
+        "lo95": 0.5235893047448826,
+        "ev": 0.03857142857142856
+      },
+      "fin_de_semana": {
+        "operaciones": 657,
+        "sin_empate": 560,
+        "aciertos": 309,
+        "acierto": 0.5517857142857143,
+        "lo95": 0.5103820842932307,
+        "ev": 0.017732115677321147
+      }
+    }
+  },
+  "herramientas": {
+    "T7-KRONOS": {
+      "variables": [
+        "kronos"
+      ],
+      "mejora_logloss": -1.570552611111499e-05,
+      "ic0.9875": [
+        -0.0001451330814184737,
+        0.00011885158860189882
+      ],
+      "c1_mejora_logloss": false,
+      "politica_b": {
+        "operaciones": 1375,
+        "sin_empate": 1236,
+        "aciertos": 694,
+        "acierto": 0.5614886731391586,
+        "lo95": 0.5336768469703385,
+        "ev": 0.03483636363636363
+      },
+      "c2_ev_no_menor": true,
+      "pasa": false,
+      "sola_acierto_signo": 0.500286944045911,
+      "acierto_todas": 0.52786344402209,
+      "por_tipo_de_dia": {
+        "entre_semana": {
+          "operaciones": 674,
+          "sin_empate": 633,
+          "aciertos": 352,
+          "acierto": 0.5560821484992101,
+          "lo95": 0.5171535747856901,
+          "ev": 0.027002967359050438
+        },
+        "fin_de_semana": {
+          "operaciones": 701,
+          "sin_empate": 603,
+          "aciertos": 342,
+          "acierto": 0.5671641791044776,
+          "lo95": 0.5273150913222692,
+          "ev": 0.042368045649072754
+        }
+      }
+    },
+    "T7-ANALOG": {
+      "variables": [
+        "analog"
+      ],
+      "mejora_logloss": -6.988019575686307e-05,
+      "ic0.9875": [
+        -0.0002574062877098696,
+        0.00012256507228792314
+      ],
+      "c1_mejora_logloss": false,
+      "politica_b": {
+        "operaciones": 1338,
+        "sin_empate": 1197,
+        "aciertos": 664,
+        "acierto": 0.5547201336675021,
+        "lo95": 0.5264341548688258,
+        "ev": 0.02346786248131539
+      },
+      "c2_ev_no_menor": false,
+      "pasa": false,
+      "sola_acierto_signo": 0.5035960443512136,
+      "acierto_todas": 0.5251380621100193,
+      "por_tipo_de_dia": {
+        "entre_semana": {
+          "operaciones": 669,
+          "sin_empate": 626,
+          "aciertos": 344,
+          "acierto": 0.549520766773163,
+          "lo95": 0.51036049882073,
+          "ev": 0.015545590433482808
+        },
+        "fin_de_semana": {
+          "operaciones": 669,
+          "sin_empate": 571,
+          "aciertos": 320,
+          "acierto": 0.5604203152364273,
+          "lo95": 0.5194395998777704,
+          "ev": 0.03139013452914798
+        }
+      }
+    },
+    "T7-KALMAN": {
+      "variables": [
+        "kalman"
+      ],
+      "mejora_logloss": -1.66300166534771e-06,
+      "ic0.9875": [
+        -6.590008706170072e-05,
+        6.248278598158719e-05
+      ],
+      "c1_mejora_logloss": false,
+      "politica_b": {
+        "operaciones": 1193,
+        "sin_empate": 1068,
+        "aciertos": 600,
+        "acierto": 0.5617977528089888,
+        "lo95": 0.5318712229335566,
+        "ev": 0.035205364626990775
+      },
+      "c2_ev_no_menor": true,
+      "pasa": false,
+      "sola_acierto_signo": 0.5042673743096895,
+      "acierto_todas": 0.5280786057519903,
+      "por_tipo_de_dia": {
+        "entre_semana": {
+          "operaciones": 566,
+          "sin_empate": 530,
+          "aciertos": 296,
+          "acierto": 0.5584905660377358,
+          "lo95": 0.5159437337917198,
+          "ev": 0.03109540636042402
+        },
+        "fin_de_semana": {
+          "operaciones": 627,
+          "sin_empate": 538,
+          "aciertos": 304,
+          "acierto": 0.5650557620817844,
+          "lo95": 0.5228491017275506,
+          "ev": 0.038915470494417854
+        }
+      }
+    },
+    "T7-ETH": {
+      "variables": [
+        "eth_r1",
+        "eth_r5"
+      ],
+      "mejora_logloss": 0.00025885319801472373,
+      "ic0.9875": [
+        -0.00048345087171014527,
+        0.0010131785624653545
+      ],
+      "c1_mejora_logloss": false,
+      "politica_b": {
+        "operaciones": 2003,
+        "sin_empate": 1843,
+        "aciertos": 1050,
+        "acierto": 0.5697232772653282,
+        "lo95": 0.5469965735494006,
+        "ev": 0.04967548676984521
+      },
+      "c2_ev_no_menor": true,
+      "pasa": false,
+      "sola_acierto_signo": 0.5197634160415464,
+      "acierto_todas": 0.5262855913361544,
+      "por_tipo_de_dia": {
+        "entre_semana": {
+          "operaciones": 1036,
+          "sin_empate": 986,
+          "aciertos": 558,
+          "acierto": 0.565922920892495,
+          "lo95": 0.5347889987946443,
+          "ev": 0.044691119691119684
+        },
+        "fin_de_semana": {
+          "operaciones": 967,
+          "sin_empate": 857,
+          "aciertos": 492,
+          "acierto": 0.574095682613769,
+          "lo95": 0.5407307788618618,
+          "ev": 0.05501551189245087
+        }
+      }
+    }
+  },
+  "pasa_alguna": false
+}

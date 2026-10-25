@@ -945,6 +945,28 @@ de cada combinación, desglose entre semana y fin de semana UTC.
 - **Si ninguna pasa:** las cuatro quedan en «SIN SEÑAL» y no se incorporan.
 - Nada de esto autoriza dinero real.
 
+**Resultado (commit de8de82; Kronos-small revisión `901c26c`, 20 000 predicciones calculadas en el PC del
+usuario; aplicado mecánicamente; `results/estudio7/dev.json`).** Prueba: 14 444 decisiones de E en
+2025-01 → 2025-08, de ellas 13 943 sin empate.
+
+| Herramienta | Mejora de log-loss [IC 98,75 %] | Política B: operaciones / acierto / EV | EV base | Acierto de la herramienta sola |
+|---|---|---|---|---|
+| Solo GBM (base) | — | 1 322 / 55,76 % / +0,028 | — | — |
+| T7-KRONOS | −0,000016 [−0,00015; +0,00012] | 1 375 / 56,15 % / +0,035 | +0,028 | **50,03 %** |
+| T7-ANALOG | −0,000070 [−0,00026; +0,00012] | 1 338 / 55,47 % / +0,023 | +0,028 | 50,36 % |
+| T7-KALMAN | −0,000002 [−0,00007; +0,00006] | 1 193 / 56,18 % / +0,035 | +0,028 | 50,43 % |
+| T7-ETH | **+0,000259** [−0,00048; +0,00101] | 2 003 / 56,97 % / +0,050 | +0,028 | **51,98 %** |
+
+**Veredicto:** ninguna pasa el criterio 1; en las cuatro, el IC de la mejora incluye 0. **Estudio 7: SIN
+SEÑAL.** No se incorpora ninguna.
+- **Kronos** sola acierta 50,03 %, igual que una moneda, en la dirección del minuto siguiente de BTC. No
+  añade información al GBM.
+- **Análogos y Kalman** no aportan: el GBM ya usa los rendimientos recientes.
+- **ETH** es la única con mejora puntual positiva: más operaciones (2 003) con más acierto (57,0 %) y el
+  doble de EV. Pero su intervalo es ancho e incluye 0, y esa lectura es posterior a ver los datos.
+  **Queda como hipótesis nueva**, que solo puede confirmarse con datos que nadie haya visto (posteriores al
+  2026-10-26) y un pre-registro propio.
+
 ## Estudio 8 — «Golden BIAS 200» reconstruido en oro (pre-registro, 2026-10-25, ANTES de calcularlo)
 
 **Origen:** el usuario encontró en TradingView el indicador «Golden BIAS 200» v6.4. Es de solo

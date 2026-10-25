@@ -282,6 +282,14 @@ acierta?», sino «¿nuestro modelo acierta más si le añadimos Kronos, los an�
   recientes y la correlación publicada de Kronos es baja. Si alguna mejora, se confirma con datos nuevos
   antes de tocar las señales.
 
+**Resultado (2026-10-25): SIN SEÑAL.** Ninguna de las cuatro herramientas mejora el modelo con el margen
+exigido:
+- **Kronos** sola acierta **50,03 %**, igual que una moneda, en la dirección del minuto siguiente de BTC.
+- **Análogos y Kalman:** sin aporte.
+- **ETH** es la única prometedora: con ella, el modelo operaría más (2 003 frente a 1 322) y con más
+  acierto (57,0 % frente a 55,8 %). Pero la mejora no es estadísticamente segura. Queda como hipótesis
+  para probar con datos nuevos.
+
 ## 7b. «Golden BIAS 200» (indicador de oro de TradingView) — resultado: SIN SEÑAL (2026-10-25)
 
 - **Qué es:** indicador de solo invitación. Cuesta 50 USD, se paga por Telegram, el código es cerrado y
