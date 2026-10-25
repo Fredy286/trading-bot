@@ -813,3 +813,14 @@ Notación:
 **Fuera de la familia (solo informativo):** GBM, duraciones de 5 y 60 min, otros pasos de número redondo
 (500 USD; 0,0050), y la frecuencia de «rebote» al estilo de Osler (no cruzar el nivel en 15 min) en
 números redondos frente a niveles desplazados medio paso.
+
+*Nota de implementación (2026-10-24, antes de ejecutar).* Código: `research/study6.py` y
+`tbot research study6`, con el mismo comparador que el Estudio 3 (`study3.compare`, extraído sin cambiar
+resultados: el Estudio 4 se reprodujo idéntico). Detalles que el texto dejaba abiertos:
+- **Mínimo de velas con precio:** 200 de las 225 para los extremos de 240 min (como `vol240`) y 12 de 15
+  para `z_rej15` (como `vol15`).
+- **Velas de HistData:** las rellenadas por falta de ticks (huecos < 30 min) cuentan como velas con
+  precio para el umbral de 720 del día anterior.
+- **Lunes de EUR/USD:** el «día anterior» es el domingo UTC, que casi nunca tiene 720 velas. Por eso
+  esas decisiones quedan fuera **en los dos modelos**, como dicta la definición.
+- **Tolerancia de redondeo:** 1e-9 al dividir por el paso, para que un toque exacto de 1,1000 cuente.

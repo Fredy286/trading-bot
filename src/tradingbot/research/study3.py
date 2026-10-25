@@ -157,11 +157,23 @@ def _logloss(p: np.ndarray, y: np.ndarray) -> np.ndarray:
 def run_symbol(symbol: str, root: Path, cfg: dict, n_boot: int = 1000, log=print, test_start: str = DEV_TEST_START,
                test_end: str = DEV_END, with_new: bool = True) -> dict:
     """`with_new=False` evalúa solo el modelo de precio (Estudio 4, periodo de confirmación)."""
-    inst = get_instrument(symbol)
-    st, cc, ec = cfg["study"], cfg["contracts"], cfg["execution"]
     spot = load(root, symbol, "spot")
     bars = spot_bars(spot)
     bars = bars[(bars.index >= pd.Timestamp(DATA_START, tz="UTC")) & (bars.index < pd.Timestamp(test_end, tz="UTC"))]
+    nf = None
+    if with_new:
+        nf = new_features(bars.index, spot, load(root, symbol, "perp"), load(root, symbol, "prem"),
+                          load(root, symbol, "fund"), load(root, OTHER[symbol], "spot"))
+    return compare(symbol, bars, nf, cfg, n_boot, log, test_start, test_end)
+
+
+def compare(symbol: str, bars: pd.DataFrame, nf: pd.DataFrame | None, cfg: dict, n_boot: int = 1000, log=print,
+            test_start: str = DEV_TEST_START, test_end: str = DEV_END) -> dict:
+    """`logit` de precio frente a `logit` de precio + bloque `nf` (filas = `bars.index`), en las MISMAS
+    decisiones, con el walk-forward de la sección 8. `nf=None`: solo el de precio. También lo usa el Estudio 6."""
+    inst = get_instrument(symbol)
+    st, cc, ec = cfg["study"], cfg["contracts"], cfg["execution"]
+    with_new = nf is not None
     pf = compute_features(bars)
     lab = make_labels(bars, HORIZON, ENTRY_DELAY, inst.point)
     tie_ind = (lab["dir"] == 0).astype(float).where(lab["dir"].notna())
@@ -169,8 +181,6 @@ def run_symbol(symbol: str, root: Path, cfg: dict, n_boot: int = 1000, log=print
     # Mismas decisiones para los dos modelos: hace falta que existan TODAS las variables.
     dm = decision_mask(bars.index, HORIZON) & pf.notna().all(axis=1).to_numpy()
     if with_new:
-        nf = new_features(bars.index, spot, load(root, symbol, "perp"), load(root, symbol, "prem"),
-                          load(root, symbol, "fund"), load(root, OTHER[symbol], "spot"))
         dm &= nf.notna().all(axis=1).to_numpy()
     rows = np.flatnonzero(dm)
     idx = bars.index[rows]

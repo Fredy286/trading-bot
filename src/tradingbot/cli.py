@@ -197,6 +197,19 @@ def cmd_research_study3(a) -> int:
     return 0
 
 
+def cmd_research_study6(a) -> int:
+    from .research import study6
+
+    rep = study6.run(Path(a.root3), Path(a.root), Path(a.out), n_boot=a.n_boot)
+    for s, v in rep["veredicto"].items():
+        m = rep["resultados"][s]["modelos"]
+        ll = rep["resultados"][s]["logloss"]
+        print(f"{s}: pasa={v['pasa']} | criterios {v} | referencia {m['referencia_precio']['hit']} "
+              f"vs zonas {m['precio_mas_bloque_nuevo']['hit']} | mejora log-loss [{ll['mejora_lo95']:.6f}; "
+              f"{ll['mejora_hi95']:.6f}]")
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -435,6 +448,12 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study6", help="Estudio 6 (zonas), fase de desarrollo (pre-registro en docs/01)")
+    x.add_argument("--root3", default="data/raw/estudio3", help="velas de contado de Binance (BTC)")
+    x.add_argument("--root", default="data/raw", help="almacén con EUR/USD de HistData")
+    x.add_argument("--out", default="results/estudio6")
+    x.add_argument("--n-boot", type=int, default=1000)
+    x.set_defaults(func=cmd_research_study6)
     x = r.add_parser("report")
     x.add_argument("--stage", choices=["dev", "holdout"], default="dev")
     x.add_argument("--config", default="config/research.toml")
