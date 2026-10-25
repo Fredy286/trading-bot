@@ -1377,3 +1377,58 @@ divididos por su vol60 (la de 5 min por √5), con la definición del Estudio 7.
 - **Si pasa:** ETH se incorpora como candidata al modelo registrado. Su efecto en la operación manual
   (+10 s) se confirma con una reproducción pre-registrada aparte, antes de cambiar las señales.
 - **Si no pasa:** no se incorpora.
+
+## Estudio 13 — selector multimoneda: cada minuto, la moneda con mayor ganancia esperada (pre-registro, 2026-10-25, ANTES de descargar los datos de las monedas nuevas)
+
+**Origen:** pedido del usuario: «el bot debe analizar todas las monedas y decidir cuál tiene más
+probabilidad de acierto en cada momento».
+
+**Por qué podría ayudar:**
+- más candidatas significa más minutos con una oportunidad que supere el margen;
+- el efecto de microestructura que el GBM detecta en BTC puede existir en otras monedas.
+
+**Por qué podría empeorar:**
+- **Maldición del ganador:** elegir el máximo de 7 estimaciones con ruido favorece las sobreestimadas.
+- Las monedas menos líquidas tienen más empates y más ruido.
+- No todas las plataformas ofrecen todas las monedas a 1 minuto.
+
+La validación fuera de muestra decide.
+
+**Universo fijo (contado de Binance, USDT):** BTC, ETH, SOL, BNB, XRP, DOGE y ADA.
+
+**Diseño (fase de desarrollo):**
+- **Por moneda:** GBM del proyecto con `FEATURES`, walk-forward trimestral de la sección 8.
+  - Pruebas del 2022-01-01 al 2025-08-31.
+  - Entrenamiento con los 12 meses previos: el 20 % final para la calibración isotónica, con purga.
+  - Etiquetas `h = 1`, `d = 1`.
+  - Tasa de empates causal por moneda, como en la Fase 1B.
+- **Selector:**
+  - en cada minuto se calcula el EV estimado de cada moneda (binaria al 85 %, empate reembolsado);
+  - candidatas: EV ≥ 0,02 (política B);
+  - se opera **solo la de mayor EV estimado**: una operación por minuto, como máximo.
+- **Comparación:** BTC sola con la política B, en el mismo código y periodo.
+
+**Criterios de la fase de desarrollo (H13, todos):**
+1. ≥ 300 operaciones;
+2. Wilson 95 % del acierto > 54,05 %;
+3. límite inferior del IC 95 % del EV por bootstrap de bloques semanales > 0;
+4. EV > 0 en ≥ 60 % de los trimestres;
+5. EV por operación del selector ≥ el de BTC sola, que el selector no sea peor.
+
+**Solo informativo:**
+- reparto de las elecciones por moneda;
+- resultados por moneda sola;
+- operaciones por día;
+- EV total por día del selector frente a BTC sola.
+
+**Confirmación, solo si pasa la fase de desarrollo:**
+- modelos por moneda entrenados con los 12 meses hasta el 2026-10-25;
+- evaluados una sola vez con todos los minutos del 2026-10-26 al 2027-01-18, la misma ventana que el
+  Estudio 12, con archivos públicos de Binance;
+- **aprueba si:**
+  - el límite inferior de Wilson 95 % > 54,05 %;
+  - el cuantil 5 % del bootstrap semanal del EV es > 0;
+  - el EV por operación es ≥ el de BTC sola;
+- informativo: entrada a +10 s con velas de 1 s.
+
+**Consecuencia:** solo si confirma, el bot pasa a vigilar las 7 monedas, en modo experimental y en demo.
