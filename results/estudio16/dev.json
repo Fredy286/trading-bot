@@ -1,0 +1,236 @@
+{
+  "estudio": "Estudio 16 — señal anticipada (pre-registro dc5ff77)",
+  "git_sha": "6559817ab1b593675c0f3a2d23cf8e8e96164d2e",
+  "periodo_prueba": [
+    "2024-07-01",
+    "2025-09-01"
+  ],
+  "hipotesis": {
+    "H16a": {
+      "k": 55,
+      "latencia": 5,
+      "operaciones": 51738,
+      "sin_empate": 48179,
+      "aciertos": 27619,
+      "acierto": 0.5732580584902136,
+      "lo95": 0.5688358217808634,
+      "p": 1.5242856963477277e-47,
+      "ev": 0.05636379450307317,
+      "ev_ic97_5": [
+        0.03915166267809519,
+        0.07214892232957913
+      ],
+      "trimestres_ev_positivo": 1.0,
+      "criterios": {
+        "min_300": true,
+        "p_bonferroni": true,
+        "wilson": true,
+        "ev_ic": true,
+        "trimestres_60": true
+      },
+      "pasa": true,
+      "sensibilidad_latencia": {
+        "L=0s": {
+          "operaciones": 51738,
+          "sin_empate": 48339,
+          "aciertos": 28082,
+          "acierto": 0.5809387864871015,
+          "lo95": 0.5765339582154689,
+          "p": 1.0606135569442913e-71,
+          "ev": 0.06982681974564149,
+          "ev_ic97_5": [
+            0.055237734558558085,
+            0.08366089600321001
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=3s": {
+          "operaciones": 51738,
+          "sin_empate": 48332,
+          "aciertos": 27951,
+          "acierto": 0.5783125051725565,
+          "lo95": 0.5739037897144371,
+          "p": 6.484879256028295e-63,
+          "ev": 0.06527793884572268,
+          "ev_ic97_5": [
+            0.04865954401568306,
+            0.08096440651412827
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=5s": {
+          "operaciones": 51738,
+          "sin_empate": 48179,
+          "aciertos": 27619,
+          "acierto": 0.5732580584902136,
+          "lo95": 0.5688358217808634,
+          "p": 1.5242856963477277e-47,
+          "ev": 0.05636379450307317,
+          "ev_ic97_5": [
+            0.03979465309009509,
+            0.07143883515046569
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=8s": {
+          "operaciones": 51738,
+          "sin_empate": 48312,
+          "aciertos": 26934,
+          "acierto": 0.5575012419274714,
+          "lo95": 0.5530678250474825,
+          "p": 3.618829275021061e-14,
+          "ev": 0.029299547721210708,
+          "ev_ic97_5": [
+            0.013569145010359773,
+            0.043999594013025486
+          ],
+          "trimestres_ev_positivo": 0.8
+        },
+        "L=10s": {
+          "operaciones": 51738,
+          "sin_empate": 48241,
+          "aciertos": 26629,
+          "acierto": 0.5519993366638337,
+          "lo95": 0.5475576852898952,
+          "p": 2.222036515251967e-07,
+          "ev": 0.019765936062468587,
+          "ev_ic97_5": [
+            0.005656534900180945,
+            0.035725439003139334
+          ],
+          "trimestres_ev_positivo": 0.8
+        },
+        "L=15s": {
+          "operaciones": 51738,
+          "sin_empate": 48290,
+          "aciertos": 26230,
+          "acierto": 0.5431766411265272,
+          "lo95": 0.5387304244302299,
+          "p": 0.12345860497060628,
+          "ev": 0.004551780122927053,
+          "ev_ic97_5": [
+            -0.008446667020693811,
+            0.019592892603398006
+          ],
+          "trimestres_ev_positivo": 0.8
+        }
+      }
+    },
+    "H16b": {
+      "k": 50,
+      "latencia": 10,
+      "operaciones": 27673,
+      "sin_empate": 25619,
+      "aciertos": 14603,
+      "acierto": 0.5700066357000664,
+      "lo95": 0.5639341679324867,
+      "p": 1.3295119881329139e-21,
+      "ev": 0.05046615834929353,
+      "ev_ic97_5": [
+        0.031077432783928903,
+        0.07037845286602079
+      ],
+      "trimestres_ev_positivo": 1.0,
+      "criterios": {
+        "min_300": true,
+        "p_bonferroni": true,
+        "wilson": true,
+        "ev_ic": true,
+        "trimestres_60": true
+      },
+      "pasa": true,
+      "sensibilidad_latencia": {
+        "L=0s": {
+          "operaciones": 27673,
+          "sin_empate": 25763,
+          "aciertos": 15260,
+          "acierto": 0.5923223227108644,
+          "lo95": 0.586308380270508,
+          "p": 3.712095552611288e-63,
+          "ev": 0.08918440357026704,
+          "ev_ic97_5": [
+            0.07077414053577116,
+            0.10943341332204663
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=3s": {
+          "operaciones": 27673,
+          "sin_empate": 25739,
+          "aciertos": 15150,
+          "acierto": 0.5886009557480866,
+          "lo95": 0.5825763978825617,
+          "p": 1.3022183327798572e-54,
+          "ev": 0.082697936616919,
+          "ev_ic97_5": [
+            0.06331891500687925,
+            0.10510810151263754
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=5s": {
+          "operaciones": 27673,
+          "sin_empate": 25744,
+          "aciertos": 15019,
+          "acierto": 0.5833980733374767,
+          "lo95": 0.5773637832805991,
+          "p": 8.072588058707635e-44,
+          "ev": 0.07375962129151156,
+          "ev_ic97_5": [
+            0.05335773582575962,
+            0.09367982791361486
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=8s": {
+          "operaciones": 27673,
+          "sin_empate": 25735,
+          "aciertos": 14768,
+          "acierto": 0.5738488439867884,
+          "lo95": 0.5677963481610336,
+          "p": 3.334499556861699e-27,
+          "ev": 0.057304954287572714,
+          "ev_ic97_5": [
+            0.040677800886815586,
+            0.07760341672477748
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=10s": {
+          "operaciones": 27673,
+          "sin_empate": 25619,
+          "aciertos": 14603,
+          "acierto": 0.5700066357000664,
+          "lo95": 0.5639341679324867,
+          "p": 1.3295119881329139e-21,
+          "ev": 0.05046615834929353,
+          "ev_ic97_5": [
+            0.031350056356996184,
+            0.06911480809033968
+          ],
+          "trimestres_ev_positivo": 1.0
+        },
+        "L=15s": {
+          "operaciones": 27673,
+          "sin_empate": 25693,
+          "aciertos": 14290,
+          "acierto": 0.5561826178336512,
+          "lo95": 0.5500994818129388,
+          "p": 2.4605633647703293e-07,
+          "ev": 0.026867343620135146,
+          "ev_ic97_5": [
+            0.0068953618298028645,
+            0.043859916424070125
+          ],
+          "trimestres_ev_positivo": 0.8
+        }
+      }
+    }
+  },
+  "verificacion": {
+    "Q60_igual_cierre_1min": 1.0,
+    "minutos": 1141920,
+    "control_desfasado_un_minuto": 0.03933,
+    "nota": "El precio 'último antes de t+60 s' calculado con velas de 1 s coincide con el cierre de la vela de 1 min en el 100 % de los minutos: el reloj de los segundos está alineado y las variables parciales (segundos < k) no ven el futuro."
+  }
+}

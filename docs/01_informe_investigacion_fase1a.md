@@ -1681,3 +1681,35 @@ L ∈ {0, 3, 5, 8, 10, 15} s.
 - se evalúa una sola vez con todos los minutos del 2026-10-26 al 2027-01-18;
 - mismos criterios 2–4, con IC unilateral 97,5 %.
 - Antes de usarla en la demo hay que medir la latencia real del usuario.
+
+**Resultado de la fase de desarrollo (commit 6559817, aplicado mecánicamente; `results/estudio16/dev.json`).**
+Prueba 2024-07 → 2025-08:
+
+| Hipótesis | Operaciones | Acierto [lím. inf. 95 %] | p | EV [IC 97,5 % semanal] | Trimestres EV > 0 | Veredicto |
+|---|---|---|---|---|---|---|
+| **H16a**: aviso en el segundo 55, clic a +5 s | 51 738 | **57,33 %** [56,88 %] | 1,5·10⁻⁴⁷ | **+0,056** [+0,039; +0,072] | 5/5 | **PASA** |
+| **H16b**: aviso en el segundo 50, clic a +10 s | 27 673 | **57,00 %** [56,39 %] | 1,3·10⁻²¹ | **+0,050** [+0,031; +0,070] | 5/5 | **PASA** |
+
+**Sensibilidad a la latencia real del clic** (informativa; cada modelo con su etiqueta a otras latencias):
+
+| Clic tras el aviso | H16a (aviso en el s 55) | H16b (aviso en el s 50) |
+|---|---|---|
+| 0 s | 58,1 % / +0,070 | 59,2 % / +0,089 |
+| 3 s | 57,8 % / +0,065 | 58,9 % / +0,083 |
+| 5 s | **57,3 % / +0,056** | 58,3 % / +0,074 |
+| 8 s | 55,8 % / +0,029 | 57,4 % / +0,057 |
+| 10 s | 55,2 % / +0,020 | **57,0 % / +0,050** |
+| 15 s | 54,3 % / +0,005 | 55,6 % / +0,027 |
+
+**Comparación con avisar al cierre:** en el mismo periodo, el modelo del Estudio 15 avisando al cierre con
+clic a +10 s daba 54,1 % y EV +0,001. **Anticipar el aviso recupera la ventaja para la operación manual.**
+H16b es la más tolerante: aún con 15 s de demora da 55,6 % y EV +0,027.
+
+**Verificación:**
+- el precio «último antes de t+60 s» de las velas de 1 s coincide con el cierre de la vela de 1 min en el
+  **100 %** de 1 141 920 minutos (control con un minuto de desfase: 3,9 %);
+- las pruebas automáticas confirman que el bloque parcial no cambia si se altera lo que ocurre desde el
+  segundo k.
+
+**Siguiente paso pre-registrado:** confirmación con los datos del 2026-10-26 al 2027-01-18. Antes de usarla
+en la demo, medir la latencia real del clic del usuario.

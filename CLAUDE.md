@@ -139,6 +139,10 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      fijo de 1 min en BTC. Deriv: BTC/ETH solo multiplicadores (8,2 pb de comisión); Binance Futures 4–10 pb vs
      ventaja de +0,47 pb; Polymarket 5/15 min bloqueada por Coljuegos. Camino: P8 (anticipar la señal al
      segundo 50–55) y ejecución manual rápida en demo.
+   - **Estudio 16 (P8: aviso anticipado en el segundo 50/55):** PASA el desarrollo. H16a (s 55, clic +5 s) 57,33 %,
+     EV +0,056; H16b (s 50, clic +10 s) 57,00 %, EV +0,050; 5/5 trimestres; reloj de 1 s alineado al 100 %.
+     H16b tolera 15 s de demora (55,6 %). Confirmación con 2026-10-26 → 2027-01-18. Es el camino para la
+     operación MANUAL: el bot debe avisar en el segundo 50 de cada vela.
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).
