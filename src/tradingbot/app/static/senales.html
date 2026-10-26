@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Señales anticipadas</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --surface: #ffffff; --surface-2: #eef1f5; --border: #d9dee6;
+    --text: #1b2330; --muted: #5b6676; --accent: #2f5bd3; --accent-soft: #e6ecfb;
+    --exp: #8a5a00; --exp-soft: #fbf1dc; --down: #b3261e; --down-soft: #fbe4e2;
+    --radius: 10px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141b; --surface: #161d27; --surface-2: #1d2633; --border: #2b3645;
+      --text: #e6ebf2; --muted: #9aa6b6; --accent: #7aa2ff; --accent-soft: #1f2d4d;
+      --exp: #f0b43c; --exp-soft: #3a2d10; --down: #ff8a80; --down-soft: #3d1a18;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+           padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  h1 { font-size: 18px; margin: 0; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+  .banner { background: var(--exp-soft); color: var(--exp); border-radius: var(--radius); padding: 10px 14px;
+            font-weight: 600; margin-bottom: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  #signal { text-align: center; padding: 24px 16px; margin-bottom: 16px; }
+  #big { font-size: 64px; font-weight: 800; line-height: 1.1; margin: 4px 0; }
+  #big.up { color: var(--accent); } #big.down { color: var(--down); } #big.none { color: var(--muted); font-size: 28px; }
+  #sub { font-size: 18px; color: var(--muted); }
+  #countdown { font-family: var(--mono); font-size: 40px; font-variant-numeric: tabular-nums; margin: 8px 0; }
+  .flash-up { animation: fu 1s ease-out 2; } .flash-down { animation: fd 1s ease-out 2; }
+  @keyframes fu { from { background: var(--accent-soft); } to { background: var(--surface); } }
+  @keyframes fd { from { background: var(--down-soft); } to { background: var(--surface); } }
+  button { font: inherit; color: #fff; background: var(--accent); border: 0; border-radius: 8px; padding: 8px 16px;
+           cursor: pointer; }
+  button.secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: .45; cursor: default; }
+  #clickbtn { font-size: 26px; padding: 16px 40px; margin-top: 8px; }
+  #after { margin-top: 12px; display: none; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+  input { font: inherit; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; width: 120px;
+          background: var(--surface); color: var(--text); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .metric .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .metric .l { font-size: 13px; color: var(--muted); }
+  .tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .ok { color: var(--accent); font-weight: 600; } .bad { color: var(--down); font-weight: 600; }
+  .note { font-size: 13px; color: var(--muted); }
+  .rowform input { width: 90px; } .rowform button { padding: 3px 8px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Señales anticipadas · BTC/USD 1 minuto</h1>
+  <div>
+    <button id="soundbtn" class="secondary">🔔 Activar sonido</button>
+    <span class="note" id="status">conectando…</span>
+  </div>
+</header>
+<main>
+  <div class="banner">EXPERIMENTAL — SOLO CUENTA DEMO. Modelo del Estudio 16 pendiente de confirmación con datos nuevos
+    (enero de 2027). Nunca dinero real.</div>
+
+  <section id="signal" class="card">
+    <h2>Señal actual</h2>
+    <div id="big" class="none">Esperando el segundo 50…</div>
+    <div id="sub"></div>
+    <div id="countdown"></div>
+    <button id="clickbtn" disabled>YA HICE CLIC</button>
+    <div class="note">Atajo: barra espaciadora. Haz clic en tu plataforma demo <b>lo antes posible</b>; ideal, antes de
+      que la cuenta regresiva llegue a 0 (cierre de la vela).</div>
+    <div id="after">
+      <label>Precio de entrada en tu plataforma <input id="f_entrada" inputmode="decimal"></label>
+      <label>Pago (%) <input id="f_pago" inputmode="decimal" placeholder="85"></label>
+      <button id="f_guardar1">Guardar</button>
+    </div>
+  </section>
+
+  <h2>Resumen de tu práctica</h2>
+  <div class="grid" id="metrics"></div>
+
+  <h2>Diario</h2>
+  <p class="note">Después de que venza cada operación (60 s después de tu clic), anota el resultado y el precio de salida
+    que muestra tu plataforma. El bot compara con el precio de Binance para saber si la plataforma sigue el mismo
+    precio, si devuelve el dinero en empate y cuánto paga.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Hora (Colombia)</th><th>Señal</th><th>Prob.</th><th>Tu clic</th>
+        <th>Binance entrada → salida</th><th>Binance</th><th>Plataforma entrada → salida</th><th>Pago</th>
+        <th>Plataforma</th><th>¿Coinciden?</th><th>Anotar</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="11" class="note">Sin avisos todavía.</td></tr></tbody>
+    </table>
+  </div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let lastAlert = null, clicked = new Set(), audio = null, offsetMs = 0, current = null;
+const fmtT = (iso) => iso ? new Date(iso).toLocaleTimeString("es-CO", {timeZone: "America/Bogota", hour12: false}) : "—";
+const pct = (x) => x == null ? "—" : (100 * x).toFixed(1) + " %";
+const num = (x, d = 2) => x == null ? "—" : Number(x).toFixed(d);
+const res = (r) => r == null ? "—" : r > 0 ? '<span class="ok">ganó</span>' : r < 0 ? '<span class="bad">perdió</span>' : "empate";
+
+$("soundbtn").onclick = () => {
+  audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+  beep(); $("soundbtn").textContent = "🔔 Sonido activo";
+};
+function beep() {
+  if (!audio) return;
+  [0, 0.18, 0.36].forEach((t, i) => {
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.frequency.value = [880, 1175, 1568][i]; o.connect(g); g.connect(audio.destination);
+    g.gain.setValueAtTime(0.25, audio.currentTime + t); g.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + t + 0.16);
+    o.start(audio.currentTime + t); o.stop(audio.currentTime + t + 0.17);
+  });
+}
+async function post(url, body) {
+  const r = await fetch(url, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  return r.json();
+}
+async function doClick() {
+  if (!current || clicked.has(current.alert_id)) return;
+  clicked.add(current.alert_id); $("clickbtn").disabled = true;
+  const r = await post("/api/senal/clic", {alert_id: current.alert_id});
+  const lat = (new Date(r.hora_binance) - new Date(current.decidido)) / 1000;
+  $("sub").textContent = `Clic registrado: ${lat.toFixed(1)} s después del aviso.`;
+  $("after").style.display = "flex";
+}
+$("clickbtn").onclick = doClick;
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space" && document.activeElement.tagName !== "INPUT") { e.preventDefault(); doClick(); }
+});
+$("f_guardar1").onclick = async () => {
+  if (!current) return;
+  await post("/api/senal/registro", {alert_id: current.alert_id, entrada: $("f_entrada").value, pago: $("f_pago").value});
+  $("after").style.display = "none"; $("f_entrada").value = "";
+};
+
+function renderSignal(st) {
+  const u = st.ultimo || {};
+  const now = Date.now() + offsetMs;
+  const big = $("big");
+  if (u.estado === "señal" && new Date(u.cierre).getTime() + 60000 > now) {
+    current = u;
+    if (lastAlert !== u.alert_id) {
+      lastAlert = u.alert_id; beep();
+      $("signal").classList.remove("flash-up", "flash-down"); void $("signal").offsetWidth;
+      $("signal").classList.add(u.lado > 0 ? "flash-up" : "flash-down");
+      $("clickbtn").disabled = clicked.has(u.alert_id); $("after").style.display = "none"; $("sub").textContent = "";
+    }
+    big.className = u.lado > 0 ? "up" : "down";
+    big.textContent = u.lado > 0 ? "↑ SUBE" : "↓ BAJA";
+    const left = (new Date(u.cierre).getTime() - now) / 1000;
+    $("countdown").textContent = left > 0 ? `cierre en ${left.toFixed(1)} s` : `${(-left).toFixed(1)} s después del cierre`;
+    if (!$("sub").textContent) $("sub").textContent = `BTC/USD · 1 minuto · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
+  } else {
+    current = null; $("clickbtn").disabled = true; big.className = "none";
+    big.textContent = u.estado === "error" ? "Error de datos (reintentando)" :
+      u.estado === "sin datos" ? "Sin datos suficientes este minuto" : "Sin señal — esperando el segundo 50";
+    const s = (now / 1000) % 60, wait = s < 50 ? 50 - s : 110 - s;
+    $("countdown").textContent = `próxima decisión en ${wait.toFixed(0)} s`;
+    $("sub").textContent = u.motivo || "";
+  }
+}
+function renderMetrics(r) {
+  const m = [["Avisos", r.avisos], ["Clics", r.clics], ["Tu tiempo de clic (mediana)", r.latencia_mediana_s == null ? "—" : num(r.latencia_mediana_s, 1) + " s"],
+    ["Tu tiempo de clic (9 de 10 por debajo de)", r.latencia_p90_s == null ? "—" : num(r.latencia_p90_s, 1) + " s"],
+    ["Acierto según Binance", pct(r.acierto_binance) + ` (${r.con_referencia_binance})`],
+    ["Acierto en tu plataforma", pct(r.acierto_plataforma) + ` (${r.anotadas_plataforma})`],
+    ["¿Plataforma = Binance?", pct(r.coincidencia_binance_plataforma) + ` (${r.n_comparables})`],
+    ["Pago medio", r.pago_medio == null ? "—" : num(r.pago_medio, 1) + " %"],
+    ["Empates en la plataforma", r.empates_plataforma],
+    ["Ganancia demo (por unidad apostada)", r.ganancia_demo_por_unidad == null ? "—" : num(r.ganancia_demo_por_unidad, 2)]];
+  $("metrics").innerHTML = m.map(([l, v]) => `<div class="card metric"><div class="v">${v ?? "—"}</div><div class="l">${l}</div></div>`).join("");
+}
+function renderRows(rows) {
+  if (!rows.length) return;
+  $("rows").innerHTML = rows.map((f) => `<tr>
+    <td>${fmtT(f.decidido)}</td><td>${f.lado > 0 ? "↑ sube" : "↓ baja"}</td><td class="num">${pct(f.p)}</td>
+    <td class="num">${f.latencia_s == null ? "sin clic" : num(f.latencia_s, 1) + " s"}</td>
+    <td class="num">${num(f.entrada_binance)} → ${num(f.salida_binance)}</td><td>${res(f.resultado_binance)}</td>
+    <td class="num">${num(f.entrada_plataforma)} → ${num(f.salida_plataforma)}</td><td class="num">${f.pago == null ? "—" : f.pago + " %"}</td>
+    <td>${res(f.resultado_plataforma)}</td>
+    <td>${f.coinciden == null ? "—" : f.coinciden ? '<span class="ok">sí</span>' : '<span class="bad">no</span>'}</td>
+    <td class="rowform">${f.clic && f.resultado_plataforma == null ? `<input placeholder="salida" id="s_${f.alert_id}">
+      <button data-a="${f.alert_id}" data-r="gano">ganó</button><button data-a="${f.alert_id}" data-r="perdio">perdió</button>
+      <button data-a="${f.alert_id}" data-r="empate">empate</button>` : ""}</td></tr>`).join("");
+  document.querySelectorAll(".rowform button").forEach((b) => b.onclick = async () => {
+    const a = b.dataset.a;
+    await post("/api/senal/registro", {alert_id: a, resultado: b.dataset.r, salida: $("s_" + a).value});
+    poll();
+  });
+}
+let editing = false;
+document.addEventListener("focusin", (e) => { editing = e.target.tagName === "INPUT"; });
+document.addEventListener("focusout", () => { editing = false; });
+async function poll() {
+  try {
+    const st = await (await fetch("/api/senal/state")).json();
+    if (st.missing) { $("status").textContent = "el bucle de señales no está corriendo"; return; }
+    offsetMs = (st.desfase_reloj_s || 0) * 1000;
+    $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ${st.minutos} minutos · ${st.avisos} avisos`;
+    renderSignal(st); renderMetrics(st.resumen);
+    if (!editing) renderRows(st.diario);
+  } catch (e) { $("status").textContent = "sin conexión con el panel"; }
+}
+setInterval(poll, 500); poll();
+</script>
+</body>
+</html>

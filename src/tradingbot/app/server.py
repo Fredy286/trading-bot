@@ -5,6 +5,10 @@ Rutas:
   GET  /api/state      estado del bucle de alertas + veredicto de la investigación
   GET  /api/research   informes markdown de las etapas disponibles
   POST /api/ack        {"alert_id": "..."} → registra la hora de recepción de la alerta
+  GET  /senales        panel del modo de señales anticipadas (cuenta demo, Estudio 16)
+  GET  /api/senal/state     estado del bucle de señales, diario y resumen
+  POST /api/senal/clic      {"alert_id"} → hora del clic (en hora de Binance)
+  POST /api/senal/registro  {"alert_id", "entrada", "salida", "pago", "resultado"} → datos de la plataforma
 
 El panel solo LEE state.json (lo escribe `tbot live`); las confirmaciones de recepción van a
 acks.jsonl, que solo escribe este servidor.
@@ -81,9 +85,19 @@ def first_acks(runtime_dir: Path) -> dict[str, str]:
     return acks
 
 
-def make_handler(runtime_dir: Path, results_dir: Path):
-    runtime_dir, results_dir = Path(runtime_dir), Path(results_dir)
+def _num(v, lo: float = 0.0, hi: float = 10**7) -> float | None:
+    if v in (None, ""):
+        return None
+    x = float(v)
+    if not lo <= x <= hi:
+        raise ValueError("fuera de rango")
+    return x
+
+
+def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("runtime/senales")):
+    runtime_dir, results_dir, senal_dir = Path(runtime_dir), Path(results_dir), Path(senal_dir)
     ack_lock = threading.Lock()
+    senal_lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):  # silencio en consola
@@ -118,6 +132,20 @@ def make_handler(runtime_dir: Path, results_dir: Path):
                 state["research"] = research_verdict(results_dir)
                 state["server_time"] = utcnow().isoformat()
                 return self._json(200, state)
+            if self.path == "/senales":
+                html = resources.files("tradingbot.app").joinpath("static/senales.html").read_bytes()
+                return self._send(200, html, "text/html; charset=utf-8")
+            if self.path == "/api/senal/state":
+                from ..live import anticipada
+
+                try:
+                    st = _read_state(senal_dir / "state.json") or {"missing": True}
+                except OSError:
+                    return self._json(503, {"error": "estado ocupado, reintente"})
+                st["diario"] = anticipada.diario(senal_dir)
+                st["resumen"] = anticipada.resumen(senal_dir)
+                st["server_time"] = utcnow().isoformat()
+                return self._json(200, st)
             if self.path == "/api/research":
                 docs = {}
                 for stage in ("dev", "holdout"):
@@ -127,17 +155,25 @@ def make_handler(runtime_dir: Path, results_dir: Path):
                 return self._json(200, docs)
             return self._json(404, {"error": "no encontrado"})
 
-        def do_POST(self):  # noqa: N802
-            if self.path != "/api/ack":
-                return self._json(404, {"error": "no encontrado"})
+        def _body(self) -> dict | None:
             n = int(self.headers.get("Content-Length", "0"))
             if n <= 0 or n > MAX_BODY:
-                return self._json(400, {"error": "cuerpo inválido"})
+                return None
             try:
                 data = json.loads(self.rfile.read(n))
-                alert_id = str(data["alert_id"])[:32]
-            except (ValueError, KeyError, TypeError):
+            except ValueError:
+                return None
+            return data if isinstance(data, dict) else None
+
+        def do_POST(self):  # noqa: N802
+            if self.path in ("/api/senal/clic", "/api/senal/registro"):
+                return self._post_senal()
+            if self.path != "/api/ack":
+                return self._json(404, {"error": "no encontrado"})
+            data = self._body()
+            if data is None or "alert_id" not in data:
                 return self._json(400, {"error": "JSON inválido"})
+            alert_id = str(data["alert_id"])[:32]
             try:
                 state = _read_state(runtime_dir / "state.json") or {}
             except OSError:
@@ -152,6 +188,49 @@ def make_handler(runtime_dir: Path, results_dir: Path):
                 jsonutil.append_line(runtime_dir / "acks.jsonl", json.dumps(
                     {"event": "received", "time": now, "alert_id": alert_id, "channel": "panel"}))
             return self._json(200, {"ok": True, "received_at": now})
+
+        def _post_senal(self):
+            from datetime import timedelta
+
+            from ..live.anticipada import RESULTADOS
+
+            now = utcnow()
+            data = self._body()
+            if data is None or "alert_id" not in data:
+                return self._json(400, {"error": "JSON inválido"})
+            aid = str(data["alert_id"])[:32]
+            rows, _ = read_rows(senal_dir / "senales.jsonl")
+            if not any(r.get("evento") == "aviso" and r.get("alert_id") == aid for r in rows):
+                return self._json(404, {"error": "aviso no encontrado"})
+            if self.path == "/api/senal/clic":
+                try:
+                    offset = float((_read_state(senal_dir / "state.json") or {}).get("desfase_reloj_s") or 0.0)
+                except OSError:
+                    offset = 0.0
+                with senal_lock:
+                    prev = [c for c in read_rows(senal_dir / "clics.jsonl")[0] if c.get("alert_id") == aid]
+                    if prev:  # vale el primer clic
+                        return self._json(200, {"ok": True, "ya_registrado": True, **prev[0]})
+                    row = {"alert_id": aid, "hora_pc": now.isoformat(),
+                           "hora_binance": (now + timedelta(seconds=offset)).isoformat()}
+                    jsonutil.append_line(senal_dir / "clics.jsonl", json.dumps(row))
+                return self._json(200, {"ok": True, **row})
+            try:
+                row = {"alert_id": aid, "hora": now.isoformat()}
+                for k in ("entrada", "salida"):
+                    if k in data:
+                        row[k] = _num(data[k])
+                if "pago" in data:
+                    row["pago"] = _num(data["pago"], 0.0, 100.0)
+                if "resultado" in data:
+                    if data["resultado"] not in RESULTADOS:
+                        raise ValueError("resultado inválido")
+                    row["resultado"] = data["resultado"]
+            except (TypeError, ValueError) as exc:
+                return self._json(400, {"error": f"dato inválido: {exc}"})
+            with senal_lock:
+                jsonutil.append_line(senal_dir / "registros.jsonl", json.dumps(row))
+            return self._json(200, {"ok": True})
 
     return Handler
 
@@ -168,14 +247,15 @@ class PanelServer(ThreadingHTTPServer):
         super().server_bind()
 
 
-def make_server(host: str, port: int, runtime_dir: Path, results_dir: Path) -> ThreadingHTTPServer:
-    return PanelServer((host, port), make_handler(runtime_dir, results_dir))
+def make_server(host: str, port: int, runtime_dir: Path, results_dir: Path,
+                senal_dir: Path = Path("runtime/senales")) -> ThreadingHTTPServer:
+    return PanelServer((host, port), make_handler(runtime_dir, results_dir, senal_dir))
 
 
 def serve(host: str = "127.0.0.1", port: int = 8765, runtime_dir: Path = Path("runtime/demo"),
-          results_dir: Path = Path("results")) -> int:
+          results_dir: Path = Path("results"), senal_dir: Path = Path("runtime/senales")) -> int:
     try:
-        srv = make_server(host, port, runtime_dir, results_dir)
+        srv = make_server(host, port, runtime_dir, results_dir, senal_dir)
     except OSError as exc:
         print(f"No se pudo abrir el panel en {host}:{port} ({exc}). ¿Hay otro «tbot serve» abierto? "
               "Ciérrelo o use otro puerto con --port.")
