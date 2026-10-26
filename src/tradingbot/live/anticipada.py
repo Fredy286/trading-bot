@@ -222,6 +222,7 @@ class SignalLoop:
         if d["estado"] == "señal":
             self.n_signals += 1
             d["alert_id"] = uuid.uuid4().hex[:12]
+            d["emitido"] = pd.Timestamp(self.feed.server_now()).isoformat()  # retraso propio: datos + modelo
             self._write({"evento": "aviso", "model_id": self.b["model_id"], **d})
             self._beep()
         self.last = d
@@ -263,7 +264,14 @@ class SignalLoop:
         tmp.replace(self.dir / "state.json")
 
     def run(self, iterations: int = 0) -> None:
-        self.feed.clock_offset()
+        for intento in range(5):  # al arrancar: hora de Binance y ~2 000 velas precargadas (no en el segundo 50)
+            try:
+                self.feed.clock_offset()
+                self.feed.get(self.feed.server_now())
+                break
+            except requests.RequestException as exc:
+                self.log(f"sin conexión con Binance ({type(exc).__name__}); reintento {intento + 1}/5")
+                time.sleep(5)
         done, last_sync = 0, time.time()
         while iterations <= 0 or done < iterations:
             now = pd.Timestamp(self.feed.server_now())
@@ -285,8 +293,11 @@ class SignalLoop:
                 self.log(f"error: {self.last['motivo']}")
             self.write_state(now.to_pydatetime())
             if time.time() - last_sync > 600:
-                self.feed.clock_offset()
-                last_sync = time.time()
+                try:
+                    self.feed.clock_offset()
+                    last_sync = time.time()
+                except requests.RequestException as exc:  # sin internet: se sigue con el último desfase
+                    self.log(f"no se pudo sincronizar el reloj ({type(exc).__name__}); se reintenta")
             done += 1
             time.sleep(1.0)
 
@@ -330,7 +341,7 @@ def resumen(runtime: Path) -> dict:
     lat = np.array([f["latencia_s"] for f in filas if f["latencia_s"] is not None], float)
     rb = [f["resultado_binance"] for f in filas if f["resultado_binance"] is not None]
     rp = [f for f in filas if f["resultado_plataforma"] is not None]
-    pagos = np.array([float(f["pago"]) for f in rp if f["pago"] not in (None, "")], float)
+    pagos = np.array([float(f["pago"]) for f in filas if f["pago"] not in (None, "")], float)
     pnl = [((float(f["pago"]) / 100 if f["pago"] not in (None, "") else 0.85) if f["resultado_plataforma"] > 0
             else (-1.0 if f["resultado_plataforma"] < 0 else 0.0)) for f in rp]
 

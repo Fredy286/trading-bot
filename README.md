@@ -115,6 +115,45 @@ Durante la observación en vivo (semanas sin supervisión):
 El estudio completo con datos reales también se puede lanzar desde GitHub: pestaña **Actions →
 «Estudio empírico» → Run workflow**.
 
+### Señales anticipadas para practicar en cuenta DEMO (Estudio 16)
+
+Es el modo pensado para operar **a mano**. El bot decide en el **segundo 50** de cada vela de 1 minuto de
+BTC/USD y avisa con sonido. Hay que hacer clic en la plataforma demo lo antes posible, idealmente antes de
+que cierre la vela.
+
+1. **Una sola vez:** congelar el modelo, entrenado con los 12 meses hasta el 2026-10-25. Es el mismo
+   modelo que se confirmará en enero de 2027, así que no se vuelve a entrenar.
+
+   ```bash
+   .venv/bin/tbot senal entrenar
+   ```
+
+2. **Cada sesión de práctica:**
+
+   ```bash
+   scripts/iniciar_senales.sh
+   ```
+
+   Abre el panel en http://127.0.0.1:8765/senales. Pulse **«Activar sonido»** una vez (los navegadores lo
+   exigen).
+3. **Con cada aviso («↑ SUBE» o «↓ BAJA»):**
+   - abra la operación de 1 minuto en la plataforma demo;
+   - de inmediato pulse **«YA HICE CLIC»** (o la barra espaciadora): así se mide su tiempo de reacción;
+   - anote el precio de entrada y el pago que muestra la plataforma.
+4. **Cuando venza** (60 s después del clic): anote en el diario el resultado (ganó, perdió o empate) y el
+   precio de salida. El bot calcula el mismo resultado con el precio de Binance y muestra si coinciden.
+5. **Pasados 15 s desde el aviso**, el panel dice «TARDE — no entres en esta». Desde ahí ya no hay ventaja
+   medida.
+
+El diario está en `runtime/senales/`. Allí, `clics.jsonl` y `registros.jsonl` son suyos, y `senales.jsonl`
+es del bot. Con unas decenas de operaciones anotadas se puede saber:
+- cuánto tarda usted en hacer clic;
+- si la plataforma sigue el precio de Binance;
+- si devuelve el dinero en empate;
+- cuánto paga de verdad.
+
+Son las condiciones que exige el Estudio 5 antes de cualquier otra cosa. **Nunca con dinero real.**
+
 ## Configuración (variables de entorno)
 
 Todas las opciones están en [`.env.example`](.env.example): instrumentos, horario permitido (hora de

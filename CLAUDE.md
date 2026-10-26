@@ -143,6 +143,12 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      EV +0,056; H16b (s 50, clic +10 s) 57,00 %, EV +0,050; 5/5 trimestres; reloj de 1 s alineado al 100 %.
      H16b tolera 15 s de demora (55,6 %). Confirmación con 2026-10-26 → 2027-01-18. Es el camino para la
      operación MANUAL: el bot debe avisar en el segundo 50 de cada vela.
+   - **Modo de señales anticipadas para DEMO (2026-10-25):** `live/anticipada.py`, panel `/senales`,
+     `tbot senal entrenar|vivo`, `scripts/iniciar_senales.sh`. Aviso en el s 50 con sonido, botón «ya hice
+     clic» (espacio), bloqueo a los 15 s («TARDE»), diario con referencia de Binance por clic. **Pendiente:**
+     `tbot senal entrenar` en cuanto Binance publique el 1m/1s del 2026-10-25 (entrena una sola vez el modelo
+     de la confirmación del Estudio 16; config/senal_anticipada.json guarda el SHA-256). El internet del PC
+     falla a ratos (DNS): el bucle sigue y reintenta.
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).

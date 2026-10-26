@@ -103,6 +103,8 @@
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
+// Pasados 15 s desde el aviso (5 s después del cierre) ya no hay ventaja medida: no se debe entrar (Estudio 16).
+const LATE_S = 15;
 let lastAlert = null, clicked = new Set(), audio = null, offsetMs = 0, current = null;
 const fmtT = (iso) => iso ? new Date(iso).toLocaleTimeString("es-CO", {timeZone: "America/Bogota", hour12: false}) : "—";
 const pct = (x) => x == null ? "—" : (100 * x).toFixed(1) + " %";
@@ -128,6 +130,7 @@ async function post(url, body) {
 }
 async function doClick() {
   if (!current || clicked.has(current.alert_id)) return;
+  if ((Date.now() + offsetMs - new Date(current.decidido).getTime()) / 1000 > LATE_S) return;
   clicked.add(current.alert_id); $("clickbtn").disabled = true;
   const r = await post("/api/senal/clic", {alert_id: current.alert_id});
   const lat = (new Date(r.hora_binance) - new Date(current.decidido)) / 1000;
@@ -156,8 +159,11 @@ function renderSignal(st) {
       $("signal").classList.add(u.lado > 0 ? "flash-up" : "flash-down");
       $("clickbtn").disabled = clicked.has(u.alert_id); $("after").style.display = "none"; $("sub").textContent = "";
     }
-    big.className = u.lado > 0 ? "up" : "down";
-    big.textContent = u.lado > 0 ? "↑ SUBE" : "↓ BAJA";
+    const since = (now - new Date(u.decidido).getTime()) / 1000;
+    const late = since > LATE_S && !clicked.has(u.alert_id);
+    big.className = late ? "none" : (u.lado > 0 ? "up" : "down");
+    big.textContent = late ? "TARDE — no entres en esta" : (u.lado > 0 ? "↑ SUBE" : "↓ BAJA");
+    if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;
     $("countdown").textContent = left > 0 ? `cierre en ${left.toFixed(1)} s` : `${(-left).toFixed(1)} s después del cierre`;
     if (!$("sub").textContent) $("sub").textContent = `BTC/USD · 1 minuto · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
