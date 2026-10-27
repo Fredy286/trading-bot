@@ -1713,3 +1713,86 @@ H16b es la más tolerante: aún con 15 s de demora da 55,6 % y EV +0,027.
 
 **Siguiente paso pre-registrado:** confirmación con los datos del 2026-10-26 al 2027-01-18. Antes de usarla
 en la demo, medir la latencia real del clic del usuario.
+
+## Estudio 17 — Fibonacci («zona dorada») e ICT, desarmados (pre-registro, 2026-10-26, ANTES de calcular nada)
+
+**Origen:** dos transcripciones de videos de redes que trajo el usuario:
+1. **Fibonacci:** marcar el impulso (de su inicio a su fin), esperar a que el retroceso toque la «zona
+   dorada» del **50–61,8 %** y entrar a favor del impulso. Si la estructura es «irregular», la extensión
+   une varios impulsos.
+2. **ICT:** «10 conceptos» (FVG, FVG inverso, *order blocks*, liquidez por tiempo, toma de liquidez,
+   estructura, quiebre de estructura, máximos y mínimos iguales, premium/descuento y desplazamiento).
+
+**Evidencia previa (2026-10-26):**
+- No hay estudios revisados por pares que respalden Fibonacci. Un análisis práctico de 40 243 correcciones
+  concluye que la concentración cerca de sus niveles es la que daría el azar.
+- El único test sistemático de ICT es un preprint (Mahadzva, 2026: walk-forward, permutación y periodo
+  bloqueado en divisas intradía). No encuentra que funcione «tal como se enseña». La toma de liquidez
+  predice **continuación**, no la reversión que se enseña.
+
+**Expectativa declarada:** «SIN SEÑAL» en las dos partes.
+
+### Parte A — ¿la zona dorada es especial? (H17-FIB-BTC, H17-FIB-XAU, H17-FIB-EUR; Bonferroni α = 0,0167)
+
+**Datos:** velas de 15 min (UTC) de BTC/USDT (contado de Binance), XAU/USD y EUR/USD (HistData, velas
+medias), 2022-01-01 → 2025-08-31. Se usan solo las velas con datos.
+
+**Impulsos (zigzag causal):** umbral = 3 × ATR14 de 15 min.
+- Un mínimo de giro queda **confirmado** cuando el cierre sube ≥ umbral sobre el mínimo acumulado desde el
+  último máximo de giro; un máximo, de forma simétrica.
+- Impulso alcista = del mínimo confirmado L al máximo H, en la vela en que H queda confirmado. Bajista:
+  simétrico.
+
+**Retroceso:** desde la confirmación de H, r(t) = (H − mín_t) / (H − L). Bajista: simétrico.
+
+**Eventos:** primer toque de cada zona en ese retroceso, mientras no se toque ni H ni L:
+- Z1 = [0,382; 0,5);
+- **Z2 = [0,5; 0,618] (dorada)**;
+- Z3 = (0,618; 0,786].
+
+El precio de entrada es el borde menos profundo de la zona, en `r_e`.
+
+**Resultado:** a partir de la vela siguiente al toque, qué se alcanza primero:
+- H (continuación, acierto) o L (fallo);
+- si caen en la misma vela, cuenta fallo;
+- sin resolución en 200 velas, el evento se descarta.
+
+**Referencia del azar:** sin tendencia, partiendo de `r_e`, la probabilidad de llegar antes a H es 1 − `r_e`.
+**Exceso** = continuación observada − (1 − `r_e`).
+
+**Criterios por instrumento (los dos):**
+1. límite inferior del IC 98,33 % (bootstrap semanal) del exceso en Z2 > 0;
+2. límite inferior del IC 98,33 % de [exceso Z2 − media(exceso Z1, exceso Z3)] > 0: la zona dorada mejor
+   que sus vecinas.
+
+### Parte B — ¿los conceptos ICT y Fibonacci añaden información a nuestro modelo? (H17-ICT, una hipótesis)
+
+**Diseño:** el del Estudio 15. GBM de BTC a 1 min, `FEATURES` frente a `FEATURES` + bloque nuevo, mismas
+decisiones, etiquetas `h = 1`, `d = 1`, política B, walk-forward con pruebas 2024-07 → 2025-08.
+
+**Bloque nuevo (10 variables; velas de 1 min, causales, fila t con velas hasta su cierre):**
+
+| Variable | Concepto | Definición |
+|---|---|---|
+| `ict_sweep_hi` | Toma de liquidez arriba | 1 si `máx_t` > máx(máx de t−60…t−1) y `cierre_t` < ese máximo; si no, 0 |
+| `ict_sweep_lo` | Toma de liquidez abajo | 1 si `mín_t` < mín(mín de t−60…t−1) y `cierre_t` > ese mínimo |
+| `ict_bos` | Quiebre de estructura | +1 si `cierre_t` > máx(máx de t−60…t−1); −1 si `cierre_t` < mín(mín de t−60…t−1); 0 si no |
+| `ict_fvg` | FVG o desplazamiento en t | (`mín_t` − `máx_{t−2}`) / (`c_t`·vol60) si > 0; (`máx_t` − `mín_{t−2}`) / (`c_t`·vol60) si < 0; 0 si no |
+| `ict_fvg15` | FVG recientes | Nº de FVG alcistas − Nº de bajistas en las velas t−14…t |
+| `ict_pd` | Premium/descuento | (`c_t` − mín de 240) / (máx de 240 − mín de 240) en t−239…t (0,5 si el rango es 0) |
+| `ict_eqh` | Máximos iguales | Nº de velas en t−59…t−1 con (máx de 60 − `máx_j`) ≤ 0,1·vol60·`c_t`, sin contar la del máximo |
+| `ict_eql` | Mínimos iguales | Ídem con los mínimos |
+| `fib_r` | Retroceso actual | Profundidad r del retroceso del último impulso del zigzag de 1 min (umbral 3·ATR14 de 1 min), con signo + si el impulso fue alcista y − si bajista; 0 sin impulso confirmado |
+| `fib_gold` | En zona dorada | 1 si \|`fib_r`\| ∈ [0,5; 0,618], 0 si no |
+
+**Criterios (los 5 del Estudio 15):**
+1. ≥ 300 operaciones;
+2. Wilson 95 % > 54,05 %;
+3. IC 95 % de la mejora de log-loss (bootstrap diario) con límite inferior > 0;
+4. EV de la prueba ≥ EV de la referencia;
+5. EV > 0 en ≥ 60 % de los trimestres.
+
+Control del ítem 39 obligatorio.
+
+**Si la Parte B pasa:** confirmación con los datos del 2026-10-26 al 2027-01-18, como en el Estudio 15.
+**Si no pasa ninguna parte:** SIN SEÑAL. Se documenta qué pieza, si alguna, mostró información.
