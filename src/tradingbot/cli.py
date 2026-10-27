@@ -316,6 +316,22 @@ def cmd_research_study16(a) -> int:
     return 0
 
 
+def cmd_research_study17(a) -> int:
+    from .research import study17
+
+    rep = study17.run()
+    for s, r in rep["parte_a_fibonacci"].items():
+        z = r["zonas"]
+        print(f"Fibonacci {s}: pasa={r['pasa']} | " + " | ".join(
+            f"{k}: {v['eventos']} ev, cont. {v['continuacion']:.3f} vs azar {v['referencia_azar']:.3f}" for k, v in z.items())
+            + f" | dorada − vecinas {r['dorada_menos_vecinas']:+.4f} {r['dorada_menos_vecinas_ic']}")
+    b = rep["parte_b_ict"]
+    print(f"ICT (BTC 1 min): pasa={b['pasa']} | {b['criterios']} | log-loss {b['mejora_logloss']}")
+    for k, v in b["politica_b"].items():
+        print(f"  {k}: {v}")
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -581,6 +597,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study17", help="Estudio 17: Fibonacci (zona dorada) e ICT, desarmados")
+    x.set_defaults(func=cmd_research_study17)
     x = r.add_parser("study16", help="Estudio 16: señal anticipada en el segundo 50/55 (P8)")
     x.add_argument("step", choices=["download", "run"])
     x.add_argument("--n-boot", type=int, default=1000)
