@@ -1796,3 +1796,30 @@ Control del ítem 39 obligatorio.
 
 **Si la Parte B pasa:** confirmación con los datos del 2026-10-26 al 2027-01-18, como en el Estudio 15.
 **Si no pasa ninguna parte:** SIN SEÑAL. Se documenta qué pieza, si alguna, mostró información.
+
+**Resultado (commit a1b2de9, aplicado mecánicamente; `results/estudio17/resultado.json`):**
+
+**Parte A, Fibonacci.** Porcentaje de veces que el precio retoma el impulso antes de volver a su inicio,
+frente a lo que daría el azar:
+
+| Instrumento | Z1 (38,2–50 %) | **Z2 dorada (50–61,8 %)** | Z3 (61,8–78,6 %) | Dorada − vecinas [IC 98,33 %] |
+|---|---|---|---|---|
+| BTC/USDT | 62,7 % vs 61,8 % (656) | **50,0 % vs 50,0 %** (1 257) | 39,2 % vs 38,2 % (1 810) | −0,009 [−0,034; +0,014] |
+| XAU/USD | 62,3 % vs 61,8 % (469) | **50,4 % vs 50,0 %** (754) | 39,7 % vs 38,2 % (1 053) | −0,006 [−0,034; +0,023] |
+| EUR/USD | 60,5 % vs 61,8 % (517) | **49,8 % vs 50,0 %** (791) | 39,5 % vs 38,2 % (1 010) | −0,002 [−0,032; +0,025] |
+
+**Ninguna pasa.** La zona dorada se comporta **exactamente como el azar** en los tres mercados, y no es
+mejor que sus vecinas. El 50 % de «acierto» que se ve en la zona dorada es pura geometría: el precio está a
+la misma distancia del fin y del inicio del impulso.
+
+**Parte B, ICT y Fibonacci en el modelo de BTC a 1 min:**
+
+| Modelo | Operaciones | Acierto [lím. inf.] | EV |
+|---|---|---|---|
+| Referencia | 51 386 | 56,89 % [56,44 %] | +0,048 |
+| + bloque ICT/Fibonacci | 65 730 | 56,30 % [55,90 %] | +0,038 |
+
+- Mejora de log-loss: +0,00002 [IC 95 %: −0,00004; +0,00009], que incluye 0.
+- **No pasa:** fallan los criterios 3 y 4. El bloque no añade información y baja la ganancia esperada.
+
+**Estudio 17: SIN SEÑAL.**

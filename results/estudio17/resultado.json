@@ -1,0 +1,153 @@
+{
+  "estudio": "Estudio 17 — Fibonacci e ICT (pre-registro 30503f6)",
+  "git_sha": "a1b2de991d4b07ee78d0a5ab874372d4d5cfd8d7",
+  "parte_a_fibonacci": {
+    "BTCUSDT": {
+      "simbolo": "BTCUSDT",
+      "impulsos": 5874,
+      "zonas": {
+        "Z1": {
+          "eventos": 656,
+          "continuacion": 0.6265243902439024,
+          "referencia_azar": 0.618,
+          "exceso": 0.008524390243902391
+        },
+        "Z2": {
+          "eventos": 1257,
+          "continuacion": 0.5003977724741447,
+          "referencia_azar": 0.5,
+          "exceso": 0.00039777247414474193
+        },
+        "Z3": {
+          "eventos": 1810,
+          "continuacion": 0.39171270718232043,
+          "referencia_azar": 0.382,
+          "exceso": 0.009712707182320424
+        }
+      },
+      "exceso_dorada_ic": [
+        -0.03215555837787445,
+        0.0318170545162801
+      ],
+      "dorada_menos_vecinas": -0.008720776238966665,
+      "dorada_menos_vecinas_ic": [
+        -0.03372754337120237,
+        0.014286866168755892
+      ],
+      "criterios": {
+        "exceso_dorada_positivo": false,
+        "dorada_mejor_que_vecinas": false
+      },
+      "pasa": false
+    },
+    "XAUUSD": {
+      "simbolo": "XAUUSD",
+      "impulsos": 3485,
+      "zonas": {
+        "Z1": {
+          "eventos": 469,
+          "continuacion": 0.6226012793176973,
+          "referencia_azar": 0.618,
+          "exceso": 0.004601279317697271
+        },
+        "Z2": {
+          "eventos": 754,
+          "continuacion": 0.5039787798408488,
+          "referencia_azar": 0.5,
+          "exceso": 0.003978779840848823
+        },
+        "Z3": {
+          "eventos": 1053,
+          "continuacion": 0.3969610636277303,
+          "referencia_azar": 0.382,
+          "exceso": 0.014961063627730309
+        }
+      },
+      "exceso_dorada_ic": [
+        -0.03678297386821504,
+        0.04302271100067385
+      ],
+      "dorada_menos_vecinas": -0.005802391631864967,
+      "dorada_menos_vecinas_ic": [
+        -0.03354661386129911,
+        0.022620698540328076
+      ],
+      "criterios": {
+        "exceso_dorada_positivo": false,
+        "dorada_mejor_que_vecinas": false
+      },
+      "pasa": false
+    },
+    "EURUSD": {
+      "simbolo": "EURUSD",
+      "impulsos": 3805,
+      "zonas": {
+        "Z1": {
+          "eventos": 517,
+          "continuacion": 0.6054158607350096,
+          "referencia_azar": 0.618,
+          "exceso": -0.012584139264990357
+        },
+        "Z2": {
+          "eventos": 791,
+          "continuacion": 0.49810366624525915,
+          "referencia_azar": 0.5,
+          "exceso": -0.0018963337547408532
+        },
+        "Z3": {
+          "eventos": 1010,
+          "continuacion": 0.39504950495049507,
+          "referencia_azar": 0.382,
+          "exceso": 0.013049504950495061
+        }
+      },
+      "exceso_dorada_ic": [
+        -0.043163809144072314,
+        0.03836452114505532
+      ],
+      "dorada_menos_vecinas": -0.002129016597493205,
+      "dorada_menos_vecinas_ic": [
+        -0.03166305262864589,
+        0.024606216258759715
+      ],
+      "criterios": {
+        "exceso_dorada_positivo": false,
+        "dorada_mejor_que_vecinas": false
+      },
+      "pasa": false
+    }
+  },
+  "parte_b_ict": {
+    "politica_b": {
+      "referencia": {
+        "operaciones": 51386,
+        "acierto": 0.5689233192159533,
+        "lo95": 0.5644399954857495,
+        "ev": 0.048013077491923864,
+        "trimestres_ev_positivo": 1.0
+      },
+      "prueba": {
+        "operaciones": 65730,
+        "acierto": 0.5629995376180725,
+        "lo95": 0.5590449791325063,
+        "ev": 0.038278563821694804,
+        "trimestres_ev_positivo": 1.0
+      }
+    },
+    "mejora_logloss": {
+      "media": 2.454278345831971e-05,
+      "ic95": [
+        -4.188004378281542e-05,
+        8.668438222909084e-05
+      ]
+    },
+    "criterios": {
+      "min_300": true,
+      "wilson": true,
+      "mejora_logloss": false,
+      "ev_no_menor": false,
+      "trimestres_60": true
+    },
+    "pasa": false
+  }
+}

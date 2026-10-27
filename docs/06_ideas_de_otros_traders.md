@@ -29,6 +29,7 @@ entretenido u optimista, no lo que funciona. Por eso aquí nada se acepta sin pr
 | **Confundir relación simultánea con anticipación** | «El oro y el dólar van al revés» | Es cierto en el mismo momento (correlación −0,40), pero eso no dice qué hará el oro **después** | Solo cuenta lo que se sabe antes de entrar |
 | **Captura de una sola operación ganadora** | «XAUUSD buy 10, +9 266 USD», «cobré 9,8 lotes» | Una ganancia no dice nada sin todas las pérdidas. Cerrar parciales no cambia la ganancia esperada | Solo cuentan los historiales completos |
 | **Respuestas imposibles de comprobar** | «¿Cómo ves la dirección?» → «descuentos y desplazamientos» | Si no se puede escribir como regla exacta, no se puede probar | Cada regla se escribe completa antes de probarla |
+| **Un 50 % que parece «funcionar»** | «El precio rebota en la zona dorada» | Desde la mitad del impulso, cualquier punto da 50 % de llegar arriba antes que abajo: es geometría, no Fibonacci | Se compara siempre con la referencia del azar y con zonas vecinas (Estudio 17) |
 | **Mostrar el mejor mes** | Capturas de canales | De 1 000 canales al azar, 124 muestran ≥ 90 % en un mes | Muestra fija y datos nuevos |
 | **Comprar indicadores** | Isaac Martínez: «no conozco un solo trader que haya hecho mucho dinero comprando indicadores» | — | Coincide con lo medido: el Golden BIAS reconstruido pierde (Estudio 8) |
 
@@ -44,6 +45,8 @@ entretenido u optimista, no lo que funciona. Por eso aquí nada se acepta sin pr
 | Comentario de Facebook (Danny Roggers) | RSI diario + semanal, estructura 4H, entrada 15M | 9 | SIN SEÑAL: acierta < 50 % |
 | Video de redes: oro + índice del dólar | Correlación negativa (< 0) + oro en zona de demanda + DXY respetando su zona de oferta | 10 | SIN SEÑAL: 48,2 % a 15 min y 49,9 % a 60 min. El filtro evita el 89 % de las perdedoras… y el 90 % de las ganadoras |
 | Video «regla de la primera vela» + capturas de «Smart Money Concept» | Rango de 9:30–9:35 NY, ruptura con FVG, retesteo con envolvente, 3:1 | 11 | SIN SEÑAL: Nasdaq −0,18 R, S&P −0,09 R, oro −0,34 R por operación; TP solo 23–28 % |
+| Video «Así se usa Fibonacci» | Retroceso al 50–61,8 % («zona dorada») y extensiones | 17 A | SIN SEÑAL: en BTC, oro y EUR/USD la zona dorada se comporta exactamente como el azar (50,0 / 50,4 / 49,8 % frente a 50 % de referencia) y no es mejor que sus vecinas |
+| Video «10 conceptos ICT» | FVG, toma de liquidez, quiebre de estructura, premium/descuento, máximos y mínimos iguales | 17 B | SIN SEÑAL: no mejora el modelo de BTC (log-loss sin cambio; EV baja de +0,048 a +0,038). Un preprint de 2026 tampoco encuentra ventaja en ICT y muestra que el barrido de liquidez predice **continuación** |
 | Comentario de Facebook (Roger Va Cr) | Mapa de calor del libro, CVD, muros | — | No se puede probar con datos históricos gratuitos del libro completo. Lo más cercano (flujo agresor) ya falló en el Estudio 3. Candidata futura: profundidad agregada del libro de futuros de Binance |
 
 **Lo que sí funcionó:** solo el modelo propio de BTC a 1 minuto (Estudio 5, H5a: 56,11 % con datos nuevos

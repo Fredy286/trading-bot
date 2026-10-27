@@ -149,6 +149,10 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      `tbot senal entrenar` en cuanto Binance publique el 1m/1s del 2026-10-25 (entrena una sola vez el modelo
      de la confirmación del Estudio 16; config/senal_anticipada.json guarda el SHA-256). El internet del PC
      falla a ratos (DNS): el bucle sigue y reintenta.
+   - **Modelo de señales anticipadas CONGELADO (2026-10-26):** `BTCUSDT-anticipada-k50-L10-35b764`, SHA-256 5ebfa485…
+     (config/senal_anticipada.json); la demo ya se puede usar con `scripts/iniciar_senales.sh`.
+   - **Estudio 17 (Fibonacci «zona dorada» + ICT):** SIN SEÑAL. Zona dorada = azar (50,0/50,4/49,8 % vs 50 %) en
+     BTC/oro/EUR; bloque ICT no mejora el GBM de BTC (EV 0,048 → 0,038).
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).
