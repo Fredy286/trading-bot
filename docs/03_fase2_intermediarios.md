@@ -86,6 +86,20 @@ movimiento absoluto medio es de 2,8 pb.
 | Kalshi, Nadex, Crypto.com NA | Contratos de eventos | Sí | **Solo residentes en EE. UU.** | No aplica |
 | IQ Option, Quotex, Pocket Option, Olymp Trade, Binomo | **Sí**, desde 1 min | **No hay API oficial** | Del exterior, sin supervisión de la SFC | Automatizar exige herramientas no oficiales: viola términos y expone credenciales. **Solo manual** |
 
+**Pagos reales de Deriv consultados con su API pública (`proposal`, 2026-10-27, apuesta de 10 USD, CALL):**
+- EUR/USD a 15 min: 83,5 % (equilibrio 54,5 %);
+- oro a 5 min: 69,5 % (equilibrio 59,0 %);
+- oro a 15 min: 73,6 % (equilibrio 57,6 %).
+
+GBP/USD y USD/JPY también tienen Rise/Fall desde 15 min. La API entrega velas de 1 min (`ticks_history`)
+sin cuenta.
+
+**IQ Option (comprobado por el usuario, 2026-10-27):**
+- BTC solo en binaria de 15 min (**pago 87 %**, equilibrio 53,5 %) y «blitz» de 3 min (cerrado en ese
+  momento);
+- las divisas y criptos que muestra la portada están marcadas **OTC**: precio generado por la
+  plataforma.
+
 **Conclusión (2026-10-25):** hoy **no existe** una vía legal, con API oficial y accesible desde Colombia,
 para automatizar un contrato de pago fijo de 1 minuto sobre BTC. Quedan tres caminos:
 1. **Anticipar la señal** para que el clic manual caiga justo al cierre. En vez de avisar después del
