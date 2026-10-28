@@ -2337,3 +2337,35 @@ HistData de 1 min, bid (`data/raw/histdata_pares/`).
   y la regla de empate a esas horas (16:00–19:00 en Bogotá).
 
 **Expectativa:** si el efecto es real, ~54–55 %; es decir, cerca del equilibrio y probablemente **no** rentable.
+
+**Resultado de H25 (commit del código del Estudio 25, aplicado mecánicamente; `results/estudio25/resultado.json`).**
+Con los criterios pre-registrados, **PASA**:
+- 71 438 operaciones; acierto **57,30 %** [56,93 %]; EV +0,058;
+- los 14 meses con EV > 0;
+- con el empate contado como pérdida, 54,96 %.
+
+**Pero la advertencia declarada de antemano se confirma.** Las dos direcciones no se comportan igual:
+
+| Momento | CALL (precio bajo la banda) | PUT (sobre la banda) |
+|---|---|---|
+| 0–5 min después de las 17:00 de Nueva York (cierre diario, el diferencial se abre) | **75,5 %** | 62,0 % |
+| 5 min antes de las 17:00 | 21,9 % | 79,5 % |
+| A más de 60 min del cierre | **61,6 %** | 53,2 % |
+
+Una reversión de verdad sería parecida en las dos direcciones. Con precios solo bid, cuando el diferencial
+se abre el bid «cae» sin que el mercado se mueva, y vuelve cuando se cierra. Eso regala aciertos a las CALL.
+**No se puede declarar operable** con datos bid.
+
+### Verificación de H25 con precio medio (pre-registro, 2026-10-27, ANTES de descargar los ticks)
+
+- **Datos:** ticks de HistData (bid y ask) de los 6 pares con mayor acierto en H25 (EURGBP, EURCHF, EURAUD,
+  GBPCAD, CHFJPY, EURJPY) y de los meses 2026-04 → 2026-09. Con ellos se construyen velas de 1 min con el
+  **precio medio** (bid + ask) / 2; se usa el último tick de cada minuto.
+- **Regla:** la misma de H25, sobre esas velas.
+- **Criterio (todos):**
+  1. acierto con precio medio > 54,05 % con límite de Wilson > 54,05 %;
+  2. diferencia entre CALL y PUT < 5 puntos.
+
+  Si no se cumple, H25 se declara **artefacto del precio bid** y P10 se descarta.
+- **Informativo:** el mismo cálculo con el bid de los ticks, para comprobar que reproduce lo de las velas de
+  HistData.
