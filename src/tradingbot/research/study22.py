@@ -139,11 +139,13 @@ def catalog_rule(col: np.ndarray, idx: pd.DatetimeIndex, days: int = 10, thr: fl
     green = (piv == 1).astype(float).where(piv.notna())
     red = (piv == -1).astype(float).where(piv.notna())
     cnt = piv.notna().astype(float)
-    # Últimos `days` días de cada columna con vela, excluyendo el día actual
-    g = green.shift(1).rolling(days, min_periods=1).sum()
-    r = red.shift(1).rolling(days, min_periods=1).sum()
-    n = cnt.shift(1).rolling(days, min_periods=1).sum()
-    full = n == days
+    # Últimos `days` días CON vela en ese HH:MM (no días de calendario: en divisas el domingo casi no tiene velas),
+    # excluyendo el día actual
+    def past(x: pd.DataFrame) -> pd.DataFrame:
+        return x.apply(lambda s: s.dropna().shift(1).rolling(days).sum().reindex(s.index))
+
+    g, r, n = past(green), past(red), past(cnt.where(piv.notna()))
+    full = (n == days) & piv.notna()
     d = np.where(full & (g / n >= thr), 1.0, np.where(full & (r / n >= thr), -1.0, np.nan))
     out = pd.DataFrame(d, index=piv.index, columns=piv.columns).stack()
     t = pd.DatetimeIndex([dd + pd.Timedelta(minutes=int(m)) for dd, m in out.index])
