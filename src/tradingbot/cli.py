@@ -345,6 +345,18 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study20(a) -> int:
+    from .research import study20
+
+    rep = study20.run()
+    for h, r in rep["hipotesis"].items():
+        print(f"{h} (pago {r['pago']:.0%}, cuarto de hora={r['cuarto_de_hora']}): pasa={r['pasa']} | {r['criterios']}")
+        print(f"  {r['operaciones']} ops ({r['por_dia']:.1f}/día) | acierto {r['acierto']} [{r['lo95']}] | EV {r['ev']} {r['ev_ic']}")
+        for m, v in r["mensual"].items():
+            print(f"    {m}: {v['operaciones']} ops, acierto {v['acierto']:.4f}, EV {v['ev']:+.4f}")
+    return 0
+
+
 def cmd_research_study19(a) -> int:
     from .research import study19
 
@@ -625,6 +637,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study20", help="Estudio 20: repetición mes a mes 2025-09 → 2026-10 del modelo H16b")
+    x.set_defaults(func=cmd_research_study20)
     x = r.add_parser("study19", help="Estudio 19: vencimiento fijo cada 15 min, entrar R min antes (pago 87 %%)")
     x.set_defaults(func=cmd_research_study19)
     x = r.add_parser("study18", help="Estudio 18: aviso anticipado con BTC a 3, 5 y 15 min")
