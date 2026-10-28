@@ -2047,8 +2047,17 @@ calibración de esos modelos no llegó a 0,60). De los meses con ≥ 100 señale
 66 %. Hipótesis nueva, sin decidir nada aquí: Estudio 21.
 
 **Verificación del «efecto cuarto de hora»:** en los Estudios 19 y 20 las velas alineadas al cuarto de hora
-quedaron por debajo del total. En la verificación 2024-07 → 2025-08, en cambio, quedaron por encima
-(55,9 % frente a 56,9 %; sin patrón por minuto). Conclusión: es azar por la muestra pequeña, no un efecto.
+quedaron por debajo del total, pero la comparación mezclaba dos cosas. Con pago 87 % el filtro de EV admite
+señales de menor probabilidad. Con la misma regla, la diferencia casi desaparece:
+
+| Regla | Periodo | Alineadas | Resto |
+|---|---|---|---|
+| pago 85 % | 2025-09 → 2026-10 | 56,6 % (1 279) | 57,7 % (18 539) |
+| pago 85 % | 2024-07 → 2025-08 | 56,6 % (1 702) | 56,9 % (24 353) |
+| pago 87 % | 2024-07 → 2025-08 | 55,9 % | 56,0 % |
+
+Conclusión: no hay un efecto especial del cuarto de hora. El modo `--cuarto 1` pierde sobre todo porque
+tiene 15 veces menos señales, no porque esas velas sean peores.
 
 ## Estudio 21 — umbral de confianza p ≥ 0,60 con el modelo congelado (pre-registro, 2026-10-27, ANTES de ver datos posteriores al 2026-10-25)
 
