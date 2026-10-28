@@ -345,6 +345,18 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study22(a) -> int:
+    from .research import study22
+
+    rep = study22.run()
+    for sym, rules in rep["reglas"].items():
+        for r, x in rules.items():
+            print(f"{sym} {r}: {x['operaciones']} ops | acierto {x['acierto'] and round(x['acierto'], 4)} "
+                  f"[{x['lo95']:.4f}] | EV {x['ev'] and round(x['ev'], 4)} | p_holm {x['p_holm']:.3g} | pasa={x['pasa']}")
+    print(f"Pasan {len(rep['pasan'])} de {rep['n_hipotesis']}: {rep['pasan']}")
+    return 0
+
+
 def cmd_research_study20(a) -> int:
     from .research import study20
 
@@ -637,6 +649,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study22", help="Estudio 22: estrategias de comunidades de binarias (MHI, Torres, catalogación…)")
+    x.set_defaults(func=cmd_research_study22)
     x = r.add_parser("study20", help="Estudio 20: repetición mes a mes 2025-09 → 2026-10 del modelo H16b")
     x.set_defaults(func=cmd_research_study20)
     x = r.add_parser("study19", help="Estudio 19: vencimiento fijo cada 15 min, entrar R min antes (pago 87 %%)")
