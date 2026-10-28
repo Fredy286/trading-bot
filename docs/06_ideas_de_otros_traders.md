@@ -52,7 +52,7 @@ entretenido u optimista, no lo que funciona. Por eso aquí nada se acepta sin pr
 | Bots de Pocket Option / guías de Quotex (GitHub, India) | SMA3/SMA8 + 3 cierres; EMA20/EMA50 + RSI14; EMA5/EMA20 + RSI 50 | 22 | SIN SEÑAL: 47,6–50,0 % (por debajo del azar) |
 | «Listas de señales» (catalogadores) | Horarios HH:MM que acertaron ≥ 80 % en los últimos 10 días | 22 | SIN SEÑAL: al día siguiente aciertan 50,0–51,5 %: es elegir el pasado, no predecir |
 | Turn Over (IQ Option, 15 min) | Vela de :45 → contra en la de :00 | 22 | SIN SEÑAL: 51,1–52,4 % |
-| smart-lab.ru (Rusia) | Bollinger (20, 2) con reversión, 3 min, 21–24 UTC | 22 | **La única con algo de información:** 53,3–55,6 % (2025–26) y 54,7–57,6 % (2021–25) en divisas. No pasa Holm, cae a 51,5–52,8 % si el empate pierde y se debilita con los años. Candidata P10 (docs/08) |
+| smart-lab.ru (Rusia) | Bollinger (20, 2) con reversión, 3 min, 21–24 UTC | 22, 25, 27 | **Desarmada y pasa el desarrollo** (Estudio 27: 57,2 % con precio medio y clic a +10 s en 24 pares). Antes, en el Estudio 22: 53,3–55,6 % (2025–26) y 54,7–57,6 % (2021–25) en divisas. No pasa Holm, cae a 51,5–52,8 % si el empate pierde y se debilita con los años. Candidata P10 (docs/08) |
 | 70 canales públicos de Telegram (pt, es, en, ru, id, hi) | Señales publicadas a diario (55 887 extraídas; 33 186 no OTC) | 23 | SIN SEÑAL: con ~20 000 señales publicadas ANTES de la entrada, la primera entrada acierta 49–51 % (como el azar). Lo que anuncian (83–99 %) es con gale; Tigers y VIPBinary publican casi todo después de la hora |
 
 **Lo que sí funcionó:** solo el modelo propio de BTC a 1 minuto:

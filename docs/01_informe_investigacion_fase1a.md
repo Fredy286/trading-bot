@@ -2456,3 +2456,40 @@ casi todos los minutos de XRP y DOGE quedarían como empate.
 **Nota de implementación del Estudio 27 (antes de descargar):** un precio de entrada o de salida solo vale si su
 último tick tiene ≤ 60 s de antigüedad; si no, la operación no se cuenta. La señal se calcula con velas de 1 min
 del precio medio, construidas con los mismos ticks.
+
+**Resultado del Estudio 26 (commit 83d434e, aplicado mecánicamente; `results/estudio26/resultado.json`).**
+
+| Moneda | Con p ≥ 0,60: operaciones | Acierto [lím. inf.] | Etiqueta robusta | Sin umbral (robusta) | Veredicto |
+|---|---|---|---|---|---|
+| **ETH/USDT** | 653 | **58,80 %** [54,97 %], EV +0,087 | 60,62 % | 54,80 % (55,13 %) | **PASA** |
+| XRP/USDT | 0 (la probabilidad máxima fue 0,576) | — | — | 54,75 % (54,43 %) | no pasa |
+| SOL/USDT | 0 (máx. 0,578) | — | — | 54,35 % (54,54 %) | no pasa |
+| DOGE/USDT | 0 | — | — | 51,44 % (51,80 %) | no pasa |
+
+**Lectura:**
+- Con aviso anticipado y clic a +10 s, el modelo de las otras monedas casi nunca está seguro. El 62,9 % de XRP
+  del Estudio 13 venía de entrar justo al cierre.
+- ETH pasa, pero con pocas señales (653 en 14 meses). Hipótesis para confirmar con modelo congelado y datos
+  nuevos.
+
+**Resultado del Estudio 27 (commit 8d2abb4, aplicado mecánicamente; `results/estudio27/resultado.json`).**
+24 pares, precio medio de ticks, 2026-04 → 2026-09:
+
+| Hipótesis | Clic | Operaciones | Acierto [lím. inf.] | Empate = pierde | CALL / PUT | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|---|---|
+| **H27a** | +5 s | 31 195 | **57,58 %** [57,03 %] | 56,15 % | 58,1 / 57,1 % | 6 de 6 | **PASA** |
+| **H27b** | +10 s | 31 166 | **57,17 %** [56,61 %] | 55,71 % | 57,6 / 56,7 % | 6 de 6 | **PASA** |
+
+**Informativo:**
+- **Por clic:** 0 s 59,5 %; 2 s 58,0 %; 20 s 56,4 %; 30 s 55,8 %.
+- **Por hora (UTC, clic +10 s):** 21 h 54,2 %; **22 h 62,3 %**; 23 h 54,8 %. De abril a septiembre (horario de
+  verano de Nueva York), 22 UTC es una hora después del cierre de Nueva York, es decir, las 17:00 de Bogotá.
+- **Mejores pares (clic +10 s):** GBPCAD 61,9 %, EURCHF 61,4 %, CADCHF 60,1 %, EURAUD y EURGBP 59,0 %.
+  Peores: NZDUSD 53,3 %, NZDCAD 54,4 %.
+- **Equilibrio según el pago:** 80 % → 55,6 % (rentable); 75 % → 57,1 % (justo); 70 % → 58,8 % (no).
+- **Señales:** unas 200 por día hábil entre los 24 pares.
+
+**Advertencias:**
+- Es precio medio de HistData. Cada plataforma tiene su propio precio, y de noche su diferencial y su pago
+  pueden ser peores.
+- La confirmación con datos posteriores al 2026-10-25 sigue pendiente (pre-registrada).

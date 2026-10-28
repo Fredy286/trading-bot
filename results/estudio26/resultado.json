@@ -1,0 +1,282 @@
+{
+  "estudio": "Estudio 26 — aviso anticipado + umbral en otras monedas (pre-registro a5d8adf)",
+  "git_sha": "83d434e3b4bd11cebc2c3b08acf81a2e9b4d1d0f",
+  "periodo": [
+    "2025-09-01",
+    "2026-10-25"
+  ],
+  "monedas": {
+    "XRPUSDT": {
+      "tic": 0.0001,
+      "tic_relativo_pb": 0.5185108368764907,
+      "operaciones": 0,
+      "por_dia": 0.0,
+      "acierto": null,
+      "lo95": null,
+      "p": 1.0,
+      "ev": null,
+      "ev_ic": [
+        null,
+        null
+      ],
+      "meses_ev_positivo": 0.0,
+      "mensual": {},
+      "criterios": {
+        "min_300": false,
+        "p_bonferroni": false,
+        "wilson": false,
+        "meses_60": false,
+        "robusta": false
+      },
+      "pasa": false,
+      "etiqueta_robusta": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "meses_ev_positivo": 0.0
+      },
+      "todas_sin_umbral": {
+        "operaciones": 1505,
+        "por_dia": 6.117886178861789,
+        "acierto": 0.5475206611570248,
+        "lo95": 0.5218268476747946,
+        "p": 0.3061357910667924,
+        "ev": 0.012458471760797335,
+        "ev_ic": [
+          -0.03527697955401745,
+          0.05584819562733929
+        ],
+        "meses_ev_positivo": 0.6666666666666666
+      },
+      "todas_sin_umbral_robusta": {
+        "operaciones": 1505,
+        "por_dia": 6.117886178861789,
+        "acierto": 0.5442779291553134,
+        "lo95": 0.5187180668202741,
+        "p": 0.3972472747435844,
+        "ev": 0.00674418604651162,
+        "ev_ic": [
+          -0.04422482104844562,
+          0.04556326203609281
+        ],
+        "meses_ev_positivo": 0.6666666666666666
+      },
+      "empates": 0.06175054400666698
+    },
+    "SOLUSDT": {
+      "tic": 0.01,
+      "tic_relativo_pb": 0.719165767709457,
+      "operaciones": 0,
+      "por_dia": 0.0,
+      "acierto": null,
+      "lo95": null,
+      "p": 1.0,
+      "ev": null,
+      "ev_ic": [
+        null,
+        null
+      ],
+      "meses_ev_positivo": 0.0,
+      "mensual": {},
+      "criterios": {
+        "min_300": false,
+        "p_bonferroni": false,
+        "wilson": false,
+        "meses_60": false,
+        "robusta": false
+      },
+      "pasa": false,
+      "etiqueta_robusta": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "meses_ev_positivo": 0.0
+      },
+      "todas_sin_umbral": {
+        "operaciones": 2020,
+        "por_dia": 11.60919540229885,
+        "acierto": 0.5434782608695652,
+        "lo95": 0.5206513884163301,
+        "p": 0.4094879793423901,
+        "ev": 0.0049504950495049506,
+        "ev_ic": [
+          -0.04037339824138393,
+          0.049825745400888764
+        ],
+        "meses_ev_positivo": 0.5
+      },
+      "todas_sin_umbral_robusta": {
+        "operaciones": 2020,
+        "por_dia": 11.60919540229885,
+        "acierto": 0.5453592029365496,
+        "lo95": 0.5229413971584985,
+        "p": 0.3450451055892802,
+        "ev": 0.008415841584158404,
+        "ev_ic": [
+          -0.040872360467009115,
+          0.060348455774411475
+        ],
+        "meses_ev_positivo": 0.6666666666666666
+      },
+      "empates": 0.07826089832201226
+    },
+    "ETHUSDT": {
+      "tic": 0.01,
+      "tic_relativo_pb": 0.03949259908693111,
+      "operaciones": 653,
+      "por_dia": 7.175824175824176,
+      "acierto": 0.5879629629629629,
+      "lo95": 0.5496552423429536,
+      "p": 0.008437969979268255,
+      "ev": 0.08705972434915771,
+      "ev_ic": [
+        0.030524985933643067,
+        0.14146146394878714
+      ],
+      "meses_ev_positivo": 1.0,
+      "mensual": {
+        "2026-04": {
+          "operaciones": 327,
+          "acierto": 0.6068111455108359,
+          "ev": 0.12110091743119264
+        },
+        "2026-05": {
+          "operaciones": 138,
+          "acierto": 0.5693430656934306,
+          "ev": 0.052898550724637686
+        },
+        "2026-06": {
+          "operaciones": 188,
+          "acierto": 0.5691489361702128,
+          "ev": 0.0529255319148936
+        }
+      },
+      "criterios": {
+        "min_300": true,
+        "p_bonferroni": true,
+        "wilson": true,
+        "meses_60": true,
+        "robusta": true
+      },
+      "pasa": true,
+      "etiqueta_robusta": {
+        "operaciones": 653,
+        "por_dia": 7.175824175824176,
+        "acierto": 0.6061538461538462,
+        "lo95": 0.5680729952378929,
+        "p": 0.00043041412007445727,
+        "ev": 0.1208269525267994,
+        "ev_ic": [
+          0.06150207900207897,
+          0.17554180240713077
+        ],
+        "meses_ev_positivo": 1.0
+      },
+      "todas_sin_umbral": {
+        "operaciones": 13925,
+        "por_dia": 33.154761904761905,
+        "acierto": 0.5480131243164419,
+        "lo95": 0.5396713805124742,
+        "p": 0.04023573949134645,
+        "ev": 0.013615798922800706,
+        "ev_ic": [
+          0.00023387145380765354,
+          0.030734128594646536
+        ],
+        "meses_ev_positivo": 0.6428571428571429
+      },
+      "todas_sin_umbral_robusta": {
+        "operaciones": 13925,
+        "por_dia": 33.154761904761905,
+        "acierto": 0.5513285900972847,
+        "lo95": 0.5430093560481405,
+        "p": 0.0056484109942816114,
+        "ev": 0.019741472172351875,
+        "ev_ic": [
+          0.00697462628636252,
+          0.03801547028438074
+        ],
+        "meses_ev_positivo": 0.6428571428571429
+      },
+      "empates": 0.016859246129119734
+    },
+    "DOGEUSDT": {
+      "tic": 1e-05,
+      "tic_relativo_pb": 0.6724497343823549,
+      "operaciones": 0,
+      "por_dia": 0.0,
+      "acierto": null,
+      "lo95": null,
+      "p": 1.0,
+      "ev": null,
+      "ev_ic": [
+        null,
+        null
+      ],
+      "meses_ev_positivo": 0.0,
+      "mensual": {},
+      "criterios": {
+        "min_300": false,
+        "p_bonferroni": false,
+        "wilson": false,
+        "meses_60": false,
+        "robusta": false
+      },
+      "pasa": false,
+      "etiqueta_robusta": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "meses_ev_positivo": 0.0
+      },
+      "todas_sin_umbral": {
+        "operaciones": 1877,
+        "por_dia": 8.649769585253456,
+        "acierto": 0.5144149236856982,
+        "lo95": 0.4911182653953959,
+        "p": 0.987014311432053,
+        "ev": -0.04555141182738413,
+        "ev_ic": [
+          -0.0831946829941191,
+          0.009810579046137167
+        ],
+        "meses_ev_positivo": 0.375
+      },
+      "todas_sin_umbral_robusta": {
+        "operaciones": 1877,
+        "por_dia": 8.649769585253456,
+        "acierto": 0.518005540166205,
+        "lo95": 0.4949399149180134,
+        "p": 0.9740059103809039,
+        "ev": -0.04009057005860417,
+        "ev_ic": [
+          -0.08244556944794817,
+          0.014080178165712779
+        ],
+        "meses_ev_positivo": 0.375
+      },
+      "empates": 0.0727085720711112
+    }
+  }
+}

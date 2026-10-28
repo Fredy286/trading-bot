@@ -176,6 +176,13 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      en data/raw/senales_terceros/ (no versionado). Pares de HistData 2020–2026 en data/raw/histdata_pares/.
    - **Estudio 24 (ETH y BTC/USDC en los segundos 0–49):** H24a (ETH) no pasa (mejora el log-loss pero baja el
      acierto de la política en los dos periodos). H24b (BTC/USDC) tampoco pasa.
+   - **Estudio 25/27 (reversión nocturna en divisas, regla de smart-lab desarmada):** en 24 pares nuevos pasa; con
+     precio medio de ticks (bid+ask, HistData) y clic a +10 s, **57,17 %** [56,61 %] en 31 166 ops, CALL/PUT
+     simétricos, 6/6 meses; a las 22 UTC, 62,3 %. Con precio bid había un artefacto (CALL 75 % justo tras el cierre
+     de NY). Falta: confirmación con datos > 2026-10-25 y que el usuario verifique pares no OTC, vencimiento de
+     3 min y pago entre 16:00 y 19:00 de Bogotá. Ticks en data/raw/histdata_ticks_seg/.
+   - **Estudio 26 (aviso anticipado + umbral p ≥ 0,60 en otras monedas):** solo ETH pasa (653 ops, 58,8 %); XRP, SOL y
+     DOGE nunca llegan a p 0,60 con clic a +10 s.
    - **Lección de los Estudios 20–24:** lo único que sube el acierto es **filtrar por confianza** del propio
      modelo (p ≥ 0,60 → ~60–62 %). Sumar variables de terceros, de otros mercados o de canales no lo mejora.
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
