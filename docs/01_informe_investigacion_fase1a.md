@@ -1876,3 +1876,24 @@ mismo aviso anticipado (segundo 50, clic 10 s después), ¿hay ventaja aprovecha
 - Si alguna pasa, se pre-registra su confirmación con los datos del 2026-10-26 al 2027-01-18 y se añade
   esa duración al modo de señales de la demo, marcada «experimental».
 - Si ninguna pasa, SIN SEÑAL para esas duraciones.
+
+**Resultado de la fase de desarrollo (commit e286b2c, aplicado mecánicamente; `results/estudio18/dev.json`).**
+Prueba 2024-07 → 2025-08, aviso en el segundo 50 y clic a +10 s:
+
+| Hipótesis | Operaciones (por día) | Acierto [lím. inf. 95 %] | p | EV [IC 98,33 %] | Una a la vez: ops/día, acierto, EV |
+|---|---|---|---|---|---|
+| H18-3 (3 min) | 30 680 (84) | 54,09 % [53,53 %] | — | +0,001 [−0,016; +0,018] | 55/día, 53,5 %, −0,010 |
+| H18-5 (5 min) | 22 691 (54) | **54,70 %** [54,05 %] | 0,025 | +0,012 [−0,016; +0,039] | 26/día, 54,0 %, −0,000 |
+| H18-15 (15 min) | 69 206 (162) | 54,19 % [53,82 %] | 0,24 | +0,002 [−0,021; +0,025] | 28/día, 54,1 %, +0,001 |
+
+**Veredicto: ninguna pasa.** Las tres quedan en ~54 %, justo en el punto de equilibrio con pago del 85 %.
+**Estudio 18: SIN SEÑAL** con pago del 85 %.
+
+**Lectura:**
+- La ventaja de BTC está concentrada en el **contrato de 1 minuto** (57,0 % en el Estudio 16). A 3–15
+  minutos se diluye hasta el empate económico.
+- Con pago del 80 % todas pierden: EV entre −0,025 y −0,015.
+- **Observación posterior a ver los datos (no es evidencia):** el punto de equilibrio baja si el pago es
+  mayor. Con 54,1–54,7 % de acierto, un pago del **90 %** daría EV de +0,028 a +0,039 por operación. Si
+  la plataforma paga ≥ 90 % en esas duraciones, haría falta un estudio nuevo con ese pago, confirmado con
+  datos nuevos.

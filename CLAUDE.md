@@ -153,6 +153,11 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      (config/senal_anticipada.json); la demo ya se puede usar con `scripts/iniciar_senales.sh`.
    - **Estudio 17 (Fibonacci «zona dorada» + ICT):** SIN SEÑAL. Zona dorada = azar (50,0/50,4/49,8 % vs 50 %) en
      BTC/oro/EUR; bloque ICT no mejora el GBM de BTC (EV 0,048 → 0,038).
+   - **IQ Option (comprobado por el usuario, 2026-10-27):** NO hay BTC/USD a 1 minuto; solo binaria de 15 min y
+     «blitz» de 3 min. Registro de errores 41 (se recomendó sin comprobar).
+   - **Estudio 18 (aviso anticipado con BTC a 3/5/15 min):** SIN SEÑAL con pago 85 % (54,09 / 54,70 / 54,19 %).
+     La ventaja vive en el contrato de 1 min. Con pago ≥ 90 % el equilibrio baja (post hoc): pedir al usuario
+     el pago real de su plataforma antes de cualquier estudio nuevo.
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).
