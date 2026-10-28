@@ -54,8 +54,8 @@ def seconds(pair: str, ym: str, work: Path = WORK) -> pd.DataFrame:
 
 def price_at(sec: pd.Series, when: pd.DatetimeIndex) -> np.ndarray:
     """Precio medio del último tick ANTES de `when` (segundo que abre como mucho en when − 1 s), si tiene ≤ 60 s."""
-    ts = sec.index.asi8
-    q = (when - pd.Timedelta(seconds=1)).asi8
+    ts = sec.index.as_unit("ns").asi8
+    q = (when - pd.Timedelta(seconds=1)).as_unit("ns").asi8
     j = np.searchsorted(ts, q, side="right") - 1
     ok = j >= 0
     jj = np.clip(j, 0, None)
