@@ -2153,3 +2153,45 @@ continuación ya conocida (`clpos`, Estudio 16), no la posición en el reloj.
 
 **Consecuencia:** lo que pase se tratará como hipótesis nueva solo para datos posteriores al 2026-10-25,
 con pre-registro propio. Lo que no pase se documenta en docs/06 como desarmado.
+
+## Estudio 23 — auditoría de canales de señales de Telegram con precios reales (pre-registro, 2026-10-27, ANTES de cruzar ninguna señal con precios)
+
+**Origen:** pedido del usuario: «ingresa a una plataforma donde envíen trading todos los días, busca su lógica,
+su patrón». Un investigador leyó, sin cuenta, las vistas web públicas de unos 70 canales de Telegram
+(`t.me/s/<canal>`) y extrajo 55 887 señales a CSV (`data/raw/senales_terceros/`; informe en `INFORME.md` de
+esa carpeta). Las 33 186 que no son OTC se pueden cruzar con precios reales.
+
+**Qué se mide:** si las señales, tal como se publicaron **antes** de la hora de entrada, aciertan más que el
+azar y más que el equilibrio con pago del 85 %.
+
+**Reglas de lectura (fijas):**
+- **Zona horaria:**
+  - la declarada por el canal;
+  - si no la declara y es brasileño: UTC−3 (Brasil no tiene horario de verano desde 2019);
+  - si no: la que el investigador anotó como inferida.
+- **Fecha de entrada:**
+  - si el texto trae la fecha completa, se usa esa;
+  - si trae día/mes sin año, se toma el año que deja la fecha más cerca de la publicación;
+  - si trae solo la hora, se toma la primera vez que llega esa hora local **después** de la publicación.
+- **Solo cuentan las señales publicadas antes de la hora de entrada.** Las publicadas después (resultados
+  «a posteriori») se excluyen y se cuentan aparte.
+- **binomo_vip_ind** («Entry time: Now»): entrada al inicio del minuto siguiente a la publicación,
+  vencimiento 5 min.
+- **Resultado:** precio de apertura de la vela de 1 min de la hora de entrada contra el cierre de la última
+  vela del vencimiento (HistData, bid, 1 min). Cuenta como empate si es igual. Se exige que existan las
+  velas de inicio y de fin.
+- **Pares:** los que HistData publica. Solo se mide la primera entrada (G0). El gale se informa aparte.
+
+**Hipótesis:** una por canal con ≥ 300 señales verificables (Holm sobre los canales). Para cada canal:
+- **H23-azar:** acierto G0 > 50 % (p de Holm < 0,05);
+- **H23-rentable:** límite inferior de Wilson 95 % > 54,05 %.
+
+**Informativo:**
+- acierto declarado por el canal frente al medido en las mismas señales: ¿cuántas marcan «WIN» cuando el
+  precio dice pérdida?
+- acierto con otras zonas horarias (de −5 a +1 h respecto de la usada), como control: si el canal dice la
+  verdad sobre su hora, el máximo debería caer en la hora usada;
+- canales con menos de 300 señales.
+
+**Expectativa declarada:** ~50 % en todos. El acierto que publican sale de la martingala (G1/G2) y de
+editar los resultados.
