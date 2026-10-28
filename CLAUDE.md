@@ -158,6 +158,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    - **Estudio 18 (aviso anticipado con BTC a 3/5/15 min):** SIN SEÑAL con pago 85 % (54,09 / 54,70 / 54,19 %).
      La ventaja vive en el contrato de 1 min. Con pago ≥ 90 % el equilibrio baja (post hoc): pedir al usuario
      el pago real de su plataforma antes de cualquier estudio nuevo.
+   - **Estudio 19 (vencimiento fijo cada 15 min, pago 87 %, entrar R min antes):** ninguna pasa estrictamente;
+     R=1 es la única con ventaja (55,42 %, EV +0,033, 7/día; con clic +5 s 58,1 %); R≥2 ≈ 53 %. Demo:
+     `scripts/iniciar_senales.sh --cuarto 1 --pago 87` (solo si la plataforma deja comprar con ≥ 1 min).
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).

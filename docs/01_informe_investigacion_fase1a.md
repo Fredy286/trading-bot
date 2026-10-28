@@ -1951,3 +1951,24 @@ Se evalúa una sola vez con los datos del 2026-10-26 al 2027-01-18.
 
 **Consecuencia:** si pasa el desarrollo, la demo avisa solo en esas velas, con la hora de vencimiento a
 elegir. Siempre solo en demo.
+
+**Resultado de la fase de desarrollo (commit 75102ce, aplicado mecánicamente; `results/estudio19/dev.json`).**
+Prueba 2024-07 → 2025-08, pago del 87 %, solo velas alineadas al cuarto de hora:
+
+| Hipótesis | Operaciones (por día) | Acierto [lím. inf. 95 %] | EV [IC 98,75 %] | Latencia 0 / 5 / 10 / 15 s |
+|---|---|---|---|---|
+| **H19-R1** (1 min antes) | 2 769 (7,3) | **55,42 %** [53,47 %] | **+0,033** [−0,013; +0,079] | 57,4 / **58,1** / 55,4 / 53,2 % |
+| H19-R2 | 3 025 (7,4) | 53,24 % [51,44 %] | −0,004 | 54,2 / 53,9 / 53,2 / 50,9 % |
+| H19-R3 | 2 576 (6,3) | 53,69 % [51,75 %] | +0,004 | 53,6 / 53,4 / 53,7 / 52,1 % |
+| H19-R5 | 2 417 (6,6) | 53,22 % [51,22 %] | −0,005 | 52,7 / 52,7 / 53,2 / 50,6 % |
+
+**Veredicto:** ninguna pasa los criterios estrictos. **R = 1 es la única con ventaja puntual.** No
+alcanza significación porque las velas alineadas son 1 de cada 15 (≈ 7 operaciones al día). Su etiqueta
+es la misma del Estudio 16 (H16b: 57,00 % con 27 673 operaciones, que sí pasó); el subconjunto alineado
+queda 1,6 puntos por debajo, dentro de lo esperable por azar con 2 769 operaciones.
+
+**Consecuencia práctica:**
+- Si la plataforma deja comprar la binaria de 15 min con ≥ 1 min hasta el vencimiento, la demo puede
+  usar el modelo congelado H16b en modo `--cuarto 1 --pago 87`.
+- Es solo práctica: la confirmación de H16b con datos nuevos sigue siendo la que decide (enero de 2027).
+- R ≥ 2 no tiene ventaja: no se usa.
