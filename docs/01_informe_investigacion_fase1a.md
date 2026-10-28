@@ -2085,3 +2085,71 @@ latencias 0 / 5 / 15 s.
 
 **Consecuencia:** la demo gana la opción `--umbral 0.60` desde ya, **solo como práctica**. Si H21 pasa, el
 umbral queda como la forma recomendada de usar la demo.
+
+## Estudio 22 — estrategias de comunidades de binarias (Brasil, Rusia, Asia, bots de GitHub), desarmadas y probadas mes a mes (pre-registro, 2026-10-27, ANTES de calcular nada)
+
+**Origen:** pedido del usuario (2026-10-27): investigar cómo «aciertan» los canales que envían señales todos
+los días. Un investigador reunió las reglas exactas de unas 40 estrategias (catálogo local en
+`data/raw/senales_terceros/CATALOGO_ESTRATEGIAS.md`; fuentes: blogs y PDF brasileños, repositorios de bots
+de IQ Option / Pocket Option, smart-lab.ru, winoptionweb). Se descartan las que no tienen regla escrita,
+las que repintan (ZigZag, fractales, Super Signals) y las de índices sintéticos.
+
+**Convenciones:**
+- color de la vela = signo de cierre − apertura (doji = 0);
+- cuadrante = bloque de 5 velas de 1 min alineado al reloj (minuto % 5 = 0 → posición 1);
+- entrada en la apertura de la vela objetivo y salida en su cierre (aproximación optimista: el clic real
+  llega después);
+- solo se opera si existen todas las velas que la regla mira y la vela objetivo es la inmediata siguiente
+  en el reloj;
+- se mide la **primera entrada (G0)**; el ciclo con gale se informa aparte.
+
+**Instrumentos y datos:** BTC/USDT (Binance contado, 1 min); EUR/USD, GBP/USD, USD/JPY y XAU/USD (HistData,
+1 min, precio bid).
+
+**Periodo principal:** 2025-09-01 → 2026-10-25, mes a mes. **Informativo:** 2021-01 → 2025-08.
+
+**Reglas (20 por instrumento; 100 hipótesis, Holm α = 0,05):**
+- *Cuadrantes (1 min):*
+  - MHI1, MHI2 y MHI3 minoría: posiciones 3–5 del cuadrante anterior → contra la mayoría en la posición
+    1 / 2 / 3;
+  - MHI1, MHI2 y MHI3 mayoría: a favor;
+  - Milhão mayoría y minoría: las 5 velas del cuadrante anterior → posición 1;
+  - Vituxo mayoría: posiciones 1–3 del anterior → posición 3;
+  - Torres Gêmeas: posición 5 = color de la 1 del mismo cuadrante;
+  - Três Vizinhos: posición 4 = color de la 3;
+  - Padrão 23: posición 2 = color de la 1;
+  - Melhor de 3: mayoría de las posiciones 2–4 del anterior → posición 3;
+  - 3x1: minoría de las posiciones 1–3 → posición 5;
+  - C3: posición 1 = color de la posición 1 del anterior;
+  - Moonwalker: posición 1 = opuesto de la posición 3 del anterior;
+  - «3 velas» de Bullex: en la posición 1, si las 3 velas anteriores son iguales → contra.
+- *Indicadores (1 min, se evalúa la vela siguiente a la señal):*
+  - SMA3/SMA8 + 3 cierres seguidos (bot de Pocket Option);
+  - EMA20/EMA50 + RSI14 con zona neutra y filtro de rango (bot de Pocket Option);
+  - EMA5/EMA20 + RSI14 > 50 (guías de Quotex).
+
+Si alguna vela mirada es doji, no se opera.
+
+**Hipótesis aparte (3 por instrumento, en la misma familia de Holm, que queda en 115):**
+- Bollinger (20, 2) con reversión, vencimiento 3 min, solo 21–24 UTC (smart-lab);
+- catalogación por horario (D = 10 días, horarios con ≥ 80 % de un color → al día siguiente);
+- Turn Over: vela de 15 min de `:45` → contra en la de `:00`, vencimiento 15 min.
+
+**Criterio para que una regla «funcione» (todos):**
+1. ≥ 300 operaciones en el periodo principal;
+2. acierto G0 (sin dojis) con p de Holm < 0,05 frente a 54,05 % (pago 85 %);
+3. Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 60 % de los meses.
+
+**Solo informativo:**
+- acierto con doji contado como pérdida;
+- ciclo con 2 gales (apuestas 1 / 2,18 / 4,74) y su EV;
+- placebo con la misma regla desplazada 1–4 minutos (sin alineación al reloj);
+- el periodo 2021–2025.
+
+**Expectativa declarada:** ~50 % en todas. Los catálogos de estas comunidades reconocen que sus patrones
+dan cerca del 50 % a largo plazo. Si alguna mayoría de BTC supera el 50 %, se esperará que lo explique la
+continuación ya conocida (`clpos`, Estudio 16), no la posición en el reloj.
+
+**Consecuencia:** lo que pase se tratará como hipótesis nueva solo para datos posteriores al 2026-10-25,
+con pre-registro propio. Lo que no pase se documenta en docs/06 como desarmado.
