@@ -2301,3 +2301,39 @@ se detuvo antes de calcular nada (zona horaria vacía leída como NaN); se corri
 pero repartida en minutos de poca confianza. Al sumarla, el modelo dispara más señales mediocres y el acierto
 de la política baja. El base del Estudio 24 (57,83 %) difiere del Estudio 20 (57,60 %) porque exige que
 existan también los segundos de ETH y de USDC (misma muestra para comparar).
+
+## Estudio 25 — reversión nocturna (Bollinger 20, 2; 3 min; 21–24 UTC) en 24 pares que el Estudio 22 no usó (pre-registro, 2026-10-27, ANTES de calcularla en esos pares)
+
+**Origen:** en el Estudio 22, la única regla de comunidades con algo de información fue la de smart-lab.ru:
+- 54,6–55,6 % en EUR/USD, GBP/USD y USD/JPY (2025–2026), sin pasar la corrección de Holm;
+- 54,7–57,6 % en 2021–2025.
+
+Para no reutilizar los mismos mercados, se prueba en pares distintos: es una réplica fuera de muestra
+*entre mercados*.
+
+**Pares (24, fijos):** AUDCAD, AUDCHF, AUDJPY, AUDNZD, AUDUSD, CADCHF, CADJPY, CHFJPY, EURAUD, EURCAD, EURCHF,
+EURGBP, EURJPY, EURNZD, GBPAUD, GBPCAD, GBPCHF, GBPJPY, GBPNZD, NZDCAD, NZDCHF, NZDJPY, NZDUSD, USDCAD. Datos:
+HistData de 1 min, bid (`data/raw/histdata_pares/`).
+
+**Periodo:** 2025-09-01 → 2026-10-23 (último día publicado).
+
+**Regla (idéntica al código del Estudio 22, `indicator_rules`):**
+- al cierre de la vela s, entre las 21:00 y las 23:59 UTC: si el cierre está por encima de la banda superior
+  de Bollinger (20, 2) → PUT; si está por debajo de la inferior → CALL;
+- resultado = apertura de s + 1 contra cierre de s + 3;
+- una operación a la vez.
+
+**Hipótesis H25 (una, con todos los pares juntos). Criterios (todos):**
+1. ≥ 1 000 operaciones;
+2. p binomial unilateral < 0,05 frente a 54,05 % (pago 85 %, empate reembolsado);
+3. límite inferior de Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 60 % de los meses.
+
+**Declarado de antemano:**
+- se informa también el acierto con el empate contado como pérdida (contrato digital) y por par, por hora y
+  frente al azar (50 %);
+- de noche, en pares poco líquidos, los precios bid de HistData pueden tener ruido de cotización que imita
+  la reversión. Por eso, aunque pase, **solo** se llevaría a la demo tras comprobar en la plataforma el pago
+  y la regla de empate a esas horas (16:00–19:00 en Bogotá).
+
+**Expectativa:** si el efecto es real, ~54–55 %; es decir, cerca del equilibrio y probablemente **no** rentable.
