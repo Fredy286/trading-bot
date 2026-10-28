@@ -78,3 +78,67 @@ def run(out_dir: Path = Path("results/estudio25"), log=print) -> dict:
     (out_dir / "resultado.json").write_text(json.dumps(jsonable(rep), indent=2, ensure_ascii=False), encoding="utf-8")
     log(f"H25: pasa={rep['pasa']} | {crit} | {main}")
     return rep
+
+
+# ----------------------------------------------------------------------- verificación con precio medio (ticks)
+VERIF_PAIRS = ("EURGBP", "EURCHF", "EURAUD", "GBPCAD", "CHFJPY", "EURJPY")
+VERIF_MONTHS = ("2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09")
+TICK_PAGE = "https://www.histdata.com/download-free-forex-historical-data/?/ascii/tick-data-quotes/{pair}/{y}/{m}"
+
+
+def tick_bars(pair: str, ym: str, work: Path = Path("data/raw/histdata_ticks")) -> pd.DataFrame:
+    """Velas de 1 min de bid y de precio medio a partir de los ticks de HistData (hora EST fija = UTC−5)."""
+    import io
+    import zipfile
+
+    from ..data.histdata_dl import extract_token
+    from ..data.http import make_session
+
+    f = Path(work) / pair / f"{ym}.parquet"
+    if not f.exists():
+        y, m = ym.split("-")
+        s = make_session()
+        page = TICK_PAGE.format(pair=pair.lower(), y=y, m=int(m))
+        tk = extract_token(s.get(page, timeout=60).text)
+        data = {"tk": tk, "date": y, "datemonth": f"{y}{m}", "platform": "ASCII", "timeframe": "T", "fxpair": pair}
+        blob = s.post("https://www.histdata.com/get.php", data=data, timeout=600,
+                      headers={"Referer": page, "Origin": "https://www.histdata.com"}).content
+        with zipfile.ZipFile(io.BytesIO(blob)) as zf:
+            name = next(n for n in zf.namelist() if n.lower().endswith(".csv"))
+            raw = pd.read_csv(io.BytesIO(zf.read(name)), header=None, names=["t", "bid", "ask", "v"])
+        t = pd.to_datetime(raw["t"], format="%Y%m%d %H%M%S%f") + pd.Timedelta(hours=5)
+        ticks = pd.DataFrame({"bid": raw["bid"].to_numpy(), "mid": ((raw["bid"] + raw["ask"]) / 2).to_numpy()},
+                             index=pd.DatetimeIndex(t).tz_localize("UTC"))
+        out = {}
+        for k in ("bid", "mid"):
+            g = ticks[k].resample("min")
+            out.update({f"{k}_o": g.first(), f"{k}_h": g.max(), f"{k}_l": g.min(), f"{k}_c": g.last()})
+        f.parent.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(out).to_parquet(f)
+    return pd.read_parquet(f)
+
+
+def verify_mid(out_dir: Path = Path("results/estudio25"), log=print) -> dict:
+    rep = {"estudio": "Estudio 25 — verificación con precio medio de ticks", "git_sha": git_sha(), "precios": {}}
+    for k in ("mid", "bid"):
+        parts = []
+        for p in VERIF_PAIRS:
+            df = pd.concat([tick_bars(p, ym) for ym in VERIF_MONTHS]).sort_index()
+            bars = df[[f"{k}_o", f"{k}_h", f"{k}_l", f"{k}_c"]].set_axis(["o", "h", "l", "c"], axis=1)
+            bars = bars.reindex(pd.date_range(bars.index[0], bars.index[-1], freq="min", tz="UTC"))
+            t = trades(bars)
+            parts.append(t[(t.index >= pd.Timestamp("2026-04-01", tz="UTC"))].assign(par=p))
+            log(f"  {k} {p}: {len(parts[-1])} operaciones")
+        t = pd.concat(parts)
+        x = stats(t)
+        x["call"] = stats(t[t["dir"] > 0])["acierto"]
+        x["put"] = stats(t[t["dir"] < 0])["acierto"]
+        rep["precios"][k] = x
+        log(f"{k}: {x}")
+    m = rep["precios"]["mid"]
+    rep["criterios"] = {"acierto_wilson": m["lo95"] > BE, "simetria_5pts": abs(m["call"] - m["put"]) < 0.05}
+    rep["pasa"] = all(rep["criterios"].values())
+    Path(out_dir).mkdir(parents=True, exist_ok=True)
+    (Path(out_dir) / "verificacion_precio_medio.json").write_text(json.dumps(jsonable(rep), indent=2,
+                                                                              ensure_ascii=False), encoding="utf-8")
+    return rep
