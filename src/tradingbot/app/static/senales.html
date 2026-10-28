@@ -221,7 +221,8 @@ async function poll() {
     const st = await (await fetch("/api/senal/state")).json();
     if (st.missing) { $("status").textContent = "el bucle de señales no está corriendo"; return; }
     offsetMs = (st.desfase_reloj_s || 0) * 1000;
-    $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ${st.minutos} minutos · ${st.avisos} avisos`;
+    $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ${st.minutos} minutos · ${st.avisos} avisos` +
+      (st.umbral ? ` · solo p ≥ ${st.umbral}` : "") + (st.cuarto_r ? ` · cuarto de hora` : "");
     renderSignal(st); renderMetrics(st.resumen);
     if (!editing) renderRows(st.diario);
   } catch (e) { $("status").textContent = "sin conexión con el panel"; }

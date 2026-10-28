@@ -576,7 +576,7 @@ def cmd_senal(a) -> int:
             print(f"Aviso: el modelo congelado se validó para entrar 1 min antes del vencimiento; --cuarto {a.cuarto} "
                   "requiere su propio modelo (Estudio 19). Se usa igualmente, solo como práctica.")
         anticipada.SignalLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, cuarto_r=a.cuarto,
-                              pago=a.pago / 100 if a.pago else None).run(a.iteraciones)
+                              pago=a.pago / 100 if a.pago else None, umbral=a.umbral).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -781,6 +781,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--cuarto", type=int, default=None,
                    help="vencimiento fijo cada 15 min: avisar solo en las velas que dejan R min hasta el vencimiento")
     x.add_argument("--pago", type=float, default=None, help="pago real de la plataforma, en porcentaje (p. ej. 87)")
+    x.add_argument("--umbral", type=float, default=None,
+                   help="avisar solo si la probabilidad de la dirección es ≥ este valor (p. ej. 0.60; Estudio 21)")
     x.set_defaults(func=cmd_senal)
 
     x = sub.add_parser("serve", help="panel web local")

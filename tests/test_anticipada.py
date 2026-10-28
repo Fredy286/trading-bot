@@ -53,6 +53,13 @@ def test_decide_signals_when_ev_clears_the_margin(bars):
     assert d2["estado"] == "sin señal"
 
 
+def test_decide_threshold_keeps_only_confident_signals(bars):
+    t = bars.index[-1] + pd.Timedelta(minutes=1)
+    assert anticipada.decide(_bundle(0.58), bars, _sec(t), t)["estado"] == "señal"
+    assert anticipada.decide(_bundle(0.58), bars, _sec(t), t, umbral=0.60)["estado"] == "sin señal"
+    assert anticipada.decide(_bundle(0.62), bars, _sec(t), t, umbral=0.60)["estado"] == "señal"
+
+
 def test_decide_refuses_stale_bars_and_ignores_seconds_after_k(bars):
     t = bars.index[-1] + pd.Timedelta(minutes=2)  # falta la vela anterior
     assert anticipada.decide(_bundle(), bars, _sec(t), t)["estado"] == "sin datos"
