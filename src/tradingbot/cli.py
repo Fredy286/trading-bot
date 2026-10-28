@@ -332,6 +332,19 @@ def cmd_research_study17(a) -> int:
     return 0
 
 
+def cmd_research_study18(a) -> int:
+    from .research import study18
+
+    rep = study18.run()
+    for h, r in rep["hipotesis"].items():
+        print(f"{h} ({r['duracion_s']} s): pasa={r['pasa']} | {r['criterios']}")
+        print(f"  {r['operaciones']} ops ({r['por_dia']:.0f}/día) | acierto {r['acierto']} [{r['lo95']}] | EV {r['ev']} {r['ev_ic']}")
+        u = r["una_a_la_vez"]
+        print(f"  una a la vez: {u['operaciones']} ops ({u['por_dia']:.0f}/día) | acierto {u['acierto']} | EV {u['ev']}")
+        print("  latencia: " + ", ".join(f"{k}: {v['acierto'] and round(v['acierto'], 4)}" for k, v in r["sensibilidad_latencia"].items()))
+    return 0
+
+
 def cmd_replay_sensitivity(a) -> int:
     """Sensibilidad informativa de la Enmienda 2 sobre la muestra fija de la reproducción."""
     from datetime import timedelta
@@ -597,6 +610,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study18", help="Estudio 18: aviso anticipado con BTC a 3, 5 y 15 min")
+    x.set_defaults(func=cmd_research_study18)
     x = r.add_parser("study17", help="Estudio 17: Fibonacci (zona dorada) e ICT, desarmados")
     x.set_defaults(func=cmd_research_study17)
     x = r.add_parser("study16", help="Estudio 16: señal anticipada en el segundo 50/55 (P8)")
