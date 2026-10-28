@@ -1897,3 +1897,57 @@ Prueba 2024-07 → 2025-08, aviso en el segundo 50 y clic a +10 s:
   mayor. Con 54,1–54,7 % de acierto, un pago del **90 %** daría EV de +0,028 a +0,039 por operación. Si
   la plataforma paga ≥ 90 % en esas duraciones, haría falta un estudio nuevo con ese pago, confirmado con
   datos nuevos.
+
+## Estudio 19 — vencimiento fijo cada 15 minutos: entrar en el último tramo (pre-registro, 2026-10-27, ANTES de calcular nada)
+
+**Origen:**
+- en la plataforma del usuario (IQ Option), la binaria de BTC vence **cada 15 minutos** con pago del
+  **87 %**, es decir, equilibrio en 53,48 %;
+- según la guía de la plataforma, se puede comprar hasta una línea punteada antes del vencimiento.
+
+**Idea:** si el vencimiento es a hora fija (:00, :15, :30, :45 UTC), entrar R minutos antes convierte el
+contrato en uno de R minutos. La ventaja de BTC es mayor cuanto más corto el plazo (Estudio 16: 57,0 % a
+1 min; Estudio 18: ~54 % a 3–15 min).
+
+**Expectativa declarada:**
+- R = 1 debería parecerse al Estudio 16 (≈ 57 %);
+- R = 2–5, entre 54 y 56 %.
+
+El usuario debe confirmar el R mínimo que permite la plataforma.
+
+**Diseño (fase de desarrollo):**
+- **Señal:** aviso en el segundo 50 de la vela t; entrada = último precio negociado antes de t + 60 s
+  (clic ≤ 10 s); salida = último precio antes del vencimiento, en t + 60 s + R·60 s.
+- **Solo se evalúan las velas t** con (minuto de t + 1 + R) múltiplo de 15, es decir, las que dejan el
+  vencimiento exactamente en un cuarto de hora.
+- **Variables:** las del Estudio 16 con k = 50.
+- **Modelo:** GBM entrenado con la etiqueta de duración R·60 s en **todas** las velas (la hora del reloj
+  no cambia el contrato). Walk-forward con pruebas 2024-07 → 2025-08, 12 meses de entrenamiento, 20 % de
+  calibración y purga.
+- **Política:** EV estimado ≥ 0,02 con el **pago del 87 %**, empate reembolsado.
+
+**Hipótesis (familia de 4, Bonferroni α = 0,0125):**
+- **H19-R1:** R = 1;
+- **H19-R2:** R = 2;
+- **H19-R3:** R = 3;
+- **H19-R5:** R = 5.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p binomial unilateral < 0,0125 frente a 53,48 %;
+3. Wilson 95 % > 53,48 %;
+4. límite inferior del IC 98,75 % del EV (bootstrap semanal) > 0;
+5. EV > 0 en ≥ 60 % de los trimestres.
+
+**Solo informativo:** latencia del clic L ∈ {0, 5, 10, 15} s y pago del 85 %.
+
+**Confirmación:** para la R que el usuario confirme como la mínima disponible, se usa el mismo modelo
+congelado:
+- **R = 1:** el modelo ya congelado del Estudio 16, `BTCUSDT-anticipada-k50-L10-35b764`, porque su
+  etiqueta es idéntica;
+- **R > 1:** un modelo congelado nuevo, entrenado con los 12 meses hasta el 2026-10-25.
+
+Se evalúa una sola vez con los datos del 2026-10-26 al 2027-01-18.
+
+**Consecuencia:** si pasa el desarrollo, la demo avisa solo en esas velas, con la hora de vencimiento a
+elegir. Siempre solo en demo.
