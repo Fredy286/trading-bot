@@ -2021,3 +2021,58 @@ los Estudios 2–4 las ventajas de ~55 % hasta 2025 desaparecieron en el último
 **Consecuencia:**
 - si H20a o H20b no pasan, la demo sigue siendo solo práctica y se informa con claridad;
 - si pasan, se refuerza (sin sustituir) la confirmación de enero de 2027.
+
+**Resultado (commit 2958e67, aplicado mecánicamente; `results/estudio20/resultado.json`).** Se repitió con
+la misma semilla para guardar las predicciones: resultado idéntico.
+
+| Hipótesis | Operaciones (por día) | Acierto [lím. inf. 95 %] | EV [IC 97,5 %] | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|
+| **H20a** (1 min, pago 85 %) | 22 129 (52,8) | **57,60 %** [56,91 %] | **+0,059** [+0,038; +0,075] | 10 de 14 | **PASA** |
+| H20b (cuarto de hora, pago 87 %) | 2 174 (6,1) | 54,90 % [52,69 %] | +0,024 [−0,019; +0,068] | 9 de 14 | no pasa |
+
+Mes a mes (H20a): 61,6 / 56,0 / 52,2 / 55,0 / 61,1 / 51,8 / 53,2 / 56,3 / 61,2 / 53,1 / 59,7 / 58,8 /
+58,6 / 58,7 % (2025-09 → 2026-10). Latencia del clic 0 / 5 / 10 / 15 s: 58,9 / 59,2 / 57,6 / 55,8 %.
+
+**Selectividad (informativo):** al operar solo cuando la probabilidad del modelo alcanza un umbral,
+
+| Umbral | 2025-09 → 2026-10 | Verificación 2024-07 → 2025-08 (mismo esquema mensual, periodo ya usado) |
+|---|---|---|
+| todas | 57,60 % (22 129) | 56,92 % (28 160) |
+| p ≥ 0,58 | 60,15 % (9 640) | 58,49 % (12 026) |
+| **p ≥ 0,60** | **62,53 %** [61,10 %] (5 185), EV +0,135 | **59,71 %** [58,21 %] (4 494), EV +0,096 |
+| p ≥ 0,62 | 62,58 % (1 754) | 61,68 % (2 254) |
+
+Con p ≥ 0,60 las señales se concentran en algunos meses (en 2026-01 y 2026-04/05/06 no hubo ninguna: la
+calibración de esos modelos no llegó a 0,60). De los meses con ≥ 100 señales, todos quedaron entre 57 y
+66 %. Hipótesis nueva, sin decidir nada aquí: Estudio 21.
+
+**Verificación del «efecto cuarto de hora»:** en los Estudios 19 y 20 las velas alineadas al cuarto de hora
+quedaron por debajo del total. En la verificación 2024-07 → 2025-08, en cambio, quedaron por encima
+(55,9 % frente a 56,9 %; sin patrón por minuto). Conclusión: es azar por la muestra pequeña, no un efecto.
+
+## Estudio 21 — umbral de confianza p ≥ 0,60 con el modelo congelado (pre-registro, 2026-10-27, ANTES de ver datos posteriores al 2026-10-25)
+
+**Origen:** Estudio 20, parte informativa. Con p ≥ 0,60 se obtuvo 62,53 % (2025-09 → 2026-10) y 59,71 %
+(2024-07 → 2025-08), es decir, menos señales y más acierto en los dos periodos.
+
+**Diseño:**
+- **Modelo:** el congelado `BTCUSDT-anticipada-k50-L10-35b764` (SHA-256 5ebfa485…), sin reentrenar.
+- **Etiqueta:** la de H16b (aviso en el segundo 50, clic a +10 s, contrato de 1 min).
+- **Datos:** velas de 1 s y 1 min de Binance del 2026-10-26 al 2027-01-18, los mismos de la confirmación
+  del Estudio 16.
+- **Política:** EV ≥ 0,02 y además probabilidad de la dirección ≥ 0,60; pago 85 %, empate reembolsado.
+
+**Hipótesis H21 (familia de 1, α = 0,05). Criterios (todos):**
+1. ≥ 200 operaciones;
+2. p binomial unilateral < 0,05 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. límite inferior del IC 95 % del EV (bootstrap por semanas) > 0.
+
+**Declarado de antemano:** la meta del usuario (60 %) se informa aparte (¿acierto puntual ≥ 60 %? ¿límite
+inferior ≥ 58 %?), pero **no** decide la hipótesis.
+
+**Solo informativo:** modo cuarto de hora con pago 87 % (muestra demasiado pequeña para decidir) y
+latencias 0 / 5 / 15 s.
+
+**Consecuencia:** la demo gana la opción `--umbral 0.60` desde ya, **solo como práctica**. Si H21 pasa, el
+umbral queda como la forma recomendada de usar la demo.

@@ -26,7 +26,7 @@ from .study19 import quarter_aligned
 from .walkforward import make_folds
 
 K, LAT, LATENCIES = 50, 10, (0, 5, 10, 15)
-TEST_START, TEST_END, DATA_START = "2025-09-01", "2026-10-26", "2024-08-25"
+TEST_START, TEST_END = "2025-09-01", "2026-10-26"
 ALPHA = 0.05 / 2
 UMBRALES = (0.56, 0.58, 0.60, 0.62)
 HYPS = {"H20a": (0.85, False), "H20b": (0.87, True)}
@@ -80,14 +80,17 @@ def evaluate(p_up, d, q, times, contract, margin, n_boot, level, umbral=None) ->
 
 
 def run(root3: Path = Path("data/raw/estudio3"), daily: Path = Path("data/processed/senal/diario"),
-        out_dir: Path = Path("results/estudio20"), n_boot: int = 1000, log=print) -> dict:
+        out_dir: Path = Path("results/estudio20"), n_boot: int = 1000, test_start: str = TEST_START,
+        test_end: str = TEST_END, log=print) -> dict:
+    """`test_start`/`test_end` distintos de los pre-registrados solo para verificaciones descriptivas."""
     cfg = load_config("config/research.toml")  # solo se lee
     st, cc, ec = cfg["study"], cfg["contracts"], cfg["execution"]
     margin = cc["binary_ev_margin"]
     spot = pd.concat([load(root3, "BTCUSDT", "spot"), _read_days(Path(daily) / "1m", "2026-10-01", "2026-10-26")])
     spot = spot[~spot.index.duplicated(keep="last")].sort_index()
     bars = spot_bars(spot)
-    bars = bars[(bars.index >= pd.Timestamp(DATA_START, tz="UTC")) & (bars.index < pd.Timestamp(TEST_END, tz="UTC"))]
+    data_start = pd.Timestamp(test_start, tz="UTC") - pd.DateOffset(months=12) - pd.Timedelta(days=7)
+    bars = bars[(bars.index >= data_start) & (bars.index < pd.Timestamp(test_end, tz="UTC"))]
     tab = build_table().reindex(bars.index)
     prev = compute_features(bars).shift(1)  # FEATURES de la vela t−1, ya cerrada en el segundo k de t
     X = pd.concat([prev[FEATURES], partial_features(tab, bars["o"], np.exp(prev["lvol60"]), K)], axis=1)
@@ -97,7 +100,7 @@ def run(root3: Path = Path("data/raw/estudio3"), daily: Path = Path("data/proces
     ok = X.notna().all(axis=1).to_numpy() & ~np.isnan(q_hat)
     label_end = pd.DatetimeIndex(bars.index + pd.Timedelta(minutes=3))
     p = np.full(len(bars), np.nan)
-    for fold in make_folds(TEST_START, TEST_END, 1, st["train_months"], st["calib_frac"]):
+    for fold in make_folds(test_start, test_end, 1, st["train_months"], st["calib_frac"]):
         fit, cal, test = fold.masks(bars.index, label_end)
         valid = ok & ~np.isnan(y) & (y != 0)
         fit_nt, cal_nt, test_ok = fit & valid, cal & valid, test & ok
@@ -106,7 +109,7 @@ def run(root3: Path = Path("data/raw/estudio3"), daily: Path = Path("data/proces
         p[test_ok] = Calibrator().fit(pc, (y[cal_nt] == 1).astype(int)).transform(pt)
         log(f"{fold.name}: ajuste={fit_nt.sum():,} calibración={cal_nt.sum():,} prueba={test_ok.sum():,}")
     report = {"estudio": "Estudio 20 — repetición mes a mes (pre-registro c53c0b2)", "git_sha": git_sha(),
-              "periodo_prueba": [TEST_START, "2026-10-25"], "hipotesis": {}}
+              "periodo_prueba": [test_start, test_end], "hipotesis": {}}
     for hname, (payout, quarter) in HYPS.items():
         contract = BinaryContract(payout, "refund")
         sel = ~np.isnan(p) & (quarter_aligned(bars.index, 1) if quarter else True)
@@ -128,6 +131,9 @@ def run(root3: Path = Path("data/raw/estudio3"), daily: Path = Path("data/proces
             f"EV={main['ev']:+.4f} {main['ev_ic']}")
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    keep = ~np.isnan(p)
+    pd.DataFrame({"p": p[keep], "y": y[keep], "q": q_hat[keep]}, index=bars.index[keep]).to_parquet(
+        out_dir / "predicciones.parquet")
     (out_dir / "resultado.json").write_text(json.dumps(jsonable(report), indent=2, ensure_ascii=False),
                                             encoding="utf-8")
     return report
