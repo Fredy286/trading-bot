@@ -2201,3 +2201,28 @@ editar los resultados.
   (afecta sobre todo a VIPBinary_signals: 894 de 943 sin vencimiento, listas en marcas de 5 min; los 49 que
   lo declaran dicen 5 min);
 - los pares sin datos en HistData (cripto de Quotex, CHFNZD) se cuentan como no verificables.
+
+**Resultado del Estudio 22 (commit de la corrección del ítem 42, aplicado mecánicamente; `results/estudio22/resultado.json`).**
+Periodo 2025-09 → 2026-10, 5 instrumentos, 115 hipótesis: **ninguna pasa** (todas con p de Holm = 1).
+
+| Familia | Reglas × instrumentos | Operaciones | Acierto G0 (mín. / mediana / máx.) | 2021–2025 (mediana) | Ciclo con 2 gales |
+|---|---|---|---|---|---|
+| Cuadrantes (MHI, Milhão, Torres, Padrão 23, C3…) | 85 | 6,57 millones | 48,9 / **50,0** / 51,3 % | 50,0 % | acierta 84,5–88,8 %, **EV −0,13 a −0,51** |
+| Placebo (las mismas reglas sin alinear al reloj) | — | — | mediana 50,0 % | — | — |
+| Indicadores de bots (SMA3/8, EMA20/50+RSI, EMA5/20+RSI) | 15 | 978 418 | 47,6 / 48,9 / 50,0 % | 48,9 % | EV −0,24 a −0,54 |
+| Catalogación por horario (≥ 80 % en 10 días → día siguiente) | 5 | 195 307 | 50,0 / 51,1 / 51,5 % | 51,1 % | EV −0,19 a −0,45 |
+| Turn Over (15 min) | 5 | 37 241 | 51,1 / 51,6 / 52,4 % | 51,9 % | — |
+| Bollinger con reversión, 3 min, 21–24 UTC | 5 | 16 098 | 53,3 / 54,6 / **55,6 %** (GBP/USD) | 54,7 % | — |
+
+**Lectura:**
+- La posición en el reloj no aporta nada: las reglas alineadas y el placebo dan lo mismo (50,0 %).
+- El «85–89 %» que anuncian sale del gale, y con gale se pierde entre 13 y 51 centavos por ciclo.
+- La catalogación elige horarios que acertaron ≥ 80 % en 10 días; al día siguiente aciertan ~51 %.
+- **Única pieza con información:** la reversión nocturna de Bollinger en divisas (54,6–55,6 % en 2025–2026 y
+  54,7–57,6 % en 2021–2025). Pero:
+  - con el empate contado como pérdida (contrato digital) baja a 51,5–52,8 %;
+  - los datos son solo bid y a esas horas el diferencial del bróker es mayor;
+  - se debilita (GBP/USD: 57,6 % → 55,6 %).
+
+  Queda como candidata (P10 en docs/08). Solo se probaría con un pre-registro propio, datos nuevos y el pago
+  y la regla de empate reales del intermediario a esas horas.
