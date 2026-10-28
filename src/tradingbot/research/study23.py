@@ -84,7 +84,7 @@ def read_channel(f: Path) -> pd.DataFrame:
         d["venc"] = 5.0
     else:
         offs = d["zona_horaria_declarada"].map(tz_offset)
-        d["entrada"] = [entry_utc(t, p, o) if pd.notna(p) and o is not None else None
+        d["entrada"] = [entry_utc(t, p, o) if pd.notna(p) and pd.notna(o) else None
                         for t, p, o in zip(d["hora_entrada_texto"], d["pub"], offs)]
         d["offset_h"] = offs
     d["entrada"] = pd.to_datetime(d["entrada"], utc=True)

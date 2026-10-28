@@ -2261,3 +2261,29 @@ volatilidad de 60 min de BTC de la vela anterior):
 
 **Consecuencia:** si pasa, un modelo congelado nuevo con los 12 meses hasta el 2026-10-25 y confirmación
 con 2026-10-26 → 2027-01-18. Si no pasa, se documenta como desarmado.
+
+**Resultado del Estudio 23 (aplicado mecánicamente; `results/estudio23/resultado.json`).** La primera ejecución
+se detuvo antes de calcular nada (zona horaria vacía leída como NaN); se corrigió la comprobación.
+
+| Canal (idioma, años) | Señales verificables publicadas antes de la entrada | Acierto G0 medido [lím. inf.] | Declarado por el canal: G0 / con gale | «WIN» declarado que el mercado real contradice |
+|---|---|---|---|---|
+| gotraderssinaisfree (pt, 2024–26) | 8 295 | 49,3 % [48,2] | sin resultados | — |
+| mestredossinaiis (pt, 2021–23) | 6 316 | 50,9 % [49,6] | 58,8 % / 86,8 % | 36,5 % |
+| Tigers_Iqoption, lista gratuita (pt, 2022–23) | 1 916 | 49,2 % [46,9] | 54,2 % / 83,5 % | 51,0 % |
+| Unidos (pt, 2025–26) | 1 397 | 51,5 % [48,9] | sin resultados | — |
+| sinaisOBM5 (pt, 2020) | 1 190 | 49,5 % [46,7] | 53,9 % / 90,0 % | 48,4 % |
+| sinaistraderpassos (pt, 2021–22) | 859 | 48,5 % [45,2] | 49,9 % / 91,4 % | 19,7 % |
+| binomo_vip_ind (en, 2025) | 320 | 45,3 % [40,0] | sin resultados | — |
+| PocketSignalsM1, fxrealbot, quotexsignals2814 | 89–117 cada uno | 42,7–53,2 % | 49–68 % / 77–99 % | 36–48 % |
+
+**Veredicto:**
+- **H23-azar y H23-rentable: ningún canal pasa** (8 evaluados, Holm).
+- Con 20 000 señales publicadas por adelantado, el acierto real de la primera entrada es el de una moneda
+  al aire (49–51 %). El «83–99 %» que anuncian es el acierto **con gale**.
+- **Control de zona horaria:** con cualquier desplazamiento de −5 a +1 h, todos siguen entre 47 y 53 %. No
+  hay una hora «correcta» escondida que les dé ventaja.
+- Tigers publicó 9 372 de sus 11 472 señales **después** de la hora de entrada (las «premium», ya con
+  resultado); VIPBinary, 875 de 943.
+- Los «WIN» declarados no concuerdan con el mercado real en el 20–51 % de los casos. Los precios de otra
+  fuente explican parte del desacuerdo; un 50 % equivale a no tener relación con el mercado (precio propio
+  del bróker o resultado inventado).
