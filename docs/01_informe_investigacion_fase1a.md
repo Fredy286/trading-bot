@@ -1972,3 +1972,52 @@ queda 1,6 puntos por debajo, dentro de lo esperable por azar con 2 769 operacion
   usar el modelo congelado H16b en modo `--cuarto 1 --pago 87`.
 - Es solo práctica: la confirmación de H16b con datos nuevos sigue siendo la que decide (enero de 2027).
 - R ≥ 2 no tiene ventaja: no se usa.
+
+## Estudio 20 — repetición mes a mes «como si no hubiera pasado» (2025-09 → 2026-10) (pre-registro, 2026-10-27, ANTES de calcular nada)
+
+**Origen (pedido del usuario, 2026-10-27):** probar mes a mes lo corrido del mercado, decidiendo cada mes
+solo con la información anterior, para ver si de verdad «se habría acertado».
+
+**Periodo:** del 2025-09-01 al 2026-10-25 (14 meses; octubre de 2026 incompleto). Este tramo **nunca se usó
+para elegir ni ajustar** el modelo del Estudio 16 (su desarrollo fue 2024-07 → 2025-08), pero **no es virgen**:
+- la Fase 1B evaluó allí (2025-09 → 2026-08) otro modelo GBM de BTC a 1 min (56,4 %);
+- el Estudio 5 evaluó otro modelo con datos desde el 2026-10-04 (H5a 56,11 %);
+- el modelo congelado de la demo se entrenó con 2025-10-26 → 2026-10-25, pero nunca se evaluó allí.
+
+Por eso es una **verificación de solidez**, no una confirmación. La confirmación sigue siendo la de
+2026-10-26 → 2027-01-18 (Estudios 12, 14, 15, 16 y 19), que este estudio **no mira**.
+
+**Diseño:**
+- **Modelo:** exactamente el de H16b (variables `FEATURES` de la vela anterior + bloque parcial de 1 s
+  hasta el segundo 49, k = 50; etiqueta: último precio antes de t + 60 s contra último precio antes de
+  t + 120 s, con clic a +10 s). GBM con la misma semilla.
+- **Repetición mensual:** para cada mes M, se entrena con los 12 meses anteriores al inicio de M (último
+  20 % para calibrar, con purga) y se aplica solo a M. Nada de M ni de meses posteriores entra en el
+  entrenamiento, la calibración ni la estimación de empates (tasa móvil de 1 440 minutos, desplazada).
+- **Datos:** velas de 1 s y 1 min de Binance (data.binance.vision), las mismas fuentes que el Estudio 16.
+- **Política:** EV estimado ≥ 0,02, empate reembolsado.
+
+**Hipótesis (familia de 2, Bonferroni α = 0,025):**
+- **H20a:** contrato de 1 min en todas las velas, pago del 85 % (equilibrio 54,05 %).
+- **H20b:** solo las velas que dejan el vencimiento en un cuarto de hora exacto (modo `--cuarto 1` de la
+  demo, binaria de 15 min de la plataforma del usuario), pago del 87 % (equilibrio 53,48 %).
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p binomial unilateral < 0,025 frente al equilibrio;
+3. límite inferior de Wilson 95 % > equilibrio;
+4. límite inferior del IC 97,5 % del EV (bootstrap por semanas) > 0;
+5. EV > 0 en ≥ 60 % de los meses.
+
+**Expectativa declarada:** si la ventaja del Estudio 16 se mantiene, H20a ≈ 55–57 %. Riesgo conocido: en
+los Estudios 2–4 las ventajas de ~55 % hasta 2025 desaparecieron en el último año.
+
+**Solo informativo (no decide nada):**
+- tabla mes a mes (operaciones, acierto, EV);
+- latencia del clic L ∈ {0, 5, 10, 15} s;
+- **selectividad:** acierto y EV si solo se operara cuando la probabilidad del modelo es ≥ 0,56 / 0,58 /
+  0,60 / 0,62 (menos señales, ¿más acierto?). Usar un umbral así exigiría un pre-registro propio.
+
+**Consecuencia:**
+- si H20a o H20b no pasan, la demo sigue siendo solo práctica y se informa con claridad;
+- si pasan, se refuerza (sin sustituir) la confirmación de enero de 2027.
