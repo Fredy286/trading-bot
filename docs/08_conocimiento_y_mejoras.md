@@ -145,7 +145,9 @@ Todas siguen el mismo camino:
 | **P7** | Variables de régimen de cripto: interés abierto y ratio largo/corto cada 5 min | Apalancamiento acumulado → más volatilidad | Estudio nuevo; esperable que no mejore la dirección a 1 min | Baja prioridad |
 
 | **P8** | **Anticipar la señal** (aviso en el segundo 50–55 con la información hasta ese segundo) | La ventaja vive en 1–2 s tras el cierre y no hay plataforma legal con API para automatizar (docs/03, 2.2). Avisar antes convierte la latencia humana en anticipación | **Estudio 16** | **Pasa el desarrollo:** aviso en el segundo 55 y clic a +5 s, 57,3 %; aviso en el 50 y clic a +10 s, 57,0 % (EV +0,05). Con 15 s de demora, aún 55,6 %. Confirmación con datos nuevos en enero |
-| **P9** | Operar solo los minutos de máxima confianza | En el desarrollo del Estudio 15, el 1 % de mayor confianza acertó 65 % a +1 s (*post hoc*) | El umbral debe fijarse con datos de entrenamiento (no con cuantiles de la prueba) y confirmarse con datos nuevos | Propuesta |
+| **P9** | Operar solo los minutos de máxima confianza | En el desarrollo del Estudio 15, el 1 % de mayor confianza acertó 65 % a +1 s (*post hoc*) | **Estudio 20** (informativo): con p ≥ 0,60, 62,5 % en 2025-09 → 2026-10 y 59,7 % en 2024-07 → 2025-08. **Estudio 21** lo confirma con el modelo congelado y datos nuevos | Pre-registrado (Estudio 21). Demo: `--umbral 0.60`, solo práctica |
+| **P10** | Reversión nocturna en divisas (Bollinger 20, 2; 3 min; 21–24 UTC) | Poca liquidez a esas horas. Fuente: smart-lab.ru, Estudio 22 | Estudio nuevo con datos posteriores al 2026-10-25, y con el pago y la regla de empate reales de la plataforma a esas horas | Candidata débil: 54,6 % de mediana, 51,5–52,8 % si el empate pierde |
+| **P11** | ETH y BTC/USDC en los segundos 0–49 | El mercado que lidera explica parte del retorno del rezagado en segundos (informe de microestructura) | **Estudio 24** | En curso |
 
 **Ejecución (2026-10-25, docs/03, 2.2):**
 - comprar o vender BTC de verdad (futuros, multiplicadores) **no sirve**: la ventaja es de +0,47 pb por

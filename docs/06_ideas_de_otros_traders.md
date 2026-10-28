@@ -48,9 +48,28 @@ entretenido u optimista, no lo que funciona. Por eso aquí nada se acepta sin pr
 | Video «Así se usa Fibonacci» | Retroceso al 50–61,8 % («zona dorada») y extensiones | 17 A | SIN SEÑAL: en BTC, oro y EUR/USD la zona dorada se comporta exactamente como el azar (50,0 / 50,4 / 49,8 % frente a 50 % de referencia) y no es mejor que sus vecinas |
 | Video «10 conceptos ICT» | FVG, toma de liquidez, quiebre de estructura, premium/descuento, máximos y mínimos iguales | 17 B | SIN SEÑAL: no mejora el modelo de BTC (log-loss sin cambio; EV baja de +0,048 a +0,038). Un preprint de 2026 tampoco encuentra ventaja en ICT y muestra que el barrido de liquidez predice **continuación** |
 | Comentario de Facebook (Roger Va Cr) | Mapa de calor del libro, CVD, muros | — | No se puede probar con datos históricos gratuitos del libro completo. Lo más cercano (flujo agresor) ya falló en el Estudio 3. Candidata futura: profundidad agregada del libro de futuros de Binance |
+| Comunidades brasileñas de binarias (blogs, PDF del Catalogador OB, bots de GitHub) | 17 reglas de «cuadrantes»: MHI 1/2/3 mayoría y minoría, Milhão, Torres Gêmeas, Três Vizinhos, Padrão 23, Melhor de 3, 3x1, C3, Moonwalker, «3 velas» | 22 | SIN SEÑAL: 6,6 millones de operaciones en 5 mercados, mediana **50,0 %**; igual que el placebo sin alinear al reloj. Con 2 gales «aciertan» 85–89 % de los ciclos y pierden 13–51 centavos por ciclo |
+| Bots de Pocket Option / guías de Quotex (GitHub, India) | SMA3/SMA8 + 3 cierres; EMA20/EMA50 + RSI14; EMA5/EMA20 + RSI 50 | 22 | SIN SEÑAL: 47,6–50,0 % (por debajo del azar) |
+| «Listas de señales» (catalogadores) | Horarios HH:MM que acertaron ≥ 80 % en los últimos 10 días | 22 | SIN SEÑAL: al día siguiente aciertan 50,0–51,5 %: es elegir el pasado, no predecir |
+| Turn Over (IQ Option, 15 min) | Vela de :45 → contra en la de :00 | 22 | SIN SEÑAL: 51,1–52,4 % |
+| smart-lab.ru (Rusia) | Bollinger (20, 2) con reversión, 3 min, 21–24 UTC | 22 | **La única con algo de información:** 53,3–55,6 % (2025–26) y 54,7–57,6 % (2021–25) en divisas. No pasa Holm, cae a 51,5–52,8 % si el empate pierde y se debilita con los años. Candidata P10 (docs/08) |
+| 70 canales públicos de Telegram (pt, es, en, ru, id, hi) | Señales publicadas a diario (55 887 extraídas; 33 186 no OTC) | 23 | Ver resultado del Estudio 23 en docs/01 |
 
-**Lo que sí funcionó:** solo el modelo propio de BTC a 1 minuto (Estudio 5, H5a: 56,11 % con datos nuevos
-y entrada a +10 s, sobre todo en fin de semana). Ninguna herramienta de terceros lo ha mejorado todavía.
+**Lo que sí funcionó:** solo el modelo propio de BTC a 1 minuto:
+- Estudio 5 (H5a): 56,11 % con datos nuevos y entrada a +10 s;
+- Estudio 20: repetido mes a mes en 2025-09 → 2026-10 con el aviso del segundo 50, 57,60 % en 22 129
+  operaciones, y **62,5 % cuando el modelo está seguro (p ≥ 0,60)**.
+
+Ninguna herramienta de terceros lo ha mejorado todavía.
+
+**Cómo «aciertan» los canales (Estudios 22 y 23 y el informe local `data/raw/senales_terceros/INFORME.md`):**
+1. cuentan como acierto lo ganado tras 1 o 2 gales: al azar eso ya da 87,5 %;
+2. ponen los ✅ después o editan las listas;
+3. reciclan marcadores, a veces con cifras imposibles;
+4. esconden las pérdidas;
+5. operan casi todo en OTC (precio propio del bróker, imposible de verificar).
+
+El negocio está en el enlace de registro y el «grupo VIP», no en la señal.
 
 ## 4. Señales de alerta de estafa (lista de control)
 
