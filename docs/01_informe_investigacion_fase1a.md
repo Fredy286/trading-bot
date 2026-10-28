@@ -2452,3 +2452,7 @@ casi todos los minutos de XRP y DOGE quedarían como empate.
   publique (sale cada mes), una sola vez.
 - **Condición para la demo:** que el usuario confirme en su plataforma que esos pares se pueden operar sin
   OTC entre las 16:00 y las 19:00 de Bogotá, con vencimiento de 3 min, y el pago real a esas horas.
+
+**Nota de implementación del Estudio 27 (antes de descargar):** un precio de entrada o de salida solo vale si su
+último tick tiene ≤ 60 s de antigüedad; si no, la operación no se cuenta. La señal se calcula con velas de 1 min
+del precio medio, construidas con los mismos ticks.
