@@ -161,6 +161,23 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    - **Estudio 19 (vencimiento fijo cada 15 min, pago 87 %, entrar R min antes):** ninguna pasa estrictamente;
      R=1 es la única con ventaja (55,42 %, EV +0,033, 7/día; con clic +5 s 58,1 %); R≥2 ≈ 53 %. Demo:
      `scripts/iniciar_senales.sh --cuarto 1 --pago 87` (solo si la plataforma deja comprar con ≥ 1 min).
+   - **Estudio 20 (2026-10-27, repetición mes a mes «como si no hubiera pasado», 2025-09 → 2026-10-25):** H20a
+     **PASA**: 57,60 % [56,91 %], EV +0,059, 22 129 operaciones, 10 de 14 meses con EV > 0. H20b (cuarto de hora,
+     pago 87 %) no pasa (54,9 %, 2 174 ops). Informativo: con p ≥ 0,60, **62,5 %** (5 185 ops) y 59,7 % en
+     2024-07 → 2025-08; las señales se concentran en algunos meses. Predicciones en results/estudio20/.
+   - **Estudio 21 (pre-registrado):** umbral p ≥ 0,60 con el modelo congelado; confirmación con 2026-10-26 →
+     2027-01-18. Demo: `--umbral 0.60` (solo práctica).
+   - **Estudio 22 (estrategias de comunidades de binarias: MHI, Milhão, Torres Gêmeas, catalogación, bots de
+     GitHub, Bollinger de smart-lab):** 0 de 115 pasan; cuadrantes 50,0 % (igual que el placebo); con 2 gales
+     85–89 % de ciclos y EV −0,13 a −0,51. Solo Bollinger nocturno (21–24 UTC) en divisas 54–56 % → candidata P10.
+     Catálogo local: data/raw/senales_terceros/CATALOGO_ESTRATEGIAS.md (no versionado).
+   - **Estudio 23 (auditoría de 21 canales de Telegram, 55 887 señales extraídas sin cuenta):** ningún canal supera
+     el azar; ~20 000 señales publicadas ANTES de la entrada aciertan 49–51 % en la primera entrada. CSV e informe
+     en data/raw/senales_terceros/ (no versionado). Pares de HistData 2020–2026 en data/raw/histdata_pares/.
+   - **Estudio 24 (ETH y BTC/USDC en los segundos 0–49):** H24a (ETH) no pasa (mejora el log-loss pero baja el
+     acierto de la política en los dos periodos). H24b (BTC/USDC) tampoco pasa.
+   - **Lección de los Estudios 20–24:** lo único que sube el acierto es **filtrar por confianza** del propio
+     modelo (p ≥ 0,60 → ~60–62 %). Sumar variables de terceros, de otros mercados o de canales no lo mejora.
    - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
      corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
      Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).

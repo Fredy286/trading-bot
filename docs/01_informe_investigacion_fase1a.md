@@ -2287,3 +2287,17 @@ se detuvo antes de calcular nada (zona horaria vacía leída como NaN); se corri
 - Los «WIN» declarados no concuerdan con el mercado real en el 20–51 % de los casos. Los precios de otra
   fuente explican parte del desacuerdo; un 50 % equivale a no tener relación con el mercado (precio propio
   del bróker o resultado inventado).
+
+**Resultado del Estudio 24 (commit e09beae, aplicado mecánicamente; `results/estudio24/resultado.json`).**
+
+| Hipótesis | Periodo | Mejora del log-loss [IC 97,5 %] | Acierto base → nuevo | EV base → nuevo | Veredicto |
+|---|---|---|---|---|---|
+| H24a (+ ETH) | desarrollo | +0,00024 [+0,00011; +0,00037] | 56,92 → 56,59 % | +0,049 → +0,043 | **no pasa** (criterios 2 y 4) |
+| | verificación | +0,00030 [+0,00018; +0,00042] | 57,83 → 57,05 % | +0,063 → +0,050 | |
+| H24b (+ BTC/USDC) | desarrollo | +0,00007 [−0,00003; +0,00015] | 56,92 → 56,87 % | +0,049 → +0,048 | **no pasa** |
+| | verificación | +0,00015 [+0,00004; +0,00025] | 57,83 → 57,09 % | +0,063 → +0,051 | |
+
+**Lectura:** los segundos de ETH contienen un poco de información (el log-loss mejora en los dos periodos),
+pero repartida en minutos de poca confianza. Al sumarla, el modelo dispara más señales mediocres y el acierto
+de la política baja. El base del Estudio 24 (57,83 %) difiere del Estudio 20 (57,60 %) porque exige que
+existan también los segundos de ETH y de USDC (misma muestra para comparar).
