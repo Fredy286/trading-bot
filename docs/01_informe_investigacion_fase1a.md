@@ -2195,3 +2195,9 @@ azar y más que el equilibrio con pago del 85 %.
 
 **Expectativa declarada:** ~50 % en todos. El acierto que publican sale de la martingala (G1/G2) y de
 editar los resultados.
+
+**Nota de implementación (2026-10-27, antes de cruzar precios):**
+- si una señal no trae vencimiento, se usa el vencimiento más frecuente que declara ese mismo canal
+  (afecta sobre todo a VIPBinary_signals: 894 de 943 sin vencimiento, listas en marcas de 5 min; los 49 que
+  lo declaran dicen 5 min);
+- los pares sin datos en HistData (cripto de Quotex, CHFNZD) se cuentan como no verificables.

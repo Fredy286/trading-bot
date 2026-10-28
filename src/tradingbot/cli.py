@@ -345,6 +345,17 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study23(a) -> int:
+    from .research import study23
+
+    rep = study23.run()
+    for k, x in rep["canales"].items():
+        extra = f" | H23 azar={x.get('H23_azar')} rentable={x.get('H23_rentable')}" if k in rep["canales_evaluados"] else ""
+        print(f"{k}: {x['sin_empate']} verificables de {x['no_otc']} no OTC (después de la entrada: "
+              f"{x['publicadas_despues']}) | acierto G0 {x['acierto'] and round(x['acierto'], 4)}{extra}")
+    return 0
+
+
 def cmd_research_study22(a) -> int:
     from .research import study22
 
@@ -649,6 +660,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study23", help="Estudio 23: auditoría de canales de señales de Telegram con precios reales")
+    x.set_defaults(func=cmd_research_study23)
     x = r.add_parser("study22", help="Estudio 22: estrategias de comunidades de binarias (MHI, Torres, catalogación…)")
     x.set_defaults(func=cmd_research_study22)
     x = r.add_parser("study20", help="Estudio 20: repetición mes a mes 2025-09 → 2026-10 del modelo H16b")
