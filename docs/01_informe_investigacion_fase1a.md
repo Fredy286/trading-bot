@@ -2407,3 +2407,7 @@ que el Estudio 13 no tocó.
 
 **Consecuencia:** lo que pase se confirmará con modelos congelados y datos posteriores al 2026-10-25 (nuevo
 pre-registro). Solo demo.
+
+**Nota de implementación (antes de descargar):** la etiqueta de H16b redondea con el tic de BTC (0,01 USD). En
+cada moneda se usa su propio tic de Binance (XRP 0,0001; SOL 0,01; ETH 0,01; DOGE 0,00001). Con el de BTC,
+casi todos los minutos de XRP y DOGE quedarían como empate.
