@@ -2226,3 +2226,38 @@ Periodo 2025-09 → 2026-10, 5 instrumentos, 115 hipótesis: **ninguna pasa** (t
 
   Queda como candidata (P10 en docs/08). Solo se probaría con un pre-registro propio, datos nuevos y el pago
   y la regla de empate reales del intermediario a esas horas.
+
+## Estudio 24 — ¿ETH o BTC/USDC se adelantan unos segundos a BTC/USDT? (pre-registro, 2026-10-27, ANTES de descargar sus velas de 1 s)
+
+**Origen:** informe de microestructura del 2026-10-27 (local, `data/raw/senales_terceros/MICROESTRUCTURA.md`):
+- entre mercados de cripto, el que lidera explica parte del retorno del rezagado en segundos (Albers y
+  otros, 2021);
+- el régimen de comisiones decide qué par de BTC lidera dentro de Binance.
+
+El Estudio 3 miró ETH y el perpetuo a escala de minutos, sin resultado. Aquí se mira **dentro del minuto,
+hasta el segundo 49**, que es lo que el aviso del segundo 50 puede usar.
+
+**Variables nuevas** (último precio antes de t + 50 s, igual que el Estudio 16; normalizadas con la
+volatilidad de 60 min de BTC de la vela anterior):
+- **ETH/USDT:** retornos de 5, 10 y 20 s, y su diferencia con los de BTC/USDT en esas mismas ventanas;
+- **BTC/USDC:** diferencia de precio con BTC/USDT (en pb) en el segundo 49, su cambio en 10 s, y la
+  diferencia de retornos de 10 s.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H24a:** H16b + variables de ETH;
+- **H24b:** H16b + variables de BTC/USDC.
+
+**Diseño:**
+- el mismo GBM, la misma semilla, la etiqueta de H16b (clic +10 s) y la política (EV ≥ 0,02, pago 85 %);
+- repetición mensual con 12 meses de entrenamiento (Estudio 20);
+- **desarrollo:** 2024-07 → 2025-08;
+- **verificación:** 2025-09 → 2026-10-25.
+
+**Criterios (cada hipótesis, todos):**
+1. desarrollo: mejora media del log-loss por minuto > 0, con límite inferior del IC 97,5 % (bootstrap por
+   semanas) > 0;
+2. desarrollo: EV por operación de la política ≥ el del modelo base;
+3. verificación: mejora del log-loss > 0 (puntual) y EV ≥ el del base.
+
+**Consecuencia:** si pasa, un modelo congelado nuevo con los 12 meses hasta el 2026-10-25 y confirmación
+con 2026-10-26 → 2027-01-18. Si no pasa, se documenta como desarmado.
