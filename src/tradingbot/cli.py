@@ -560,7 +560,11 @@ def cmd_senal(a) -> int:
     print(f"Señales anticipadas con {bundle['model_id']}: aviso en el segundo {bundle['k']} de cada vela. "
           f"Panel: http://127.0.0.1:8765/senales — Ctrl+C para detener. SOLO CUENTA DEMO.")
     try:
-        anticipada.SignalLoop(bundle, Path(a.runtime), sound=not a.sin_sonido).run(a.iteraciones)
+        if a.cuarto and a.cuarto != 1:  # el modelo congelado (H16b) entra 1 min antes del vencimiento
+            print(f"Aviso: el modelo congelado se validó para entrar 1 min antes del vencimiento; --cuarto {a.cuarto} "
+                  "requiere su propio modelo (Estudio 19). Se usa igualmente, solo como práctica.")
+        anticipada.SignalLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, cuarto_r=a.cuarto,
+                              pago=a.pago / 100 if a.pago else None).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -760,6 +764,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--runtime", default="runtime/senales")
     x.add_argument("--iteraciones", type=int, default=0, help="0 = sin límite")
     x.add_argument("--sin-sonido", action="store_true")
+    x.add_argument("--cuarto", type=int, default=None,
+                   help="vencimiento fijo cada 15 min: avisar solo en las velas que dejan R min hasta el vencimiento")
+    x.add_argument("--pago", type=float, default=None, help="pago real de la plataforma, en porcentaje (p. ej. 87)")
     x.set_defaults(func=cmd_senal)
 
     x = sub.add_parser("serve", help="panel web local")

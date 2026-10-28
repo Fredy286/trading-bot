@@ -146,3 +146,25 @@ def test_panel_records_click_once_and_validates_platform_data(tmp_path):
     finally:
         srv.shutdown()
         srv.server_close()
+
+
+def test_quarter_turn_only_decides_in_the_minute_before_the_last_minute(bars, tmp_path):
+    assert anticipada.quarter_turn(pd.Timestamp("2026-11-01 10:13", tz="UTC"), 1)
+    assert not anticipada.quarter_turn(pd.Timestamp("2026-11-01 10:14", tz="UTC"), 1)
+
+    class _Feed:
+        offset_s, session = 0.0, None
+
+        def server_now(self):
+            return pd.Timestamp("2026-11-01 10:05:50", tz="UTC").to_pydatetime()
+
+    loop = anticipada.SignalLoop(_bundle(), tmp_path, feed=_Feed(), secfeed=None, sound=False, cuarto_r=1, pago=0.87)
+    d = loop.step(pd.Timestamp("2026-11-01 10:05:50.25", tz="UTC").to_pydatetime())
+    assert d["estado"] == "fuera de turno" and d["proximo"].startswith("2026-11-01T10:13:50")
+
+
+def test_real_payout_changes_the_expected_gain(bars):
+    t = bars.index[-1] + pd.Timedelta(minutes=1)
+    d85 = anticipada.decide(_bundle(0.56), bars, _sec(t), t)
+    d87 = anticipada.decide(_bundle(0.56), bars, _sec(t), t, payout=0.87)
+    assert d87["ev"] > d85["ev"]

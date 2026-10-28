@@ -166,13 +166,21 @@ function renderSignal(st) {
     if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;
     $("countdown").textContent = left > 0 ? `cierre en ${left.toFixed(1)} s` : `${(-left).toFixed(1)} s después del cierre`;
-    if (!$("sub").textContent) $("sub").textContent = `BTC/USD · 1 minuto · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
+    if (!$("sub").textContent) $("sub").textContent = u.vence
+      ? `BTC/USD · vencimiento a elegir: ${fmtT(u.vence).slice(0, 5)} · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`
+      : `BTC/USD · 1 minuto · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
   } else {
     current = null; $("clickbtn").disabled = true; big.className = "none";
     big.textContent = u.estado === "error" ? "Error de datos (reintentando)" :
-      u.estado === "sin datos" ? "Sin datos suficientes este minuto" : "Sin señal — esperando el segundo 50";
-    const s = (now / 1000) % 60, wait = s < 50 ? 50 - s : 110 - s;
-    $("countdown").textContent = `próxima decisión en ${wait.toFixed(0)} s`;
+      u.estado === "sin datos" ? "Sin datos suficientes este minuto" :
+      u.estado === "fuera de turno" ? "Esperando el turno del vencimiento" : "Sin señal — esperando el segundo 50";
+    if (u.estado === "fuera de turno" && u.proximo) {
+      const wait = (new Date(u.proximo).getTime() - now) / 1000;
+      $("countdown").textContent = `próxima decisión a las ${fmtT(u.proximo)} (en ${Math.max(0, wait).toFixed(0)} s)`;
+    } else {
+      const s = (now / 1000) % 60, wait = s < 50 ? 50 - s : 110 - s;
+      $("countdown").textContent = `próxima decisión en ${wait.toFixed(0)} s`;
+    }
     $("sub").textContent = u.motivo || "";
   }
 }

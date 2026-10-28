@@ -144,9 +144,11 @@ def load_bundle(path: Path = MODEL_PATH, reg: Path = REG_PATH) -> dict:
 
 
 # ----------------------------------------------------------------------------------------------- decisión
-def decide(bundle: dict, bars: pd.DataFrame, sec: pd.DataFrame, minute_open: pd.Timestamp) -> dict:
+def decide(bundle: dict, bars: pd.DataFrame, sec: pd.DataFrame, minute_open: pd.Timestamp,
+           payout: float | None = None) -> dict:
     """Decisión en el segundo k de la vela `minute_open`. `bars`: velas de 1 min CERRADAS (hasta la anterior);
-    `sec`: velas de 1 s CERRADAS de la vela en curso (columnas o, h, l, c, v, tb, n)."""
+    `sec`: velas de 1 s CERRADAS de la vela en curso (columnas o, h, l, c, v, tb, n). `payout`: pago real de la
+    plataforma (por defecto, el del modelo)."""
     if bars.index[-1] != minute_open - pd.Timedelta(minutes=1):
         return {"estado": "sin datos", "motivo": "falta la vela de 1 min anterior"}
     sec = sec[(sec.index >= minute_open) & (sec.index < minute_open + pd.Timedelta(seconds=bundle["k"]))]
@@ -163,7 +165,8 @@ def decide(bundle: dict, bars: pd.DataFrame, sec: pd.DataFrame, minute_open: pd.
     p_up = float(bundle["calibrator"].transform(bundle["model"].predict_proba(X.to_numpy())[:, 1])[0])
     side = 1 if p_up >= 0.5 else -1
     p_dir = p_up if side == 1 else 1 - p_up
-    ev = float(BinaryContract(bundle["payout"], "refund").ev(np.array([p_dir]), np.array([bundle["q"]]))[0])
+    b = bundle["payout"] if payout is None else payout
+    ev = float(BinaryContract(b, "refund").ev(np.array([p_dir]), np.array([bundle["q"]]))[0])
     return {"estado": "señal" if ev >= bundle["ev_margin"] else "sin señal", "lado": side, "p": p_dir, "ev": ev}
 
 
@@ -195,9 +198,17 @@ def last_before(sec: pd.DataFrame, t: pd.Timestamp, max_gap_s: int = 5) -> float
 
 
 # ----------------------------------------------------------------------------------------------- bucle
+def quarter_turn(minute_open: pd.Timestamp, r: int) -> bool:
+    """Vencimiento fijo cada 15 min (Estudio 19): la vela del aviso deja el vencimiento, R min después de la
+    entrada, justo en :00, :15, :30 o :45."""
+    return (minute_open.minute + 1 + r) % 15 == 0
+
+
 class SignalLoop:
-    def __init__(self, bundle: dict, runtime: Path, feed=None, secfeed=None, sound: bool = True, log=print):
+    def __init__(self, bundle: dict, runtime: Path, feed=None, secfeed=None, sound: bool = True, log=print,
+                 cuarto_r: int | None = None, pago: float | None = None):
         self.b, self.dir = bundle, Path(runtime)
+        self.cuarto_r, self.pago = cuarto_r, pago
         self.dir.mkdir(parents=True, exist_ok=True)
         self.feed = feed or BinancePollingFeed("BTCUSDT")
         self.sec = secfeed or SecondsFeed(self.feed.session)
@@ -213,12 +224,22 @@ class SignalLoop:
 
     def step(self, now: datetime) -> dict:
         minute_open = pd.Timestamp(now).floor("min")
+        r = self.cuarto_r
+        if r and not quarter_turn(minute_open, r):
+            nxt = minute_open + pd.Timedelta(minutes=1)
+            while not quarter_turn(nxt, r):
+                nxt += pd.Timedelta(minutes=1)
+            d = {"estado": "fuera de turno", "proximo": (nxt + pd.Timedelta(seconds=self.b["k"])).isoformat()}
+            self.last = d
+            return d
         bars, _ = self.feed.get(now)
         sec = self.sec.get(minute_open, now)
-        d = decide(self.b, bars, sec, minute_open)
+        d = decide(self.b, bars, sec, minute_open, self.pago)
         self.n_minutes += 1
         d.update({"vela": minute_open.isoformat(), "decidido": pd.Timestamp(now).isoformat(),
                   "cierre": (minute_open + pd.Timedelta(minutes=1)).isoformat()})
+        if r:
+            d["vence"] = (minute_open + pd.Timedelta(minutes=1 + r)).isoformat()
         if d["estado"] == "señal":
             self.n_signals += 1
             d["alert_id"] = uuid.uuid4().hex[:12]
@@ -258,6 +279,7 @@ class SignalLoop:
         state = {"actualizado": utcnow().isoformat(), "hora_binance": pd.Timestamp(now).isoformat(),
                  "desfase_reloj_s": self.feed.offset_s, "inicio": self.started.isoformat(),
                  "model_id": self.b["model_id"], "k": self.b["k"], "latencia_prevista": self.b["latencia"],
+                 "cuarto_r": self.cuarto_r, "pago": self.pago if self.pago is not None else self.b["payout"],
                  "minutos": self.n_minutes, "avisos": self.n_signals, "ultimo": self.last}
         tmp = self.dir / f"state.json.{os.getpid()}.tmp"
         tmp.write_text(jsonutil.dumps(state, default=str), encoding="utf-8")
