@@ -1823,3 +1823,56 @@ la misma distancia del fin y del inicio del impulso.
 - **No pasa:** fallan los criterios 3 y 4. El bloque no añade información y baja la ganancia esperada.
 
 **Estudio 17: SIN SEÑAL.**
+
+## Estudio 18 — aviso anticipado con contratos que SÍ existen: BTC a 3, 5 y 15 minutos (pre-registro, 2026-10-27, ANTES de calcular nada)
+
+**Origen:** el usuario comprobó en su plataforma demo (IQ Option) que **no hay BTC/USD a 1 minuto**. Hay
+binaria de BTC con vencimiento de **15 minutos** y «blitz» de **3 minutos** como mínimo. La ventaja
+validada en desarrollo (Estudios 15 y 16) es a 1 minuto y vive en los primeros segundos. Pregunta: con el
+mismo aviso anticipado (segundo 50, clic 10 s después), ¿hay ventaja aprovechable si el contrato dura 3,
+5 o 15 minutos?
+
+**Por qué podría haberla:**
+- la presión del final de la vela continúa unos segundos;
+- la tendencia y la volatilidad de varios minutos (`FEATURES`: rendimientos de 5–240 min, medias, RSI,
+  volatilidad) pueden informar plazos más largos.
+
+**Por qué podría no haberla:**
+- a 3–15 minutos el efecto de los primeros segundos se diluye en el ruido;
+- a 15 minutos los Estudios 2 y 4 no confirmaron ventaja (con entrada a 1 min y sin velas de 1 s).
+
+**Expectativa declarada:** ventaja menor que a 1 minuto; probable «SIN SEÑAL» a 15 minutos.
+
+**Hipótesis (familia de 3, Bonferroni α = 0,0167):**
+- **H18-3:** vencimiento de 180 s;
+- **H18-5:** 300 s;
+- **H18-15:** 900 s.
+
+**Diseño común:**
+- **Variables:** las del Estudio 16 con k = 50, es decir, `FEATURES` de la vela t−1 + bloque parcial
+  de la vela t hasta el segundo 50.
+- **Entrada:** último precio negociado antes de t + 60 s (clic 10 s después del aviso, como H16b).
+- **Salida:** último precio negociado antes de t + 60 s + duración. Dirección con redondeo a medio tick;
+  empate si no se mueve.
+- El modelo de cada hipótesis se entrena con su propia etiqueta.
+- **Validación:** GBM del proyecto, política B (EV ≥ 0,02; binaria 85 %; empate reembolsado; tasa de
+  empates causal desplazada lo suficiente para que la etiqueta ya sea conocida). Walk-forward con pruebas
+  2024-07 → 2025-08, 12 meses de entrenamiento, 20 % de calibración y purga igual a la duración más 2 min.
+
+**Criterios (cada hipótesis, todos):**
+1. ≥ 300 operaciones;
+2. p binomial unilateral < 0,0167 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. límite inferior del IC 98,33 % del EV (bootstrap semanal) > 0;
+5. EV > 0 en ≥ 60 % de los trimestres.
+
+**Solo informativo:**
+- **«Una operación a la vez»:** solo se toma una señal si no hay otra abierta. Es lo realista a mano.
+  Se informan sus operaciones, acierto y EV.
+- **Latencia del clic:** L ∈ {0, 5, 10, 15, 20} s.
+- **Pago del 80 %.**
+
+**Consecuencias:**
+- Si alguna pasa, se pre-registra su confirmación con los datos del 2026-10-26 al 2027-01-18 y se añade
+  esa duración al modo de señales de la demo, marcada «experimental».
+- Si ninguna pasa, SIN SEÑAL para esas duraciones.
