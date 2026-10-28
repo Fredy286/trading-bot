@@ -2369,3 +2369,41 @@ se abre el bid «cae» sin que el mercado se mueva, y vuelve cuando se cierra. E
   Si no se cumple, H25 se declara **artefacto del precio bid** y P10 se descarta.
 - **Informativo:** el mismo cálculo con el bid de los ticks, para comprobar que reproduce lo de las velas de
   HistData.
+
+## Estudio 26 — aviso anticipado con umbral de confianza en otras monedas (pre-registro, 2026-10-27, ANTES de descargar sus velas de 1 s)
+
+**Origen:**
+- en BTC, filtrar por confianza (p ≥ 0,60) subió el acierto a 60–62 % (Estudio 20, informativo);
+- en el Estudio 13 (modelo sin anticipación, entrada al cierre), XRP, SOL y DOGE mostraron el mismo patrón
+  al exigir más EV (XRP 62,9 % con EV ≥ 0,12; SOL 61,7 %; DOGE 61,0 %), y ETH 58,1 %. BNB y ADA casi no
+  tenían señales de alta confianza.
+
+Elegir estas 4 monedas usa lo visto en el Estudio 13 (periodo 2022–2025); la prueba es en 2025-09 → 2026-10,
+que el Estudio 13 no tocó.
+
+**Monedas (fijas):** XRP/USDT, SOL/USDT, ETH/USDT y DOGE/USDT (Binance contado).
+
+**Modelo:** la receta de H16b para cada moneda, sin cambiar nada:
+- `FEATURES` de sus velas de 1 min y bloque parcial de sus velas de 1 s hasta el segundo 49;
+- etiqueta: último precio antes de t + 60 s contra último precio antes de t + 120 s;
+- GBM con la misma semilla;
+- repetición mensual 2025-09 → 2026-10-25, con 12 meses de entrenamiento y 20 % de calibración (Estudio 20).
+
+**Política:** EV ≥ 0,02 (pago 85 %) **y** probabilidad de la dirección ≥ 0,60.
+
+**Hipótesis (una por moneda; Bonferroni α = 0,0125). Criterios (todos):**
+1. ≥ 300 operaciones;
+2. p binomial < 0,0125 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 60 % de los meses con operaciones;
+5. **robustez contra el «rebote» del último precio:** en monedas de precio bajo, el último precio salta entre
+   compra y venta. Con la etiqueta recalculada usando el **promedio de los 5 últimos cierres de 1 s** antes
+   de t + 60 y de t + 120, el acierto en las mismas operaciones debe seguir > 54,05 %.
+
+**Informativo:**
+- todas las señales sin umbral;
+- el tamaño relativo del tic de precio de cada moneda;
+- un selector conjunto (cuántas señales al día suman las 4 monedas + BTC).
+
+**Consecuencia:** lo que pase se confirmará con modelos congelados y datos posteriores al 2026-10-25 (nuevo
+pre-registro). Solo demo.
