@@ -345,6 +345,15 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study24(a) -> int:
+    from .research import study24
+
+    rep = study24.run()
+    for h, r in rep["hipotesis"].items():
+        print(f"{h} ({r['mercado']}): pasa={r['pasa']} | {r['criterios']}")
+    return 0
+
+
 def cmd_research_study23(a) -> int:
     from .research import study23
 
@@ -660,6 +669,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study24", help="Estudio 24: ETH y BTC/USDC en los segundos 0–49 como mejora de H16b")
+    x.set_defaults(func=cmd_research_study24)
     x = r.add_parser("study23", help="Estudio 23: auditoría de canales de señales de Telegram con precios reales")
     x.set_defaults(func=cmd_research_study23)
     x = r.add_parser("study22", help="Estudio 22: estrategias de comunidades de binarias (MHI, Torres, catalogación…)")
