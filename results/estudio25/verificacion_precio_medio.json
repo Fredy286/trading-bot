@@ -1,0 +1,35 @@
+{
+  "estudio": "Estudio 25 — verificación con precio medio de ticks",
+  "git_sha": "eaf4862670a8b4ed0fa0926f62e58b4fe67cb864",
+  "precios": {
+    "mid": {
+      "operaciones": 7640,
+      "sin_empate": 7422,
+      "acierto": 0.5978172999191592,
+      "lo95": 0.5866139034466029,
+      "acierto_empate_pierde": 0.5807591623036649,
+      "ev": 0.10293848167539264,
+      "p": 1.5169571695729693e-23,
+      "p_azar": 2.3783126532446282e-64,
+      "call": 0.6062670299727521,
+      "put": 0.5895522388059702
+    },
+    "bid": {
+      "operaciones": 7500,
+      "sin_empate": 7135,
+      "acierto": 0.5995795374912404,
+      "lo95": 0.5881594039557252,
+      "acierto_empate_pierde": 0.5704,
+      "ev": 0.10390666666666666,
+      "p": 5.143818060044202e-24,
+      "p_azar": 3.9340489593733856e-64,
+      "call": 0.6197461212976022,
+      "put": 0.5796657381615599
+    }
+  },
+  "criterios": {
+    "acierto_wilson": true,
+    "simetria_5pts": true
+  },
+  "pasa": true
+}

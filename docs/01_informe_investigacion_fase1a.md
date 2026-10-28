@@ -2411,3 +2411,44 @@ pre-registro). Solo demo.
 **Nota de implementación (antes de descargar):** la etiqueta de H16b redondea con el tic de BTC (0,01 USD). En
 cada moneda se usa su propio tic de Binance (XRP 0,0001; SOL 0,01; ETH 0,01; DOGE 0,00001). Con el de BTC,
 casi todos los minutos de XRP y DOGE quedarían como empate.
+
+**Resultado de la verificación con precio medio (`results/estudio25/verificacion_precio_medio.json`): PASA.**
+
+| Precio | Operaciones | Acierto [lím. inf.] | Empate = pierde | CALL | PUT |
+|---|---|---|---|---|---|
+| **Medio** (ticks bid + ask) | 7 640 | **59,78 %** [58,66 %] | 58,08 % | 60,6 % | 59,0 % |
+| Bid de los ticks | 7 500 | 59,96 % | 57,04 % | 62,0 % | 58,0 % |
+
+**Lectura:**
+- La asimetría se debía al bid; con precio medio, la reversión nocturna es simétrica y se mantiene.
+- Hay dos límites:
+  1. los 6 pares se eligieron por ser los mejores del Estudio 25 (sesgo de selección);
+  2. se supuso entrada en la apertura exacta de la vela siguiente.
+
+## Estudio 27 — reversión nocturna en divisas: operatividad con clic humano y los 24 pares (pre-registro, 2026-10-27, ANTES de descargar más ticks)
+
+**Diseño:**
+- **Datos:** ticks de HistData (precio medio) de los 24 pares del Estudio 25, 2026-04 → 2026-09.
+- **Regla:** la de H25, con dos cambios:
+  - la señal se conoce al cierre de la vela s (último tick antes de s + 60 s);
+  - **la entrada es el precio medio del último tick antes de s + 60 s + L** (L = demora del clic), y el
+    vencimiento es exactamente 3 min después de la entrada (último tick antes de entrada + 180 s).
+- **Hipótesis (Bonferroni α = 0,025):**
+  - **H27a:** L = 5 s;
+  - **H27b:** L = 10 s.
+- **Criterios (cada una, todos):**
+  1. ≥ 1 000 operaciones;
+  2. p < 0,025 frente a 54,05 % (pago 85 %);
+  3. Wilson 95 % > 54,05 %;
+  4. EV > 0 en ≥ 5 de los 6 meses;
+  5. CALL y PUT a menos de 5 puntos entre sí.
+- **Informativo:**
+  - L = 0, 2, 20 y 30 s;
+  - el acierto con el empate contado como pérdida;
+  - los equilibrios con pagos del 70, 75 y 80 % (57,1 %; 57,1 %; 55,6 %) — de noche las plataformas suelen
+    bajar el pago;
+  - acierto por par y por hora.
+- **Confirmación (si pasa):** las mismas reglas con los ticks de 2026-10-26 → 2027-01-18 en cuanto HistData los
+  publique (sale cada mes), una sola vez.
+- **Condición para la demo:** que el usuario confirme en su plataforma que esos pares se pueden operar sin
+  OTC entre las 16:00 y las 19:00 de Bogotá, con vencimiento de 3 min, y el pago real a esas horas.
