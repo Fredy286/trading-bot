@@ -2676,3 +2676,43 @@ Acierto con clic a +10 s, 21–24 UTC, 24 pares, 2025-11 → 2026-09:
 
 El modo en vivo ofrecerá esta variante como **opción de práctica** (útil también si la plataforma solo deja
 vencimientos de 5 min), sin dejar de usar la regla actual por defecto.
+
+## Estudio 32 — auditoría PROSPECTIVA de canales de señales (pre-registro, 2026-10-29, ANTES de capturar ninguna señal nueva)
+
+**Origen:** el usuario no cree que quienes «aciertan 60 % o más todos los días» tiren al azar. El Estudio 23
+miró el pasado de 21 canales (49–51 % en la primera entrada), pero el pasado se puede editar o borrar. Aquí se
+vigila **hacia adelante**: cada hora se guarda lo que publican los canales (`.github/workflows/vigilancia_canales.yml`,
+`src/tradingbot/data/telegram_publico.py`), con la hora de Telegram y la nuestra, y cada día se cruza con precios
+reales. Nadie puede corregir después lo que ya guardamos.
+
+**Canales:** los de `config/canales_vigilados.txt`. La investigación diaria puede añadir más, pero cada canal
+entra en la evaluación solo con las señales capturadas **después** de añadirlo.
+
+**Lectura de señales (reglas fijas):**
+- Cada línea del mensaje que contenga a la vez:
+  - un par de divisas verificable en Deriv (los 25 `frx…`, escrito con o sin «/»);
+  - una hora HH:MM;
+  - una dirección: CALL / PUT / BUY / SELL / COMPRA / VENDA / VENTA / UP / DOWN, o los emojis 🟩 🟥 ⬆ ⬇ 🔼 🔽.
+- **Vencimiento:** el marcado en la línea o en el mensaje (M1 / M5 / M15). Si no hay ninguno, la señal no es
+  verificable.
+- **Se excluyen** las líneas o los mensajes que digan «OTC».
+- **Zona horaria:** la anotada para el canal en la lista. Sin zona, ninguna señal del canal es verificable.
+- **Fecha de entrada:** la primera vez que llega esa hora local **después** de la publicación (regla del Estudio 23).
+- **Resultado:** apertura de la vela de 1 min de la entrada frente al cierre de la última vela del vencimiento
+  (velas de precio medio de la API pública de Deriv); empate si son iguales. Solo cuenta la primera entrada (G0);
+  la martingala no se cuenta como acierto.
+
+**Hipótesis (una por canal con ≥ 100 señales verificadas; Holm entre canales):**
+- **H32-azar:** acierto G0 > 50 %;
+- **H32-rentable:** límite inferior de Wilson 95 % > 54,05 % (pago 85 %).
+
+**Evaluación formal:** una sola vez, el 2027-01-31, con las señales publicadas entre el 2026-10-29 y el 2027-01-25.
+Antes de esa fecha solo se informan tablas descriptivas mensuales, sin veredicto.
+
+**Si algún canal pasa:** se pre-registra un estudio para desarmar sus señales (horario, par, dirección frente
+al movimiento reciente, posición en las bandas, etc.) y buscar qué dato usa.
+
+**Nota sobre datos reservados:** auditar canales de terceros con precios posteriores al 2026-10-25 **no** evalúa
+ninguna estrategia propia, así que se permite. Nunca se calculan aquí aciertos de los Estudios 12–29.
+
+**Expectativa declarada:** ~50 % en todos, como en el Estudio 23.
