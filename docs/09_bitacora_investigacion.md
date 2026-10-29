@@ -168,3 +168,69 @@ lo más útil es que Fredy anote en la demo la hora de Bogotá de cada señal no
 - Confirmación del Estudio 27 (P10): cuando HistData publique los ticks de nov-2026 → ene-2027 (sale cada mes),
   una sola vez con datos 2026-10-26 → 2027-01-18.
 - Estudios 12, 14, 15, 16 y 21 (confirmación): evaluación única después del 2027-01-18.
+
+## 2026-10-29 (autónoma)
+
+**Preparación:** la cola de estudios (`config/cola_estudios.txt`) estaba vacía: no había resultados sin documentar.
+Este entorno **no llega** a data.binance.vision, api.binance.com ni histdata.com (el proxy rechaza la conexión), y
+no hay datos locales; tampoco se pudieron abrir arxiv.org ni cryptoslate.com. Por eso el estudio de hoy se deja
+en la cola de GitHub Actions.
+
+**Temas buscados:** (1) regímenes de volatilidad de BTC y fines de semana a alta frecuencia; (2) liquidez y
+diferencial en divisas alrededor del cambio de día de las 17:00 de Nueva York (base de P10); (3) dependencia de
+los retornos de 1 min según volatilidad, hora y desbalance de órdenes; (4) comportamiento del precio alrededor
+de la financiación de los perpetuos (00/08/16 UTC). Rotar mañana a: noticias macro programadas en divisas y
+adelanto oro ↔ dólar.
+
+**Hallazgos**
+1. *Volatilidad de BTC por día y hora:* nada nuevo y útil para 1–15 min. De Nicola (Ledger, 2021,
+   https://ledger.pitt.edu/ojs/ledger/article/view/213) halla autocorrelación negativa a 1–4 h, no a 1 min;
+   Karim y otros (IRFA 2024, https://ideas.repec.org/a/eee/finana/v96y2024ipas1057521924005490.html) estudian
+   la relación retorno–volatilidad de 1 min a diario. Un informe de industria citado por Blockworks
+   (https://blockworks.co/news/bitcoins-price-predictable-study) dice que el viernes es más volátil; sin método
+   verificable. Leído solo el resumen del buscador.
+2. *Cambio de día en divisas (17:00 NY):* solo páginas de brókeres y foros (p. ej.
+   https://blackbull.com/en/education-hub/understanding-roll-over-and-widening-spreads-2,
+   https://financefeeds.com/bidfx-research-finds-liquidity-gap-in-fx-markets-between-4-pm-and-6-pm-est/): el
+   diferencial se abre varios pips unos minutos (de 5 min a 1 h según el relato) porque los bancos reinician
+   sus motores de precios. **Ninguna fuente mide si el precio revierte después.** Para P10 confirma el riesgo
+   práctico ya anotado: en la demo, mirar el diferencial real del bróker justo después de las 17:00 NY.
+3. *Reloj de cuarto de hora en cripto:* Kim y Hansen (preprint, julio 2026, https://arxiv.org/abs/2607.09426,
+   **no leído completo**; ya citado el 2026-10-26) y un resumen de prensa (https://cryptoslate.com/?p=559513,
+   **no se pudo abrir**): el volumen y el movimiento se concentran en los minutos :00/:15/:30/:45, sobre todo en
+   sus primeros 10 s, y el efecto sigue al quitar las horas de financiación. Las páginas de brókeres confirman
+   la financiación de Binance a las 00, 08 y 16 UTC (p. ej. https://www.sharpe.ai/funding-rates/exchange/binance).
+
+**Estudio del día — Estudio 33 (pre-registro aea2c8b, código a1598a3):** la «familia de reloj» propuesta el
+26 y el 27 de octubre, en una sola hipótesis. Al GBM de BTC 1 min (el de los Estudios 7 y 13) se le añaden 8
+variables de calendario del minuto que se opera: ¿es :00/:15/:30/:45?, ¿múltiplo de 5?, su fase dentro del
+cuarto de hora, ¿es en punto?, minutos hasta la financiación, ¿es la hora de financiación o los 5 min siguientes?
+Pasa solo si mejora el log-loss (IC 95 % > 0) y el EV de la política en el desarrollo (2022-01 → 2025-08) y,
+además, en la verificación (2025-09 → 2026-09). Datos solo hasta 2026-09. **No ejecutado aquí** (sin acceso a
+Binance): orden `tbot research study33` en la cola; GitHub Actions la corre a las 10:00, 16:00 o 22:00 de Bogotá.
+Expectativa declarada: sin señal o < 0,5 puntos.
+
+**Nota técnica:** los Estudios 25, 27, 28, 30 y 31 no tienen comando `tbot research studyNN` (se ejecutaron por
+otra vía), así que la cola no puede repetirlos; el Estudio 33 sí lo tiene y descarga sus propios datos.
+
+**Incidencia de subida:** el primer intento de push recibió 403 (sin permiso de escritura). En un reintento el permiso
+ya funcionaba, pero mientras tanto la sesión principal había usado el número 32 (auditoría prospectiva de canales) y
+pedía subir a `claude/rutina-AAAA-MM-DD`. Se rehízo todo sobre la rama actual como **Estudio 33** (antes de ejecutar
+nada) y se subió a `claude/rutina-2026-10-29`; `integrar_rutina.yml` lo lleva a la rama principal si pasan las pruebas.
+
+**Pendientes con fecha**
+- **2026-10-30:** documentar el resultado del Estudio 33 en docs/01 (tabla + veredicto), docs/08 (P12) y
+  CLAUDE.md. Si la orden falla en Actions, revisar el registro del flujo «Cola de estudios».
+- **2026-11-01:** cambio de horario de Nueva York (sin cambios en la regla de P10: ventana UTC fija).
+- H5b del Estudio 5: sigue sin evaluarse (sesión principal con Fredy).
+- Estudios 12, 14, 15, 16, 19, 21 y 29 (confirmación): evaluación única después del 2027-01-18.
+
+**Para Fredy**
+- Hoy busqué si la hora exacta del reloj (los minutos :00, :15, :30, :45 y la hora en que se pagan las
+  financiaciones) ayuda a adivinar el siguiente minuto de BTC. Un estudio reciente dice que en esos minutos
+  hay ráfagas de movimiento.
+- Dejé la prueba escrita y congelada (Estudio 33). La corre GitHub sola hoy; aquí no hay acceso a Binance.
+- Espero honestamente que no cambie nada; si mejora, habría que confirmarlo con datos nuevos.
+- Para las señales nocturnas: justo después de las 17:00 de Nueva York los brókeres abren el diferencial; en la
+  demo fíjate si el precio salta en esos minutos.
+- No cambió nada en el bot ni en las señales.

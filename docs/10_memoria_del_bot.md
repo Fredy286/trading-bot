@@ -29,7 +29,7 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 
 | # | Idea | Por qué | Estado |
 |---|---|---|---|
-| 1 | Variables de «reloj» (minuto en el cuarto de hora, hora de financiación 00/08/16 UTC) en el GBM de BTC | Preprint de Kim y Hansen (2026): ráfagas de volumen y dependencia serial en los cuartos de hora | El 2026-10-29 la rutina la pre-registró y programó, pero **no pudo subirla** (error 403). Rehacerla con el siguiente número de estudio libre |
+| 1 | Variables de «reloj» (minuto en el cuarto de hora, hora de financiación 00/08/16 UTC) en el GBM de BTC | Preprint de Kim y Hansen (2026): ráfagas de volumen y dependencia serial en los cuartos de hora | **Estudio 33** (pre-registro aea2c8b, código a1598a3), en la cola de GitHub Actions desde el 2026-10-29. Documentar el resultado |
 | 2 | Confirmación de ETH con umbral: modelo congelado de ETH (12 meses hasta el 2026-10-25) y evaluación única con datos nuevos | Estudio 26 pasó (58,8 %) | Por pre-registrar (confirmación) |
 | 3 | Selector BTC + ETH con p ≥ 0,60 en el horario del usuario (21:00–01:00 Bogotá) | Más señales de alta confianza en sus horas | Idea |
 | 4 | Traders con historial **verificado** (Myfxbook, Darwinex, eToro, ranking de TradingView): ¿quién acierta ≥ 60 % de verdad y cómo? | El usuario cree que hay algo detrás de quien acierta a diario | Investigar; desarmar su riesgo (acierto alto con pérdidas grandes = asimetría) |

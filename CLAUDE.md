@@ -215,7 +215,7 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        (`tbot canales auditar`, Estudio 32 → `results/auditoria_canales/`; veredicto único el 2027-01-31).
      - **Integración:** la rutina sube a `claude/rutina-AAAA-MM-DD`; `.github/workflows/integrar_rutina.yml` la reaplica
        sobre la rama principal si pasan las pruebas. El 2026-10-29 la primera rutina recibió 403 al hacer push
-       (falta permiso de escritura de la app de Claude en GitHub); su estudio de «reloj» se perdió (memoria, idea 1).
+       (falta permiso de escritura de la app de Claude en GitHub); en un reintento sí subió: su estudio de «reloj» quedó como **Estudio 33** (aea2c8b), en la cola.
      - **Memoria del bot:** `docs/10_memoria_del_bot.md` (lo aprendido + ideas pendientes con estado).
      - En el horario del usuario (21:00–01:00 Bogotá) funciona el modelo de BTC 1 min (57,6 %; 60,7 % con p ≥ 0,60,
        Estudio 20, descriptivo); la reversión de divisas no (52 % a esas horas, Estudio 30).
