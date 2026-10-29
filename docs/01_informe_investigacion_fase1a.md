@@ -2905,3 +2905,35 @@ decil del diferencial relativo (diferencial en la señal ÷ referencia nocturna 
   Estudio 29 la acotan.
 - Hora 22 UTC: 61,7 %.
 - Mejores pares: GBPAUD 60,1 %, EURGBP 59,0 %. Peores: USDCAD 52,9 %, NZDUSD 53,4 %.
+
+## Estudio 37 — ¿la ventaja de BTC a 1 min existe en el precio de otra bolsa (Coinbase)? (pre-registro, 2026-10-29, ANTES de descargar velas de Coinbase)
+
+**Origen:** el Estudio 34 mostró que una ventaja puede depender de cómo se forma el precio en una fuente concreta.
+El modelo de BTC aprende y se juzga con el último precio de Binance (BTC/USDT). Las plataformas de binarias usan su
+propio precio, a menudo un índice de varias bolsas. Si la continuación del final de la vela es un movimiento real de
+BTC, también debe verse en Coinbase (BTC/USD).
+
+**Señales:** las de H20a (Estudio 20): predicciones mes a mes 2025-09-01 → 2026-10-25 (`results/estudio20/predicciones.parquet`,
+calculadas solo con datos de Binance), con la misma política: EV ≥ 0,02 con pago del 85 % y la tasa de empates de
+Binance. Son las mismas 22 129 operaciones.
+
+**Resultado con Coinbase:** velas de 1 min de BTC-USD de la API pública de Coinbase Exchange. La señal se decide en
+el segundo 50 de la vela t y el clic a +10 s cae en su cierre. Por eso, resultado = signo(cierre de la vela t + 1 −
+cierre de la vela t) en Coinbase (empate si son iguales). Si falta alguna de las dos velas, la operación no se cuenta.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H37a:** todas las señales de H20a;
+- **H37b:** solo las de probabilidad ≥ 0,60.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p binomial < 0,025 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 60 % de los meses.
+
+**Informativo:**
+- en cuántas operaciones coinciden los resultados de Binance y Coinbase;
+- el acierto cuando no coinciden.
+
+**Expectativa declarada:** algo menos que en Binance (57,6 % / 62,5 %). Un acierto cercano al 50 % indicaría que la
+ventaja es propia del precio de Binance y no un movimiento de BTC.
