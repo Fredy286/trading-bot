@@ -2877,3 +2877,31 @@ t + 2 (3 min). En el Estudio 27 el equivalente con HistData (L = 0) dio 59,5 %; 
 
 **Expectativa declarada:** 56–60 %. Si el precio de Deriv no muestra la ventaja, la demo en vivo pierde su base y se
 anotaría como advertencia mayor.
+
+**Resultado del Estudio 34 (commit 954284d, aplicado mecánicamente; `results/estudio34/resultado.json`).**
+Año 2024-09 → 2025-08, nunca usado; 24 pares; precio medio de ticks; clic a +10 s:
+
+| Hipótesis | Operaciones | Acierto [lím. inf.] | Empate = pierde | CALL / PUT | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|---|
+| **H34a** (regla actual, 3 min) | 65 119 | **56,21 %** [55,82 %], EV +0,039 | 55,23 % | 56,6 / 55,9 % | **12 de 12** | **PASA** (se replica) |
+| H34b (solo con diferencial normal) | 41 268 | 53,27 % [52,78 %], EV −0,014 | 52,24 % | 53,5 / 53,1 % | 3 de 12 | no pasa |
+| **H34c** (30 / 2,5 / 5 min) | 23 594 | **59,59 %** [58,95 %], EV +0,101 | 58,85 % | 60,2 / 59,0 % | **12 de 12** | **PASA** |
+
+**Hallazgo clave (informativo): la ventaja vive en los minutos de diferencial muy abierto.** Acierto de H34a por
+decil del diferencial relativo (diferencial en la señal ÷ referencia nocturna de los 20 días previos):
+
+| Decil | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Diferencial relativo hasta | 0,67 | 0,77 | 0,85 | 0,95 | 1,09 | 1,48 | 2,61 | 4,39 | 7,33 | 61 |
+| Acierto | 54,0 % | 52,9 % | 52,9 % | 53,3 % | 54,1 % | 53,3 % | 53,8 % | **60,1 %** | **63,1 %** | **65,9 %** |
+
+**Lectura:**
+- La reversión nocturna se replica en otro año, pero su mecanismo es de **microestructura**. Cuando el
+  diferencial se abre 3–60 veces lo normal (poca liquidez tras el cierre de Nueva York), el **precio medio** se mueve
+  porque cambia una de las dos puntas y luego vuelve. Con diferencial normal, el acierto (~53–54 %) queda por
+  debajo del equilibrio.
+- Que una plataforma de binarias pague ese movimiento depende de **qué precio usa** y de si a esas horas baja el pago
+  o suspende la operación. Es la mayor duda práctica de P10. El Estudio 36 (precio de Deriv) y la confirmación del
+  Estudio 29 la acotan.
+- Hora 22 UTC: 61,7 %.
+- Mejores pares: GBPAUD 60,1 %, EURGBP 59,0 %. Peores: USDCAD 52,9 %, NZDUSD 53,4 %.
