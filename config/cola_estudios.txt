@@ -3,4 +3,5 @@
 # El flujo ejecuta cada orden pendiente, guarda results/ en la rama y la mueve a la sección «hechas».
 # Regla: añadir una orden aquí solo DESPUÉS de los commits del pre-registro y del código (docs/01).
 [pendientes]
+tbot research study33
 [hechas]
