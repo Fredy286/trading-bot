@@ -41,15 +41,16 @@ def _write(path: Path, rows: list[dict]) -> None:
 
 
 # ----------------------------------------------------------------------------------------------------- BTC
-def btc_day(day: str, cache: Path = CACHE, bundle: dict | None = None) -> list[dict]:
-    """Señales del modelo congelado H16b en el día `day` (UTC) y su resultado con las velas de 1 s de Binance."""
+def btc_day(day: str, cache: Path = CACHE, bundle: dict | None = None, symbol: str = "BTCUSDT") -> list[dict]:
+    """Señales de un modelo congelado con aviso anticipado (BTC H16b por defecto; ETH en `eth_day`) en el día `day`
+    (UTC) y su resultado con las velas de 1 s de Binance."""
     b = bundle or load_bundle()
     d0 = pd.Timestamp(day, tz="UTC")
     d1 = d0 + pd.Timedelta(days=1)
-    m1 = download_daily("1m", f"{d0 - pd.Timedelta(days=3):%Y-%m-%d}", f"{d1:%Y-%m-%d}", cache)
-    sec = download_daily("1s", f"{d0:%Y-%m-%d}", f"{d1:%Y-%m-%d}", cache)
+    m1 = download_daily("1m", f"{d0 - pd.Timedelta(days=3):%Y-%m-%d}", f"{d1:%Y-%m-%d}", cache, symbol)
+    sec = download_daily("1s", f"{d0:%Y-%m-%d}", f"{d1:%Y-%m-%d}", cache, symbol)
     try:  # los 3 primeros minutos del día siguiente cierran las etiquetas de las últimas velas
-        nxt = download_daily("1s", f"{d1:%Y-%m-%d}", f"{d1 + pd.Timedelta(days=1):%Y-%m-%d}", cache)
+        nxt = download_daily("1s", f"{d1:%Y-%m-%d}", f"{d1 + pd.Timedelta(days=1):%Y-%m-%d}", cache, symbol)
         sec = pd.concat([sec, nxt[nxt.index < d1 + pd.Timedelta(minutes=5)]])
     except FileNotFoundError:
         pass
@@ -77,6 +78,13 @@ def btc_day(day: str, cache: Path = CACHE, bundle: dict | None = None) -> list[d
                      "umbral_060": bool(p_dir[i] >= 0.60), "cuarto_hora": bool(quarter_turn(t, 1)),
                      "resultado": r, "modelo": b["model_id"]})
     return rows
+
+
+def eth_day(day: str) -> list[dict]:
+    """ETH/USDT con su modelo congelado (Estudio 35)."""
+    from ..research.study35 import MODEL_PATH, REG_PATH
+
+    return btc_day(day, CACHE / "eth", load_bundle(MODEL_PATH, REG_PATH), "ETHUSDT")
 
 
 # ----------------------------------------------------------------------------------------------- divisas
@@ -133,7 +141,7 @@ def night_day(day: str, feed: DerivFeed | None = None, pairs=PAIRS) -> list[dict
 # --------------------------------------------------------------------------------------------- orquestación
 def run_day(day: str, root: Path = ROOT, log=print) -> dict:
     out = {}
-    for name, fn in (("btc", btc_day), ("nocturna", night_day)):
+    for name, fn in (("btc", btc_day), ("eth", eth_day), ("nocturna", night_day)):
         path = Path(root) / name / f"{day}.jsonl"
         if path.exists():
             out[name] = "ya existía"
@@ -168,6 +176,7 @@ def resumen(root: Path = ROOT, abrir: bool = False, now: pd.Timestamp | None = N
     sellado = now < SELLO and not abrir
     out = {"sellado_hasta": SELLO.strftime("%Y-%m-%d") if sellado else None}
     groups = {"btc": [("todas", None), ("p ≥ 0,60", "umbral_060"), ("cuarto de hora", "cuarto_hora")],
+              "eth": [("todas", None), ("p ≥ 0,60", "umbral_060")],
               "nocturna": [("actual", ("variante", "actual")), ("fuerte", ("variante", "fuerte")),
                            ("actual, hora fuerte", "hora_fuerte")]}
     for name, specs in groups.items():
@@ -176,7 +185,7 @@ def resumen(root: Path = ROOT, abrir: bool = False, now: pd.Timestamp | None = N
         for lab, cond in specs:
             g = df
             if isinstance(cond, str) and len(df):
-                g = df[df[cond]] if name == "btc" else df[(df[cond]) & (df["variante"] == "actual")]
+                g = df[df[cond]] if name in ("btc", "eth") else df[(df[cond]) & (df["variante"] == "actual")]
             elif isinstance(cond, tuple) and len(df):
                 g = df[df[cond[0]] == cond[1]]
             n = int(len(g))

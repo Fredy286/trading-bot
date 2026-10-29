@@ -2838,3 +2838,13 @@ sellados igual que BTC.
 **Potencia declarada:** con ~140 operaciones esperadas (≈ 47 al mes en el Estudio 26), un acierto real del 59 % se
 detectaría solo la mitad de las veces. Un «no pasa» por pocas operaciones no refuta la idea; se informaría como «sin
 muestra suficiente» y se extendería con un pre-registro nuevo.
+
+**Nota del Estudio 35 (2026-10-29, tras congelar el modelo, sin mirar ningún resultado).** Modelo
+`ETHUSDT-anticipada-k50-L10-02b1e4` (SHA-256 71aaa021…; ajuste 412 346 y calibración 103 808 minutos; q = 0,0258).
+
+En sus primeros 3 días (2026-10-26 → 28), la probabilidad máxima de la dirección fue 0,546–0,551. En el Estudio 26
+llegaba a 0,61. Por eso no hubo ninguna señal con EV ≥ 0,02 y, menos aún, con p ≥ 0,60. Solo se miraron
+probabilidades, no aciertos.
+
+Si sigue así, H35 terminará con «sin muestra suficiente». No se cambia nada: el modelo y el umbral quedan
+congelados.
