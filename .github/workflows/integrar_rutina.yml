@@ -1,0 +1,48 @@
+name: Integrar trabajo de la rutina diaria
+
+# La investigación diaria en la nube sube su trabajo a una rama propia «claude/rutina-AAAA-MM-DD». Este flujo la
+# reaplica sobre la rama principal, corre TODAS las pruebas y, si pasan, la sube a la rama principal y borra la rama
+# del día. Si hay conflicto o falla una prueba, la rama queda intacta para que la rutina del día siguiente la arregle.
+
+on:
+  push:
+    branches: ["claude/rutina-**"]
+  workflow_dispatch:
+
+concurrency:
+  group: integrar-rutina
+  cancel-in-progress: false
+
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    env:
+      PYTHONIOENCODING: utf-8
+      MAIN: claude/festive-cray-n1yfb3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Reaplicar la rama del día sobre la principal
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "$MAIN"
+          git rebase "origin/$MAIN"
+      - run: pip install -e . pytest
+      - name: Pruebas
+        run: python -m pytest -q
+      - name: Subir a la rama principal y borrar la rama del día
+        run: |
+          for i in 1 2 3 4; do
+            git fetch origin "$MAIN" && git rebase "origin/$MAIN" && git push origin "HEAD:$MAIN" && break
+            sleep $((i * 5))
+          done
+          git push origin --delete "${GITHUB_REF_NAME}" || true

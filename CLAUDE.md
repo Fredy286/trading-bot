@@ -210,6 +210,13 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - **Cola de estudios** (`.github/workflows/cola_estudios.yml`, 10:00/16:00/22:00 Bogotá): ejecuta solo órdenes
        `tbot research studyNN` y guarda results/.
      - La tarea local `investigacion-diaria-trading-bot` quedó PAUSADA (la reemplaza la rutina en la nube).
+     - **Vigilancia 24/7 de canales** (`.github/workflows/vigilancia_canales.yml`, cada hora): guarda los mensajes nuevos
+       de `config/canales_vigilados.txt` en `results/canales/`; el registro diario los audita con Deriv
+       (`tbot canales auditar`, Estudio 32 → `results/auditoria_canales/`; veredicto único el 2027-01-31).
+     - **Integración:** la rutina sube a `claude/rutina-AAAA-MM-DD`; `.github/workflows/integrar_rutina.yml` la reaplica
+       sobre la rama principal si pasan las pruebas. El 2026-10-29 la primera rutina recibió 403 al hacer push
+       (falta permiso de escritura de la app de Claude en GitHub); su estudio de «reloj» se perdió (memoria, idea 1).
+     - **Memoria del bot:** `docs/10_memoria_del_bot.md` (lo aprendido + ideas pendientes con estado).
      - En el horario del usuario (21:00–01:00 Bogotá) funciona el modelo de BTC 1 min (57,6 %; 60,7 % con p ≥ 0,60,
        Estudio 20, descriptivo); la reversión de divisas no (52 % a esas horas, Estudio 30).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
