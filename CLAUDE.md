@@ -181,6 +181,14 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      simétricos, 6/6 meses; a las 22 UTC, 62,3 %. Con precio bid había un artefacto (CALL 75 % justo tras el cierre
      de NY). Falta: confirmación con datos > 2026-10-25 y que el usuario verifique pares no OTC, vencimiento de
      3 min y pago entre 16:00 y 19:00 de Bogotá. Ticks en data/raw/histdata_ticks_seg/.
+   - **Estudio 28 (invierno, 2025-11 → 2026-03):** pasa con ventana UTC fija (56,79 %, 26 832 ops) y con la anclada a NY
+     (55,37 %); la regla eligió **UTC fija = 16:00–18:59 Bogotá todo el año**. Hora fuerte: 22 UTC (17:00 Bogotá),
+     61,7 % invierno y 62,3 % verano. **Estudio 29 pre-registrado:** confirmación con ticks 2026-10-26 → 2027-01-18
+     (H29a ventana entera, H29b solo 22 UTC), una vez, cuando HistData los publique.
+   - **Modo en vivo de la reversión nocturna (2026-10-28):** `live/nocturna.py`, panel `/nocturna`, `tbot nocturna`,
+     `scripts/iniciar_nocturna.sh`. Usa la API pública de Deriv (sin cuenta; 19 de los 24 pares; precio medio), avisa
+     con sonido, registra el clic y mide el resultado de referencia con los ticks de Deriv. Probado en vivo
+     (3 avisos, ventana forzada). Dependencia nueva: websocket-client.
    - **Estudio 26 (aviso anticipado + umbral p ≥ 0,60 en otras monedas):** solo ETH pasa (653 ops, 58,8 %); XRP, SOL y
      DOGE nunca llegan a p 0,60 con clic a +10 s.
    - **Lección de los Estudios 20–24:** lo único que sube el acierto es **filtrar por confianza** del propio

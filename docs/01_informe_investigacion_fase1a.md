@@ -2528,3 +2528,47 @@ vencimiento 3 min desde la entrada; una operación a la vez). Solo cambia la ven
 **Informativo:**
 - acierto por hora contada desde el cierre de Nueva York, juntando verano e invierno;
 - acierto según la volatilidad del día anterior (por encima o por debajo de la mediana), de la bitácora.
+
+**Resultado del Estudio 28 (commit 9592c1a, aplicado mecánicamente; `results/estudio28/resultado.json`).**
+Invierno de Nueva York, 2025-11 → 2026-03, 24 pares, precio medio de ticks, clic a +10 s:
+
+| Hipótesis | Ventana | Operaciones | Acierto [lím. inf.] | CALL / PUT | Veredicto |
+|---|---|---|---|---|---|
+| **H28a** | 21:00–23:59 UTC (fija) | 26 832 | **56,79 %** [56,20 %] | 57,3 / 56,3 % | **PASA** |
+| H28b | 17:00–19:59 Nueva York | 28 472 | 55,37 % [54,79 %] | 55,1 / 55,7 % | pasa |
+
+**Decisión según la regla fijada de antemano:** la ventana del modo en vivo queda en **UTC fija**, es decir, de
+**16:00 a 18:59 en Bogotá todo el año** (Colombia no cambia de hora). La ventaja **no** se ancla al cierre de
+Nueva York.
+
+**Informativo:**
+- **Acierto por hora:**
+
+  | Estación | 17:00 NY | 18:00 NY | 19:00 NY |
+  |---|---|---|---|
+  | Invierno | 61,7 % (= 22 UTC) | 54,5 % | 51,4 % |
+  | Verano | 54,5 % | 62,3 % (= 22 UTC) | 54,8 % |
+
+  La hora fuerte es **siempre las 22 UTC (17:00 en Bogotá)**, en las dos estaciones.
+- **Volatilidad del día anterior:** alta 55,1 %, baja 55,6 %; no cambia nada.
+
+## Estudio 29 — confirmación de la reversión nocturna con datos nuevos (pre-registro, 2026-10-28, ANTES de existir los datos)
+
+**Datos:** ticks de HistData (precio medio) del 2026-10-26 al 2027-01-18, de los 24 pares, en cuanto HistData
+los publique (sale cada mes). Se evalúa **una sola vez**, con todo el periodo.
+
+**Regla:** la de H27b/H28a (ventana 21–24 UTC, Bollinger 20, 2; reversión; clic a +10 s; vencimiento de 3 min;
+una operación a la vez). El código es `study28.pair_rows` con la ventana H28a, sin cambios.
+
+**Hipótesis (Holm α = 0,05):**
+- **H29a:** toda la ventana 21:00–23:59 UTC;
+- **H29b:** solo la hora fuerte, 22:00–22:59 UTC. Es *post hoc* de los Estudios 27 y 28, por eso se confirma aquí.
+
+**Criterios (cada una):**
+1. ≥ 500 operaciones (H29a) / ≥ 200 (H29b);
+2. p de Holm < 0,05 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. CALL y PUT a menos de 5 puntos.
+
+**Informativo:** el diario del modo en vivo (precio de Deriv y clics reales del usuario) se compara con lo que
+dice HistData para los mismos minutos.
