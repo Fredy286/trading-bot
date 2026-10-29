@@ -19,9 +19,11 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: write
+      actions: write
     env:
       PYTHONIOENCODING: utf-8
       MAIN: claude/festive-cray-n1yfb3
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,3 +48,9 @@ jobs:
             sleep $((i * 5))
           done
           git push origin --delete "${GITHUB_REF_NAME}" || true
+      # Los horarios de GitHub se retrasan o se saltan con carga alta: la cola y la vigilancia se disparan aquí
+      # mismo, en cuanto llega el trabajo de la rutina (workflow_dispatch sí se permite con el token del flujo).
+      - name: Disparar la cola de estudios y la vigilancia de canales
+        run: |
+          gh workflow run cola_estudios.yml --ref "$MAIN" || true
+          gh workflow run vigilancia_canales.yml --ref "$MAIN" || true
