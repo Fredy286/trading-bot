@@ -1,0 +1,48 @@
+{
+  "estudio": "Estudio 39 — reversión nocturna operable en Deriv (pre-registro b452ff0)",
+  "git_sha": "3fa0c49f201179f3787ccc4d883081c1c28577e0",
+  "hipotesis": {
+    "H39a": {
+      "operaciones": 8697,
+      "acierto": 0.5383345128568059,
+      "lo95": 0.5277074922324986,
+      "acierto_empate_pierde": 0.5247786593078073,
+      "ev": -0.0039783833505806655,
+      "p": 0.662290568975443,
+      "call": 0.5309586421228784,
+      "put": 0.5455180442374854,
+      "criterios": {
+        "min_500": true,
+        "p": false,
+        "wilson": false,
+        "simetria": true
+      },
+      "pasa": false,
+      "por_hora": {
+        "22": 0.566626065773447,
+        "23": 0.5117768122570318
+      }
+    },
+    "H39b": {
+      "operaciones": 4214,
+      "acierto": 0.5336398838334947,
+      "lo95": 0.5184045665063347,
+      "acierto_empate_pierde": 0.5232558139534884,
+      "ev": -0.012517797816801143,
+      "p": 0.8174708521793269,
+      "call": 0.533587422582182,
+      "put": 0.5336940482046237,
+      "criterios": {
+        "min_500": true,
+        "p": false,
+        "wilson": false,
+        "simetria": true
+      },
+      "pasa": false,
+      "por_hora": {
+        "22": 0.5731850117096019,
+        "23": 0.5057755775577558
+      }
+    }
+  }
+}

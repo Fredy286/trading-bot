@@ -3051,3 +3051,35 @@ pesa más.
 **Consecuencia:** solo si pasa, se pre-registra su confirmación con datos de Deriv posteriores al 2026-10-25 y se
 propone al usuario una demo **automática** en Deriv con su API oficial (cuenta demo y token del usuario, guardado
 solo en `.env`).
+
+**Resultado del Estudio 39 (aplicado mecánicamente; `results/estudio39/resultado.json`): NO PASA.**
+
+| Hipótesis | Operaciones | Acierto [lím. inf.] | CALL / PUT | 22 UTC | 23 UTC |
+|---|---|---|---|---|---|
+| H39a (20 / 2) | 8 697 | 53,83 % [52,77 %] | 53,1 / 54,6 % | 56,7 % | 51,2 % |
+| H39b (30 / 2,5) | 4 214 | 53,36 % [51,84 %] | 53,4 / 53,4 % | 57,3 % | 50,6 % |
+
+**Lectura:**
+- A 15 min la reversión se diluye, y Deriv no deja operar en su tramo más fuerte (20:50–22:00 UTC).
+- La hora de las 22 UTC (56,7–57,3 %) es una lectura *post hoc*: solo vale como hipótesis para datos nuevos
+  (Estudio 40).
+- Pago de Deriv a 15 min en esas horas: por consultar con `proposal` después de las 22:00 UTC (a las 21:00 UTC la API
+  respondió «Trading is not available from 20:50:00 to 22:00:00»).
+
+## Estudio 40 — confirmación: reversión en Deriv de 22:00 a 22:59 UTC a 15 min (pre-registro, 2026-10-29, ANTES de ver datos de Deriv posteriores al 2026-10-25)
+
+**Origen:** Estudio 39, lectura *post hoc* por hora.
+
+**Regla:** la de H39a (Bollinger 20, 2 sobre velas de 1 min de Deriv; reversión; entrada en la apertura de t;
+vencimiento de 15 min; una a la vez por par), solo con t de 22:00 a 22:59 UTC, en los 19 pares.
+
+**Datos:** velas de Deriv del 2026-10-26 al 2027-01-18. Deriv guarda un año, así que se descargan después.
+Evaluación **única** después del 2027-01-18.
+
+**Hipótesis H40 (α = 0,05). Criterios (todos):**
+1. ≥ 300 operaciones;
+2. p < 0,05 frente al equilibrio del **pago real** de Deriv a esa hora (consultado con `proposal` antes de evaluar;
+   si no se puede consultar, 85 %);
+3. Wilson 95 % por encima de ese equilibrio.
+
+**Consecuencia:** si pasa, se propone al usuario una demo automática en Deriv con su API oficial.
