@@ -1,0 +1,6 @@
+# Cola de estudios para GitHub Actions (.github/workflows/cola_estudios.yml).
+# Una orden por línea, SOLO de la forma «tbot research studyNN» (lo demás se ignora).
+# El flujo ejecuta cada orden pendiente, guarda results/ en la rama y la mueve a la sección «hechas».
+# Regla: añadir una orden aquí solo DESPUÉS de los commits del pre-registro y del código (docs/01).
+[pendientes]
+[hechas]

@@ -1,0 +1,51 @@
+name: Cola de estudios
+
+# Ejecuta los estudios pre-registrados que la investigación diaria deja en config/cola_estudios.txt
+# (solo órdenes «tbot research studyNN»), con internet completo, y guarda results/ y la cola en la rama.
+
+on:
+  schedule:
+    - cron: "0 15,21,3 * * *"   # 10:00, 16:00 y 22:00 en Bogotá
+  workflow_dispatch:
+
+concurrency:
+  group: cola-estudios
+  cancel-in-progress: false
+
+jobs:
+  cola:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    permissions:
+      contents: write
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - name: ¿Hay órdenes pendientes?
+        id: hay
+        run: |
+          n=$(sed -n '/^\[pendientes\]/,/^\[hechas\]/p' config/cola_estudios.txt | grep -c '^tbot ' || true)
+          echo "n=$n" >> "$GITHUB_OUTPUT"
+      - if: steps.hay.outputs.n != '0'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - if: steps.hay.outputs.n != '0'
+        run: pip install -e .
+      - if: steps.hay.outputs.n != '0'
+        name: Ejecutar la cola
+        run: python scripts/cola_estudios.py || echo "Alguna orden falló (queda anotado en la cola)"
+      - if: steps.hay.outputs.n != '0'
+        name: Guardar en la rama
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/cola_estudios.txt
+          git add results/ -- ':!results/**/*.parquet' || true
+          git commit -m "Cola de estudios: resultados $(date -u +%Y-%m-%d) [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((i * 5))
+          done
