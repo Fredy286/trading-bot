@@ -2767,3 +2767,43 @@ pieza se lleva a H16b solo con un estudio nuevo pre-registrado y confirmación c
 
 **Expectativa declarada:** SIN SEÑAL o mejora muy pequeña (< 0,5 puntos de acierto). Dos indicios en contra: la
 hora del día ya está en el modelo, y en el Estudio 24 una mejora del log-loss no se tradujo en mejor política.
+
+## Estudio 34 — réplica de la reversión nocturna en un año nunca usado (2024-09 → 2025-08) y filtro de diferencial (pre-registro, 2026-10-29, ANTES de descargar ningún tick de ese periodo)
+
+**Origen:** diseño de la rutina autónoma del 2026-10-29 (docs/10, idea 5).
+- **Réplica:** los Estudios 27, 28 y 31 usaron 2025-11 → 2026-09. El año 2024-09 → 2025-08 **nunca** se miró con
+  precio medio en los 24 pares (el Estudio 22 usó solo 4 pares, con bid). Es una réplica limpia en otro periodo.
+- **Filtro:** tras el cierre de Nueva York los brókeres abren el diferencial (CME 2026; BidFX vía financefeeds).
+  Un diferencial abierto puede fabricar movimientos del precio medio que ninguna plataforma paga. Si la ventaja
+  sobrevive solo con diferencial normal, es más creíble y más operable.
+
+**Datos:** ticks de HistData (bid y ask) de los 24 pares de los Estudios 25 y 27, 2024-09 → 2025-08 (12 meses;
+incluye inviernos y veranos de Nueva York).
+
+**Reglas comunes (las de H27b/H28a):** Bollinger sobre velas de 1 min de precio medio, señal al cierre de la vela s,
+reversión, ventana 21:00–23:59 UTC (hora de la vela de entrada), clic a +10 s, una operación a la vez por par,
+precio válido si su último tick tiene ≤ 60 s.
+
+**Hipótesis (Holm α = 0,05 entre las tres):**
+- **H34a:** regla base (N = 20, K = 2, vencimiento 3 min);
+- **H34b:** H34a solo cuando el diferencial (ask − bid) del último tick antes del cierre de s es ≤ 1,5 veces la
+  mediana, en los 20 días hábiles anteriores del mismo par, de las medianas de diferencial por minuto entre las 21 y
+  las 24 UTC (si no hay 20 días previos, la señal no cuenta);
+- **H34c:** variante fuerte (N = 30, K = 2,5, vencimiento 5 min; H29c).
+
+**Criterios (cada una, todos):**
+1. ≥ 1 000 operaciones (H34c: ≥ 500);
+2. p de Holm < 0,05 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 9 de los 12 meses;
+5. CALL y PUT a menos de 5 puntos.
+
+**Informativo:**
+- acierto por decil del diferencial relativo;
+- acierto a las 22 UTC;
+- acierto con el empate contado como pérdida;
+- acierto por par.
+
+**Expectativa declarada:** H34a ~55–57 % si el efecto es estable; H34b igual o algo mayor; H34c ~58–60 %.
+**Consecuencia:** si H34a no se replica, la reversión nocturna pierde credibilidad y la demo nocturna queda solo
+como observación hasta la confirmación del Estudio 29.
