@@ -2848,3 +2848,32 @@ probabilidades, no aciertos.
 
 Si sigue así, H35 terminará con «sin muestra suficiente». No se cambia nada: el modelo y el umbral quedan
 congelados.
+
+## Estudio 36 — ¿la reversión nocturna existe en el precio de un bróker (Deriv)? (pre-registro, 2026-10-29, ANTES de descargar velas históricas de Deriv)
+
+**Origen:** docs/10, idea 7. Los Estudios 25–31 midieron con precios de HistData. Una plataforma de binarias liquida
+con su propio precio. Deriv es un bróker con API pública: si la ventaja también aparece en su precio medio, es más
+probable que exista en otras plataformas (y la demo en vivo usa precisamente Deriv).
+
+**Datos:** velas de 1 min de precio medio de la API pública de Deriv (`ticks_history`, granularidad 60), 19 pares
+(los de Deriv entre los 24 de los Estudios 25 y 27), 2026-04-01 → 2026-09-30 (los mismos meses que el Estudio 27),
+ventana 21:00–23:59 UTC.
+
+**Regla:** Bollinger (20, 2), señal al cierre de la vela s, reversión, una operación a la vez por par. Solo hay velas
+de Deriv, no ticks: la entrada es la **apertura** de la vela t = s + 1 min (L = 0) y la salida, el cierre de la vela
+t + 2 (3 min). En el Estudio 27 el equivalente con HistData (L = 0) dio 59,5 %; con el clic a +10 s, 57,2 %.
+
+**Hipótesis H36 (familia de 1). Criterios (todos):**
+1. ≥ 1 000 operaciones;
+2. p binomial < 0,05 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. CALL y PUT a menos de 5 puntos.
+
+**Informativo:**
+- variante fuerte (30 / 2,5 / 5 min);
+- coincidencia de señales con HistData en el mismo par y minuto, y del resultado en las señales comunes;
+- acierto con el empate contado como pérdida;
+- hora 22 UTC.
+
+**Expectativa declarada:** 56–60 %. Si el precio de Deriv no muestra la ventaja, la demo en vivo pierde su base y se
+anotaría como advertencia mayor.
