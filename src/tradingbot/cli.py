@@ -345,6 +345,15 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study34(a) -> int:
+    from .research import study34
+
+    rep = study34.run()
+    for h, r in rep["hipotesis"].items():
+        print(f"{h}: pasa={r['pasa']} | {r['operaciones']} ops, acierto {r['acierto']} | {r['criterios']}")
+    return 0
+
+
 def cmd_research_study26(a) -> int:
     from .research import study26
 
@@ -738,6 +747,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study34", help="Estudio 34: réplica de la reversión nocturna 2024-09 → 2025-08 con filtro de diferencial")
+    x.set_defaults(func=cmd_research_study34)
     x = r.add_parser("study26", help="Estudio 26: aviso anticipado + umbral p ≥ 0,60 en XRP, SOL, ETH y DOGE")
     x.set_defaults(func=cmd_research_study26)
     x = r.add_parser("study33", help="Estudio 33: variables de reloj (cuarto de hora, financiación) en el GBM de BTC 1 min")
