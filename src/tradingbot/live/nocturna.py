@@ -84,18 +84,23 @@ class DerivFeed:
     def _call(self, req: dict) -> dict:
         import websocket
 
-        for attempt in range(3):
+        for attempt in range(6):
             try:
                 if self.ws is None:
                     self.ws = websocket.create_connection(self.url, timeout=15)
                 self.ws.send(json.dumps(req))
                 r = json.loads(self.ws.recv())
-                if "error" in r:
-                    raise RuntimeError(r["error"].get("message", "error de Deriv"))
-                return r
             except (OSError, ValueError, websocket.WebSocketException):
                 self.ws = None
                 time.sleep(1 + attempt)
+                continue
+            if "error" in r:
+                msg = r["error"].get("message", "error de Deriv")
+                if "rate limit" in msg.lower():  # Deriv pide esperar: se espera y se reintenta
+                    time.sleep(15 * (attempt + 1))
+                    continue
+                raise RuntimeError(msg)
+            return r
         raise ConnectionError("Deriv no responde")
 
     def sync_clock(self) -> float:

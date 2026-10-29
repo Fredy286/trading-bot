@@ -593,6 +593,21 @@ def cmd_serve(a) -> int:
                  senal_dir=Path(a.senal_runtime), nocturna_dir=Path(a.nocturna_runtime))
 
 
+def cmd_registro(a) -> int:
+    """Registro diario automático de las señales de las estrategias congeladas (prueba hacia adelante)."""
+    import json as _json
+
+    from .live import registro
+
+    if a.accion == "pendientes":
+        registro.run_pending(a.desde)
+    elif a.accion == "dia":
+        registro.run_day(a.fecha)
+    else:
+        print(_json.dumps(registro.resumen(abrir=a.abrir), indent=2, ensure_ascii=False))
+    return 0
+
+
 def cmd_nocturna(a) -> int:
     """Reversión nocturna en divisas (Estudios 25, 27 y 28) para cuenta DEMO."""
     from .live import nocturna
@@ -856,6 +871,14 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--senal-runtime", default="runtime/senales")
     x.add_argument("--nocturna-runtime", default="runtime/nocturna")
     x.set_defaults(func=cmd_serve)
+
+    x = sub.add_parser("registro", help="registro diario automático de señales y resultados (sin intervención)")
+    x.add_argument("accion", choices=["pendientes", "dia", "resumen"])
+    x.add_argument("--desde", default="2026-10-26", help="pendientes: primer día a registrar")
+    x.add_argument("--fecha", help="dia: AAAA-MM-DD (UTC)")
+    x.add_argument("--abrir", action="store_true",
+                   help="resumen: mostrar aciertos antes del 2027-01-19 (rompe el sello; queda anotado)")
+    x.set_defaults(func=cmd_registro)
 
     x = sub.add_parser("nocturna", help="señales de reversión nocturna en divisas para cuenta DEMO (Estudio 27)")
     x.add_argument("--runtime", default="runtime/nocturna")

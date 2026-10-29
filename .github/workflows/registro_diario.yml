@@ -1,0 +1,44 @@
+name: Registro diario de señales
+
+# Prueba hacia adelante sin intervención del usuario (src/tradingbot/live/registro.py): cada mañana registra las
+# señales del día anterior de las estrategias congeladas (BTC 1 min H16b con Binance; reversión nocturna en divisas
+# con Deriv) y su resultado. No envía órdenes. Los aciertos quedan sellados hasta el 2027-01-19 (Estudios 16, 21, 29).
+
+on:
+  schedule:
+    - cron: "40 6 * * *"   # 06:40 UTC = 01:40 en Bogotá (Binance publica el día anterior de madrugada)
+  workflow_dispatch:
+
+concurrency:
+  group: registro-diario
+  cancel-in-progress: false
+
+jobs:
+  registro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e .
+      - name: Registrar los días completos que falten (desde el 2026-10-26)
+        run: tbot registro pendientes
+      - name: Conteos (los aciertos siguen sellados)
+        run: tbot registro resumen
+      - name: Guardar en la rama
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/registro/
+          git commit -m "Registro diario $(date -u +%Y-%m-%d) [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((i * 5))
+          done
