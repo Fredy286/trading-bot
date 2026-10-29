@@ -71,6 +71,51 @@ Ninguna herramienta de terceros lo ha mejorado todavía.
 
 El negocio está en el enlace de registro y el «grupo VIP», no en la señal.
 
+## 3b. ¿Hay gente que acierta 60 % o más de verdad? (2026-10-29)
+
+Pregunta del usuario: «no creo que tiren al azar; debe haber algo detrás de quien acierta todos los días».
+Lo que dicen los estudios con datos completos (no capturas de pantalla):
+
+1. **Sí existen traders con habilidad, pero son rarísimos.**
+   - En Taiwán (1992–2006, todos los day traders del país), **menos del 1 %** gana de forma predecible y repetida
+     después de comisiones. Los 500 mejores del año anterior siguieron ganando unos 0,38 % al día; los peores
+     siguieron perdiendo.
+   - En Brasil, de 19 646 personas que empezaron a hacer day trading en el mini-índice (2013–2015), solo el 7,9 %
+     siguió más de 300 sesiones. De esas, **17 personas (1,1 %) ganaron más que el salario mínimo** y nadie mostró
+     aprendizaje.
+2. **«Verificado» no quiere decir «rentable».** El sello de Myfxbook solo confirma que los datos vienen del bróker;
+   muchas cuentas verificadas pierden. Un acierto alto suele esconder **pérdidas grandes y raras**: muchas ganancias
+   pequeñas y, de vez en cuando, una pérdida que se lo lleva todo (martingala, rejillas, operar sin stop). Las
+   propias tiendas de robots de MQL5 muestran que sus sistemas de mayor acierto tienen las caídas más profundas.
+3. **Lo que se ve en redes está filtrado.** Miles de personas lo intentan y solo se muestran las rachas buenas
+   (sesgo de supervivencia). Las cifras de las plataformas («79 % de nuestros Popular Investors ganaron en 2021») las
+   publican ellas mismas y no cuentan a los que se fueron.
+4. **En binarias, el acierto sí importa, porque el pago es fijo.** Pero ahí aparecen otras trampas, ya medidas en
+   este proyecto:
+   - el gale (al azar da 87,5 %);
+   - el OTC (precio del propio bróker, imposible de verificar);
+   - publicar después de la operación.
+
+   En 20 000 señales publicadas por adelantado, la primera entrada acertó 49–51 % (Estudio 23).
+
+**Qué hay «detrás» cuando alguien acierta de verdad:** una ventaja pequeña (55–60 %), en condiciones concretas
+(hora, mercado, volatilidad) y medida con disciplina. Es lo mismo que encontramos aquí: BTC a 1 min ~57 % y ~60 %
+con alta confianza; la reversión nocturna en divisas ~57 % y ~62 % a las 17 h de Bogotá. **No** hay evidencia de nadie
+con 80–90 % sostenido sin martingala ni OTC.
+
+**Cómo lo seguimos comprobando:** la vigilancia hacia adelante de canales (Estudio 32) guarda lo que publican antes
+de la operación. Si alguien acierta de verdad, aparecerá ahí, y entonces desarmaremos qué hace.
+
+Fuentes:
+- [Barber, Lee, Liu y Odean, *The cross-section of speculator skill: Evidence from day trading* (J. Financial Markets, 2014)](https://ideas.repec.org/a/eee/finmar/v18y2014icp1-24.html)
+  y [documento de trabajo](https://faculty.haas.berkeley.edu/odean/papers/day%20traders/Day%20Trading%20Skill%20110523.pdf);
+- [Chague, De-Losso y Giovannetti, *Day Trading for a Living?* (FGV, 2020)](https://repositorio.fgv.br/items/e87d04fc-4b4c-4a56-ab5a-1c84c1afde1b/full);
+- [MQL5: los tres mayores aciertos tienen las tres mayores caídas](https://www.mql5.com/en/blogs/post/777108) y
+  [por qué un acierto alto puede perder](https://www.mql5.com/en/blogs/post/778171) (blogs de vendedores);
+- [Reseña de Myfxbook 2026](https://takeprofitapp.com/en/learn/myfxbook-review-2026);
+- [eToro sobre sus Popular Investors (cifras propias)](https://etoro.com/news-and-analysis/copytrader/popular-investors-with-3-or-more-years-profit);
+- [Darwinex: atributos invertibles (compara contra 10 000 estrategias al azar)](https://help.darwinex.com/what-are-investable-attributes).
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:
