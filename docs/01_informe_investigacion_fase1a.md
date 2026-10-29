@@ -2807,3 +2807,34 @@ precio válido si su último tick tiene ≤ 60 s.
 **Expectativa declarada:** H34a ~55–57 % si el efecto es estable; H34b igual o algo mayor; H34c ~58–60 %.
 **Consecuencia:** si H34a no se replica, la reversión nocturna pierde credibilidad y la demo nocturna queda solo
 como observación hasta la confirmación del Estudio 29.
+
+## Estudio 35 — confirmación de ETH con aviso anticipado y umbral p ≥ 0,60 (pre-registro, 2026-10-29, ANTES de entrenar el modelo y de ver datos posteriores al 2026-10-25)
+
+**Origen:** Estudio 26: ETH/USDT con la receta de H16b y p ≥ 0,60 pasó en 2025-09 → 2026-10 (653 operaciones,
+58,80 % [54,97 %], etiqueta robusta 60,62 %). Docs/10, idea 2.
+
+**Modelo congelado (se entrena UNA vez, hoy):**
+- la receta exacta de `train_frozen` (BTC, Estudio 16), aplicada a ETH/USDT: 12 meses (2025-10-26 → 2026-10-25),
+  último 20 % para calibrar con purga, GBM con semilla 2024;
+- etiqueta de H16b: clic a +10 s, contrato de 1 min, tic de 0,01;
+- archivo `config/modelos/ETHUSDT_senal_anticipada_k50.pkl`, con su SHA-256 en `config/senal_anticipada_eth.json`.
+
+**Datos de confirmación:** velas de 1 s y 1 min de Binance del 2026-10-26 al 2027-01-18. Se evalúa una sola vez
+después del 2027-01-18. El registro diario automático guarda las señales y su resultado cada día, con los aciertos
+sellados igual que BTC.
+
+**Hipótesis H35 (familia de 1, α = 0,05). Política:** EV ≥ 0,02 (pago 85 %) y probabilidad de la dirección ≥ 0,60.
+
+**Criterios (todos):**
+1. ≥ 100 operaciones;
+2. p binomial unilateral < 0,05 frente a 54,05 %.
+
+**Informativo:**
+- Wilson 95 %;
+- EV;
+- la etiqueta robusta (promedio de los 5 últimos segundos);
+- todas las señales sin umbral.
+
+**Potencia declarada:** con ~140 operaciones esperadas (≈ 47 al mes en el Estudio 26), un acierto real del 59 % se
+detectaría solo la mitad de las veces. Un «no pasa» por pocas operaciones no refuta la idea; se informaría como «sin
+muestra suficiente» y se extendería con un pre-registro nuevo.
