@@ -9,6 +9,9 @@ Rutas:
   GET  /api/senal/state     estado del bucle de señales, diario y resumen
   POST /api/senal/clic      {"alert_id"} → hora del clic (en hora de Binance)
   POST /api/senal/registro  {"alert_id", "entrada", "salida", "pago", "resultado"} → datos de la plataforma
+  GET  /nocturna       panel de la reversión nocturna en divisas (cuenta demo, Estudios 25/27/28)
+  GET  /api/nocturna/state  estado del bucle nocturno, diario y resumen
+  POST /api/nocturna/clic   {"alert_id"} → hora del clic (en hora de Deriv)
 
 El panel solo LEE state.json (lo escribe `tbot live`); las confirmaciones de recepción van a
 acks.jsonl, que solo escribe este servidor.
@@ -94,10 +97,13 @@ def _num(v, lo: float = 0.0, hi: float = 10**7) -> float | None:
     return x
 
 
-def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("runtime/senales")):
+def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("runtime/senales"),
+                 nocturna_dir: Path = Path("runtime/nocturna")):
     runtime_dir, results_dir, senal_dir = Path(runtime_dir), Path(results_dir), Path(senal_dir)
+    nocturna_dir = Path(nocturna_dir)
     ack_lock = threading.Lock()
     senal_lock = threading.Lock()
+    nocturna_lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):  # silencio en consola
@@ -146,6 +152,20 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
                 st["resumen"] = anticipada.resumen(senal_dir)
                 st["server_time"] = utcnow().isoformat()
                 return self._json(200, st)
+            if self.path == "/nocturna":
+                html = resources.files("tradingbot.app").joinpath("static/nocturna.html").read_bytes()
+                return self._send(200, html, "text/html; charset=utf-8")
+            if self.path == "/api/nocturna/state":
+                from ..live import nocturna
+
+                try:
+                    st = _read_state(nocturna_dir / "state.json") or {"missing": True}
+                except OSError:
+                    return self._json(503, {"error": "estado ocupado, reintente"})
+                st["diario"] = nocturna.diario(nocturna_dir)
+                st["resumen"] = nocturna.resumen(nocturna_dir)
+                st["server_time"] = utcnow().isoformat()
+                return self._json(200, st)
             if self.path == "/api/research":
                 docs = {}
                 for stage in ("dev", "holdout"):
@@ -168,6 +188,8 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
         def do_POST(self):  # noqa: N802
             if self.path in ("/api/senal/clic", "/api/senal/registro"):
                 return self._post_senal()
+            if self.path == "/api/nocturna/clic":
+                return self._post_nocturna()
             if self.path != "/api/ack":
                 return self._json(404, {"error": "no encontrado"})
             data = self._body()
@@ -232,6 +254,30 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
                 jsonutil.append_line(senal_dir / "registros.jsonl", json.dumps(row))
             return self._json(200, {"ok": True})
 
+        def _post_nocturna(self):
+            from datetime import timedelta
+
+            now = utcnow()
+            data = self._body()
+            if data is None or "alert_id" not in data:
+                return self._json(400, {"error": "JSON inválido"})
+            aid = str(data["alert_id"])[:32]
+            rows, _ = read_rows(nocturna_dir / "senales.jsonl")
+            if not any(r.get("evento") == "aviso" and r.get("alert_id") == aid for r in rows):
+                return self._json(404, {"error": "aviso no encontrado"})
+            try:
+                offset = float((_read_state(nocturna_dir / "state.json") or {}).get("desfase_reloj_s") or 0.0)
+            except OSError:
+                offset = 0.0
+            with nocturna_lock:
+                prev = [c for c in read_rows(nocturna_dir / "clics.jsonl")[0] if c.get("alert_id") == aid]
+                if prev:  # vale el primer clic
+                    return self._json(200, {"ok": True, "ya_registrado": True, **prev[0]})
+                row = {"alert_id": aid, "hora_pc": now.isoformat(),
+                       "hora_deriv": (now + timedelta(seconds=offset)).isoformat()}
+                jsonutil.append_line(nocturna_dir / "clics.jsonl", json.dumps(row))
+            return self._json(200, {"ok": True, **row})
+
     return Handler
 
 
@@ -248,14 +294,15 @@ class PanelServer(ThreadingHTTPServer):
 
 
 def make_server(host: str, port: int, runtime_dir: Path, results_dir: Path,
-                senal_dir: Path = Path("runtime/senales")) -> ThreadingHTTPServer:
-    return PanelServer((host, port), make_handler(runtime_dir, results_dir, senal_dir))
+                senal_dir: Path = Path("runtime/senales"), nocturna_dir: Path = Path("runtime/nocturna")):
+    return PanelServer((host, port), make_handler(runtime_dir, results_dir, senal_dir, nocturna_dir))
 
 
 def serve(host: str = "127.0.0.1", port: int = 8765, runtime_dir: Path = Path("runtime/demo"),
-          results_dir: Path = Path("results"), senal_dir: Path = Path("runtime/senales")) -> int:
+          results_dir: Path = Path("results"), senal_dir: Path = Path("runtime/senales"),
+          nocturna_dir: Path = Path("runtime/nocturna")) -> int:
     try:
-        srv = make_server(host, port, runtime_dir, results_dir, senal_dir)
+        srv = make_server(host, port, runtime_dir, results_dir, senal_dir, nocturna_dir)
     except OSError as exc:
         print(f"No se pudo abrir el panel en {host}:{port} ({exc}). ¿Hay otro «tbot serve» abierto? "
               "Ciérrelo o use otro puerto con --port.")

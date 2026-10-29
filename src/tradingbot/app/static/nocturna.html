@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reversión nocturna</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --surface: #ffffff; --surface-2: #eef1f5; --border: #d9dee6;
+    --text: #1b2330; --muted: #5b6676; --accent: #2f5bd3; --accent-soft: #e6ecfb;
+    --exp: #8a5a00; --exp-soft: #fbf1dc; --down: #b3261e; --down-soft: #fbe4e2;
+    --radius: 10px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141b; --surface: #161d27; --surface-2: #1d2633; --border: #2b3645;
+      --text: #e6ebf2; --muted: #9aa6b6; --accent: #7aa2ff; --accent-soft: #1f2d4d;
+      --exp: #f0b43c; --exp-soft: #3a2d10; --down: #ff8a80; --down-soft: #3d1a18;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+           padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  h1 { font-size: 18px; margin: 0; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+  .banner { background: var(--exp-soft); color: var(--exp); border-radius: var(--radius); padding: 10px 14px;
+            font-weight: 600; margin-bottom: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  #active { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .sig { text-align: center; }
+  .sig .pair { font-size: 22px; font-weight: 700; }
+  .sig .dir { font-size: 44px; font-weight: 800; line-height: 1.1; }
+  .sig .dir.up { color: var(--accent); } .sig .dir.down { color: var(--down); }
+  .sig .t { font-family: var(--mono); font-size: 28px; font-variant-numeric: tabular-nums; }
+  .sig.late { opacity: .55; }
+  .flash { animation: fl 1s ease-out 2; }
+  @keyframes fl { from { background: var(--accent-soft); } to { background: var(--surface); } }
+  button { font: inherit; color: #fff; background: var(--accent); border: 0; border-radius: 8px; padding: 8px 16px;
+           cursor: pointer; }
+  button.secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: .45; cursor: default; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .metric .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .metric .l { font-size: 13px; color: var(--muted); }
+  .tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .ok { color: var(--accent); font-weight: 600; } .bad { color: var(--down); font-weight: 600; }
+  .note { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Reversión nocturna en divisas</h1>
+  <div><span id="status" class="note">cargando…</span> <button id="soundbtn" class="secondary">Activar sonido</button></div>
+</header>
+<main>
+  <div class="banner">EXPERIMENTAL — SOLO CUENTA DEMO. Divisas sin OTC, vencimiento 3 min. Entra en los primeros 10 s;
+    pasados 15 s, no entres. El resultado de la tabla es una referencia con el precio medio de Deriv, no el de tu plataforma.</div>
+  <div id="active"><div class="card note" style="text-align:center">Sin avisos ahora. <span id="win"></span></div></div>
+  <div class="grid" id="metrics"></div>
+  <h2>Diario</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Hora (Bogotá)</th><th>Par</th><th>Dirección</th><th>Tu clic</th><th>Entrada → salida (Deriv)</th><th>Resultado</th></tr></thead>
+    <tbody id="rows"><tr><td colspan="6" class="note">Sin avisos todavía.</td></tr></tbody>
+  </table></div>
+  <p class="note">Ventana: de 16:00 a 19:00 en Bogotá con el horario de verano de Nueva York; la regla del Estudio 28 decide si se corre una hora en invierno. Pares: los 19 que publica Deriv.</p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const LATE_S = 15;
+let offsetMs = 0, seen = new Set(), audio = null, first = true, clicked = new Set();
+const fmtT = (iso) => iso ? new Date(iso).toLocaleTimeString("es-CO", { timeZone: "America/Bogota", hour12: false }) : "—";
+const num = (v, d = 5) => v == null ? "—" : Number(v).toFixed(d);
+const pair = (p) => p.slice(0, 3) + "/" + p.slice(3);
+
+$("soundbtn").onclick = () => {
+  audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+  beep(); $("soundbtn").textContent = "Sonido activo"; $("soundbtn").disabled = true;
+};
+function beep() {
+  if (!audio) return;
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.frequency.value = 880; o.connect(g); g.connect(audio.destination);
+  g.gain.setValueAtTime(0.25, audio.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.6);
+  o.start(); o.stop(audio.currentTime + 0.6);
+}
+async function clic(id) {
+  clicked.add(id);
+  try { await fetch("/api/nocturna/clic", { method: "POST", headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ alert_id: id }) }); } catch (e) {}
+  refresh();
+}
+function renderActive(diario) {
+  const now = Date.now() + offsetMs;
+  const live = diario.filter((r) => now - new Date(r.entrada_desde).getTime() < 60000);
+  if (!live.length) {
+    $("active").innerHTML = '<div class="card note" style="text-align:center">Sin avisos ahora. <span id="win"></span></div>';
+    return;
+  }
+  $("active").innerHTML = live.map((r) => {
+    const age = (now - new Date(r.entrada_desde).getTime()) / 1000;
+    const late = age > LATE_S, up = r.lado === "CALL", done = r.clic || clicked.has(r.alert_id);
+    const isNew = !seen.has(r.alert_id);
+    return `<div class="card sig ${late ? "late" : ""} ${isNew ? "flash" : ""}">
+      <div class="pair">${pair(r.par)}</div>
+      <div class="dir ${up ? "up" : "down"}">${up ? "↑ SUBE" : "↓ BAJA"}</div>
+      <div class="note">${r.lado} · 3 minutos</div>
+      <div class="t">${late ? "TARDE" : Math.max(0, age).toFixed(0) + " s"}</div>
+      <button ${done || late ? "disabled" : ""} onclick="clic('${r.alert_id}')">${done ? "Clic registrado" : "Ya entré"}</button>
+    </div>`;
+  }).join("");
+}
+function renderRows(diario) {
+  if (!diario.length) return;
+  $("rows").innerHTML = diario.map((r) => {
+    const res = r.resultado, cls = res === "gana" ? "ok" : res === "pierde" ? "bad" : "";
+    const lag = r.demora_s == null ? "" : ` (+${r.demora_s} s)`;
+    return `<tr><td class="num">${fmtT(r.entrada_desde)}</td><td>${pair(r.par)}</td><td>${r.lado}</td>
+      <td class="num">${r.clic ? fmtT(r.clic) : "—"}${r.clic ? lag : ""}</td>
+      <td class="num">${num(r.entrada_ref)} → ${num(r.salida_ref)}</td><td class="${cls}">${res || "esperando…"}</td></tr>`;
+  }).join("");
+}
+function renderMetrics(s) {
+  const pct = (v) => v == null ? "—" : (100 * v).toFixed(1) + " %";
+  const m = [["Avisos", s.avisos], ["Medidos", s.medidos], ["Acierto de referencia", pct(s.acierto)],
+             ["Con tu clic", s.con_clic], ["Acierto con tu clic", pct(s.acierto_con_clic)], ["Empates", s.empates]];
+  $("metrics").innerHTML = m.map(([l, v]) => `<div class="card metric"><div class="v">${v ?? "—"}</div><div class="l">${l}</div></div>`).join("");
+}
+async function refresh() {
+  try {
+    const st = await (await fetch("/api/nocturna/state", { cache: "no-store" })).json();
+    if (st.missing) { $("status").textContent = "el bucle nocturno no está corriendo"; return; }
+    offsetMs = (st.desfase_reloj_s || 0) * 1000;
+    const u = st.ultimo || {};
+    $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ventana ${st.ventana} · ${u.estado || "—"}`;
+    const fresh = st.diario.filter((r) => !seen.has(r.alert_id));
+    if (!first && fresh.some((r) => Date.now() + offsetMs - new Date(r.entrada_desde).getTime() < LATE_S * 1000)) beep();
+    renderActive(st.diario); renderRows(st.diario); renderMetrics(st.resumen);
+    st.diario.forEach((r) => seen.add(r.alert_id)); first = false;
+  } catch (e) { $("status").textContent = "sin conexión con el panel"; }
+}
+refresh(); setInterval(refresh, 1000);
+</script>
+</body>
+</html>

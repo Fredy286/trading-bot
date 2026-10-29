@@ -590,7 +590,20 @@ def cmd_serve(a) -> int:
     from .app.server import serve
 
     return serve(host=a.host, port=a.port, runtime_dir=Path(a.runtime), results_dir=Path(a.results),
-                 senal_dir=Path(a.senal_runtime))
+                 senal_dir=Path(a.senal_runtime), nocturna_dir=Path(a.nocturna_runtime))
+
+
+def cmd_nocturna(a) -> int:
+    """Reversión nocturna en divisas (Estudios 25, 27 y 28) para cuenta DEMO."""
+    from .live import nocturna
+
+    print("Reversión nocturna en divisas. Panel: http://127.0.0.1:8765/nocturna — Ctrl+C para detener. "
+          "SOLO CUENTA DEMO.")
+    try:
+        nocturna.NightLoop(Path(a.runtime), ventana=a.ventana, sound=not a.sin_sonido).run(a.iteraciones)
+    except KeyboardInterrupt:
+        pass
+    return 0
 
 
 def cmd_senal(a) -> int:
@@ -840,7 +853,16 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--runtime", default="runtime/demo")
     x.add_argument("--results", default="results")
     x.add_argument("--senal-runtime", default="runtime/senales")
+    x.add_argument("--nocturna-runtime", default="runtime/nocturna")
     x.set_defaults(func=cmd_serve)
+
+    x = sub.add_parser("nocturna", help="señales de reversión nocturna en divisas para cuenta DEMO (Estudio 27)")
+    x.add_argument("--runtime", default="runtime/nocturna")
+    x.add_argument("--ventana", choices=["auto", "utc", "nueva_york"], default="auto",
+                   help="auto = la elegida por la regla pre-registrada del Estudio 28")
+    x.add_argument("--iteraciones", type=int, default=0, help="0 = sin límite")
+    x.add_argument("--sin-sonido", action="store_true")
+    x.set_defaults(func=cmd_nocturna)
     return p
 
 

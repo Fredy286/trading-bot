@@ -154,6 +154,22 @@ es del bot. Con unas decenas de operaciones anotadas se puede saber:
 
 Son las condiciones que exige el Estudio 5 antes de cualquier otra cosa. **Nunca con dinero real.**
 
+### Reversión nocturna en divisas para practicar en cuenta DEMO (Estudios 25, 27 y 28)
+
+```bash
+scripts/iniciar_nocturna.sh
+```
+
+- Abre el panel en `http://127.0.0.1:8765/nocturna`; pulse «Activar sonido».
+- Cada minuto de la ventana nocturna (de 16:00 a 19:00 en Bogotá con el horario de verano de Nueva York; el
+  Estudio 28 decide si en invierno se corre una hora) mira 19 pares en la API pública de Deriv (sin cuenta).
+- Si una vela de 1 min cierra fuera de las bandas de Bollinger (20, 2), suena el aviso: **SUBE** (CALL) si
+  cerró por debajo, **BAJA** (PUT) si cerró por encima. Vencimiento: **3 minutos**.
+- Entre en los primeros 10 s y pulse «Ya entré». Pasados 15 s, el panel marca «TARDE».
+- Unos 3½ min después, el diario anota el resultado de referencia con el precio medio de Deriv, desde la
+  hora de su clic. El resultado de su plataforma puede ser distinto: compárelos.
+- Desarrollo: 57,2 % con clic a +10 s (Estudio 27). **Sin confirmación con datos nuevos todavía. Solo demo.**
+
 ## Configuración (variables de entorno)
 
 Todas las opciones están en [`.env.example`](.env.example): instrumentos, horario permitido (hora de

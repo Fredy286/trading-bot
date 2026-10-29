@@ -17,6 +17,7 @@ dependencies = [
     "scipy>=1.10",
     "requests>=2.31",
     "tzdata>=2023.3",
+    "websocket-client>=1.6",
 ]
 
 [project.optional-dependencies]
