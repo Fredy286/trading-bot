@@ -161,8 +161,8 @@ scripts/iniciar_nocturna.sh
 ```
 
 - Abre el panel en `http://127.0.0.1:8765/nocturna`; pulse «Activar sonido».
-- Cada minuto de la ventana nocturna (de 16:00 a 19:00 en Bogotá con el horario de verano de Nueva York; el
-  Estudio 28 decide si en invierno se corre una hora) mira 19 pares en la API pública de Deriv (sin cuenta).
+- Cada minuto de la ventana nocturna (de 16:00 a 19:00 en Bogotá, todo el año, según el
+  Estudio 28) mira 19 pares en la API pública de Deriv (sin cuenta). La ★ marca la hora fuerte (5 p. m.).
 - Si una vela de 1 min cierra fuera de las bandas de Bollinger (20, 2), suena el aviso: **SUBE** (CALL) si
   cerró por debajo, **BAJA** (PUT) si cerró por encima. Vencimiento: **3 minutos**.
 - Entre en los primeros 10 s y pulse «Ya entré». Pasados 15 s, el panel marca «TARDE».

@@ -34,6 +34,7 @@ PAIRS = ("AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "EURAUD", "EURCAD", "
          "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "NZDJPY", "NZDUSD", "USDCAD")
 N_BAND, K_SD = 20, 2.0
 DUR_S, LAT_DEFAULT_S, LATE_S = 180, 10, 15
+STRONG_HOUR_UTC = 22  # hora fuerte en los Estudios 27 y 28 (17:00 en Bogotá); se confirma en el Estudio 29
 FIRE_AT_S = 1.5  # segundo del minuto en que se decide (la vela anterior ya cerró)
 SOUND = "/usr/share/sounds/freedesktop/stereo/complete.oga"
 
@@ -169,14 +170,16 @@ class NightLoop:
                    "lado": "CALL" if side > 0 else "PUT", "vela_senal": pd.Timestamp(idx[-1], unit="s", tz="UTC").isoformat(),
                    "entrada_desde": t.isoformat(), "entrar_antes": (t + pd.Timedelta(seconds=LATE_S)).isoformat(),
                    "vencimiento_min": DUR_S // 60, "precio_cierre": float(closed["close"].iloc[-1]),
-                   "emitido": pd.Timestamp(self.feed.now(), unit="s", tz="UTC").isoformat(), "ventana": self.ventana}
+                   "emitido": pd.Timestamp(self.feed.now(), unit="s", tz="UTC").isoformat(), "ventana": self.ventana,
+                   "hora_fuerte": t.hour == STRONG_HOUR_UTC}
             self._write(row)
             self.pending.append(row)
             self.busy[pair] = t_epoch + DUR_S
             out.append(row)
             local = t.tz_convert(BOGOTA).strftime("%H:%M")
+            star = "  ★ hora fuerte" if row["hora_fuerte"] else ""
             self.log(f"{local} Bogotá  {pair[:3]}/{pair[3:]}  {'↑ CALL' if side > 0 else '↓ PUT'}  3 min — entre ya "
-                     f"(antes de {LATE_S} s)")
+                     f"(antes de {LATE_S} s){star}")
         if out:
             self._beep()
         self.last = {"estado": "señales" if out else "sin señal", "minuto": t.isoformat(), "avisos": len(out)}

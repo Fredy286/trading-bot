@@ -69,7 +69,7 @@
     <thead><tr><th>Hora (Bogotá)</th><th>Par</th><th>Dirección</th><th>Tu clic</th><th>Entrada → salida (Deriv)</th><th>Resultado</th></tr></thead>
     <tbody id="rows"><tr><td colspan="6" class="note">Sin avisos todavía.</td></tr></tbody>
   </table></div>
-  <p class="note">Ventana: de 16:00 a 19:00 en Bogotá con el horario de verano de Nueva York; la regla del Estudio 28 decide si se corre una hora en invierno. Pares: los 19 que publica Deriv.</p>
+  <p class="note">Ventana: de 16:00 a 19:00 en Bogotá, todo el año (Estudio 28). Pares: los 19 que publica Deriv. ★ = hora fuerte (5 p. m. en Bogotá; 62 % en desarrollo, sin confirmar).</p>
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
@@ -110,7 +110,7 @@ function renderActive(diario) {
     return `<div class="card sig ${late ? "late" : ""} ${isNew ? "flash" : ""}">
       <div class="pair">${pair(r.par)}</div>
       <div class="dir ${up ? "up" : "down"}">${up ? "↑ SUBE" : "↓ BAJA"}</div>
-      <div class="note">${r.lado} · 3 minutos</div>
+      <div class="note">${r.lado} · 3 minutos${r.hora_fuerte ? " · ★ hora fuerte" : ""}</div>
       <div class="t">${late ? "TARDE" : Math.max(0, age).toFixed(0) + " s"}</div>
       <button ${done || late ? "disabled" : ""} onclick="clic('${r.alert_id}')">${done ? "Clic registrado" : "Ya entré"}</button>
     </div>`;
@@ -121,7 +121,7 @@ function renderRows(diario) {
   $("rows").innerHTML = diario.map((r) => {
     const res = r.resultado, cls = res === "gana" ? "ok" : res === "pierde" ? "bad" : "";
     const lag = r.demora_s == null ? "" : ` (+${r.demora_s} s)`;
-    return `<tr><td class="num">${fmtT(r.entrada_desde)}</td><td>${pair(r.par)}</td><td>${r.lado}</td>
+    return `<tr><td class="num">${fmtT(r.entrada_desde)}</td><td>${pair(r.par)}${r.hora_fuerte ? " ★" : ""}</td><td>${r.lado}</td>
       <td class="num">${r.clic ? fmtT(r.clic) : "—"}${r.clic ? lag : ""}</td>
       <td class="num">${num(r.entrada_ref)} → ${num(r.salida_ref)}</td><td class="${cls}">${res || "esperando…"}</td></tr>`;
   }).join("");
