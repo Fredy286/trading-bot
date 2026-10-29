@@ -198,9 +198,20 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      DOGE nunca llegan a p 0,60 con clic a +10 s.
    - **Lección de los Estudios 20–24:** lo único que sube el acierto es **filtrar por confianza** del propio
      modelo (p ≥ 0,60 → ~60–62 %). Sumar variables de terceros, de otros mercados o de canales no lo mejora.
-   - **Investigación diaria automática:** tarea programada `investigacion-diaria-trading-bot` (7:00 Bogotá,
-     corre si la app está abierta) → bitácora docs/09_bitacora_investigacion.md (solo commit, sin push).
-     Tiene prohibido mirar resultados de datos posteriores al 2026-10-25 (reservados para los Estudios 12/14/15).
+   - **AUTONOMÍA (2026-10-29, pedido del usuario: «no tengo tiempo para pruebas; que el bot mejore solo»; solo
+     tiene libres las noches desde las 21:00 Bogotá):**
+     - **Registro diario** (`.github/workflows/registro_diario.yml`, 06:40 UTC): `tbot registro pendientes` califica
+       solo las señales del día anterior de BTC H16b (Binance) y de la reversión nocturna (Deriv, variantes actual y
+       fuerte) → `results/registro/`. Aciertos SELLADOS hasta el 2027-01-19 (`tbot registro resumen`; `--abrir` rompe
+       el sello y queda anotado). Deriv: máx. 1 000 ticks por petición y límite de velocidad (se reintenta).
+     - **Investigación diaria en la nube:** rutina «Investigación diaria autónoma — bot de trading»
+       (trig_01SHKUXWuUNMpszfj8qXRAJQ, 12:00 UTC = 7:00 Bogotá, Opus 5.5, sin conectores): investiga, pre-registra,
+       programa, ejecuta (o deja en `config/cola_estudios.txt`), documenta en docs/09 y hace push a la rama.
+     - **Cola de estudios** (`.github/workflows/cola_estudios.yml`, 10:00/16:00/22:00 Bogotá): ejecuta solo órdenes
+       `tbot research studyNN` y guarda results/.
+     - La tarea local `investigacion-diaria-trading-bot` quedó PAUSADA (la reemplaza la rutina en la nube).
+     - En el horario del usuario (21:00–01:00 Bogotá) funciona el modelo de BTC 1 min (57,6 %; 60,7 % con p ≥ 0,60,
+       Estudio 20, descriptivo); la reversión de divisas no (52 % a esas horas, Estudio 30).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
