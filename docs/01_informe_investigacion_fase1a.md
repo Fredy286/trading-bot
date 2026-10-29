@@ -2975,3 +2975,23 @@ pública, y su precio de BTC es lo más parecido disponible.
 **Criterios:** los del Estudio 37 (≥ 300 operaciones, p < 0,025, Wilson > 54,05 %, EV > 0 en ≥ 60 % de los meses).
 
 **Expectativa declarada:** parecido a Coinbase (52–54 %).
+
+**Resultado del Estudio 36 (commit a0921d8, aplicado mecánicamente; `results/estudio36/resultado.json`): PASA.**
+
+| Precio | Operaciones | Acierto [lím. inf.] | Empate = pierde | CALL / PUT |
+|---|---|---|---|---|
+| **Deriv, regla actual (H36)** | 22 981 | **56,35 %** [55,69 %], EV +0,040 | 53,64 % | 56,3 / 56,4 % |
+| Deriv, variante 30 / 2,5 / 5 min | 8 669 | 60,67 % [59,62 %], EV +0,119 | 58,75 % | 61,3 / 60,0 % |
+| HistData, mismas reglas (L = 0) | 24 778 | 57,43 % | 55,94 % | 57,7 / 57,2 % |
+
+**Hallazgo clave:**
+- Las señales de las dos fuentes **casi no coinciden**: solo 1 565 caen en el mismo par y minuto, y en ellas la
+  dirección coincide el 45,9 % de las veces (como el azar). Cada fuente tiene sus propios saltos de diferencial, y la
+  reversión ocurre **dentro de cada fuente**.
+- Junto con el Estudio 34, la conclusión es que la reversión nocturna es un fenómeno del precio de cada proveedor en
+  las horas de poca liquidez.
+- **Consecuencia práctica:** las señales deben calcularse **con el mismo precio con el que liquida la plataforma**.
+  Las señales del modo en vivo (precio de Deriv) solo son coherentes para operar en Deriv. Para otra plataforma
+  (por ejemplo, IQ Option), la regla tendría que aplicarse sobre su propio gráfico (Bollinger 20, 2 en velas de
+  1 min, de 16:00 a 19:00 en Bogotá).
+- Hora 22 UTC con Deriv: 55,7 %.

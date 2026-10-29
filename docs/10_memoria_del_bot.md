@@ -19,6 +19,12 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 - **La reversión nocturna vive en el diferencial abierto (Estudio 34):** se replica en 2024–25 (56,2 %; 5 min 59,6 %),
   pero el acierto sale de los minutos con diferencial 3–60 veces lo normal (60–66 %); con diferencial normal, 53–54 %.
   Antes de mejorarla, comprobar que una plataforma real pague ese movimiento.
+- **Las ventajas viven en el precio de cada fuente (Estudios 34, 36 y 37):**
+  - BTC: las señales calificadas con Coinbase aciertan 52,2 % (Binance 57,6 %);
+  - divisas de noche: la reversión existe en Deriv (56,4 %; 5 min 60,7 %) y en HistData, pero con señales distintas
+    (dirección coincidente 46 %).
+
+  Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**
   - el precio bid crea reversiones falsas en el cierre de Nueva York (usar precio medio);
   - con martingala, el «85–90 %» sale del azar;

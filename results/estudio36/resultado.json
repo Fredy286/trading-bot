@@ -1,0 +1,57 @@
+{
+  "estudio": "Estudio 36 — reversión nocturna con precio de Deriv (pre-registro 767a0b9)",
+  "git_sha": "5cb45a63cd28a5e2309bc30076c650f43b5e04cd",
+  "meses": [
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09"
+  ],
+  "H36": {
+    "operaciones": 22981,
+    "acierto": 0.56352,
+    "lo95": 0.5569370916488008,
+    "acierto_empate_pierde": 0.536399634480658,
+    "ev": 0.0404660371611331,
+    "p": 4.469465161808142e-12,
+    "call": 0.5628262826282628,
+    "put": 0.5642359498374362,
+    "criterios": {
+      "min_1000": true,
+      "p": true,
+      "wilson": true,
+      "simetria": true
+    },
+    "pasa": true
+  },
+  "informativo": {
+    "fuerte": {
+      "operaciones": 8669,
+      "acierto": 0.6067429116035263,
+      "lo95": 0.5962464561267394,
+      "acierto_empate_pierde": 0.5874956742415504,
+      "ev": 0.1185892259776214,
+      "p": 1.1859056435282922e-34,
+      "call": 0.613345521023766,
+      "put": 0.5995520159283225
+    },
+    "histdata_L0_mismas_reglas": {
+      "operaciones": 24778,
+      "acierto": 0.5742574257425742,
+      "lo95": 0.5680084122447652,
+      "acierto_empate_pierde": 0.559447897328275,
+      "ev": 0.06076761643393332,
+      "p": 3.197331479862645e-26,
+      "call": 0.5769866182058483,
+      "put": 0.5715116762237181
+    },
+    "senales_deriv": 22983,
+    "senales_histdata": 26738,
+    "senales_en_comun": 1565,
+    "misma_direccion_en_comun": 0.4594249201277955,
+    "mismo_resultado_en_comun": 0.4708362614195362,
+    "hora_22": 0.5570852921423775
+  }
+}
