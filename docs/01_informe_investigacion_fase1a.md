@@ -2572,3 +2572,38 @@ una operación a la vez). El código es `study28.pair_rows` con la ventana H28a,
 
 **Informativo:** el diario del modo en vivo (precio de Deriv y clics reales del usuario) se compara con lo que
 dice HistData para los mismos minutos.
+
+## Estudio 30 — ¿la reversión de Bollinger funciona en otras horas y en otros mercados? (pre-registro, 2026-10-28, ANTES de calcularla fuera de 21–24 UTC y fuera de divisas)
+
+**Origen:** el pedido del usuario de buscar más piezas como la reversión nocturna (Estudios 27 y 28). Hasta
+hoy la regla solo se midió entre las 21 y las 24 UTC. Su explicación (poca liquidez) predice que podría
+aparecer en otras horas tranquilas (sesión asiática) y no en las horas de mucha liquidez (Londres y Nueva
+York).
+
+**Regla:** la de H27b/H28a, sin cambiar nada salvo la hora y el mercado: Bollinger (20, 2) sobre velas de 1 min
+de precio medio, reversión, clic a +10 s, vencimiento 3 min desde la entrada, una operación a la vez por
+instrumento.
+
+**Datos:**
+- **Divisas:** ticks de HistData ya descargados (24 pares, 2025-11 → 2026-09, 11 meses).
+- **Otros mercados:** ticks de HistData de oro (XAUUSD) y S&P 500 (SPXUSD) del mismo periodo, y BTC/USDT
+  con velas de 1 s de Binance (precio negociado; el tic de BTC es despreciable).
+
+**Hipótesis (24, Holm α = 0,05):**
+- **Parte A (21):** divisas, cada hora UTC de 0 a 20 por separado (la hora de entrada t de la operación);
+- **Parte B (3):** ventana nocturna 21–24 UTC en XAUUSD, SPXUSD y BTCUSDT.
+
+**Criterios (cada una, todos):**
+1. ≥ 1 000 operaciones (Parte B: ≥ 500);
+2. p de Holm < 0,05 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 8 de los 11 meses;
+5. CALL y PUT a menos de 5 puntos.
+
+**Expectativa declarada:**
+- horas de Asia (0–6 UTC): acierto parecido a la noche (~55 %);
+- horas de Londres y Nueva York (7–20 UTC): ~50 %, o incluso continuación (< 50 %);
+- oro y S&P: dudoso; BTC: sin reversión (su ventaja conocida es la continuación).
+
+**Consecuencia:** lo que pase se confirma con datos posteriores al 2026-10-25 (se suma a la familia del Estudio 29)
+antes de llevarlo al modo en vivo.
