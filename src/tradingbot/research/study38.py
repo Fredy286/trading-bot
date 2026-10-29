@@ -29,7 +29,8 @@ def month_candles(ym: str, feed: DerivFeed, work: Path = WORK) -> pd.Series:
         b = min(a + pd.Timedelta(minutes=999), end - pd.Timedelta(minutes=1))  # Deriv: máx. 1 000 velas por petición
         r = feed._call({"ticks_history": "cryBTCUSD", "style": "candles", "granularity": 60, "count": 5000,
                         "start": int(a.timestamp()), "end": int(b.timestamp())})
-        rows.extend(r.get("candles", []))
+        ta, tb = int(a.timestamp()), int(b.timestamp())
+        rows.extend(c for c in r.get("candles", []) if ta <= c["epoch"] <= tb)  # fuera de su historial, Deriv da velas de hoy
         a = b + pd.Timedelta(minutes=1)
     df = pd.DataFrame(rows).drop_duplicates("epoch") if rows else pd.DataFrame(columns=["epoch", "close"])
     ser = pd.Series(df["close"].astype(float).to_numpy(), index=pd.to_datetime(df["epoch"], unit="s", utc=True)).sort_index()
