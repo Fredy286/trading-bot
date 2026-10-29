@@ -3012,3 +3012,42 @@ de Deriv para `cryBTCUSD`: desde el 2025-10-29 (un año); los meses anteriores n
   precio, su acierto esperado es ~52–53 %, por debajo del equilibrio.
 - Las confirmaciones pre-registradas siguen su curso (miden lo que dicen medir, con Binance), pero **no** son una
   recomendación para operar en otra plataforma.
+
+## Estudio 39 — reversión nocturna operable en Deriv: su precio, 22–24 UTC, vencimiento 15 min (pre-registro, 2026-10-29, ANTES de calcularla a 15 min)
+
+**Origen:**
+- el Estudio 36 mostró que la reversión existe con el precio de Deriv (56,4 % a 3 min; 60,7 % a 5 min);
+- la API de Deriv (`contracts_for` y `proposal`, 2026-10-29) muestra que:
+  - en divisas, el «sube/baja» (CALL/PUT) dura **como mínimo 15 min**;
+  - Deriv **no deja operar de 20:50 a 22:00 UTC**.
+
+Por eso la única versión operable en Deriv es: su precio, entradas de **22:00 a 23:59 UTC** y vencimiento de 15 min.
+Además, señal y pago usarían el mismo precio.
+
+**Datos:** las velas de 1 min de Deriv ya descargadas para el Estudio 36 (`data/raw/deriv_velas/`, 19 pares,
+2026-04 → 2026-09, 19:30–00:10 UTC). Es el mismo periodo, con un vencimiento que no se había calculado.
+
+**Regla:**
+- Bollinger sobre velas de 1 min de Deriv; señal al cierre de la vela s; reversión;
+- entrada en la apertura de la vela t = s + 1 (L = 0), solo si t está entre las 22:00 y las 23:59 UTC;
+- salida en el cierre de la vela t + 14 (15 min);
+- una operación a la vez por par (15 min).
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H39a:** N = 20, K = 2;
+- **H39b:** N = 30, K = 2,5.
+
+**Criterios (cada una, todos):**
+1. ≥ 500 operaciones;
+2. p < 0,025 frente a 54,05 % (pago 85 %);
+3. Wilson 95 % > 54,05 %;
+4. CALL y PUT a menos de 5 puntos.
+
+El pago real de Deriv a esas horas se consultará con `proposal` y se informará el equilibrio correspondiente.
+
+**Expectativa declarada:** dudosa. A 15 min, el rebote del diferencial pesa menos y el movimiento real del mercado
+pesa más.
+
+**Consecuencia:** solo si pasa, se pre-registra su confirmación con datos de Deriv posteriores al 2026-10-25 y se
+propone al usuario una demo **automática** en Deriv con su API oficial (cuenta demo y token del usuario, guardado
+solo en `.env`).
