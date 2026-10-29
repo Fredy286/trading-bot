@@ -2937,3 +2937,41 @@ cierre de la vela t) en Coinbase (empate si son iguales). Si falta alguna de las
 
 **Expectativa declarada:** algo menos que en Binance (57,6 % / 62,5 %). Un acierto cercano al 50 % indicaría que la
 ventaja es propia del precio de Binance y no un movimiento de BTC.
+
+**Resultado del Estudio 37 (aplicado mecánicamente; `results/estudio37/resultado.json`): NO PASA. Advertencia mayor.**
+
+| Hipótesis | Operaciones | Acierto con Coinbase [lím. inf.] | Mismas señales con Binance | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|
+| H37a (todas) | 22 030 | **52,22 %** [51,55 %] | 57,60 % | 0 de 14 | no pasa |
+| H37b (p ≥ 0,60) | 5 148 | **53,75 %** [52,35 %] | 62,53 % | 4 de 10 | no pasa |
+
+**Informativo:**
+- el resultado coincide entre Binance y Coinbase en el 88,2 % de las operaciones;
+- cuando no coincide, Binance da la razón al modelo el 67,1 % de las veces.
+
+**Lectura:**
+- La mayor parte de la ventaja del modelo de BTC (5–9 puntos de 7–12) **es propia del último precio de Binance** en
+  esos segundos. No es un movimiento de BTC visible en otra bolsa grande.
+- En Coinbase queda un resto de información (52–54 %), por debajo del equilibrio.
+- Consecuencia práctica: una plataforma que liquide con su propio precio (índice de varias bolsas) probablemente
+  **no** pague la ventaja medida con Binance. Los Estudios 5, 16, 20 y 21 siguen siendo válidos **para el precio de
+  Binance**; su utilidad real depende del precio de liquidación de cada plataforma.
+- Siguiente: medir con el precio de un bróker (Deriv, Estudio 38).
+
+## Estudio 38 — señales de BTC juzgadas con el precio de un bróker (Deriv, cryBTCUSD) (pre-registro, 2026-10-29, ANTES de descargarlo)
+
+**Origen:** el Estudio 37. Las plataformas de binarias liquidan con su propio precio. Deriv es un bróker con API
+pública, y su precio de BTC es lo más parecido disponible.
+
+**Diseño:** idéntico al Estudio 37:
+- las señales de H20a;
+- resultado = signo(cierre de la vela t + 1 − cierre de la vela t) con las velas de 1 min de `cryBTCUSD` de Deriv;
+- periodo 2025-09-01 → 2026-10-25, o el tramo que Deriv tenga disponible (se informa la cobertura).
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H38a:** todas;
+- **H38b:** p ≥ 0,60.
+
+**Criterios:** los del Estudio 37 (≥ 300 operaciones, p < 0,025, Wilson > 54,05 %, EV > 0 en ≥ 60 % de los meses).
+
+**Expectativa declarada:** parecido a Coinbase (52–54 %).
