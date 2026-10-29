@@ -1,0 +1,319 @@
+{
+  "estudio": "Estudio 33 — variables de reloj en el GBM de BTC 1 min (pre-registro aea2c8b)",
+  "git_sha": "3fd4d237b26d47409ec1e2faf7c05117375468c9",
+  "variables": [
+    "k_q15",
+    "k_m5",
+    "k_ph15_sin",
+    "k_ph15_cos",
+    "k_hora0",
+    "k_fund_min",
+    "k_fund0",
+    "k_fund_post"
+  ],
+  "periodos": {
+    "desarrollo": [
+      "2022-01-01",
+      "2025-09-01"
+    ],
+    "verificacion": [
+      "2025-09-01",
+      "2026-10-01"
+    ]
+  },
+  "desarrollo": {
+    "minutos": 1877303,
+    "mejora_logloss": 0.0005575691350905315,
+    "ic95_logloss": [
+      0.00046926949234897254,
+      0.0006464477155790823
+    ],
+    "base": {
+      "acierto": 0.5660158088812176,
+      "ev": 0.04371656902699948,
+      "operaciones": 219856,
+      "sin_empate": 203936,
+      "aciertos": 115431,
+      "lo95": 0.5638634864449756,
+      "hi95": 0.568165644247455,
+      "ev_ic95": [
+        0.03597486555705677,
+        0.05103316213990018
+      ],
+      "trimestres_ev_positivo": 0.8666666666666667,
+      "operaciones_por_dia": 164.3168908819133,
+      "ev_total_por_dia": 7.183370702541105
+    },
+    "reloj": {
+      "acierto": 0.5654810904217322,
+      "ev": 0.043522267855996916,
+      "operaciones": 311660,
+      "sin_empate": 293978,
+      "aciertos": 166239,
+      "lo95": 0.5636883533895285,
+      "hi95": 0.5672721161090748,
+      "ev_ic95": [
+        0.037691201431668445,
+        0.04920548754886031
+      ],
+      "trimestres_ev_positivo": 0.9333333333333333,
+      "operaciones_por_dia": 232.75578790141896,
+      "ev_total_por_dia": 10.130059746079162
+    },
+    "informativo": {
+      "cuarto_de_hora": {
+        "base": {
+          "acierto": 0.5510835913312694,
+          "ev": 0.018490566037735842,
+          "operaciones": 14310,
+          "sin_empate": 13566,
+          "aciertos": 7476,
+          "lo95": 0.542700375482197,
+          "hi95": 0.5594378838177495,
+          "ev_ic95": [
+            0.0019581635664172106,
+            0.03439542264481576
+          ],
+          "trimestres_ev_positivo": 0.6666666666666666,
+          "operaciones_por_dia": 11.466346153846153,
+          "ev_total_por_dia": 0.2120192307692307
+        },
+        "reloj": {
+          "acierto": 0.5792211697489099,
+          "ev": 0.06997676948863468,
+          "operaciones": 34007,
+          "sin_empate": 33255,
+          "aciertos": 19262,
+          "lo95": 0.573906201667176,
+          "hi95": 0.5845178367695686,
+          "ev_ic95": [
+            0.057469777168562525,
+            0.08154906669017305
+          ],
+          "trimestres_ev_positivo": 1.0,
+          "operaciones_por_dia": 25.39731142643764,
+          "ev_total_por_dia": 1.7772218073188946
+        }
+      },
+      "resto": {
+        "base": {
+          "acierto": 0.5670798970426012,
+          "ev": 0.0454727895458924,
+          "operaciones": 205546,
+          "sin_empate": 190370,
+          "aciertos": 107955,
+          "lo95": 0.5648527824781403,
+          "hi95": 0.5693043043639837,
+          "ev_ic95": [
+            0.03877969995867962,
+            0.05210313707394354
+          ],
+          "trimestres_ev_positivo": 0.8666666666666667,
+          "operaciones_por_dia": 153.62182361733932,
+          "ev_total_por_dia": 6.985612855007473
+        },
+        "reloj": {
+          "acierto": 0.5637285548263866,
+          "ev": 0.04028211472593488,
+          "operaciones": 277653,
+          "sin_empate": 260723,
+          "aciertos": 146977,
+          "lo95": 0.5618240115970967,
+          "hi95": 0.5656312200778302,
+          "ev_ic95": [
+            0.034724703927766665,
+            0.046479039131894447
+          ],
+          "trimestres_ev_positivo": 0.8666666666666667,
+          "operaciones_por_dia": 207.35847647498133,
+          "ev_total_por_dia": 8.352837938760267
+        }
+      },
+      "financiacion_0_5": {
+        "base": {
+          "acierto": 0.576,
+          "ev": 0.06216606498194945,
+          "operaciones": 2770,
+          "sin_empate": 2625,
+          "aciertos": 1512,
+          "lo95": 0.5569970434745962,
+          "hi95": 0.5947808346600162,
+          "ev_ic95": [
+            0.03520101336251909,
+            0.09565267628490133
+          ],
+          "trimestres_ev_positivo": 0.7333333333333333,
+          "operaciones_por_dia": 3.2858837485172003,
+          "ev_total_por_dia": 0.20427046263345194
+        },
+        "reloj": {
+          "acierto": 0.5708824995845105,
+          "ev": 0.0544758064516129,
+          "operaciones": 6200,
+          "sin_empate": 6017,
+          "aciertos": 3435,
+          "lo95": 0.5583349190211164,
+          "hi95": 0.5833396269426903,
+          "ev_ic95": [
+            0.03423058109408915,
+            0.07650410685165311
+          ],
+          "trimestres_ev_positivo": 0.8,
+          "operaciones_por_dia": 4.736440030557677,
+          "ev_total_por_dia": 0.2580213903743315
+        }
+      }
+    }
+  },
+  "verificacion": {
+    "minutos": 548736,
+    "mejora_logloss": 0.00010308142459551803,
+    "ic95_logloss": [
+      2.5635005487537465e-05,
+      0.0001674307277864731
+    ],
+    "base": {
+      "acierto": 0.5649026721551664,
+      "ev": 0.040777534047690425,
+      "operaciones": 63367,
+      "sin_empate": 57332,
+      "aciertos": 32387,
+      "lo95": 0.5608402188671044,
+      "hi95": 0.5689564282619053,
+      "ev_ic95": [
+        0.025369039721181225,
+        0.052441374277833235
+      ],
+      "trimestres_ev_positivo": 1.0,
+      "operaciones_por_dia": 160.4227848101266,
+      "ev_total_por_dia": 6.541645569620251
+    },
+    "reloj": {
+      "acierto": 0.5639862563669791,
+      "ev": 0.03945077990076482,
+      "operaciones": 72958,
+      "sin_empate": 66358,
+      "aciertos": 37425,
+      "lo95": 0.5602095991076759,
+      "hi95": 0.5677555054653112,
+      "ev_ic95": [
+        0.02608565368012813,
+        0.05055204028455277
+      ],
+      "trimestres_ev_positivo": 1.0,
+      "operaciones_por_dia": 184.70379746835442,
+      "ev_total_por_dia": 7.286708860759494
+    },
+    "informativo": {
+      "cuarto_de_hora": {
+        "base": {
+          "acierto": 0.5447980743514309,
+          "ev": 0.0072252208047104876,
+          "operaciones": 4076,
+          "sin_empate": 3739,
+          "aciertos": 2037,
+          "lo95": 0.5287978227398967,
+          "hi95": 0.5607063657355119,
+          "ev_ic95": [
+            -0.02143897989859073,
+            0.03443933632115967
+          ],
+          "trimestres_ev_positivo": 0.6,
+          "operaciones_por_dia": 11.259668508287293,
+          "ev_total_por_dia": 0.08135359116022084
+        },
+        "reloj": {
+          "acierto": 0.5519017432646592,
+          "ev": 0.019666357738646893,
+          "operaciones": 5395,
+          "sin_empate": 5048,
+          "aciertos": 2786,
+          "lo95": 0.5381487056495355,
+          "hi95": 0.5655758450172945,
+          "ev_ic95": [
+            -0.008730978925439604,
+            0.04152531947319679
+          ],
+          "trimestres_ev_positivo": 0.8,
+          "operaciones_por_dia": 13.658227848101266,
+          "ev_total_por_dia": 0.2686075949367088
+        }
+      },
+      "resto": {
+        "base": {
+          "acierto": 0.5663053010654376,
+          "ev": 0.04308411057327417,
+          "operaciones": 59291,
+          "sin_empate": 53593,
+          "aciertos": 30350,
+          "lo95": 0.5621048515361678,
+          "hi95": 0.5704962456150494,
+          "ev_ic95": [
+            0.025506888403448967,
+            0.057184354562102385
+          ],
+          "trimestres_ev_positivo": 1.0,
+          "operaciones_por_dia": 150.10379746835443,
+          "ev_total_por_dia": 6.467088607594935
+        },
+        "reloj": {
+          "acierto": 0.5649812428641331,
+          "ev": 0.041030593668131964,
+          "operaciones": 67563,
+          "sin_empate": 61310,
+          "aciertos": 34639,
+          "lo95": 0.5610529993655041,
+          "hi95": 0.5689013436029521,
+          "ev_ic95": [
+            0.025155946864564037,
+            0.05408245683806415
+          ],
+          "trimestres_ev_positivo": 1.0,
+          "operaciones_por_dia": 171.04556962025316,
+          "ev_total_por_dia": 7.018101265822784
+        }
+      },
+      "financiacion_0_5": {
+        "base": {
+          "acierto": 0.5632754342431762,
+          "ev": 0.039929328621908115,
+          "operaciones": 849,
+          "sin_empate": 806,
+          "aciertos": 454,
+          "lo95": 0.5288137718822624,
+          "hi95": 0.5971367843746648,
+          "ev_ic95": [
+            -0.03358953321619089,
+            0.1062581046441495
+          ],
+          "trimestres_ev_positivo": 0.6,
+          "operaciones_por_dia": 3.493827160493827,
+          "ev_total_por_dia": 0.13950617283950614
+        },
+        "reloj": {
+          "acierto": 0.5259067357512953,
+          "ev": -0.025823723228995066,
+          "operaciones": 1214,
+          "sin_empate": 1158,
+          "aciertos": 609,
+          "lo95": 0.4971085894132493,
+          "hi95": 0.5545335621502684,
+          "ev_ic95": [
+            -0.09589181831440101,
+            0.021249717558313327
+          ],
+          "trimestres_ev_positivo": 0.4,
+          "operaciones_por_dia": 3.781931464174455,
+          "ev_total_por_dia": -0.09766355140186919
+        }
+      }
+    }
+  },
+  "criterios": {
+    "dev_logloss_ic": true,
+    "dev_ev": false,
+    "verif_logloss": true,
+    "verif_ev": false
+  },
+  "pasa": false
+}
