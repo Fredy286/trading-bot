@@ -345,6 +345,14 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study36(a) -> int:
+    from .research import study36
+
+    rep = study36.run()
+    print(f"H36: pasa={rep['H36']['pasa']} | {rep['H36']['criterios']}")
+    return 0
+
+
 def cmd_research_study34(a) -> int:
     from .research import study34
 
@@ -747,6 +755,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study36", help="Estudio 36: reversión nocturna con el precio de Deriv (feed de bróker)")
+    x.set_defaults(func=cmd_research_study36)
     x = r.add_parser("study34", help="Estudio 34: réplica de la reversión nocturna 2024-09 → 2025-08 con filtro de diferencial")
     x.set_defaults(func=cmd_research_study34)
     x = r.add_parser("study26", help="Estudio 26: aviso anticipado + umbral p ≥ 0,60 en XRP, SOL, ETH y DOGE")
