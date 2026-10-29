@@ -219,6 +219,21 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - **Memoria del bot:** `docs/10_memoria_del_bot.md` (lo aprendido + ideas pendientes con estado).
      - En el horario del usuario (21:00–01:00 Bogotá) funciona el modelo de BTC 1 min (57,6 %; 60,7 % con p ≥ 0,60,
        Estudio 20, descriptivo); la reversión de divisas no (52 % a esas horas, Estudio 30).
+   - **Estudios del 2026-10-29 (tarde, sesión local):**
+     - **Estudio 33** (variables de «reloj» en BTC, rutina): no pasa (mejora el log-loss, no la política).
+     - **Estudio 34** (réplica nocturna 2024-09 → 2025-08): H34a 56,21 %, H34c (5 min) 59,59 %, 12/12 meses: **se replica**.
+       Pero H34b (diferencial normal) 53,3 %: la ventaja vive en los minutos de diferencial 3–60× lo normal (60–66 %).
+     - **Estudio 35:** modelo congelado de ETH (ETHUSDT-anticipada-k50-L10-02b1e4, SHA 71aaa021…); confirmación tras el
+       2027-01-18; en sus primeros días no supera p 0,55 (casi sin señales). ETH ya está en el registro diario.
+     - **Estudio 36** (reversión nocturna con precio de Deriv): pasa, 56,35 % (5 min 60,67 %), pero las señales de Deriv y
+       de HistData casi no coinciden (dirección igual 46 %): la reversión vive en el precio de cada proveedor.
+     - **Estudio 37** (señales de BTC juzgadas con Coinbase): **no pasa**, 52,2 % (p ≥ 0,60: 53,8 %) frente a 57,6 % con
+       Binance. **ADVERTENCIA MAYOR:** la ventaja de BTC es en buena parte propia del último precio de Binance.
+     - **Estudio 38** (las mismas señales con el precio de BTC de Deriv): ver docs/01.
+     - **Regla nueva:** una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma. Antes de
+       recomendar cualquier operación real o en demo, verificar la fuente de precio de la plataforma.
+     - Horarios de GitHub poco fiables (ítem 46): la integración de la rutina dispara la cola y la vigilancia.
+       Deriv entrega como mucho 1 000 velas/ticks por petición y, fuera de su historial, devuelve las de hoy (ítems 47–48).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
