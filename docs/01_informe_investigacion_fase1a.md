@@ -2716,3 +2716,54 @@ al movimiento reciente, posición en las bandas, etc.) y buscar qué dato usa.
 ninguna estrategia propia, así que se permite. Nunca se calculan aquí aciertos de los Estudios 12–29.
 
 **Expectativa declarada:** ~50 % en todos, como en el Estudio 23.
+
+## Estudio 33 — variables de «reloj» (cuarto de hora y hora de financiación) en el modelo de BTC 1 min (pre-registro, 2026-10-29, ANTES de calcularlas)
+
+*Renumerado de 32 a 33 el mismo día, antes de ejecutar nada: el número 32 ya lo usaba la auditoría prospectiva de canales.*
+
+**Origen:** bitácora del 2026-10-26 y del 2026-10-27 (propuesta repetida dos días, nunca probada):
+- Kim y Hansen (preprint de 2026, futuros de cripto; https://arxiv.org/abs/2607.09426, **no se pudo leer el
+  texto completo**, solo su resumen en la bitácora y en buscadores): el volumen, la volatilidad y la dependencia
+  serial del flujo de órdenes y de los retornos se concentran en los minutos :00, :15, :30 y :45, sobre todo en
+  sus primeros 10 s; según un resumen de prensa (https://cryptoslate.com/?p=559513, **no se pudo leer**: dominio
+  bloqueado en este entorno), el efecto sigue al quitar las horas de financiación;
+- Binance liquida la financiación de los perpetuos a las 00:00, 08:00 y 16:00 UTC.
+
+El modelo actual ve la hora del día (`tod_sin`, `tod_cos`) y el día de la semana, pero **no** la posición del
+minuto dentro del cuarto de hora ni la distancia a la financiación.
+
+**Datos:** velas de 1 min del contado BTC/USDT de Binance (data.binance.vision, archivos mensuales), 2021-01 →
+2026-09. Nada posterior al 2026-10-25.
+
+**Modelo base (sin cambios):** el de los Estudios 7 y 13 — GBM con `FEATURES`, horizonte 1 min, entrada en la
+apertura de la vela siguiente (d = 1), walk-forward trimestral con 12 meses de entrenamiento, 20 % de calibración
+isotónica, misma semilla, política B (EV estimado ≥ 0,02; pago 85 %; empate reembolsado; probabilidad de empate
+estimada de forma causal como en el Estudio 13).
+
+**Bloque nuevo (8 variables, todas de calendario, calculadas sobre el minuto que se opera, t + 1):**
+- `k_q15`: 1 si ese minuto empieza en :00, :15, :30 o :45;
+- `k_m5`: 1 si empieza en un múltiplo de 5 que no es cuarto de hora;
+- `k_ph15_sin`, `k_ph15_cos`: fase del minuto dentro del cuarto de hora (minuto mod 15);
+- `k_hora0`: 1 si empieza en :00;
+- `k_fund_min`: minutos hasta la próxima financiación (00/08/16 UTC), dividido por 480;
+- `k_fund0`: 1 si el minuto empieza exactamente a una hora de financiación;
+- `k_fund_post`: 1 si está entre 1 y 5 minutos después de una hora de financiación.
+
+**Hipótesis única H33 (α = 0,05; una sola familia, sin más pruebas):** base + bloque de reloj mejora al base.
+
+**Criterios (todos):**
+1. **desarrollo** (prueba 2022-01 → 2025-08): mejora media del log-loss por minuto > 0, con límite inferior del IC
+   95 % (bootstrap por semanas) > 0;
+2. desarrollo: EV por operación de la política ≥ el del base;
+3. **verificación** (prueba 2025-09 → 2026-09): mejora del log-loss > 0 (puntual) y EV ≥ el del base.
+
+**Informativo (no decide):** acierto y número de operaciones del base y del nuevo en los minutos `k_q15` = 1 frente
+al resto, y en las horas de financiación.
+
+**Limitación declarada:** el modelo base entra en la apertura (sin demora). La ráfaga del cuarto de hora vive en
+los primeros 10 s, que el aviso del segundo 50 con clic a +10 s (H16b) no puede aprovechar igual. Si H33 pasa, la
+pieza se lleva a H16b solo con un estudio nuevo pre-registrado y confirmación con datos posteriores al
+2026-10-25.
+
+**Expectativa declarada:** SIN SEÑAL o mejora muy pequeña (< 0,5 puntos de acierto). Dos indicios en contra: la
+hora del día ya está en el modelo, y en el Estudio 24 una mejora del log-loss no se tradujo en mejor política.
