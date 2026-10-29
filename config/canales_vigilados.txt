@@ -1,0 +1,16 @@
+# Canales PÚBLICOS de Telegram vigilados cada hora (src/tradingbot/data/telegram_publico.py).
+# Uno por línea: nombre (tal como aparece en t.me/<nombre>) y, si se conoce, su zona horaria en horas (p. ej. -3). La investigación diaria puede añadir canales
+# que publiquen señales con hora ANTES de la entrada y en activos verificables (no OTC).
+# De la auditoría del Estudio 23 (activos en 2026):
+gotraderssinaisfree -3
+Unidos -3
+PocketSignalsM1 -3
+PocketOptionSignalsM5 -3
+PocketSignalsM15
+QuotexSignalsM1
+QuotexSignalfreee -3
+quotexsignals2814 -3
+pocket_option_signals6 +6
+GavinVIPResults -5
+Pocket_Option_Signal_OTC_market
+Olymp_Trade_Quotex_Signals5

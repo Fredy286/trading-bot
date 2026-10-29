@@ -593,6 +593,25 @@ def cmd_serve(a) -> int:
                  senal_dir=Path(a.senal_runtime), nocturna_dir=Path(a.nocturna_runtime))
 
 
+def cmd_canales(a) -> int:
+    """Vigilancia de canales públicos de Telegram y su auditoría prospectiva (Estudio 32)."""
+    import json as _json
+
+    if a.accion == "capturar":
+        from .data.telegram_publico import capture_all
+
+        capture_all()
+    elif a.accion == "auditar":
+        from .research.study32 import audit_pending
+
+        audit_pending()
+    else:
+        from .research.study32 import table
+
+        print(_json.dumps(table(), indent=2, ensure_ascii=False))
+    return 0
+
+
 def cmd_registro(a) -> int:
     """Registro diario automático de las señales de las estrategias congeladas (prueba hacia adelante)."""
     import json as _json
@@ -871,6 +890,10 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--senal-runtime", default="runtime/senales")
     x.add_argument("--nocturna-runtime", default="runtime/nocturna")
     x.set_defaults(func=cmd_serve)
+
+    x = sub.add_parser("canales", help="vigilar canales públicos de señales y auditarlos con precios reales (Estudio 32)")
+    x.add_argument("accion", choices=["capturar", "auditar", "tabla"])
+    x.set_defaults(func=cmd_canales)
 
     x = sub.add_parser("registro", help="registro diario automático de señales y resultados (sin intervención)")
     x.add_argument("accion", choices=["pendientes", "dia", "resumen"])

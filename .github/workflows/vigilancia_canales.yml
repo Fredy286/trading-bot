@@ -1,0 +1,42 @@
+name: Vigilancia de canales de señales
+
+# Cada hora guarda los mensajes nuevos de los canales PÚBLICOS de config/canales_vigilados.txt (vista web t.me/s/,
+# sin cuenta), con la hora de Telegram y la nuestra. Así la auditoría (Estudio 32) no depende de lo que los canales
+# editen o borren después. Solo lectura de páginas públicas.
+
+on:
+  schedule:
+    - cron: "11 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: vigilancia-canales
+  cancel-in-progress: false
+
+jobs:
+  capturar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      PYTHONIOENCODING: utf-8
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Capturar mensajes nuevos
+        run: python -c "from tradingbot.data.telegram_publico import capture_all; capture_all()"
+      - name: Guardar en la rama
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/canales/
+          git commit -m "Vigilancia de canales $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]" || exit 0
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((i * 5))
+          done
