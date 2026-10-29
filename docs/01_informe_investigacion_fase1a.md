@@ -3066,6 +3066,17 @@ solo en `.env`).
 - Pago de Deriv a 15 min en esas horas: por consultar con `proposal` después de las 22:00 UTC (a las 21:00 UTC la API
   respondió «Trading is not available from 20:50:00 to 22:00:00»).
 
+**Nota (2026-10-29, 22:05 UTC; consulta `proposal` a 15 min en los 19 pares, CALL y PUT):** Deriv no da precio.
+Respondió en las 38 consultas: «Trading on forex contracts with duration less than 5 hours is not available from
+21:00:00 to 23:59:59». Es decir:
+- de 20:50 a 22:00 UTC no se opera nada;
+- de 21:00 a 23:59 UTC no se opera ningún contrato de divisas de **menos de 5 horas**.
+
+La premisa del Estudio 39 («de 22:00 a 23:59 UTC sí se puede operar») era **falsa**: se dedujo del primer mensaje sin
+comprobarlo a las 22:00 (registro de errores, ítem 49). El resultado del Estudio 39 no cambia (no pasa). Conclusión:
+**en Deriv la reversión nocturna de divisas no se puede operar a ninguna hora útil**, porque la ventaja existe solo de
+21 a 24 UTC (Estudio 30) y a 5 horas o más no tiene sentido. No hay pago que informar.
+
 ## Estudio 40 — confirmación: reversión en Deriv de 22:00 a 22:59 UTC a 15 min (pre-registro, 2026-10-29, ANTES de ver datos de Deriv posteriores al 2026-10-25)
 
 **Origen:** Estudio 39, lectura *post hoc* por hora.
@@ -3083,3 +3094,10 @@ Evaluación **única** después del 2027-01-18.
 3. Wilson 95 % por encima de ese equilibrio.
 
 **Consecuencia:** si pasa, se propone al usuario una demo automática en Deriv con su API oficial.
+
+**Nota (2026-10-29, 22:05 UTC, después del pre-registro y antes de ver datos nuevos):** Deriv no permite contratos de
+divisas de menos de 5 horas de 21:00 a 23:59 UTC (nota del Estudio 39). Por eso la consecuencia anterior **no se puede
+cumplir**: el Estudio 40 se conserva sin cambios (regla, datos, criterios y fecha), pero solo como medida científica de
+si la reversión de las 22 UTC con el precio de Deriv persiste a 15 min. Aunque pase, **no** se propondrá ninguna
+operación en Deriv. Como no hay pago real a esa hora, el criterio 2 usa el 85 % (equilibrio 54,05 %), tal como prevé
+el propio pre-registro.
