@@ -49,20 +49,20 @@ TRAIN_END = pd.Timestamp("2026-10-26", tz="UTC")  # excluido
 CALIB_FRAC = 0.2
 MODEL_PATH = Path("config/modelos/BTCUSDT_senal_anticipada_k50.pkl")
 REG_PATH = Path("config/senal_anticipada.json")
-DAILY_URL = "https://data.binance.vision/data/spot/daily/klines/BTCUSDT/{i}/BTCUSDT-{i}-{d}.zip"
+DAILY_URL = "https://data.binance.vision/data/spot/daily/klines/{s}/{i}/{s}-{i}-{d}.zip"
 SOUND = "/usr/share/sounds/freedesktop/stereo/complete.oga"
 FIRE_AT_S = 50.25  # segundo de la vela en que se decide (hora de Binance), con margen de publicación
 
 
 # ----------------------------------------------------------------------------------------------- datos y entrenamiento
-def download_daily(interval: str, start: str, end: str, cache: Path) -> pd.DataFrame:
+def download_daily(interval: str, start: str, end: str, cache: Path, symbol: str = "BTCUSDT") -> pd.DataFrame:
     """Archivos diarios de Binance (1m o 1s) en [start, end), con caché en disco."""
     session, parts = make_session(), []
     for d in pd.date_range(start, end, freq="D", inclusive="left"):
         f = Path(cache) / interval / f"{d:%Y-%m-%d}.parquet"
         if not f.exists():
             try:
-                raw = get_bytes(session, DAILY_URL.format(i=interval, d=f"{d:%Y-%m-%d}"), timeout=300)
+                raw = get_bytes(session, DAILY_URL.format(s=symbol, i=interval, d=f"{d:%Y-%m-%d}"), timeout=300)
             except NotFound as exc:
                 raise FileNotFoundError(f"Binance aún no publica {interval} del {d:%Y-%m-%d}") from exc
             with zipfile.ZipFile(io.BytesIO(raw)) as zf:
