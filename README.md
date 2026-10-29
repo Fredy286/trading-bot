@@ -117,6 +117,11 @@ El estudio completo con datos reales también se puede lanzar desde GitHub: pest
 
 ### Señales anticipadas para practicar en cuenta DEMO (Estudio 16)
 
+> **Advertencia (Estudios 37 y 38, 2026-10-29):** estas señales se calculan y se validaron con el precio de
+> **Binance**. Calificadas con el precio de Coinbase o del bróker Deriv aciertan solo 52–53 %, por debajo del
+> equilibrio. En una plataforma que pague con su propio precio, lo esperable es **no ganar**. Úsalas solo para
+> entender cómo funciona el sistema.
+
 Es el modo pensado para operar **a mano**. El bot decide en el **segundo 50** de cada vela de 1 minuto de
 BTC/USD y avisa con sonido. Hay que hacer clic en la plataforma demo lo antes posible, idealmente antes de
 que cierre la vela.

@@ -2995,3 +2995,20 @@ pública, y su precio de BTC es lo más parecido disponible.
   (por ejemplo, IQ Option), la regla tendría que aplicarse sobre su propio gráfico (Bollinger 20, 2 en velas de
   1 min, de 16:00 a 19:00 en Bogotá).
 - Hora 22 UTC con Deriv: 55,7 %.
+
+**Resultado del Estudio 38 (aplicado mecánicamente; `results/estudio38/resultado.json`): NO PASA.** Cobertura del historial
+de Deriv para `cryBTCUSD`: desde el 2025-10-29 (un año); los meses anteriores no existen en su API.
+
+| Hipótesis | Operaciones | Acierto con Deriv [lím. inf.] | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|
+| H38a (todas) | 17 560 | **52,36 %** [51,61 %] | 3 de 13 | no pasa |
+| H38b (p ≥ 0,60) | 3 690 | **53,20 %** [51,55 %] | 3 de 9 | no pasa |
+
+**Lectura:**
+- Coincide con Coinbase (Estudio 37). El resultado es el mismo que en Binance en el 87,7 % de las operaciones,
+  pero la ventaja se queda en Binance.
+- **Conclusión firme:** el modelo de BTC a 1 min (Estudios 15, 16, 20 y 21) predice el **último precio de Binance**,
+  no el precio de BTC que usan otras bolsas y brókeres. Para una plataforma de binarias que liquida con su propio
+  precio, su acierto esperado es ~52–53 %, por debajo del equilibrio.
+- Las confirmaciones pre-registradas siguen su curso (miden lo que dicen medir, con Binance), pero **no** son una
+  recomendación para operar en otra plataforma.

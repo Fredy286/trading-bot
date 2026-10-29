@@ -229,7 +229,8 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        de HistData casi no coinciden (dirección igual 46 %): la reversión vive en el precio de cada proveedor.
      - **Estudio 37** (señales de BTC juzgadas con Coinbase): **no pasa**, 52,2 % (p ≥ 0,60: 53,8 %) frente a 57,6 % con
        Binance. **ADVERTENCIA MAYOR:** la ventaja de BTC es en buena parte propia del último precio de Binance.
-     - **Estudio 38** (las mismas señales con el precio de BTC de Deriv): ver docs/01.
+     - **Estudio 38** (las mismas señales con el precio de BTC del bróker Deriv): **no pasa**, 52,4 % (p ≥ 0,60: 53,2 %).
+       Confirma el 37: el modelo de BTC predice el precio de Binance. NO recomendar sus señales para otra plataforma.
      - **Regla nueva:** una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma. Antes de
        recomendar cualquier operación real o en demo, verificar la fuente de precio de la plataforma.
      - Horarios de GitHub poco fiables (ítem 46): la integración de la rutina dispara la cola y la vigilancia.

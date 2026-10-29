@@ -24,6 +24,9 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   - divisas de noche: la reversión existe en Deriv (56,4 %; 5 min 60,7 %) y en HistData, pero con señales distintas
     (dirección coincidente 46 %).
 
+  - BTC con el precio del bróker Deriv: 52,4 % (Estudio 38). El modelo de BTC predice el precio de BINANCE, no
+    el de BTC en general.
+
   Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**
   - el precio bid crea reversiones falsas en el cierre de Nueva York (usar precio medio);
@@ -38,6 +41,7 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 
 | # | Idea | Por qué | Estado |
 |---|---|---|---|
+| 0 | **Aprender con el precio de la plataforma**: entrenar y juzgar los modelos con el precio de un bróker (Deriv: 1 año de velas de 1 min de BTC/ETH y divisas) en vez del de Binance. Las ventajas parecen vivir en el precio de cada fuente | Estudios 34, 36, 37 y 38 | PRIORIDAD MÁXIMA. Pre-registrar con desarrollo 2025-10-29 → 2026-08 y verificación 2026-09 → 2026-10-25 (datos de Deriv ≤ 2026-10-25) |
 | 1 | Variables de «reloj» (minuto en el cuarto de hora, hora de financiación 00/08/16 UTC) en el GBM de BTC | Preprint de Kim y Hansen (2026): ráfagas de volumen y dependencia serial en los cuartos de hora | **Estudio 33** (pre-registro aea2c8b, código a1598a3), en la cola de GitHub Actions desde el 2026-10-29. Documentar el resultado |
 | 2 | Confirmación de ETH con umbral: modelo congelado de ETH (12 meses hasta el 2026-10-25) y evaluación única con datos nuevos | Estudio 26 pasó (58,8 %) | Por pre-registrar (confirmación) |
 | 3 | Selector BTC + ETH con p ≥ 0,60 en el horario del usuario (21:00–01:00 Bogotá) | Más señales de alta confianza en sus horas | Idea |
