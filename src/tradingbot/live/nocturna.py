@@ -34,6 +34,8 @@ PAIRS = ("AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "EURAUD", "EURCAD", "
          "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "NZDJPY", "NZDUSD", "USDCAD")
 N_BAND, K_SD = 20, 2.0
 DUR_S, LAT_DEFAULT_S, LATE_S = 180, 10, 15
+# Variantes: «actual» = regla de los Estudios 27/28; «fuerte» = casilla 30/2,5/5 min del Estudio 31 (H29c, sin confirmar)
+VARIANTES = {"actual": (20, 2.0, 180), "fuerte": (30, 2.5, 300)}
 STRONG_HOUR_UTC = 22  # hora fuerte en los Estudios 27 y 28 (17:00 en Bogotá); se confirma en el Estudio 29
 FIRE_AT_S = 1.5  # segundo del minuto en que se decide (la vela anterior ya cerró)
 SOUND = "/usr/share/sounds/freedesktop/stereo/complete.oga"
@@ -54,15 +56,15 @@ def auto_window(path: Path = Path("results/estudio28/resultado.json")) -> str:
         return "utc"
 
 
-def band_side(closes: np.ndarray) -> int:
+def band_side(closes: np.ndarray, n: int = N_BAND, k: float = K_SD) -> int:
     """+1 (CALL) si el último cierre queda bajo la banda inferior, −1 (PUT) si queda sobre la superior, 0 si no."""
-    if len(closes) < N_BAND or np.isnan(closes[-N_BAND:]).any():
+    if len(closes) < n or np.isnan(closes[-n:]).any():
         return 0
-    w = closes[-N_BAND:]
+    w = closes[-n:]
     mid, sd = w.mean(), w.std(ddof=0)
-    if w[-1] > mid + K_SD * sd:
+    if w[-1] > mid + k * sd:
         return -1
-    if w[-1] < mid - K_SD * sd:
+    if w[-1] < mid - k * sd:
         return 1
     return 0
 
@@ -105,7 +107,7 @@ class DerivFeed:
     def now(self) -> float:
         return time.time() + self.offset_s
 
-    def candles(self, pair: str, count: int = N_BAND + 2) -> pd.DataFrame:
+    def candles(self, pair: str, count: int = 32) -> pd.DataFrame:
         r = self._call({"ticks_history": f"frx{pair}", "style": "candles", "granularity": 60, "count": count,
                         "end": "latest"})
         c = pd.DataFrame(r.get("candles", []))
@@ -121,12 +123,14 @@ class DerivFeed:
 
 class NightLoop:
     def __init__(self, runtime: Path, feed: DerivFeed | None = None, ventana: str = "auto", pairs=PAIRS,
-                 sound: bool = True, log=print):
+                 sound: bool = True, log=print, variante: str = "actual"):
         self.dir = Path(runtime)
         self.dir.mkdir(parents=True, exist_ok=True)
         self.feed = feed or DerivFeed()
         self.ventana = auto_window() if ventana == "auto" else ventana
         self.pairs, self.sound, self.log = tuple(pairs), sound, log
+        self.variante = variante
+        self.n, self.k, self.dur = VARIANTES[variante]
         self.busy: dict[str, int] = {}
         self.started = utcnow()
         self.last: dict = {}
@@ -160,25 +164,25 @@ class NightLoop:
             if closed.empty or closed.index[-1] != t_epoch - 60:
                 continue  # la vela de la señal no existe o aún no cerró
             idx = closed.index.to_numpy()
-            last = closed.iloc[-N_BAND:]
-            if len(last) < N_BAND or (np.diff(last.index.to_numpy()) != 60).any():
-                continue  # se exigen 20 velas consecutivas
-            side = band_side(closed["close"].to_numpy())
+            last = closed.iloc[-self.n:]
+            if len(last) < self.n or (np.diff(last.index.to_numpy()) != 60).any():
+                continue  # se exigen N velas consecutivas
+            side = band_side(closed["close"].to_numpy(), self.n, self.k)
             if side == 0:
                 continue
             row = {"evento": "aviso", "alert_id": uuid.uuid4().hex[:12], "par": pair,
                    "lado": "CALL" if side > 0 else "PUT", "vela_senal": pd.Timestamp(idx[-1], unit="s", tz="UTC").isoformat(),
                    "entrada_desde": t.isoformat(), "entrar_antes": (t + pd.Timedelta(seconds=LATE_S)).isoformat(),
-                   "vencimiento_min": DUR_S // 60, "precio_cierre": float(closed["close"].iloc[-1]),
+                   "vencimiento_min": self.dur // 60, "variante": self.variante, "precio_cierre": float(closed["close"].iloc[-1]),
                    "emitido": pd.Timestamp(self.feed.now(), unit="s", tz="UTC").isoformat(), "ventana": self.ventana,
                    "hora_fuerte": t.hour == STRONG_HOUR_UTC}
             self._write(row)
             self.pending.append(row)
-            self.busy[pair] = t_epoch + DUR_S
+            self.busy[pair] = t_epoch + self.dur
             out.append(row)
             local = t.tz_convert(BOGOTA).strftime("%H:%M")
             star = "  ★ hora fuerte" if row["hora_fuerte"] else ""
-            self.log(f"{local} Bogotá  {pair[:3]}/{pair[3:]}  {'↑ CALL' if side > 0 else '↓ PUT'}  3 min — entre ya "
+            self.log(f"{local} Bogotá  {pair[:3]}/{pair[3:]}  {'↑ CALL' if side > 0 else '↓ PUT'}  {self.dur // 60} min — entre ya "
                      f"(antes de {LATE_S} s){star}")
         if out:
             self._beep()
@@ -193,16 +197,17 @@ class NightLoop:
             t0 = pd.Timestamp(r["entrada_desde"]).timestamp()
             ck = clicks.get(r["alert_id"])
             entry_t = pd.Timestamp(ck["hora_deriv"]).timestamp() if ck else t0 + LAT_DEFAULT_S
-            if now_epoch < entry_t + DUR_S + 15:
+            dur = int(r.get("vencimiento_min", DUR_S // 60)) * 60
+            if now_epoch < entry_t + dur + 15:
                 still.append(r)
                 continue
             try:
-                times, prices = self.feed.ticks(r["par"], int(t0) - 120, int(entry_t + DUR_S) + 5)
+                times, prices = self.feed.ticks(r["par"], int(t0) - 120, int(entry_t + dur) + 5)
             except (ConnectionError, RuntimeError):
                 still.append(r)
                 continue
             e = price_before(times, prices, entry_t)
-            x = price_before(times, prices, entry_t + DUR_S)
+            x = price_before(times, prices, entry_t + dur)
             res = None if e is None or x is None else (0 if abs(x - e) < 1e-9 else (1 if x > e else -1))
             side = 1 if r["lado"] == "CALL" else -1
             out = {"evento": "resultado", "alert_id": r["alert_id"], "par": r["par"], "entrada_ref": e, "salida_ref": x,
@@ -214,6 +219,7 @@ class NightLoop:
 
     def write_state(self) -> None:
         state = {"actualizado": utcnow().isoformat(), "inicio": self.started.isoformat(), "ventana": self.ventana,
+                 "variante": self.variante, "vencimiento_min": self.dur // 60,
                  "pares": list(self.pairs), "desfase_reloj_s": self.feed.offset_s, "ultimo": self.last,
                  "pendientes": len(self.pending)}
         tmp = self.dir / f"state.json.{os.getpid()}.tmp"
@@ -225,7 +231,8 @@ class NightLoop:
             self.feed.sync_clock()
         except ConnectionError as exc:
             self.log(f"Aviso: no se pudo sincronizar el reloj con Deriv ({exc}); se usa el del PC")
-        self.log(f"Reversión nocturna ({self.ventana}) en {len(self.pairs)} pares. SOLO CUENTA DEMO.")
+        self.log(f"Reversión nocturna ({self.ventana}, variante {self.variante}: banda {self.n}/{self.k}, "
+                 f"{self.dur // 60} min) en {len(self.pairs)} pares. SOLO CUENTA DEMO.")
         n = 0
         while not iterations or n < iterations:
             now = self.feed.now()

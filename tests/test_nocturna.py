@@ -99,3 +99,19 @@ def test_panel_routes(tmp_path):
             assert "Ya entré" in r.read().decode()
     finally:
         srv.shutdown()
+
+
+def test_strong_variant_uses_5_minutes(tmp_path):
+    t0 = int(pd.Timestamp("2026-07-01 21:10", tz="UTC").timestamp())
+    feed = FakeFeed(t0)
+    closes = np.r_[np.full(30, 1.0) + np.random.default_rng(1).normal(0, 1e-4, 30), 0.99]
+    feed.c = pd.DataFrame({"open": closes, "high": closes, "low": closes, "close": closes},
+                          index=t0 - 60 * np.arange(31, 0, -1))
+    loop = nocturna.NightLoop(tmp_path, feed=feed, ventana="utc", pairs=("EURGBP",), sound=False,
+                              log=lambda *_: None, variante="fuerte")
+    out = loop.step(t0)
+    assert out[0]["vencimiento_min"] == 5 and loop.busy["EURGBP"] == t0 + 300
+    loop.resolve(t0 + 10 + 180 + 20)
+    assert loop.pending  # con 5 min aún no vence
+    loop.resolve(t0 + 10 + 300 + 20)
+    assert nocturna.diario(tmp_path)[0]["resultado"] == "gana"

@@ -169,6 +169,9 @@ scripts/iniciar_nocturna.sh
 - Unos 3½ min después, el diario anota el resultado de referencia con el precio medio de Deriv, desde la
   hora de su clic. El resultado de su plataforma puede ser distinto: compárelos.
 - Desarrollo: 57,2 % con clic a +10 s (Estudio 27). **Sin confirmación con datos nuevos todavía. Solo demo.**
+- Variante para practicar: `scripts/iniciar_nocturna.sh --variante fuerte`. Usa una banda más ancha (30 velas,
+  2,5 desviaciones) y vencimiento de **5 min**: menos avisos y 61,3 % en desarrollo (Estudio 31). Sirve también
+  si su plataforma no tiene 3 min.
 
 ## Configuración (variables de entorno)
 

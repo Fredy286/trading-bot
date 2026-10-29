@@ -189,6 +189,11 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      `scripts/iniciar_nocturna.sh`. Usa la API pública de Deriv (sin cuenta; 19 de los 24 pares; precio medio), avisa
      con sonido, registra el clic y mide el resultado de referencia con los ticks de Deriv. Probado en vivo
      (3 avisos, ventana forzada). Dependencia nueva: websocket-client.
+   - **Estudio 30 (reversión en otras horas y mercados):** ninguna pasa. Divisas a otras horas 51–54 %; oro, S&P y BTC
+     de noche no. La ventaja existe solo a las 21–24 UTC.
+   - **Estudio 31 (solidez de parámetros, informativo):** sólida. Superficie suave y monótona (más ancho/largo → más
+     acierto); 30/2,5/5 min = 61,3 % (21 302 ops). Enmienda al Estudio 29: H29c (esa casilla). Modo en vivo:
+     `--variante fuerte` (5 min), solo práctica.
    - **Estudio 26 (aviso anticipado + umbral p ≥ 0,60 en otras monedas):** solo ETH pasa (653 ops, 58,8 %); XRP, SOL y
      DOGE nunca llegan a p 0,60 con clic a +10 s.
    - **Lección de los Estudios 20–24:** lo único que sube el acierto es **filtrar por confianza** del propio

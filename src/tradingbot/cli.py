@@ -600,7 +600,8 @@ def cmd_nocturna(a) -> int:
     print("Reversión nocturna en divisas. Panel: http://127.0.0.1:8765/nocturna — Ctrl+C para detener. "
           "SOLO CUENTA DEMO.")
     try:
-        nocturna.NightLoop(Path(a.runtime), ventana=a.ventana, sound=not a.sin_sonido).run(a.iteraciones)
+        nocturna.NightLoop(Path(a.runtime), ventana=a.ventana, sound=not a.sin_sonido,
+                           variante=a.variante).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -862,6 +863,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="auto = la elegida por la regla pre-registrada del Estudio 28")
     x.add_argument("--iteraciones", type=int, default=0, help="0 = sin límite")
     x.add_argument("--sin-sonido", action="store_true")
+    x.add_argument("--variante", choices=["actual", "fuerte"], default="actual",
+                   help="actual = banda 20/2, 3 min (Estudios 27/28); fuerte = banda 30/2,5, 5 min (Estudio 31, sin confirmar)")
     x.set_defaults(func=cmd_nocturna)
     return p
 

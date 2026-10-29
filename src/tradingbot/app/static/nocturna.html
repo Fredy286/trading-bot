@@ -60,7 +60,7 @@
   <div><span id="status" class="note">cargando…</span> <button id="soundbtn" class="secondary">Activar sonido</button></div>
 </header>
 <main>
-  <div class="banner">EXPERIMENTAL — SOLO CUENTA DEMO. Divisas sin OTC, vencimiento 3 min. Entra en los primeros 10 s;
+  <div class="banner">EXPERIMENTAL — SOLO CUENTA DEMO. Divisas sin OTC, con el vencimiento que indica cada aviso. Entra en los primeros 10 s;
     pasados 15 s, no entres. El resultado de la tabla es una referencia con el precio medio de Deriv, no el de tu plataforma.</div>
   <div id="active"><div class="card note" style="text-align:center">Sin avisos ahora. <span id="win"></span></div></div>
   <div class="grid" id="metrics"></div>
@@ -110,7 +110,7 @@ function renderActive(diario) {
     return `<div class="card sig ${late ? "late" : ""} ${isNew ? "flash" : ""}">
       <div class="pair">${pair(r.par)}</div>
       <div class="dir ${up ? "up" : "down"}">${up ? "↑ SUBE" : "↓ BAJA"}</div>
-      <div class="note">${r.lado} · 3 minutos${r.hora_fuerte ? " · ★ hora fuerte" : ""}</div>
+      <div class="note">${r.lado} · ${r.vencimiento_min || 3} minutos${r.hora_fuerte ? " · ★ hora fuerte" : ""}</div>
       <div class="t">${late ? "TARDE" : Math.max(0, age).toFixed(0) + " s"}</div>
       <button ${done || late ? "disabled" : ""} onclick="clic('${r.alert_id}')">${done ? "Clic registrado" : "Ya entré"}</button>
     </div>`;
@@ -121,7 +121,7 @@ function renderRows(diario) {
   $("rows").innerHTML = diario.map((r) => {
     const res = r.resultado, cls = res === "gana" ? "ok" : res === "pierde" ? "bad" : "";
     const lag = r.demora_s == null ? "" : ` (+${r.demora_s} s)`;
-    return `<tr><td class="num">${fmtT(r.entrada_desde)}</td><td>${pair(r.par)}${r.hora_fuerte ? " ★" : ""}</td><td>${r.lado}</td>
+    return `<tr><td class="num">${fmtT(r.entrada_desde)}</td><td>${pair(r.par)}${r.hora_fuerte ? " ★" : ""}</td><td>${r.lado} · ${r.vencimiento_min || 3} min</td>
       <td class="num">${r.clic ? fmtT(r.clic) : "—"}${r.clic ? lag : ""}</td>
       <td class="num">${num(r.entrada_ref)} → ${num(r.salida_ref)}</td><td class="${cls}">${res || "esperando…"}</td></tr>`;
   }).join("");
@@ -138,7 +138,7 @@ async function refresh() {
     if (st.missing) { $("status").textContent = "el bucle nocturno no está corriendo"; return; }
     offsetMs = (st.desfase_reloj_s || 0) * 1000;
     const u = st.ultimo || {};
-    $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ventana ${st.ventana} · ${u.estado || "—"}`;
+    $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ventana ${st.ventana} · variante ${st.variante || "actual"} (${st.vencimiento_min || 3} min) · ${u.estado || "—"}`;
     const fresh = st.diario.filter((r) => !seen.has(r.alert_id));
     if (!first && fresh.some((r) => Date.now() + offsetMs - new Date(r.entrada_desde).getTime() < LATE_S * 1000)) beep();
     renderActive(st.diario); renderRows(st.diario); renderMetrics(st.resumen);
