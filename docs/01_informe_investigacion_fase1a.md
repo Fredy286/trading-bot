@@ -2493,3 +2493,38 @@ del precio medio, construidas con los mismos ticks.
 - Es precio medio de HistData. Cada plataforma tiene su propio precio, y de noche su diferencial y su pago
   pueden ser peores.
 - La confirmación con datos posteriores al 2026-10-25 sigue pendiente (pre-registrada).
+
+## Estudio 28 — reversión nocturna en invierno: ¿ventana UTC fija o anclada al cierre de Nueva York? (pre-registro, 2026-10-28, ANTES de descargar los ticks de invierno)
+
+**Origen:**
+- el Estudio 27 usó solo meses de verano en Nueva York (2026-04 → 2026-09), con el cierre de las 17:00 NY a
+  las 21:00 UTC. La mejor hora fue la siguiente al cierre (22 UTC, 62,3 %);
+- el 2026-11-01 Nueva York pasa a invierno: el cierre queda a las 22:00 UTC (las 17:00 en Bogotá). La
+  bitácora del 2026-10-28 propuso esta prueba.
+
+**Datos:** ticks de HistData (precio medio), los mismos 24 pares, **2025-11 → 2026-03** (invierno en Nueva
+York; meses no usados en los Estudios 25 y 27 con precio medio).
+
+**Regla:** la de H27b (Bollinger 20, 2 sobre velas de 1 min de precio medio; reversión; clic a +10 s;
+vencimiento 3 min desde la entrada; una operación a la vez). Solo cambia la ventana horaria.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H28a:** ventana fija de 21:00 a 23:59 UTC (la actual);
+- **H28b:** ventana anclada a Nueva York: de las 17:00 a las 19:59 hora de Nueva York (en invierno, de 22:00 a
+  00:59 UTC).
+
+**Criterios (cada una, todos):**
+1. ≥ 1 000 operaciones;
+2. p < 0,025 frente a 54,05 %;
+3. Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 4 de los 5 meses;
+5. CALL y PUT a menos de 5 puntos.
+
+**Regla de decisión para el modo en vivo (fijada ahora):**
+- si H28b pasa y su acierto es ≥ al de H28a, la ventana se ancla a Nueva York: **de las 17:00 a las 19:59
+  NY**, es decir, de 16:00 a 18:59 en Bogotá en verano y de 17:00 a 19:59 en invierno;
+- si no, se mantiene la ventana UTC.
+
+**Informativo:**
+- acierto por hora contada desde el cierre de Nueva York, juntando verano e invierno;
+- acierto según la volatilidad del día anterior (por encima o por debajo de la mediana), de la bitácora.
