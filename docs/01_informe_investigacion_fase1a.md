@@ -2607,3 +2607,41 @@ instrumento.
 
 **Consecuencia:** lo que pase se confirma con datos posteriores al 2026-10-25 (se suma a la familia del Estudio 29)
 antes de llevarlo al modo en vivo.
+
+**Resultado del Estudio 30 (aplicado mecánicamente; `results/estudio30/resultado.json`): ninguna de las 24 pasa.**
+
+| Grupo | Acierto (clic +10 s, 3 min) | Comentario |
+|---|---|---|
+| Divisas 0–6 UTC (Asia) | 51,9–53,4 % | por debajo del equilibrio, contra lo esperado |
+| Divisas 7–15 UTC (Londres / Nueva York) | 50,9–52,9 % | casi azar |
+| Divisas 16–20 UTC | 52,6–53,6 % | por debajo del equilibrio |
+| Oro (21–24 UTC) | 52,4 % (1 680 ops) | asimétrico (CALL 55,7 / PUT 49,3) |
+| S&P 500 (21–24 UTC) | 48,0 % (924 ops) | no |
+| BTC/USDT (21–24 UTC) | 54,5 % (3 800 ops), Wilson 52,9 % | no supera el equilibrio |
+
+**Lectura:**
+- En divisas hay una reversión pequeña a toda hora (51–54 %), pero solo entre las 21 y las 24 UTC llega a ser
+  rentable (56,8–57,2 %, Estudios 27 y 28).
+- La ventaja no es «cualquier hora tranquila»: está en ese tramo concreto, el que sigue al cierre de Nueva York,
+  justo cuando abren Sídney y Wellington.
+- El modo en vivo se queda como está.
+
+## Estudio 31 — solidez de los parámetros de la reversión nocturna (pre-registro, 2026-10-28, SOLO INFORMATIVO, ANTES de calcularlo)
+
+**Pregunta:** ¿el 57 % depende de los números exactos (20 velas, 2 desviaciones, 3 min) o se sostiene con
+valores vecinos? Si solo funciona en un punto aislado, es frágil (sobreajuste); si funciona en una zona, es más
+creíble.
+
+**Rejilla:** ventana 21–24 UTC, 24 pares, precio medio de ticks, clic a +10 s, 2025-11 → 2026-09:
+- velas de la banda N ∈ {14, 20, 30};
+- desviaciones K ∈ {1,5; 2; 2,5};
+- vencimiento ∈ {1, 2, 3, 5} min.
+
+En total, 36 combinaciones.
+
+**Criterio de solidez, declarado de antemano:** la regla se considera sólida si las combinaciones vecinas de
+(20, 2, 3 min) —cambiando un solo parámetro a la vez, 5 en total— superan todas el 54,05 % (Wilson, límite
+inferior > 52 %).
+
+**No decide nada:** el modo en vivo **no** cambia de parámetros por este estudio. Un cambio exigiría
+pre-registrarlo y confirmarlo con datos nuevos.
