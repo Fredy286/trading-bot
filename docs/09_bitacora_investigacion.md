@@ -234,3 +234,20 @@ nada) y se subió a `claude/rutina-2026-10-29`; `integrar_rutina.yml` lo lleva a
 - Para las señales nocturnas: justo después de las 17:00 de Nueva York los brókeres abren el diferencial; en la
   demo fíjate si el precio salta en esos minutos.
 - No cambió nada en el bot ni en las señales.
+
+### 2026-10-29 (autónoma, segunda ejecución)
+
+Tema del jueves: reversión nocturna en divisas. Una segunda ejecución de la rutina diseñó un estudio (réplica de la
+reversión nocturna en 2024-09 → 2025-08, un año que nunca se miró con precio medio, y un filtro de «diferencial
+normal»). Al ir a subirlo vio que la primera ejecución ya había integrado el Estudio 33 (reloj). Por la regla de
+**un estudio nuevo al día**, no se subió: quedó como idea 5 en docs/10, con el diseño completo y sin ningún dato real
+visto (solo una prueba con datos inventados, que dio ~50 %, como debe). Incidente anotado en docs/04 (ítem 45).
+
+Fuentes del mecanismo (el diferencial se abre tras las 17:00 de Nueva York): CME, «When FX futures pause» (2026),
+https://www.cmegroup.com/articles/2026/when-fx-futures-pause.html (no se leyó completo; resumen del buscador);
+BidFX según https://financefeeds.com/bidfx-research-finds-liquidity-gap-in-fx-markets-between-4-pm-and-6-pm-est/
+(prensa del sector: de 16:00 a 18:00 EST pasa menos del 0,6 % del volumen diario).
+
+**Para Fredy:** nada cambia hoy. La próxima prueba de la reversión nocturna ya está diseñada: repetirla en otro año y
+comprobar que no sea un efecto de los minutos en que el bróker abre el diferencial.
+
