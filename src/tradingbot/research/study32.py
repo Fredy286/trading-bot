@@ -89,9 +89,12 @@ def audit_day(day: str, feed=None, root: Path = ROOT, out: Path = OUT, lista: Pa
                     if not (d0 <= pd.Timestamp(s["entrada_utc"]) < d1):
                         continue
                     if s["par"] not in cache:
-                        r = f._call({"ticks_history": f"frx{s['par']}", "style": "candles", "granularity": 60,
-                                     "count": 5000, "start": int(d0.timestamp()), "end": int(d1.timestamp()) + 1800})
-                        c = pd.DataFrame(r.get("candles", []))
+                        parts = []  # Deriv entrega como mucho 1 000 velas por petición: bloques de 960 min
+                        for a in range(int(d0.timestamp()), int(d1.timestamp()) + 1800, 960 * 60):
+                            r = f._call({"ticks_history": f"frx{s['par']}", "style": "candles", "granularity": 60,
+                                         "count": 1000, "start": a, "end": min(a + 960 * 60, int(d1.timestamp()) + 1800)})
+                            parts.extend(r.get("candles", []))
+                        c = pd.DataFrame(parts).drop_duplicates("epoch") if parts else pd.DataFrame()
                         cache[s["par"]] = ((c.set_index("epoch")["close"].astype(float), c.set_index("epoch")["open"].astype(float))
                                            if len(c) else (pd.Series(dtype=float), pd.Series(dtype=float)))
                     closes, opens = cache[s["par"]]

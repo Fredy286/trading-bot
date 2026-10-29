@@ -32,3 +32,29 @@ def test_parse_page_strips_links():
             'Hola<br/>https://afiliado.com/x?aff=1</div><time datetime="2026-10-29T10:00:00+00:00"></time></div>')
     p = parse_page(page)[0]
     assert p["id"] == 7 and p["texto"] == "Hola\n[enlace]" and p["publicado_utc"].startswith("2026-10-29")
+
+
+def test_audit_day_requests_candles_in_blocks_of_at_most_1000(tmp_path):
+    import json
+
+    from tradingbot.research.study32 import audit_day
+
+    calls = []
+
+    class Feed:
+        def _call(self, req):
+            calls.append(req)
+            n = (req["end"] - req["start"]) // 60 + 1
+            assert n <= 1000
+            ep = range(req["start"], req["end"] + 1, 60)
+            return {"candles": [{"epoch": e, "open": 1.0, "close": 1.0 - 1e-4} for e in ep]}
+
+    (tmp_path / "lista.txt").write_text("canalx -3\n", encoding="utf-8")
+    (tmp_path / "can" / "canalx").mkdir(parents=True)
+    msg = {"id": 1, "publicado_utc": "2026-11-02T12:00:00+00:00", "texto": "M1;EURUSD;20:30;PUT"}
+    (tmp_path / "can" / "canalx" / "2026-11-02.jsonl").write_text(json.dumps(msg) + "\n", encoding="utf-8")
+    out = audit_day("2026-11-02", feed=Feed(), root=tmp_path / "can", out=tmp_path / "out",
+                    lista=tmp_path / "lista.txt", log=lambda *_: None)
+    assert out == {"canalx": 1} and len(calls) >= 2  # 20:30 Brasília = 23:30 UTC: necesita el segundo bloque
+    row = json.loads((tmp_path / "out" / "canalx" / "2026-11-02.jsonl").read_text(encoding="utf-8"))
+    assert row["resultado"] == "gana"

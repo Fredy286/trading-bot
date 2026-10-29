@@ -26,7 +26,7 @@ def month_candles(ym: str, feed: DerivFeed, work: Path = WORK) -> pd.Series:
     end = start + pd.offsets.MonthBegin(1)
     rows, a = [], start
     while a < end:
-        b = min(a + pd.Timedelta(minutes=4999), end - pd.Timedelta(minutes=1))
+        b = min(a + pd.Timedelta(minutes=999), end - pd.Timedelta(minutes=1))  # Deriv: máx. 1 000 velas por petición
         r = feed._call({"ticks_history": "cryBTCUSD", "style": "candles", "granularity": 60, "count": 5000,
                         "start": int(a.timestamp()), "end": int(b.timestamp())})
         rows.extend(r.get("candles", []))
