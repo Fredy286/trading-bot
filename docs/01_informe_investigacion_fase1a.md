@@ -2640,7 +2640,7 @@ creíble.
 En total, 36 combinaciones.
 
 **Criterio de solidez, declarado de antemano:** la regla se considera sólida si las combinaciones vecinas de
-(20, 2, 3 min) —cambiando un solo parámetro a la vez, 5 en total— superan todas el 54,05 % (Wilson, límite
+(20, 2, 3 min) —cambiando un solo parámetro a la vez: N 14 y 30, K 1,5 y 2,5, vencimiento 2 y 5 min; 6 en total (corregido antes de ejecutar: decía 5 por un error de conteo)— superan todas el 54,05 % (Wilson, límite
 inferior > 52 %).
 
 **No decide nada:** el modo en vivo **no** cambia de parámetros por este estudio. Un cambio exigiría
