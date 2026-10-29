@@ -2645,3 +2645,34 @@ inferior > 52 %).
 
 **No decide nada:** el modo en vivo **no** cambia de parámetros por este estudio. Un cambio exigiría
 pre-registrarlo y confirmarlo con datos nuevos.
+
+**Resultado del Estudio 31 (`results/estudio31/resultado.json`): SÓLIDA.**
+
+Acierto con clic a +10 s, 21–24 UTC, 24 pares, 2025-11 → 2026-09:
+
+| N, K | 1 min | 2 min | 3 min | 5 min |
+|---|---|---|---|---|
+| 14, 1,5 | 53,7 % | 54,5 % | 55,3 % | 55,6 % |
+| 14, 2,0 | 54,6 % | 55,5 % | 56,0 % | 56,9 % |
+| 14, 2,5 | 55,9 % | 57,1 % | 57,7 % | 58,5 % |
+| 20, 1,5 | 54,1 % | 55,0 % | 55,9 % | 56,9 % |
+| **20, 2,0 (regla actual)** | 54,9 % | 56,0 % | **57,0 %** | 57,8 % |
+| 20, 2,5 | 56,4 % | 58,0 % | 59,0 % | 59,8 % |
+| 30, 1,5 | 54,3 % | 55,6 % | 56,5 % | 57,7 % |
+| 30, 2,0 | 55,4 % | 56,9 % | 58,3 % | 59,5 % |
+| 30, 2,5 | 57,1 % | 58,7 % | 60,4 % | **61,3 %** (21 302 ops) |
+
+**Lectura:**
+- La superficie es suave y monótona: más acierto con bandas más anchas (precio más extremo), más velas y
+  vencimiento más largo.
+- No hay picos aislados, que serían la huella del sobreajuste; las 6 vecinas pasan.
+- La de 1 min con la regla actual queda justo en el equilibrio (54,9 %): no conviene usar 1 min.
+- Elegir ahora la mejor casilla sería *post hoc*. Por eso se añade a la confirmación como hipótesis aparte.
+
+**Enmienda al Estudio 29 (2026-10-28, ANTES de existir los datos de confirmación):**
+- se añade **H29c**: N = 30, K = 2,5, vencimiento 5 min (la casilla más fuerte del Estudio 31), con ≥ 200
+  operaciones;
+- la familia del Estudio 29 pasa a 3 hipótesis (Holm).
+
+El modo en vivo ofrecerá esta variante como **opción de práctica** (útil también si la plataforma solo deja
+vencimientos de 5 min), sin dejar de usar la regla actual por defecto.
