@@ -101,3 +101,70 @@ sola hipótesis nueva, prioridad baja frente a la confirmación de P1/P8. No se 
   `end` = 2026-10-26 (lo hace la sesión principal con Fredy; no ejecutado aquí).
 - Estudios 12, 14, 15 y 16 (confirmación): evaluación única después del 2027-01-18.
 - El modelo de señales anticipadas ya quedó congelado el 2026-10-26 (pendiente de ayer, cerrado).
+
+## 2026-10-28
+
+**Temas buscados:** (1) liquidez y reversión en divisas después del cierre de Nueva York (base de P10);
+(2) métodos de validación fuera de muestra (validación cruzada purgada, Sharpe deflactado, probabilidad de
+sobreajuste); (3) predictibilidad de muy corto plazo y regímenes de liquidez en oro. Rotar mañana a:
+cambios de régimen de volatilidad en cripto (fines de semana, noticias macro) y adelanto oro ↔ dólar.
+
+**Hallazgos**
+
+1. *Krohn, Mueller y Whelan, «Foreign Exchange Fixings and Returns Around the Clock»* (documento de trabajo
+   del Banco de Canadá 2021-48; no es revista revisada por pares). PDF leído:
+   https://www.bankofcanada.ca/wp-content/uploads/2021/10/swp2021-48.pdf . Ya estaba citado en docs/02 para
+   los *fixings*; lo nuevo hoy es lo que dice **para P10 (reversión nocturna)**:
+   - Datos: 9 divisas del G10 contra el dólar, 1999–2019, datos intradía (versiones previas a 5 min) y flujo
+     de órdenes de una plataforma entre bancos.
+   - Mecanismo: los bancos que dan liquidez acumulan inventario y lo cubren; cuando hay poca capacidad de
+     riesgo, el precio se pasa y luego vuelve (reversión). Es el mismo mecanismo que proponemos para P10.
+   - Tamaño: ~2,5 pb por día alrededor de los *fixings* (ventanas de horas), t de 4,5 a 11,7; sin costos
+     rinde, con costos «la mayor parte de la ganancia desaparece» (según los autores).
+   - Dato útil: **las reversiones son más fuertes cuando la volatilidad previa es alta** (lo contrario que
+     en BTC 1 min, donde la continuación es más fuerte con volatilidad baja).
+   - Además, entre el cierre de Nueva York y el *fixing* de Tokio (9:55 en Tokio = 00:55 UTC) el dólar tiende
+     a subir; es una deriva lenta de horas, no sirve para 3 min.
+   - Fuente complementaria (CME, 2026, «When FX futures pause»): describe que los bancos reducen riesgo al
+     cierre de su libro y muchos proveedores de liquidez se retiran. **No se pudo leer** (tiempo de espera
+     agotado): https://www.cmegroup.com/news/2026/when-fx-futures-pause.html
+
+   **Aviso práctico importante para P10 (no es un resultado, es calendario):** el Estudio 27 usó abril →
+   septiembre, todo con horario de verano de Nueva York, cuando el cierre de Nueva York es a las 21 UTC. Su
+   mejor hora fue las 22 UTC (una hora después del cierre). **El 2026-11-01 Nueva York vuelve a su horario de
+   invierno**: el cierre pasa a las 22 UTC (17:00 de Bogotá, que no cambia de hora). Si el efecto va ligado al
+   cierre de Nueva York, la «mejor hora» se correría a las 23 UTC (18:00 de Bogotá) en todo el periodo de
+   confirmación (2026-10-26 → 2027-01-18). La regla pre-registrada usa 21–24 UTC fijo y cubre ambas horas, así
+   que **no hay que cambiarla**; pero:
+   - en la demo no conviene concentrarse en las 17:00 de Bogotá por lo visto en verano;
+   - el resultado de la confirmación puede salir algo distinto por esta causa, y conviene saberlo de antemano.
+
+   **Hipótesis comprobable (para un futuro pre-registro, no ejecutada):** «la reversión nocturna se ancla al
+   cierre de Nueva York, no a la hora UTC». Prueba: con HistData de los 24 pares de 2021 → 2026-03 (incluye
+   varios inviernos y veranos; nada posterior al 2026-10-25), comparar el acierto por «horas desde el cierre de
+   Nueva York» frente a «hora UTC». Segunda pieza, del documento: ¿la reversión es mayor con volatilidad del
+   día anterior alta? Ambas como una sola familia, con Holm, y confirmación con datos nuevos.
+
+2. *Validación fuera de muestra (validación cruzada purgada combinatoria, Sharpe deflactado, probabilidad de
+   sobreajuste):* **nada nuevo.** Solo explicaciones de manual y páginas de herramientas, ningún método nuevo de
+   2025–2026. El proyecto ya usa lo esencial (pre-registro, walk-forward, periodo bloqueado, Holm/Bonferroni,
+   registro de pruebas; docs/01 y docs/08 1.2 ya citan a Bailey y López de Prado). Fuentes:
+   https://en.wikipedia.org/wiki/Purged_cross-validation ; https://www.luxalgo.com/library/concept/probability-of-backtest-overfitting/
+   (blog de vendedor). Una idea menor: llevar un conteo total de hipótesis probadas en los Estudios 1–27 para
+   reportarlo junto a cada «pasa» (cuántas cosas se probaron antes de encontrar esta).
+
+3. *Oro a muy corto plazo:* **nada que sirva.** Solo comentarios de TradingView del tipo «barrido de
+   liquidez» (sin pruebas) y una tesis de pregrado con datos diarios
+   (https://eprints.umm.ac.id/id/eprint/25133/). Coincide con los Estudios 8, 10 y 17: sin señal en oro.
+
+**Propuesta del día:** solo una, de prioridad media porque toca P10, la pieza que pasó el desarrollo: estudio
+nuevo «horas desde el cierre de Nueva York» + volatilidad previa, con datos de divisas hasta 2026-03. Antes de eso,
+lo más útil es que Fredy anote en la demo la hora de Bogotá de cada señal nocturna desde el 1-nov.
+
+**Pendientes con fecha**
+- **H5b del Estudio 5: sigue sin evaluarse** (solo hay `results/estudio5/verdict.json` del 2026-10-24). Lanzar
+  «Estudio 5» en GitHub Actions con `end` = 2026-10-26 (sesión principal con Fredy; no ejecutado aquí).
+- **2026-11-01:** cambio de horario de Nueva York (ver hallazgo 1).
+- Confirmación del Estudio 27 (P10): cuando HistData publique los ticks de nov-2026 → ene-2027 (sale cada mes),
+  una sola vez con datos 2026-10-26 → 2027-01-18.
+- Estudios 12, 14, 15, 16 y 21 (confirmación): evaluación única después del 2027-01-18.
