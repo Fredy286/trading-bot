@@ -2717,6 +2717,21 @@ ninguna estrategia propia, así que se permite. Nunca se calculan aquí aciertos
 
 **Expectativa declarada:** ~50 % en todos, como en el Estudio 23.
 
+**Enmienda 1 (2026-10-30, rutina autónoma; ANTES de auditar ningún día: `results/auditoria_canales/` vacío y ningún
+precio consultado).** Al revisar a mano las capturas del 29 y 30 de octubre aparecieron dos fallos de lectura que no
+dependen del resultado de ninguna señal:
+1. **Fecha de la lista.** Muchos canales publican listas fechadas («Sinais … 30/10», «🗓 22/10/2026») después de
+   que pasaran sus primeras horas (p. ej. una «Lista m1» publicada a las 00:42 de Brasília con entradas a las
+   00:08 y 00:36). La regla «primera vez que llega esa hora después de la publicación» las llevaba al día
+   siguiente, que el canal no anunció. Nueva regla: si el mensaje trae una fecha dd/mm (o dd/mm/aaaa), la entrada
+   es esa fecha a esa hora local; si así queda **en o antes** de la publicación, la señal **se descarta** (no se
+   publicó antes de la entrada). Sin fecha en el mensaje, sigue la regla original.
+2. **Texto recortado.** La captura guardaba solo los primeros 500 caracteres de cada mensaje, así que las listas
+   largas perdían sus últimas señales (el corte depende de la posición, no del resultado: no sesga, pero reduce
+   la muestra). Desde esta enmienda se guardan hasta 4 096 caracteres (el máximo de Telegram). Los mensajes ya
+   capturados se quedan como están.
+Hipótesis, criterios, fechas y expectativa no cambian.
+
 ## Estudio 33 — variables de «reloj» (cuarto de hora y hora de financiación) en el modelo de BTC 1 min (pre-registro, 2026-10-29, ANTES de calcularlas)
 
 *Renumerado de 32 a 33 el mismo día, antes de ejecutar nada: el número 32 ya lo usaba la auditoría prospectiva de canales.*
