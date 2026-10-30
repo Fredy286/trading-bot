@@ -3294,3 +3294,72 @@ informa el conteo y se espera hasta llegar a 300, con un máximo de 6 meses.
 
 **Consecuencia:** si pasa, queda confirmado que las señales de 1 min de alta confianza sirven con un precio promedio
 en USDT, como el de IQ Option. Aun así, solo serían operables donde exista un contrato de 1 min con ese precio.
+
+**Resultado del Estudio 42 (aplicado mecánicamente; `results/estudio42/resultado.json`): H42a PASA; H42b no pasa
+(pocas operaciones).**
+
+| Hipótesis | Operaciones (por día con señal) | Acierto [lím. inf.] | EV por operación [IC 97,5 %] | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|
+| H42a (política EV ≥ 0,02 al 86 %) | 13 066 (34) | **55,34 %** [54,48 %] | +0,029 [+0,013; +0,048] | 12 de 13 | **pasa** |
+| H42b (p ≥ 0,60) | 242 | 60,33 % [54,05 %] | +0,122 [−0,005; +0,208] | 2 de 2 | no pasa (< 300 y IC del EV) |
+
+Equilibrio: 53,76 %. En 2025-09 la política no hizo ninguna operación. El único mes negativo fue 2026-05 (52,6 %).
+
+**Informativo (H42a):**
+
+| Variante | Operaciones | Acierto | EV |
+|---|---|---|---|
+| Una a la vez (sin solaparse) | 9 545 | 55,22 % [54,22 %] | +0,027 [+0,008; +0,045] |
+| Referencia: el mismo modelo entrenado con la etiqueta de Binance | 26 239 | 54,88 % | +0,021 |
+| Solo en el horario del usuario (21:00–01:00 Bogotá) | 1 589 (5 por noche) | 56,81 % [54,36 %] | +0,057 [+0,007; +0,103] |
+
+**Lectura:**
+- Con el precio que usa IQ Option, reconstruido como el promedio de Binance, Bybit y OKX, el blitz de BTC de 3 min
+  muestra una ventaja **pequeña pero estable** en desarrollo: 55,3 % frente al 53,8 % necesario. Equivale a unos
+  +3 centavos por cada dólar apostado.
+- **Aprender con el precio de la plataforma ayuda.** El modelo entrenado con el promedio gana más por operación que el
+  entrenado con Binance (+0,029 frente a +0,021) y es más selectivo.
+- En el horario del usuario el acierto fue mayor (56,8 %), pero es una lectura *post hoc*, con pocas operaciones.
+- Es desarrollo: los meses de prueba se predicen sin mirar el futuro, pero el diseño ya se conocía. **Falta la
+  confirmación con datos nuevos (Estudio 44).** Hasta entonces, solo práctica en la cuenta demo.
+- Supuestos que la confirmación no puede comprobar:
+  - el promedio de tres bolsas es una aproximación del precio de IQ Option, verificada en dos momentos;
+  - el clic cae 10 s después del aviso, es decir, el blitz empieza al cierre de la vela;
+  - el pago sigue en 86 %.
+
+## Estudio 44 — confirmación del blitz de BTC con el precio compuesto (pre-registro, 2026-10-30, ANTES de entrenar el modelo congelado y de mirar datos posteriores al 2026-10-25)
+
+**Modelo congelado:**
+- la receta exacta del Estudio 42 (mismas variables, etiqueta del compuesto a 3 min, GBM y calibración);
+- entrenado **una sola vez** con los 12 meses del 2025-10-26 al 2026-10-25, el último 20 % para calibrar, con purga
+  de 5 min;
+- se guarda en `config/modelos/BTCUSDT_blitz3_compuesto.pkl`; el SHA-256 y los datos del entrenamiento van en
+  `config/senal_blitz.json`;
+- no se vuelve a entrenar ni se cambia hasta la evaluación. El modo de práctica usa este mismo modelo.
+
+**Política:** la de H42a: EV estimado ≥ 0,02 con pago del 86 %. La tasa de empates es la del entrenamiento (con el
+compuesto es casi cero).
+
+**Datos:** del 2026-10-26 al 2027-01-18:
+- velas de 1 s de Binance (archivos diarios públicos), para las variables del segundo 50;
+- cierres de 1 min de Binance, Bybit y OKX, para las variables y el resultado con el compuesto.
+
+Se descargan después del 2027-01-18.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H44a:** todas las horas;
+- **H44b:** solo el horario del usuario: decisión de 02:00 a 05:59 UTC (21:00–00:59 Bogotá).
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p < 0,025 frente a 53,76 %;
+3. Wilson 95 % > 53,76 %.
+
+Si H44b no llega a 300 operaciones, se informa el conteo y se espera hasta llegar, con un máximo de 6 meses.
+
+**Evaluación:** una sola vez, después del 2027-01-18.
+
+**Consecuencia:**
+- Si pasa, el aviso del blitz queda confirmado para seguir practicando en la cuenta demo.
+- Operar con dinero real sigue prohibido sin una autorización expresa y específica del usuario.
+- Si no pasa, el blitz de BTC queda sin señal y se retira el modo de práctica.
