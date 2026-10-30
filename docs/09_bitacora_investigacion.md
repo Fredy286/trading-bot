@@ -251,3 +251,44 @@ BidFX según https://financefeeds.com/bidfx-research-finds-liquidity-gap-in-fx-m
 **Para Fredy:** nada cambia hoy. La próxima prueba de la reversión nocturna ya está diseñada: repetirla en otro año y
 comprobar que no sea un efecto de los minutos en que el bróker abre el diferencial.
 
+
+## 2026-10-30 (autónoma)
+
+Tema del viernes: canales de señales.
+
+**Estado de la vigilancia (Estudio 32):** el flujo de captura sí corre (última captura 2026-10-30 05:37 UTC, 12
+canales). La auditoría con precios aún no ha juzgado ningún día: el registro diario del 29 corrió antes de que hubiera
+un día completo, y el del 30 (06:40 UTC) todavía no aparece en la rama a las 12:15 UTC (horarios de GitHub poco
+fiables, ítem 46). `tbot canales tabla` está vacía; no hay nada que leer, y de todos modos no habrá veredicto antes
+del 2027-01-31.
+
+**Lectura a mano de lo capturado (sin precios):** de 12 canales, solo **2** dan señales verificables con las reglas
+del pre-registro: gotraderssinaisfree (63 señales con entrada entre el 29 y el 31 de octubre) y QuotexSignalfreee (14).
+Los demás publican casi todo en OTC (PocketSignalsM15 100 %, PocketOptionSignalsM5 ~90 %), solo resultados después de
+la hora (GavinVIPResults, PocketSignalsM1, pocket_option_signals6), pares que Deriv no tiene (quotexsignals2814:
+USD/COP) o no publican desde antes del 29 (Unidos, QuotexSignalsM1). Además aparecieron dos fallos de lectura:
+el texto se cortaba a 500 caracteres y las listas fechadas publicadas tarde se movían al día siguiente.
+→ **Enmienda 1 del Estudio 32** (a35670a, antes de auditar ningún día) y su código con pruebas; registro de errores 50.
+
+**Búsqueda de canales nuevos:** sin resultado útil. Desde este entorno no se abren t.me ni los directorios de canales
+(tlmtr.io): «host no permitido». Las búsquedas web solo devolvieron copiadores de señales para MetaTrader y
+denuncias de estafas con canales de binarias (p. ej. https://www.forexpeacearmy.com/community/threads/binary-options-investment-scam-on-telegram.62568/post-348346,
+https://forums.babypips.com/t/scam-alert-usdjpy-master-telegram-channel/883700; solo resúmenes del buscador). No se
+añadió ningún canal: no se pudo comprobar que publiquen antes de la entrada ni que no sean OTC.
+
+**Estudio nuevo:** ninguno (no había material que lo justificara).
+
+**Pendientes con fecha**
+- 2026-10-31: comprobar que el registro diario auditó el 29 y el 30 (`results/auditoria_canales/dias_auditados.txt`).
+- Sesión local con Fredy: buscar 3–5 canales nuevos con listas NO OTC fechadas (t.me sí abre desde su PC).
+- 2026-11-01: cambio de horario de Nueva York (la ventana nocturna es UTC fija: sin cambios).
+- Estudios 12, 14, 15, 16, 19, 21 y 29: evaluación única después del 2027-01-18; canales: 2027-01-31.
+
+**Para Fredy**
+- Hoy revisé los canales de señales que el bot vigila cada hora. De 12, solo 2 publican señales que se puedan
+  comprobar (con hora antes de entrar y sin OTC). Los otros publican OTC o solo «ganamos» después.
+- Arreglé dos fallos antes de que contaran: se cortaban las listas largas y algunas señales se juzgaban el día
+  equivocado. Todavía no se ha juzgado ninguna señal, así que nada cambia en los resultados.
+- No pude buscar canales nuevos: desde la nube no se abre Telegram. Si me pasas nombres de canales que publiquen
+  listas de divisas normales (no OTC), los agrego.
+- El bot y las señales no cambiaron.

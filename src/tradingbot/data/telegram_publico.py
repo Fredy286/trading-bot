@@ -18,7 +18,7 @@ import requests
 ROOT = Path("results/canales")
 LISTA = Path("config/canales_vigilados.txt")
 URL = "https://t.me/s/{c}"
-MAX_TEXT = 500
+MAX_TEXT = 4096  # máximo de Telegram (enmienda 1 del Estudio 32; antes 500 recortaba las listas)
 UA = {"User-Agent": "Mozilla/5.0 (investigacion trading-bot; solo lectura)"}
 
 _POST = re.compile(r'data-post="([^"/]+)/(\d+)"')

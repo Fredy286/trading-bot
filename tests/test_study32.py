@@ -58,3 +58,22 @@ def test_audit_day_requests_candles_in_blocks_of_at_most_1000(tmp_path):
     assert out == {"canalx": 1} and len(calls) >= 2  # 20:30 Brasília = 23:30 UTC: necesita el segundo bloque
     row = json.loads((tmp_path / "out" / "canalx" / "2026-11-02.jsonl").read_text(encoding="utf-8"))
     assert row["resultado"] == "gana"
+
+
+def test_dated_list_keeps_its_date_and_drops_hours_already_past():
+    pub = pd.Timestamp("2026-10-30T03:42:37+00:00")  # 00:42 del 30/10 en Brasília
+    txt = "Lista m1 30/10\n\nM1;GBPJPY;00:08;PUT\nM1;EURAUD;00:42;PUT\nM1;AUDUSD;02:12;CALL"
+    s = parse_signals(txt, pub, -3)
+    assert [x["entrada_utc"] for x in s] == ["2026-10-30T05:12:00+00:00"]  # 00:08 y 00:42 ya pasaron: fuera
+    pub2 = pd.Timestamp("2026-10-22T01:22:02+00:00")  # 22:22 del 21/10 en Brasília, lista del día siguiente
+    s2 = parse_signals("🗓 22/10/2026\n⏳M5 EURUSD 00:25 PUT 🟥", pub2, -3)
+    assert s2[0]["entrada_utc"] == "2026-10-22T03:25:00+00:00"
+    pub3 = pd.Timestamp("2027-01-01T02:00:00+00:00")  # 23:00 del 31/12 en Brasília: «01/01» es del año siguiente
+    assert parse_signals("Sinais 01/01\nM5;EURUSD;09:00;CALL", pub3, -3)[0]["entrada_utc"] == "2027-01-01T12:00:00+00:00"
+    assert parse_signals("Sinais 31/12\nM5;EURUSD;09:00;CALL", pub3, -3) == []  # 31/12 09:00 ya pasó
+
+
+def test_capture_keeps_long_lists():
+    from tradingbot.data.telegram_publico import MAX_TEXT
+
+    assert MAX_TEXT >= 4096

@@ -27,16 +27,37 @@ _TIME = re.compile(r"(?<!\d)([01]?\d|2[0-3])[:h]([0-5]\d)(?!\d)")
 _TF = re.compile(r"\bM(1|5|15)\b", re.I)
 _UP = re.compile(r"\b(CALL|BUY|COMPRA|UP)\b|🟩|⬆|🔼", re.I)
 _DOWN = re.compile(r"\b(PUT|SELL|VENDA|VENTA|DOWN)\b|🟥|⬇|🔽", re.I)
+_DATE = re.compile(r"(?<![\d/])(0?[1-9]|[12]\d|3[01])/(0?[1-9]|1[0-2])(?:/(\d{4}|\d{2}))?(?![\d/])")
 START, EVAL_END = "2026-10-29", "2027-01-26"
 
 
+def _list_date(text: str, pub_local: pd.Timestamp) -> pd.Timestamp | None:
+    """Fecha dd/mm(/aaaa) del mensaje (enmienda 1), con el año más cercano a la publicación si no lo trae."""
+    m = _DATE.search(text)
+    if not m:
+        return None
+    y = m.group(3)
+    year = (2000 + int(y) if len(y) == 2 else int(y)) if y else pub_local.year
+    try:
+        d = pd.Timestamp(year=year, month=int(m.group(2)), day=int(m.group(1)))
+    except ValueError:
+        return None
+    if not y:
+        if d - pub_local > pd.Timedelta(days=180):
+            d = d.replace(year=year - 1)
+        elif pub_local - d > pd.Timedelta(days=180):
+            d = d.replace(year=year + 1)
+    return d
+
+
 def parse_signals(text: str, published: pd.Timestamp, tz_h: float | None) -> list[dict]:
-    """Señales verificables de un mensaje según las reglas del pre-registro."""
+    """Señales verificables de un mensaje según las reglas del pre-registro (con la enmienda 1)."""
     if tz_h is None or "OTC" in text.upper():  # regla: se excluyen los mensajes que digan «OTC»
         return []
     post_tf = _TF.search(text)
     off = pd.Timedelta(hours=tz_h)
     pub_local = published.tz_convert(None) + off
+    day = _list_date(text, pub_local)
     out = []
     for ln in text.splitlines():
         pm = [m for m in _PAIR.finditer(ln.upper()) if m.group(1) + m.group(2) in DERIV_FX]
@@ -47,9 +68,15 @@ def parse_signals(text: str, published: pd.Timestamp, tz_h: float | None) -> lis
         tf = _TF.search(ln) or post_tf
         if not tf:
             continue
-        local = pub_local.normalize() + pd.Timedelta(hours=int(tm.group(1)), minutes=int(tm.group(2)))
-        if local <= pub_local:
-            local += pd.Timedelta(days=1)  # primera vez que llega esa hora DESPUÉS de la publicación
+        hm = pd.Timedelta(hours=int(tm.group(1)), minutes=int(tm.group(2)))
+        if day is not None:  # lista fechada: esa fecha; si la hora ya pasó al publicarla, no es verificable
+            local = day + hm
+            if local <= pub_local:
+                continue
+        else:
+            local = pub_local.normalize() + hm
+            if local <= pub_local:
+                local += pd.Timedelta(days=1)  # primera vez que llega esa hora DESPUÉS de la publicación
         out.append({"par": pm[0].group(1) + pm[0].group(2), "dir": 1 if up else -1, "venc_min": int(tf.group(1)),
                     "entrada_utc": (local - off).tz_localize("UTC").isoformat(), "linea": ln.strip()[:120]})
     return out
