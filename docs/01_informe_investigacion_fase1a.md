@@ -3413,3 +3413,9 @@ una prueba de signos sobre los pares de semestres, unilateral.
 **Expectativa declarada:** H45 no pasa. Las elegidas no deberían destacar después (los Estudios 8, 9, 17 y 22 ya
 mostraron que estos indicadores no tienen ventaja). Las cifras del video deberían requerir mucho apalancamiento o
 errores de prueba.
+
+**Nota de implementación (2026-10-30, antes de calcular):**
+- Los semestres van anclados al final: el último es [2026-04-26, 2026-10-26), es decir, incluye el 25 de octubre
+  completo. Los anteriores retroceden de 6 en 6 meses, y el primero empieza el 2021-04-26.
+- Los meses previos (desde 2020-12) solo sirven para calentar los indicadores.
+- Cada vela de 4 h cuenta en el semestre en que abre.

@@ -345,6 +345,16 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study45(a) -> int:
+    from .research import study45
+
+    rep = study45.run()
+    for rule, r in rep["temporalidades"].items():
+        print(f"{rule}: H45 pasa={r['H45']['pasa']} ({r['H45']['ganan_al_promedio']}/{r['H45']['pares']}, "
+              f"p = {r['H45']['p']:.3f})")
+    return 0
+
+
 def cmd_research_study42(a) -> int:
     from .research import study42
 
@@ -828,6 +838,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study45", help="Estudio 45: las 5 estrategias típicas de ChatGPT para BTC; elegir 2 y medir después")
+    x.set_defaults(func=cmd_research_study45)
     x = r.add_parser("study42", help="Estudio 42: blitz de BTC de IQ Option (3 min) con un modelo del precio compuesto")
     x.set_defaults(func=cmd_research_study42)
     x = r.add_parser("study41", help="Estudio 41: señales de BTC 1 min juzgadas con el promedio de Binance, Bybit y OKX")
