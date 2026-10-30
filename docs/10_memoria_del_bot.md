@@ -34,6 +34,23 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   - el OTC no se puede verificar;
   - el acierto al cierre exacto de la vela desaparece con el clic humano;
   - unidades de tiempo de pandas (microsegundos).
+- **Deriv, desarmado (2026-10-30, consultas `proposal` y `contracts_for` a las 03:55 UTC):**
+  - el pago de «sube/baja» a 15 min en divisas **depende del movimiento reciente**: tras una caída, «sube» paga
+    menos (NZDJPY −3,7 pb en 15 min: CALL 51,4 %, PUT 100,1 %; AUDCAD −3,4 pb: CALL 75,1 %, PUT 81,8 %). Su modelo de
+    precios ya cobra la reversión de corto plazo;
+  - el lado favorable casi siempre queda en 81,8 % (equilibrio 55,0 %);
+  - oro: sube/baja desde 5 min; índices (OTC_NDX, OTC_SPC, OTC_DJI): desde 15 min; BTC y ETH: solo multiplicadores;
+  - más el bloqueo de 21:00 a 23:59 UTC (ítem 49). **Conclusión: Deriv no sirve para nuestras ventajas.** No
+    proponer estudios de reversión ni de BTC en Deriv. Datos: `results/estudio39/ofertas_deriv_2026-10-30T0355Z.json`.
+- **IQ Option, pista sobre su precio de BTC (2026-10-30, página pública iqoption.com/en, sin cuenta):**
+  - «Bitcoin» aparece con compra/venta a 1 centavo (78 258,98 / 78 258,99), el formato del libro de Binance al
+    contado (Bybit y OKX cotizan de 0,1 en 0,1);
+  - «Bitcoin-PerpFuture» (paso de 0,1) va 53 USD por debajo, como el perpetuo de Binance (−44 ± 5 USD esa noche);
+  - las bolsas en dólares (Coinbase, Kraken, Bitstamp) estaban unos 205 USD más abajo.
+
+  Hipótesis: **IQ Option toma el precio de BTC de Binance**. La captura de la página no tiene hora, así que falta
+  confirmarlo con una captura del gráfico del usuario con la hora visible. Si se confirma, el modelo de BTC sí
+  aplicaría a sus contratos (binaria con vencimiento fijo cada 15 min y blitz).
 - **El usuario:** opera solo en demo; tiene libres las noches desde las 21:00 de Bogotá; su plataforma (IQ Option)
   no tiene BTC a 1 min (sí binaria de 15 min con pago del 87 %).
 
