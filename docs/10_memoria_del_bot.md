@@ -48,9 +48,16 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   - «Bitcoin-PerpFuture» (paso de 0,1) va 53 USD por debajo, como el perpetuo de Binance (−44 ± 5 USD esa noche);
   - las bolsas en dólares (Coinbase, Kraken, Bitstamp) estaban unos 205 USD más abajo.
 
-  Hipótesis: **IQ Option toma el precio de BTC de Binance**. La captura de la página no tiene hora, así que falta
-  confirmarlo con una captura del gráfico del usuario con la hora visible. Si se confirma, el modelo de BTC sí
-  aplicaría a sus contratos (binaria con vencimiento fijo cada 15 min y blitz).
+  Primera hipótesis: IQ Option toma el precio de BTC de Binance.
+- **IQ Option, captura del usuario con hora (2026-10-29 23:06:57 Bogotá; detalle en el Estudio 41 de docs/01):**
+  - marcaba 77 925,99 (compra/venta con 4 decimales: precio calculado). En ese segundo Binance marcaba 77 934, OKX
+    77 925, Bybit 77 918,9 y Coinbase 77 725;
+  - promedio de Binance, Bybit y OKX: 77 925,97. **IQ Option usa un PROMEDIO de bolsas en USDT**, no Binance solo;
+  - su binaria de BTC vence en horas fijas (cada 15 min), cierra la compra 5 min antes y paga 87 %. Es el caso R = 5
+    del Estudio 19: 53,2 % con el precio de Binance, por debajo del equilibrio (53,5 %). **Esa binaria no tiene
+    ventaja con nuestro modelo.** Falta conocer duraciones y pago del «blitz» de BTC;
+  - en la captura el saldo era de 0,24 USD (posible cuenta real): recordar al usuario que practique en la cuenta de
+    práctica.
 - **El usuario:** opera solo en demo; tiene libres las noches desde las 21:00 de Bogotá; su plataforma (IQ Option)
   no tiene BTC a 1 min (sí binaria de 15 min con pago del 87 %).
 
