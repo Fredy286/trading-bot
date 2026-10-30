@@ -3101,3 +3101,78 @@ cumplir**: el Estudio 40 se conserva sin cambios (regla, datos, criterios y fech
 si la reversión de las 22 UTC con el precio de Deriv persiste a 15 min. Aunque pase, **no** se propondrá ninguna
 operación en Deriv. Como no hay pago real a esa hora, el criterio 2 usa el 85 % (equilibrio 54,05 %), tal como prevé
 el propio pre-registro.
+
+## Estudio 41 — señales de BTC juzgadas con el precio que parece usar IQ Option: promedio de Binance, Bybit y OKX (pre-registro, 2026-10-30, ANTES de descargar velas de Bybit y OKX del periodo)
+
+**Origen: captura del usuario** (IQ Option, Bitcoin «Binaria», 2026-10-29 23:06:57 Bogotá = 2026-10-30 04:06:57 UTC).
+
+En la captura:
+- precio 77 925,99;
+- abajo, compra/venta 77 925,5690 / 77 925,5680. Tiene 4 decimales y 0,001 de diferencial: es un precio
+  **calculado**, no el libro de una bolsa.
+
+Precios de las bolsas en ese segundo (Binance y OKX, velas de 1 s) o en el cierre de ese minuto (el resto):
+
+| Bolsa | Precio |
+|---|---|
+| Binance | 77 934,00 |
+| OKX | 77 925,0 |
+| Bybit | 77 918,9 |
+| Bitget | 77 929,12 |
+| KuCoin | 77 930,6 |
+| Gate | 77 917,8 |
+| Coinbase (en dólares) | 77 725,46 |
+
+- El promedio de Binance, Bybit y OKX da 77 925,97; el de las seis bolsas en USDT, 77 925,9.
+- Las 31 velas de 1 min de la captura (22:36–23:06 Bogotá), leídas en píxeles (±2 USD), se parecen más a ese
+  promedio que a Binance solo, que va unos 10 USD más arriba.
+
+Conclusión provisional: IQ Option liquida BTC con un **promedio de bolsas en USDT**, de composición exacta desconocida.
+
+**La binaria de BTC de IQ Option (lo que muestra la misma captura):**
+- vencimiento fijo (23:15);
+- la compra se cierra 5 min antes (a las 23:06:57 quedaban 3:03 para comprar);
+- pago 87 %.
+
+Es el caso R = 5 del Estudio 19: 53,22 % con el precio de Binance, por debajo del equilibrio de 53,48 %.
+Consecuencia directa de un resultado ya medido (no es un estudio nuevo): **la binaria de BTC de IQ Option no tiene
+ventaja con nuestro modelo**, ni siquiera con el precio de Binance. Queda por saber qué duraciones y pago tiene el
+«blitz» de BTC (se pidió al usuario).
+
+**Pregunta del Estudio 41:** la ventaja de 1 min, ¿sobrevive al promedio de varias bolsas en USDT?
+- Es un diagnóstico: si no sobrevive a 1 min, menos sobrevivirá a 3–5 min.
+- La respuesta decide si el modelo de BTC sirve en IQ Option o si hay que aprender con su precio reconstruido
+  (idea 0 de docs/10).
+
+**Señales:** las de H20a (las mismas de los Estudios 37 y 38): predicciones mes a mes 2025-09-01 → 2026-10-25
+(`results/estudio20/predicciones.parquet`), política EV ≥ 0,02 con pago del 85 %.
+
+**Precio de juicio:**
+- velas de 1 min de BTC/USDT al contado de Binance, Bybit y OKX, de sus API públicas;
+- precio compuesto = promedio simple de los tres cierres del minuto. Si falta alguna de las tres, la operación no se
+  cuenta;
+- resultado = signo(compuesto de la vela t + 1 − compuesto de la vela t), con la misma alineación que los Estudios 37
+  y 38: la señal se decide en el segundo 50 de la vela t y el clic a +10 s cae en su cierre. Empate si la diferencia
+  es menor de 0,005.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H41a:** todas las señales de H20a, juzgadas con el compuesto;
+- **H41b:** solo las de probabilidad ≥ 0,60.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p binomial < 0,025 frente a 54,05 % (pago 85 %, como en los Estudios 37 y 38);
+3. Wilson 95 % > 54,05 %;
+4. EV > 0 en ≥ 60 % de los meses.
+
+**Informativo:**
+- las mismas señales juzgadas con Bybit solo, con OKX solo y con Binance (velas de su API, como referencia);
+- coincidencia de resultados entre Binance y el compuesto, y acierto cuando no coinciden.
+
+**Expectativa declarada:** entre Coinbase (52,2 %) y Binance (57,6 %). El compuesto incluye a Binance con un tercio del
+peso.
+
+**Consecuencia:**
+- Si H41a o H41b pasa: se pre-registra un estudio del blitz de BTC con la duración y el pago reales que dé el usuario.
+- Si ninguna pasa: el modelo de BTC no sirve con el precio de IQ Option. Solo quedaría entrenar un modelo nuevo con
+  el precio compuesto (idea 0), con pre-registro propio.
