@@ -3241,3 +3241,56 @@ Las operaciones de 3 min se solapan (una por minuto). Por eso el criterio 4 usa 
 - Si no pasa: el blitz de BTC de IQ Option queda **sin señal**.
 
 El resultado del Estudio 41 se lee después de este commit y no cambia este diseño.
+
+**Resultado del Estudio 41 (aplicado mecánicamente; `results/estudio41/resultado.json`; las tres bolsas completas,
+604 805 minutos cada una): H41a NO PASA (solo por el criterio de los meses); H41b PASA.**
+
+| Hipótesis | Operaciones | Acierto con el compuesto [lím. inf.] | EV (pago 85 %) | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|
+| H41a (todas) | 22 129 | **55,48 %** [54,81 %] | +0,026 | 8 de 14 (57 %) | no pasa (criterio 4) |
+| H41b (p ≥ 0,60) | 5 185 | **58,64 %** [57,26 %] | +0,081 | 9 de 10 | **pasa** |
+
+Las mismas señales juzgadas con cada bolsa por separado (informativo):
+
+| Precio de juicio | Todas | p ≥ 0,60 |
+|---|---|---|
+| Binance | 57,60 % | 62,53 % |
+| OKX | 54,90 % | 57,43 % |
+| Bybit | 54,26 % | 57,00 % |
+| Compuesto (promedio de las tres) | 55,48 % | 58,64 % |
+| *Coinbase (Estudio 37, en dólares)* | *52,22 %* | *53,75 %* |
+| *Deriv (Estudio 38, en dólares)* | *52,36 %* | *53,20 %* |
+
+- El resultado coincide entre Binance y el compuesto en el 92,6 % de las operaciones. Cuando no coincide, Binance da
+  la razón al modelo el 59,1 % de las veces.
+- En H41b no hubo señales con p ≥ 0,60 en 2026-01, 2026-04, 2026-05 ni 2026-06: se concentran en algunos meses, como
+  ya se vio en el Estudio 20.
+
+**Lectura:**
+- Una parte grande de la ventaja **sí sobrevive** en las otras bolsas en USDT (OKX, Bybit) y en su promedio. Se pierde
+  en las bolsas en dólares (Coinbase, Deriv). Probablemente las bolsas en USDT siguen a Binance en los mismos
+  segundos, y las de dólares tienen su propio ruido (más la diferencia entre USDT y dólar).
+- Para IQ Option, que liquida con un promedio en USDT, el filtro p ≥ 0,60 daría ~58,6 % **a 1 min**. Pero IQ Option no
+  tiene BTC a 1 min. Su contrato corto es el blitz de 3 min (Estudio 42, ya pre-registrado).
+- Es desarrollo con datos ya usados por el modelo (2025-09 → 2026-10-25). La confirmación con datos nuevos es el
+  Estudio 43.
+
+## Estudio 43 — confirmación: señales de alta confianza juzgadas con el precio compuesto (pre-registro, 2026-10-30, ANTES de mirar velas de Bybit u OKX posteriores al 2026-10-25)
+
+**Señales:** las del Estudio 21, es decir, el modelo congelado `BTCUSDT-anticipada-k50-L10-35b764` con p ≥ 0,60 y la
+política de H16b, del 2026-10-26 al 2027-01-18. Son las que guarda el registro diario (`results/registro/btc/`), con
+los aciertos sellados.
+
+**Precio de juicio:** el compuesto del Estudio 41: promedio simple de los cierres de 1 min de BTC/USDT al contado de
+Binance, Bybit y OKX, con la misma alineación. Las velas se descargan después del 2027-01-18.
+
+**Hipótesis H43 (α = 0,05). Criterios (todos):**
+1. ≥ 300 operaciones;
+2. p < 0,05 frente a 54,05 % (pago 85 %);
+3. Wilson 95 % > 54,05 %.
+
+**Evaluación:** una sola vez, después del 2027-01-18, junto con el Estudio 21. Si hay menos de 300 operaciones, se
+informa el conteo y se espera hasta llegar a 300, con un máximo de 6 meses.
+
+**Consecuencia:** si pasa, queda confirmado que las señales de 1 min de alta confianza sirven con un precio promedio
+en USDT, como el de IQ Option. Aun así, solo serían operables donde exista un contrato de 1 min con ese precio.
