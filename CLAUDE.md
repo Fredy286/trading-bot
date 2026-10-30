@@ -240,8 +240,14 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        - binaria de BTC: vence cada 15 min, la compra cierra 5 min antes, pago 87 %. **Sin ventaja** (R = 5 del
          Estudio 19: 53,2 %);
        - blitz de BTC: 3 min fijos desde la compra, pago 86 % (equilibrio 53,76 %);
-       - Estudio 41: señales de Binance juzgadas con ese promedio. Estudio 42: modelo entrenado con el promedio para el
-         blitz.
+       - **Estudio 41:** las señales de Binance juzgadas con ese promedio aciertan 55,5 %; con p ≥ 0,60, 58,6 % (pasa).
+         En bolsas en USDT la ventaja sobrevive; en las de dólares no. Confirmación: Estudio 43.
+       - **Estudio 42 (blitz 3 min, 86 %): PASA en desarrollo.** El modelo entrenado con el promedio acierta 55,3 %
+         (EV +0,029, 12 de 13 meses); en el horario del usuario, 56,8 % (*post hoc*).
+       - Modelo congelado `BTCUSDT-blitz3-compuesto-0f8694` (config/senal_blitz.json). Confirmación: Estudio 44,
+         después del 2027-01-18.
+       - Modo de práctica: `scripts/iniciar_blitz.sh` → panel /blitz (el mismo `senales.html`, que elige el modo por
+         la ruta). Datos en `data/raw/bolsas_usdt/`.
        - Deriv también desarmado (docs/10): cobra la reversión en el pago (tope 81,8 %). Descartado.
      - **Regla nueva:** una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma. Antes de
        recomendar cualquier operación real o en demo, verificar la fuente de precio de la plataforma.

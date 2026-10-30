@@ -159,6 +159,41 @@ es del bot. Con unas decenas de operaciones anotadas se puede saber:
 
 Son las condiciones que exige el Estudio 5 antes de cualquier otra cosa. **Nunca con dinero real.**
 
+### Blitz de BTC de IQ Option (3 min) para practicar en cuenta DEMO (Estudios 41, 42 y 44)
+
+IQ Option paga el BTC con un **promedio de bolsas en USDT**, no con el precio de Binance solo. Lo comprobamos con
+dos capturas del usuario: el promedio de Binance, Bybit y OKX coincidió con su precio a pocos centavos. Este modo
+usa ese mismo promedio.
+
+- **El contrato:** «Bitcoin Blitz» de **3 minutos** desde la compra, con pago del **86 %**. Para ganar a la larga
+  hay que acertar más del **53,8 %**.
+- **En desarrollo:**
+  - 55,3 % mes a mes (13 066 operaciones, 12 de 13 meses con ganancia) con un modelo que aprende con el promedio;
+  - en el horario de 21:00 a 01:00 de Bogotá, 56,8 % (unas 5 por noche; lectura *post hoc*).
+- **Falta la confirmación con datos nuevos** (Estudio 44, enero de 2027). **Solo cuenta demo.**
+- **La binaria de 15 min de BTC de IQ Option no sirve:** cierra la compra 5 min antes del vencimiento, y a 5 min
+  no hay ventaja (53,2 %).
+
+1. **Una sola vez:** `.venv/bin/tbot blitz entrenar`. Ya está hecho: modelo congelado
+   `BTCUSDT-blitz3-compuesto-0f8694`, con su huella en `config/senal_blitz.json`.
+2. **Cada sesión:**
+
+   ```bash
+   scripts/iniciar_blitz.sh
+   ```
+
+   Abre http://127.0.0.1:8765/blitz. Pulse **«Activar sonido»**.
+3. **Con cada aviso, en el segundo 50:**
+   - abra **Bitcoin Blitz (3 min)** en IQ Option, en la cuenta de **práctica**, en la dirección indicada;
+   - pulse **«YA HICE CLIC»** (o la barra espaciadora).
+
+   Lo ideal es hacer clic antes del cierre de la vela. Pasados 15 s el panel dice «TARDE»: no entre.
+4. **Cuando venza** (3 min después del clic): anote en el diario «ganó», «perdió» o «empate» y el precio de
+   salida. El bot calcula el resultado de referencia con el promedio de las tres bolsas y muestra si coinciden.
+
+Si IQ Option muestra otro pago, páselo con `scripts/iniciar_blitz.sh --pago 85`: con menos pago, el bot avisa
+menos. **Nunca con dinero real.**
+
 ### Reversión nocturna en divisas para practicar en cuenta DEMO (Estudios 25, 27 y 28)
 
 ```bash
