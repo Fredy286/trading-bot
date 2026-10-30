@@ -345,6 +345,15 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study41(a) -> int:
+    from .research import study41
+
+    rep = study41.run()
+    for h, r in rep["hipotesis"].items():
+        print(f"{h}: pasa={r['pasa']} | {r['criterios']}")
+    return 0
+
+
 def cmd_research_study39(a) -> int:
     from .research import study39
 
@@ -782,6 +791,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study41", help="Estudio 41: señales de BTC 1 min juzgadas con el promedio de Binance, Bybit y OKX")
+    x.set_defaults(func=cmd_research_study41)
     x = r.add_parser("study39", help="Estudio 39: reversión nocturna operable en Deriv (22–24 UTC, 15 min)")
     x.set_defaults(func=cmd_research_study39)
     x = r.add_parser("study38", help="Estudio 38: señales de BTC 1 min juzgadas con el precio de Deriv")
