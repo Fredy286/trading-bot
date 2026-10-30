@@ -3419,3 +3419,43 @@ errores de prueba.
   completo. Los anteriores retroceden de 6 en 6 meses, y el primero empieza el 2021-04-26.
 - Los meses previos (desde 2020-12) solo sirven para calentar los indicadores.
 - Cada vela de 4 h cuenta en el semestre en que abre.
+
+**Resultado del Estudio 45 (aplicado mecánicamente; `results/estudio45/resultado.json`): H45 NO PASA.**
+
+| Temporalidad | Las 2 elegidas superan al promedio de las 5 en el semestre siguiente | p (signos) |
+|---|---|---|
+| 4 h (principal) | 6 de 10 | 0,377 |
+| 1 h (informativo) | 8 de 10 | 0,055 |
+
+Con 4 h, el promedio de las elegidas en el semestre siguiente fue **+2,7 % por semestre**. Comprar y mantener dio
++10,0 % en los mismos 10 semestres.
+
+**Último semestre (2026-04-26 → 2026-10-25, «hace 6 meses» del video), 4 h, sin apalancamiento:**
+
+| Estrategia | Con costos (0,1 %) | Sin costos | Operaciones |
+|---|---|---|---|
+| MACD | +9,9 % | +18,6 % | 38 |
+| Supertrend | +2,7 % | +5,5 % | 13 |
+| Bollinger | 0,0 % | +4,9 % | 24 |
+| EMA 9/21 | −8,2 % | −2,6 % | 29 |
+| RSI 30/70 | −8,5 % | −7,8 % | 3 |
+| *Comprar y mantener* | *+3,3 %* | | |
+
+- Ninguna de las dos mejores llega a +927 % ni con 50 veces de apalancamiento: el capital se liquida antes, aun sin
+  contar los movimientos dentro de cada vela.
+- **Lectura adicional (*post hoc*, `results/estudio45/maximo_con_apalancamiento.json`):** se tomó, en cada semestre
+  desde 2021, la mejor estrategia y el mejor apalancamiento **después** de conocer el resultado, es decir, la
+  elección más tramposa posible. El máximo fue +687 % (RSI con 10×, 2023-04 → 2023-10), con una caída del 86 % por el
+  camino. Nunca se llega a +927 % ni a +1 588 %.
+
+**Lectura:**
+- Pedir estrategias a ChatGPT, probarlas en el pasado y quedarse con las que salieron bien no predice el futuro: las
+  elegidas rinden en el semestre siguiente como las demás.
+- Cifras de +927 % o +1 588 % en 6 meses con estas estrategias exigen al menos una de estas cosas:
+  - mucho apalancamiento y un semestre muy favorable, con caídas de 60–90 % por el camino;
+  - errores de la prueba de TradingView: sin comisiones, mirar el futuro con `request.security` o repintado,
+    rellenos imposibles (docs/07);
+  - elegir el periodo y los parámetros después de ver el resultado.
+- Además el método mezcla tres sesgos: probar varias y mostrar las mejores (5 → 2), mirar solo el pasado y no
+  restar costos.
+- Nada de esto aplica al blitz: es otro mercado (contado o futuros con apalancamiento), no opciones de pago fijo.

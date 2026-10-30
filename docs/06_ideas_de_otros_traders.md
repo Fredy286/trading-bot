@@ -54,6 +54,7 @@ entretenido u optimista, no lo que funciona. Por eso aquí nada se acepta sin pr
 | Turn Over (IQ Option, 15 min) | Vela de :45 → contra en la de :00 | 22 | SIN SEÑAL: 51,1–52,4 % |
 | smart-lab.ru (Rusia) | Bollinger (20, 2) con reversión, 3 min, 21–24 UTC | 22, 25, 27 | **Desarmada y pasa el desarrollo** (Estudio 27: 57,2 % con precio medio y clic a +10 s en 24 pares). Antes, en el Estudio 22: 53,3–55,6 % (2025–26) y 54,7–57,6 % (2021–25) en divisas. No pasa Holm, cae a 51,5–52,8 % si el empate pierde y se debilita con los años. Candidata P10 (docs/08) |
 | 70 canales públicos de Telegram (pt, es, en, ru, id, hi) | Señales publicadas a diario (55 887 extraídas; 33 186 no OTC) | 23 | SIN SEÑAL: con ~20 000 señales publicadas ANTES de la entrada, la primera entrada acierta 49–51 % (como el azar). Lo que anuncian (83–99 %) es con gale; Tigers y VIPBinary publican casi todo después de la hora |
+| Video «Le doy $1 000 a ChatGPT para que haga trading por mí» (audio por WhatsApp, 2026-10-30) | Pedir 5 estrategias «rentables» de BTC a ChatGPT, probarlas en TradingView sobre el pasado y quedarse con las 2 que ganaron (+927 % y +1 588 % en 6 meses) | 45 | SIN SEÑAL: elegir las 2 mejores de 5 no predice el semestre siguiente (6 de 10, p = 0,38); rinden +2,7 % por semestre frente a +10,0 % de comprar y mantener. En los últimos 6 meses la mejor dio +9,9 % sin apalancamiento y no llega a +927 % ni con 50×. Ni eligiendo después la mejor estrategia y el mejor apalancamiento de cada semestre desde 2021 se pasa de +687 % (con caída del 86 %) |
 
 **Lo que sí funcionó:** solo el modelo propio de BTC a 1 minuto:
 - Estudio 5 (H5a): 56,11 % con datos nuevos y entrada a +10 s;
@@ -130,6 +131,7 @@ Si una oferta cumple **dos o más**, trátala como sospechosa:
 7. No menciona costos (spread, comisión, pago de la plataforma, empates).
 8. Presiona con urgencia («últimos cupos», «precio sube mañana»).
 9. Explica las pérdidas después con historias («cazaron stops») en lugar de reglas fijadas antes.
+10. Muestra solo las estrategias que salieron bien en una prueba sobre el pasado (por ejemplo, «2 de 5») y no las prueba en un periodo posterior (Estudio 45).
 
 **TradingView:** guía de uso y trampas de su backtest en `docs/07_tradingview.md`.
 

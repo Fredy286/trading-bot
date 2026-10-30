@@ -15,7 +15,9 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 - **Lo que NO funciona (no repetir sin una idea realmente distinta):** indicadores clásicos (RSI, MACD, medias,
   Fibonacci, ICT, zonas), patrones de velas por color y posición del reloj (MHI, Milhão, Torres…), «catalogación»
   de horarios, Kronos, análogos, Kalman, ETH/USDC como variables extra para BTC, la reversión en otras horas u otros
-  mercados (oro, S&P, BTC), y los canales de señales auditados (49–51 % en la primera entrada).
+  mercados (oro, S&P, BTC), y los canales de señales auditados (49–51 % en la primera entrada). Tampoco las
+  «estrategias de ChatGPT» elegidas por su prueba sobre el pasado (Estudio 45: las 2 mejores de 5 no destacan en el
+  semestre siguiente; las cifras de +900–1 500 % en 6 meses no salen ni con 50× de apalancamiento).
 - **La reversión nocturna vive en el diferencial abierto (Estudio 34):** se replica en 2024–25 (56,2 %; 5 min 59,6 %),
   pero el acierto sale de los minutos con diferencial 3–60 veces lo normal (60–66 %); con diferencial normal, 53–54 %.
   Antes de mejorarla, comprobar que una plataforma real pague ese movimiento.

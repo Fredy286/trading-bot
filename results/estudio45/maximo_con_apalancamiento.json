@@ -1,0 +1,90 @@
+[
+ {
+  "semestre": "2021-04→2021-10",
+  "estrategia": "Bollinger",
+  "apalancamiento": 2.5,
+  "capital_final": 1.57,
+  "rend": "+57%",
+  "mayor_caida": "60%"
+ },
+ {
+  "semestre": "2021-10→2022-04",
+  "estrategia": "Supertrend",
+  "apalancamiento": 1.5,
+  "capital_final": 1.09,
+  "rend": "+9%",
+  "mayor_caida": "31%"
+ },
+ {
+  "semestre": "2022-04→2022-10",
+  "estrategia": "RSI 30/70",
+  "apalancamiento": 1.0,
+  "capital_final": 0.85,
+  "rend": "-15%",
+  "mayor_caida": "50%"
+ },
+ {
+  "semestre": "2022-10→2023-04",
+  "estrategia": "Supertrend",
+  "apalancamiento": 8.0,
+  "capital_final": 7.55,
+  "rend": "+655%",
+  "mayor_caida": "64%"
+ },
+ {
+  "semestre": "2023-04→2023-10",
+  "estrategia": "RSI 30/70",
+  "apalancamiento": 10.0,
+  "capital_final": 7.87,
+  "rend": "+687%",
+  "mayor_caida": "86%"
+ },
+ {
+  "semestre": "2023-10→2024-04",
+  "estrategia": "RSI 30/70",
+  "apalancamiento": 7.5,
+  "capital_final": 3.81,
+  "rend": "+281%",
+  "mayor_caida": "65%"
+ },
+ {
+  "semestre": "2024-04→2024-10",
+  "estrategia": "EMA 9/21",
+  "apalancamiento": 3.0,
+  "capital_final": 1.25,
+  "rend": "+25%",
+  "mayor_caida": "36%"
+ },
+ {
+  "semestre": "2024-10→2025-04",
+  "estrategia": "Supertrend",
+  "apalancamiento": 2.5,
+  "capital_final": 1.23,
+  "rend": "+23%",
+  "mayor_caida": "66%"
+ },
+ {
+  "semestre": "2025-04→2025-10",
+  "estrategia": "Supertrend",
+  "apalancamiento": 7.5,
+  "capital_final": 2.31,
+  "rend": "+131%",
+  "mayor_caida": "61%"
+ },
+ {
+  "semestre": "2025-10→2026-04",
+  "estrategia": "Bollinger",
+  "apalancamiento": 1.0,
+  "capital_final": 0.83,
+  "rend": "-17%",
+  "mayor_caida": "34%"
+ },
+ {
+  "semestre": "2026-04→2026-10",
+  "estrategia": "MACD",
+  "apalancamiento": 3.5,
+  "capital_final": 1.22,
+  "rend": "+22%",
+  "mayor_caida": "42%"
+ }
+]
