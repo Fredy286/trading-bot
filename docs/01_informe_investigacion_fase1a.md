@@ -3363,3 +3363,53 @@ Si H44b no llega a 300 operaciones, se informa el conteo y se espera hasta llega
 - Si pasa, el aviso del blitz queda confirmado para seguir practicando en la cuenta demo.
 - Operar con dinero real sigue prohibido sin una autorización expresa y específica del usuario.
 - Si no pasa, el blitz de BTC queda sin señal y se retira el modo de práctica.
+
+## Estudio 45 — «Le di $1 000 a ChatGPT»: cinco estrategias típicas de BTC, elegir las dos mejores y ver qué pasa después (pre-registro, 2026-10-30, ANTES de calcular nada)
+
+**Origen:** audio de un video corto que mandó el usuario (85 s, transcrito en local). El autor pidió a ChatGPT cinco
+estrategias «rentables» para Bitcoin, las pasó a Pine Script y las probó en TradingView sobre el pasado:
+- tres perdieron;
+- dos ganaron +927 % y +1 588 % en 6 meses («500 dólares serían 8 440; 44 dólares al día»).
+
+No dice las reglas, la temporalidad, el apalancamiento ni las comisiones.
+
+**Qué se mide:** el método, no sus cifras.
+1. Elegir las 2 mejores de 5 estrategias en un periodo pasado, ¿predice algo del periodo siguiente?
+2. ¿Cuánto apalancamiento hace falta para que una estrategia corriente dé +927 % o +1 588 % en 6 meses, y qué
+   caída sufre por el camino?
+
+**Las cinco estrategias** (las que ChatGPT suele proponer para BTC; fijadas antes de calcular). Todas compran y
+venden en largo, sin apalancamiento, sobre velas de **4 h** de BTC/USDT de Binance, y deciden al cierre de la vela
+para operar desde la siguiente:
+1. **Cruce de EMA 9/21:** dentro mientras la EMA 9 esté por encima de la EMA 21.
+2. **RSI (14):** entra cuando el RSI cruza hacia arriba el 30; sale cuando cruza hacia abajo el 70.
+3. **MACD (12, 26, 9):** dentro mientras el MACD esté por encima de su señal.
+4. **Bollinger (20, 2):** entra cuando el cierre queda bajo la banda inferior; sale cuando supera la media de 20.
+5. **Supertrend (ATR 10, multiplicador 3):** dentro mientras la tendencia sea alcista.
+
+Referencia: comprar y mantener.
+
+**Costos:** 0,1 % por lado (comisión de contado de Binance); informativo: sin costos (lo que TradingView usa por
+defecto).
+
+**Datos y ventanas:**
+- velas de 1 min de BTC/USDT de Binance del 2020-12 al 2026-10-25, agrupadas en 4 h;
+- semestres consecutivos desde el 2021-01-01, con el último del 2026-04-25 al 2026-10-25, el equivalente a «hace 6
+  meses» del video;
+- no se usa nada posterior al 2026-10-25.
+
+**Procedimiento:** en cada semestre k se eligen las 2 estrategias con mayor rendimiento, con costos. Se mide su
+rendimiento en el semestre k + 1 y se compara con el promedio de las 5 y con comprar y mantener.
+
+**Hipótesis H45 (α = 0,05):** en el semestre siguiente, las 2 elegidas rinden más que el promedio de las 5. Se usa
+una prueba de signos sobre los pares de semestres, unilateral.
+
+**Informativo:**
+- en el último semestre: el rendimiento de cada estrategia;
+- el apalancamiento constante que haría falta para llegar a +927 % y +1 588 %, y la mayor caída del capital con ese
+  apalancamiento;
+- lo mismo con velas de 1 h.
+
+**Expectativa declarada:** H45 no pasa. Las elegidas no deberían destacar después (los Estudios 8, 9, 17 y 22 ya
+mostraron que estos indicadores no tienen ventaja). Las cifras del video deberían requerir mucho apalancamiento o
+errores de prueba.
