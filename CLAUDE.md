@@ -234,6 +234,15 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - **Estudios 39–40** (reversión en Deriv a 15 min): el 39 no pasa (53,8 %); el 40 (22 UTC) está pre-registrado, pero
        Deriv **no permite contratos de divisas de menos de 5 h de 21:00 a 23:59 UTC** (consulta del 2026-10-29, ítem 49):
        la reversión nocturna no se puede operar en Deriv. El 40 sigue solo como medida científica.
+     - **IQ Option desarmado (capturas del usuario, 2026-10-29 23:06 y 23:15 Bogotá):**
+       - BTC se liquida con un **PROMEDIO de bolsas en USDT** (Binance, Bybit, OKX…; compra/venta con 4 decimales), no
+         con Binance solo;
+       - binaria de BTC: vence cada 15 min, la compra cierra 5 min antes, pago 87 %. **Sin ventaja** (R = 5 del
+         Estudio 19: 53,2 %);
+       - blitz de BTC: 3 min fijos desde la compra, pago 86 % (equilibrio 53,76 %);
+       - Estudio 41: señales de Binance juzgadas con ese promedio. Estudio 42: modelo entrenado con el promedio para el
+         blitz.
+       - Deriv también desarmado (docs/10): cobra la reversión en el pago (tope 81,8 %). Descartado.
      - **Regla nueva:** una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma. Antes de
        recomendar cualquier operación real o en demo, verificar la fuente de precio de la plataforma.
      - Horarios de GitHub poco fiables (ítem 46): la integración de la rutina dispara la cola y la vigilancia.
