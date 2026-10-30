@@ -9,6 +9,8 @@ Rutas:
   GET  /api/senal/state     estado del bucle de señales, diario y resumen
   POST /api/senal/clic      {"alert_id"} → hora del clic (en hora de Binance)
   POST /api/senal/registro  {"alert_id", "entrada", "salida", "pago", "resultado"} → datos de la plataforma
+  GET  /blitz          el mismo panel, para el blitz de BTC de IQ Option (3 min, Estudio 42)
+  GET  /api/blitz/state, POST /api/blitz/clic, POST /api/blitz/registro  → igual que /api/senal/*
   GET  /nocturna       panel de la reversión nocturna en divisas (cuenta demo, Estudios 25/27/28)
   GET  /api/nocturna/state  estado del bucle nocturno, diario y resumen
   POST /api/nocturna/clic   {"alert_id"} → hora del clic (en hora de Deriv)
@@ -98,12 +100,13 @@ def _num(v, lo: float = 0.0, hi: float = 10**7) -> float | None:
 
 
 def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("runtime/senales"),
-                 nocturna_dir: Path = Path("runtime/nocturna")):
+                 nocturna_dir: Path = Path("runtime/nocturna"), blitz_dir: Path = Path("runtime/blitz")):
     runtime_dir, results_dir, senal_dir = Path(runtime_dir), Path(results_dir), Path(senal_dir)
     nocturna_dir = Path(nocturna_dir)
     ack_lock = threading.Lock()
-    senal_lock = threading.Lock()
     nocturna_lock = threading.Lock()
+    # modo → (carpeta, candado, pago supuesto si el usuario no anota el suyo)
+    modos = {"senal": (senal_dir, threading.Lock(), 0.85), "blitz": (Path(blitz_dir), threading.Lock(), 0.86)}
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):  # silencio en consola
@@ -138,18 +141,19 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
                 state["research"] = research_verdict(results_dir)
                 state["server_time"] = utcnow().isoformat()
                 return self._json(200, state)
-            if self.path == "/senales":
+            if self.path in ("/senales", "/blitz"):  # la página elige el modo por su ruta
                 html = resources.files("tradingbot.app").joinpath("static/senales.html").read_bytes()
                 return self._send(200, html, "text/html; charset=utf-8")
-            if self.path == "/api/senal/state":
+            if self.path in ("/api/senal/state", "/api/blitz/state"):
                 from ..live import anticipada
 
+                folder, _, pago_def = modos[self.path.split("/")[2]]
                 try:
-                    st = _read_state(senal_dir / "state.json") or {"missing": True}
+                    st = _read_state(folder / "state.json") or {"missing": True}
                 except OSError:
                     return self._json(503, {"error": "estado ocupado, reintente"})
-                st["diario"] = anticipada.diario(senal_dir)
-                st["resumen"] = anticipada.resumen(senal_dir)
+                st["diario"] = anticipada.diario(folder)
+                st["resumen"] = anticipada.resumen(folder, pago_def)
                 st["server_time"] = utcnow().isoformat()
                 return self._json(200, st)
             if self.path == "/nocturna":
@@ -186,7 +190,7 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
             return data if isinstance(data, dict) else None
 
         def do_POST(self):  # noqa: N802
-            if self.path in ("/api/senal/clic", "/api/senal/registro"):
+            if self.path in ("/api/senal/clic", "/api/senal/registro", "/api/blitz/clic", "/api/blitz/registro"):
                 return self._post_senal()
             if self.path == "/api/nocturna/clic":
                 return self._post_nocturna()
@@ -217,6 +221,7 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
             from ..live.anticipada import RESULTADOS
 
             now = utcnow()
+            senal_dir, senal_lock, _ = modos[self.path.split("/")[2]]
             data = self._body()
             if data is None or "alert_id" not in data:
                 return self._json(400, {"error": "JSON inválido"})
@@ -224,7 +229,7 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
             rows, _ = read_rows(senal_dir / "senales.jsonl")
             if not any(r.get("evento") == "aviso" and r.get("alert_id") == aid for r in rows):
                 return self._json(404, {"error": "aviso no encontrado"})
-            if self.path == "/api/senal/clic":
+            if self.path.endswith("/clic"):
                 try:
                     offset = float((_read_state(senal_dir / "state.json") or {}).get("desfase_reloj_s") or 0.0)
                 except OSError:
@@ -294,15 +299,16 @@ class PanelServer(ThreadingHTTPServer):
 
 
 def make_server(host: str, port: int, runtime_dir: Path, results_dir: Path,
-                senal_dir: Path = Path("runtime/senales"), nocturna_dir: Path = Path("runtime/nocturna")):
-    return PanelServer((host, port), make_handler(runtime_dir, results_dir, senal_dir, nocturna_dir))
+                senal_dir: Path = Path("runtime/senales"), nocturna_dir: Path = Path("runtime/nocturna"),
+                blitz_dir: Path = Path("runtime/blitz")):
+    return PanelServer((host, port), make_handler(runtime_dir, results_dir, senal_dir, nocturna_dir, blitz_dir))
 
 
 def serve(host: str = "127.0.0.1", port: int = 8765, runtime_dir: Path = Path("runtime/demo"),
           results_dir: Path = Path("results"), senal_dir: Path = Path("runtime/senales"),
-          nocturna_dir: Path = Path("runtime/nocturna")) -> int:
+          nocturna_dir: Path = Path("runtime/nocturna"), blitz_dir: Path = Path("runtime/blitz")) -> int:
     try:
-        srv = make_server(host, port, runtime_dir, results_dir, senal_dir, nocturna_dir)
+        srv = make_server(host, port, runtime_dir, results_dir, senal_dir, nocturna_dir, blitz_dir)
     except OSError as exc:
         print(f"No se pudo abrir el panel en {host}:{port} ({exc}). ¿Hay otro «tbot serve» abierto? "
               "Ciérrelo o use otro puerto con --port.")

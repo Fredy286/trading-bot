@@ -60,14 +60,14 @@
 </head>
 <body>
 <header>
-  <h1>Señales anticipadas · BTC/USD 1 minuto</h1>
+  <h1 id="titulo">Señales anticipadas · BTC/USD 1 minuto</h1>
   <div>
     <button id="soundbtn" class="secondary">🔔 Activar sonido</button>
     <span class="note" id="status">conectando…</span>
   </div>
 </header>
 <main>
-  <div class="banner">EXPERIMENTAL — SOLO CUENTA DEMO. Modelo del Estudio 16 pendiente de confirmación con datos nuevos
+  <div class="banner" id="banner">EXPERIMENTAL — SOLO CUENTA DEMO. Modelo del Estudio 16 pendiente de confirmación con datos nuevos
     (enero de 2027). Nunca dinero real. Ojo: predice el precio de Binance; con el precio de otras bolsas o brókeres
     acierta solo 52–53 % (Estudios 37 y 38), así que en tu plataforma lo esperable es no ganar.</div>
 
@@ -90,13 +90,13 @@
   <div class="grid" id="metrics"></div>
 
   <h2>Diario</h2>
-  <p class="note">Después de que venza cada operación (60 s después de tu clic), anota el resultado y el precio de salida
+  <p class="note" id="nota_diario">Después de que venza cada operación (60 s después de tu clic), anota el resultado y el precio de salida
     que muestra tu plataforma. El bot compara con el precio de Binance para saber si la plataforma sigue el mismo
     precio, si devuelve el dinero en empate y cuánto paga.</p>
   <div class="tablewrap">
     <table>
       <thead><tr><th>Hora (Colombia)</th><th>Señal</th><th>Prob.</th><th>Tu clic</th>
-        <th>Binance entrada → salida</th><th>Binance</th><th>Plataforma entrada → salida</th><th>Pago</th>
+        <th id="th_ref1">Binance entrada → salida</th><th id="th_ref2">Binance</th><th>Plataforma entrada → salida</th><th>Pago</th>
         <th>Plataforma</th><th>¿Coinciden?</th><th>Anotar</th></tr></thead>
       <tbody id="rows"><tr><td colspan="11" class="note">Sin avisos todavía.</td></tr></tbody>
     </table>
@@ -104,6 +104,23 @@
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
+// La misma página sirve dos modos: /senales (BTC 1 min, precio de Binance) y /blitz (blitz de BTC de IQ Option, 3 min,
+// precio promedio de Binance, Bybit y OKX; Estudio 42).
+const BLITZ = location.pathname.startsWith("/blitz");
+const MODE = BLITZ ? {api: "/api/blitz", ref: "promedio", contrato: "BTC · blitz de 3 min (vence 3 min después de tu clic)",
+  titulo: "Blitz de IQ Option · BTC 3 minutos", pago: "86",
+  banner: "EXPERIMENTAL — SOLO CUENTA DEMO. Modelo del Estudio 42: 55,3 % en desarrollo con el precio de IQ Option " +
+    "reconstruido (promedio de Binance, Bybit y OKX); hace falta 53,8 % con pago del 86 %. Pendiente de confirmación " +
+    "con datos nuevos (Estudio 44, enero de 2027). Abre Bitcoin «Blitz» de 3 min y haz clic apenas suene. Nunca dinero real.",
+  nota: "Después de que venza cada operación (3 min después de tu clic), anota el resultado y el precio de salida que " +
+    "muestra IQ Option. El bot compara con el promedio de Binance, Bybit y OKX (del cierre de la vela del aviso al " +
+    "cierre 3 min después) para saber si IQ Option sigue ese precio y cuánto paga."}
+  : {api: "/api/senal", ref: "Binance", contrato: "BTC/USD · 1 minuto"};
+if (BLITZ) {
+  document.title = MODE.titulo; $("titulo").textContent = MODE.titulo; $("banner").textContent = MODE.banner;
+  $("nota_diario").textContent = MODE.nota; $("f_pago").placeholder = MODE.pago;
+  $("th_ref1").textContent = "Promedio entrada → salida"; $("th_ref2").textContent = "Promedio";
+}
 // Pasados 15 s desde el aviso (5 s después del cierre) ya no hay ventaja medida: no se debe entrar (Estudio 16).
 const LATE_S = 15;
 let lastAlert = null, clicked = new Set(), audio = null, offsetMs = 0, current = null;
@@ -133,7 +150,7 @@ async function doClick() {
   if (!current || clicked.has(current.alert_id)) return;
   if ((Date.now() + offsetMs - new Date(current.decidido).getTime()) / 1000 > LATE_S) return;
   clicked.add(current.alert_id); $("clickbtn").disabled = true;
-  const r = await post("/api/senal/clic", {alert_id: current.alert_id});
+  const r = await post(MODE.api + "/clic", {alert_id: current.alert_id});
   const lat = (new Date(r.hora_binance) - new Date(current.decidido)) / 1000;
   $("sub").textContent = `Clic registrado: ${lat.toFixed(1)} s después del aviso.`;
   $("after").style.display = "flex";
@@ -144,7 +161,7 @@ document.addEventListener("keydown", (e) => {
 });
 $("f_guardar1").onclick = async () => {
   if (!current) return;
-  await post("/api/senal/registro", {alert_id: current.alert_id, entrada: $("f_entrada").value, pago: $("f_pago").value});
+  await post(MODE.api + "/registro", {alert_id: current.alert_id, entrada: $("f_entrada").value, pago: $("f_pago").value});
   $("after").style.display = "none"; $("f_entrada").value = "";
 };
 
@@ -167,9 +184,9 @@ function renderSignal(st) {
     if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;
     $("countdown").textContent = left > 0 ? `cierre en ${left.toFixed(1)} s` : `${(-left).toFixed(1)} s después del cierre`;
-    if (!$("sub").textContent) $("sub").textContent = u.vence
+    if (!$("sub").textContent) $("sub").textContent = u.vence && !BLITZ
       ? `BTC/USD · vencimiento a elegir: ${fmtT(u.vence).slice(0, 5)} · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`
-      : `BTC/USD · 1 minuto · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
+      : `${MODE.contrato} · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
   } else {
     current = null; $("clickbtn").disabled = true; big.className = "none";
     big.textContent = u.estado === "error" ? "Error de datos (reintentando)" :
@@ -188,9 +205,9 @@ function renderSignal(st) {
 function renderMetrics(r) {
   const m = [["Avisos", r.avisos], ["Clics", r.clics], ["Tu tiempo de clic (mediana)", r.latencia_mediana_s == null ? "—" : num(r.latencia_mediana_s, 1) + " s"],
     ["Tu tiempo de clic (9 de 10 por debajo de)", r.latencia_p90_s == null ? "—" : num(r.latencia_p90_s, 1) + " s"],
-    ["Acierto según Binance", pct(r.acierto_binance) + ` (${r.con_referencia_binance})`],
+    [`Acierto según ${MODE.ref}`, pct(r.acierto_ref) + ` (${r.con_referencia})`],
     ["Acierto en tu plataforma", pct(r.acierto_plataforma) + ` (${r.anotadas_plataforma})`],
-    ["¿Plataforma = Binance?", pct(r.coincidencia_binance_plataforma) + ` (${r.n_comparables})`],
+    [`¿Plataforma = ${MODE.ref}?`, pct(r.coincidencia_ref_plataforma) + ` (${r.n_comparables})`],
     ["Pago medio", r.pago_medio == null ? "—" : num(r.pago_medio, 1) + " %"],
     ["Empates en la plataforma", r.empates_plataforma],
     ["Ganancia demo (por unidad apostada)", r.ganancia_demo_por_unidad == null ? "—" : num(r.ganancia_demo_por_unidad, 2)]];
@@ -201,7 +218,7 @@ function renderRows(rows) {
   $("rows").innerHTML = rows.map((f) => `<tr>
     <td>${fmtT(f.decidido)}</td><td>${f.lado > 0 ? "↑ sube" : "↓ baja"}</td><td class="num">${pct(f.p)}</td>
     <td class="num">${f.latencia_s == null ? "sin clic" : num(f.latencia_s, 1) + " s"}</td>
-    <td class="num">${num(f.entrada_binance)} → ${num(f.salida_binance)}</td><td>${res(f.resultado_binance)}</td>
+    <td class="num">${num(f.entrada_ref)} → ${num(f.salida_ref)}</td><td>${res(f.resultado_ref)}</td>
     <td class="num">${num(f.entrada_plataforma)} → ${num(f.salida_plataforma)}</td><td class="num">${f.pago == null ? "—" : f.pago + " %"}</td>
     <td>${res(f.resultado_plataforma)}</td>
     <td>${f.coinciden == null ? "—" : f.coinciden ? '<span class="ok">sí</span>' : '<span class="bad">no</span>'}</td>
@@ -210,7 +227,7 @@ function renderRows(rows) {
       <button data-a="${f.alert_id}" data-r="empate">empate</button>` : ""}</td></tr>`).join("");
   document.querySelectorAll(".rowform button").forEach((b) => b.onclick = async () => {
     const a = b.dataset.a;
-    await post("/api/senal/registro", {alert_id: a, resultado: b.dataset.r, salida: $("s_" + a).value});
+    await post(MODE.api + "/registro", {alert_id: a, resultado: b.dataset.r, salida: $("s_" + a).value});
     poll();
   });
 }
@@ -219,7 +236,7 @@ document.addEventListener("focusin", (e) => { editing = e.target.tagName === "IN
 document.addEventListener("focusout", () => { editing = false; });
 async function poll() {
   try {
-    const st = await (await fetch("/api/senal/state")).json();
+    const st = await (await fetch(MODE.api + "/state")).json();
     if (st.missing) { $("status").textContent = "el bucle de señales no está corriendo"; return; }
     offsetMs = (st.desfase_reloj_s || 0) * 1000;
     $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ${st.minutos} minutos · ${st.avisos} avisos` +

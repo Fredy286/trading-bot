@@ -664,7 +664,8 @@ def cmd_serve(a) -> int:
     from .app.server import serve
 
     return serve(host=a.host, port=a.port, runtime_dir=Path(a.runtime), results_dir=Path(a.results),
-                 senal_dir=Path(a.senal_runtime), nocturna_dir=Path(a.nocturna_runtime))
+                 senal_dir=Path(a.senal_runtime), nocturna_dir=Path(a.nocturna_runtime),
+                 blitz_dir=Path(a.blitz_runtime))
 
 
 def cmd_canales(a) -> int:
@@ -740,6 +741,33 @@ def cmd_senal(a) -> int:
                   "requiere su propio modelo (Estudio 19). Se usa igualmente, solo como práctica.")
         anticipada.SignalLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, cuarto_r=a.cuarto,
                               pago=a.pago / 100 if a.pago else None, umbral=a.umbral).run(a.iteraciones)
+    except KeyboardInterrupt:
+        pass
+    return 0
+
+
+def cmd_blitz(a) -> int:
+    """Modo de práctica del blitz de BTC de IQ Option (3 min, Estudios 42 y 44) para cuenta DEMO."""
+    from .live import anticipada, blitz
+
+    if a.accion == "entrenar":
+        try:
+            meta = blitz.train_frozen_blitz()
+        except (FileExistsError, FileNotFoundError) as exc:
+            print(exc)
+            return 2
+        print(json.dumps(meta, indent=2, ensure_ascii=False))
+        return 0
+    try:
+        bundle = anticipada.load_bundle(blitz.MODEL_PATH, blitz.REG_PATH)
+    except FileNotFoundError:
+        print("Falta el modelo. Ejecute primero: tbot blitz entrenar")
+        return 2
+    print(f"Blitz de BTC (3 min) con {bundle['model_id']}: aviso en el segundo {bundle['k']} de cada vela. "
+          f"Panel: http://127.0.0.1:8765/blitz — Ctrl+C para detener. SOLO CUENTA DEMO.")
+    try:
+        blitz.BlitzLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, pago=a.pago / 100 if a.pago else None,
+                        umbral=a.umbral).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -972,6 +1000,16 @@ def build_parser() -> argparse.ArgumentParser:
                    help="avisar solo si la probabilidad de la dirección es ≥ este valor (p. ej. 0.60; Estudio 21)")
     x.set_defaults(func=cmd_senal)
 
+    x = sub.add_parser("blitz", help="avisos para el blitz de BTC de IQ Option (3 min) en cuenta DEMO (Estudio 42)")
+    x.add_argument("accion", choices=["entrenar", "vivo"])
+    x.add_argument("--runtime", default="runtime/blitz")
+    x.add_argument("--iteraciones", type=int, default=0, help="0 = sin límite")
+    x.add_argument("--sin-sonido", action="store_true")
+    x.add_argument("--pago", type=float, default=None, help="pago real del blitz en porcentaje (por defecto 86)")
+    x.add_argument("--umbral", type=float, default=None,
+                   help="avisar solo si la probabilidad de la dirección es ≥ este valor (solo práctica)")
+    x.set_defaults(func=cmd_blitz)
+
     x = sub.add_parser("serve", help="panel web local")
     x.add_argument("--host", default="127.0.0.1")
     x.add_argument("--port", type=int, default=8765)
@@ -979,6 +1017,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--results", default="results")
     x.add_argument("--senal-runtime", default="runtime/senales")
     x.add_argument("--nocturna-runtime", default="runtime/nocturna")
+    x.add_argument("--blitz-runtime", default="runtime/blitz")
     x.set_defaults(func=cmd_serve)
 
     x = sub.add_parser("canales", help="vigilar canales públicos de señales y auditarlos con precios reales (Estudio 32)")

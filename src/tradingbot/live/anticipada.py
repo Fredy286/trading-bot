@@ -214,6 +214,7 @@ class SignalLoop:
         self.feed = feed or BinancePollingFeed("BTCUSDT")
         self.sec = secfeed or SecondsFeed(self.feed.session)
         self.sound, self.log = sound, log
+        self.extra_state: dict = {}  # datos propios de cada modo (el blitz los usa) que se añaden a state.json
         self.last: dict = {}
         self.started = utcnow()
         self.n_minutes = self.n_signals = 0
@@ -281,7 +282,7 @@ class SignalLoop:
                  "desfase_reloj_s": self.feed.offset_s, "inicio": self.started.isoformat(),
                  "model_id": self.b["model_id"], "k": self.b["k"], "latencia_prevista": self.b["latencia"],
                  "cuarto_r": self.cuarto_r, "umbral": self.umbral, "pago": self.pago if self.pago is not None else self.b["payout"],
-                 "minutos": self.n_minutes, "avisos": self.n_signals, "ultimo": self.last}
+                 "minutos": self.n_minutes, "avisos": self.n_signals, "ultimo": self.last, **self.extra_state}
         tmp = self.dir / f"state.json.{os.getpid()}.tmp"
         tmp.write_text(jsonutil.dumps(state, default=str), encoding="utf-8")
         tmp.replace(self.dir / "state.json")
@@ -330,7 +331,8 @@ RESULTADOS = {"gano": 1, "perdio": -1, "empate": 0}
 
 
 def diario(runtime: Path, limit: int = 50) -> list[dict]:
-    """Una fila por aviso con el clic, la referencia de Binance y lo que anotó el usuario de su plataforma."""
+    """Una fila por aviso con el clic, la referencia y lo que anotó el usuario de su plataforma. La referencia es el
+    precio de Binance (este modo) o el compuesto (blitz); `*_ref` la da en los dos casos."""
     d = Path(runtime)
     rows, _ = read_rows(d / "senales.jsonl")
     avisos = [r for r in rows if r.get("evento") == "aviso"]
@@ -349,23 +351,26 @@ def diario(runtime: Path, limit: int = 50) -> list[dict]:
         if c.get("hora_binance"):
             lat = (pd.Timestamp(c["hora_binance"]) - pd.Timestamp(a["decidido"])).total_seconds()
         res_p = RESULTADOS.get(g.get("resultado"))
-        out.append({"alert_id": aid, "decidido": a["decidido"], "cierre": a["cierre"], "lado": a["lado"],
-                    "p": a["p"], "ev": a["ev"], "clic": c.get("hora_binance"), "latencia_s": lat,
+        ref = {k: r.get(f"{k}_ref", r.get(f"{k}_binance")) for k in ("entrada", "salida", "resultado")}
+        out.append({"alert_id": aid, "decidido": a["decidido"], "cierre": a["cierre"], "vence": a.get("vence"),
+                    "lado": a["lado"], "p": a["p"], "ev": a["ev"], "clic": c.get("hora_binance"), "latencia_s": lat,
                     "entrada_binance": r.get("entrada_binance"), "salida_binance": r.get("salida_binance"),
-                    "resultado_binance": r.get("resultado_binance"), "entrada_plataforma": g.get("entrada"),
-                    "salida_plataforma": g.get("salida"), "pago": g.get("pago"), "resultado_plataforma": res_p,
-                    "coinciden": (None if res_p is None or r.get("resultado_binance") is None
-                                  else res_p == r["resultado_binance"])})
+                    "resultado_binance": r.get("resultado_binance"), "entrada_ref": ref["entrada"],
+                    "salida_ref": ref["salida"], "resultado_ref": ref["resultado"],
+                    "entrada_plataforma": g.get("entrada"), "salida_plataforma": g.get("salida"), "pago": g.get("pago"),
+                    "resultado_plataforma": res_p,
+                    "coinciden": None if res_p is None or ref["resultado"] is None else res_p == ref["resultado"]})
     return out
 
 
-def resumen(runtime: Path) -> dict:
+def resumen(runtime: Path, pago_def: float = 0.85) -> dict:
+    """`pago_def`: pago supuesto cuando el usuario no anotó el de su plataforma (85 % aquí; 86 % en el blitz)."""
     filas = diario(runtime, limit=10**9)
     lat = np.array([f["latencia_s"] for f in filas if f["latencia_s"] is not None], float)
-    rb = [f["resultado_binance"] for f in filas if f["resultado_binance"] is not None]
+    rb = [f["resultado_ref"] for f in filas if f["resultado_ref"] is not None]
     rp = [f for f in filas if f["resultado_plataforma"] is not None]
     pagos = np.array([float(f["pago"]) for f in filas if f["pago"] not in (None, "")], float)
-    pnl = [((float(f["pago"]) / 100 if f["pago"] not in (None, "") else 0.85) if f["resultado_plataforma"] > 0
+    pnl = [((float(f["pago"]) / 100 if f["pago"] not in (None, "") else pago_def) if f["resultado_plataforma"] > 0
             else (-1.0 if f["resultado_plataforma"] < 0 else 0.0)) for f in rp]
 
     def hit(v):
@@ -376,9 +381,11 @@ def resumen(runtime: Path) -> dict:
     return {"avisos": len(filas), "clics": int(len(lat)),
             "latencia_mediana_s": float(np.median(lat)) if len(lat) else None,
             "latencia_p90_s": float(np.percentile(lat, 90)) if len(lat) else None,
-            "con_referencia_binance": len(rb), "acierto_binance": hit(rb),
+            "con_referencia": len(rb), "acierto_ref": hit(rb),
+            "con_referencia_binance": len(rb), "acierto_binance": hit(rb),  # nombres anteriores (modo de 1 min)
             "anotadas_plataforma": len(rp), "acierto_plataforma": hit([f["resultado_plataforma"] for f in rp]),
             "empates_plataforma": sum(1 for f in rp if f["resultado_plataforma"] == 0),
             "pago_medio": float(pagos.mean()) if len(pagos) else None,
             "ganancia_demo_por_unidad": float(sum(pnl)) if pnl else None,
+            "coincidencia_ref_plataforma": (sum(co) / len(co)) if co else None,
             "coincidencia_binance_plataforma": (sum(co) / len(co)) if co else None, "n_comparables": len(co)}
