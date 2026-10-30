@@ -3176,3 +3176,68 @@ peso.
 - Si H41a o H41b pasa: se pre-registra un estudio del blitz de BTC con la duración y el pago reales que dé el usuario.
 - Si ninguna pasa: el modelo de BTC no sirve con el precio de IQ Option. Solo quedaría entrenar un modelo nuevo con
   el precio compuesto (idea 0), con pre-registro propio.
+
+## Estudio 42 — blitz de BTC de IQ Option (3 min, pago 86 %): modelo que aprende con el precio compuesto (pre-registro, 2026-10-30, ANTES de ver el resultado del Estudio 41 y de calcular nada a 3 min con el compuesto)
+
+**Origen:** segunda captura del usuario (IQ Option, Bitcoin «Blitz», 2026-10-29 23:15:34 Bogotá = 04:15:34 UTC):
+- vencimiento fijo de **3 min desde la compra** (no se puede cambiar);
+- beneficio 86 %, así que el equilibrio es 1/1,86 = 53,76 %;
+- precio 78 210,15 (compra/venta con 4 decimales). Un instante antes de una caída brusca, Binance marcaba 78 218,26 y
+  OKX 78 213,1. Con Bybit cerca de 78 199, el promedio de las tres da unos 78 210: **otra vez el promedio, no Binance**.
+
+Es la idea 0 de docs/10 («aprender con el precio de la plataforma») aplicada al único contrato corto de BTC que tiene
+el usuario. La binaria (5–20 min, pago 87 %) ya quedó sin ventaja (Estudio 41, R = 5 del Estudio 19).
+
+**Precio compuesto:** promedio simple de los cierres de 1 min de BTC/USDT al contado de Binance, Bybit y OKX, con las
+mismas velas y la misma caché que el Estudio 41 (`data/raw/bolsas_usdt/`), ampliadas hacia atrás hasta 2024-08 para
+entrenar.
+
+**Etiqueta:**
+- decisión en el segundo 50 de la vela t; clic a +10 s, que cae en el cierre de t;
+- el blitz dura 3 min, así que resultado = signo(compuesto(t + 3) − compuesto(t)), con los cierres de cada minuto;
+- empate si la diferencia es menor de 0,005.
+
+**Variables:** las del modelo H16b / Estudio 20 (vela anterior de Binance y bloque parcial hasta el segundo 50 con
+velas de 1 s de Binance) más tres del compuesto, todas conocidas en el segundo 50 de t (vol = exp(lvol60) de la vela
+t − 1, como en las demás):
+1. `c_r1` = log(compuesto(t − 1) / compuesto(t − 2)) / vol;
+2. `c_r3` = log(compuesto(t − 1) / compuesto(t − 4)) / (vol · √3);
+3. `c_disp` = diferencia en puntos básicos entre Binance y el compuesto al cierre de t − 1, menos su media de los 60
+   minutos anteriores (qué bolsa va adelantada).
+
+**Modelo y periodo:** la receta del Estudio 20, sin cambios salvo la etiqueta:
+- GBM mes a mes, periodo de prueba 2025-09-01 → 2026-10-25;
+- cada mes se entrena solo con los 12 meses anteriores (el último 20 % para calibrar), con purga de 5 min porque la
+  etiqueta dura 3;
+- mismos ajustes de `config/research.toml`;
+- tasa de empates estimada con las 1 440 etiquetas anteriores ya conocidas (desfase de 5 min).
+
+**Política:** EV estimado ≥ 0,02 con pago del 86 % y empate reembolsado (con el compuesto casi no hay empates).
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H42a:** todas las operaciones de la política;
+- **H42b:** solo las de probabilidad ≥ 0,60.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p < 0,025 frente a 53,76 %;
+3. Wilson 95 % > 53,76 %;
+4. intervalo del EV (bootstrap por semanas, 97,5 %) por encima de 0;
+5. EV > 0 en ≥ 60 % de los meses.
+
+Las operaciones de 3 min se solapan (una por minuto). Por eso el criterio 4 usa bloques semanales.
+
+**Informativo:**
+- una a la vez (sin operaciones solapadas);
+- referencia: el mismo modelo entrenado con la etiqueta de **Binance** a 3 min y juzgado con el compuesto. Mide si
+  aprender con el precio de la plataforma ayuda;
+- acierto en el horario del usuario (21:00–01:00 Bogotá).
+
+**Expectativa declarada:** dudosa. A 3 min, con el precio de Binance, el modelo dio 54,1 % (Estudio 18, otro periodo).
+
+**Consecuencia:**
+- Si H42a o H42b pasa: se pre-registra su confirmación con datos posteriores al 2026-10-25 (evaluación única después
+  del 2027-01-18) y se construye un modo de práctica para el blitz (aviso en el segundo 50 con el precio compuesto).
+- Si no pasa: el blitz de BTC de IQ Option queda **sin señal**.
+
+El resultado del Estudio 41 se lee después de este commit y no cambia este diseño.
