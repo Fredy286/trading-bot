@@ -26,6 +26,15 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 
   - BTC con el precio del bróker Deriv: 52,4 % (Estudio 38). El modelo de BTC predice el precio de BINANCE, no
     el de BTC en general.
+  - **Pero en las bolsas en USDT la ventaja sobrevive en buena parte (Estudio 41):**
+
+    | Precio de juicio | Todas | p ≥ 0,60 |
+    |---|---|---|
+    | OKX | 54,9 % | 57,4 % |
+    | Bybit | 54,3 % | 57,0 % |
+    | Promedio de Binance, Bybit y OKX (el de IQ Option) | 55,5 % | **58,6 %** (pasa) |
+
+    Se pierde en las bolsas en dólares (Coinbase, Deriv). Confirmación: Estudio 43 (después del 2027-01-18).
 
   Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**
@@ -65,7 +74,7 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 
 | # | Idea | Por qué | Estado |
 |---|---|---|---|
-| 0 | **Aprender con el precio de la plataforma**: entrenar y juzgar los modelos con el precio de un bróker (Deriv: 1 año de velas de 1 min de BTC/ETH y divisas) en vez del de Binance. Las ventajas parecen vivir en el precio de cada fuente | Estudios 34, 36, 37 y 38 | PRIORIDAD MÁXIMA. Pre-registrar con desarrollo 2025-10-29 → 2026-08 y verificación 2026-09 → 2026-10-25 (datos de Deriv ≤ 2026-10-25) |
+| 0 | **Aprender con el precio de la plataforma**: entrenar y juzgar los modelos con el precio de la plataforma del usuario. IQ Option liquida BTC con un promedio de bolsas en USDT, que SÍ se puede reconstruir con datos públicos (Binance, Bybit, OKX). Deriv quedó descartado | Estudios 34, 36–38 y 41 | **Estudio 42** (blitz de BTC de 3 min al 86 %, modelo entrenado con el promedio) pre-registrado y en ejecución. Si pasa: confirmación con datos nuevos y modo de práctica del blitz |
 | 0b | Reversión en Deriv: Deriv no deja operar divisas de 20:50 a 22:00 UTC, exige ≥ 15 min y (consulta del 2026-10-29 a las 22:05 UTC) **no permite contratos de divisas de menos de 5 h de 21:00 a 23:59 UTC**. Estudio 39 (22–24 UTC, 15 min) no pasa (53,8 %); a las 22 UTC 56,7 % (post hoc) | Estudios 36, 39 y 40 | **DESCARTADA para operar** (Deriv cierra toda la ventana útil). El Estudio 40 sigue solo como medida científica (evaluación única tras el 2027-01-18). No buscar más horarios de reversión en Deriv. La reversión solo tendría uso en una plataforma que permita 3–5 min de 21 a 24 UTC en pares NO OTC y liquide con un precio cuyos datos podamos descargar |
 | 1 | Variables de «reloj» (minuto en el cuarto de hora, hora de financiación 00/08/16 UTC) en el GBM de BTC | Preprint de Kim y Hansen (2026): ráfagas de volumen y dependencia serial en los cuartos de hora | **Estudio 33** (pre-registro aea2c8b, código a1598a3), en la cola de GitHub Actions desde el 2026-10-29. Documentar el resultado |
 | 2 | Confirmación de ETH con umbral: modelo congelado de ETH (12 meses hasta el 2026-10-25) y evaluación única con datos nuevos | Estudio 26 pasó (58,8 %) | Por pre-registrar (confirmación) |
