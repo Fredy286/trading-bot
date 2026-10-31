@@ -8,6 +8,10 @@ blitz empieza con el clic (idealmente al cierre de la vela) y vence 3 min despu�
 
 Mismos archivos y reglas que `anticipada` (un archivo, un escritor). La referencia de cada aviso es el resultado con
 el compuesto: cierre de la vela del aviso → cierre 3 min después. No envía órdenes a ningún intermediario.
+
+Además, tras cada aviso el bucle graba cada segundo, durante 25 s, el precio de seis bolsas en USDT (`precios.jsonl`).
+Con el precio de entrada exacto que el usuario anota de IQ Option, `comparar` mide qué promedio usa la plataforma: el
+modelo se entrenó con el de tres bolsas y, con el de cinco, el acierto de octubre bajó de 56,8 % a 54,4 %.
 """
 
 from __future__ import annotations
@@ -15,7 +19,10 @@ from __future__ import annotations
 import hashlib
 import json
 import pickle
+import threading
+import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -30,6 +37,7 @@ from ..research.features import FEATURES, compute_features
 from ..research.models import fit_predict_proba
 from ..research.study3 import load, spot_bars
 from ..research.study16 import minute_table, partial_features
+from .. import jsonutil
 from ..research.study20 import build_table
 from ..execution.paper import read_rows
 from ..research.study41 import composite
@@ -166,13 +174,116 @@ class UsdtCloses:
         return {v: self.get(v, a, t1) for v in VENUES}
 
 
+# ----------------------------------------------------------------------------------------------- grabador de precios
+def _mid(b, a):
+    return (float(b) + float(a)) / 2
+
+
+# bolsa → (url, parámetros, lectura → (último, medio)); Binance no da el último en esta respuesta (su diferencial es
+# de 0,01, así que el medio sirve igual)
+TICKERS = {
+    "binance": ("https://api.binance.com/api/v3/ticker/bookTicker", {"symbol": "BTCUSDT"},
+                lambda j: (None, _mid(j["bidPrice"], j["askPrice"]))),
+    "bybit": ("https://api.bybit.com/v5/market/tickers", {"category": "spot", "symbol": "BTCUSDT"},
+              lambda j: (lambda x: (float(x["lastPrice"]), _mid(x["bid1Price"], x["ask1Price"])))(j["result"]["list"][0])),
+    "okx": ("https://www.okx.com/api/v5/market/ticker", {"instId": "BTC-USDT"},
+            lambda j: (lambda x: (float(x["last"]), _mid(x["bidPx"], x["askPx"])))(j["data"][0])),
+    "kucoin": ("https://api.kucoin.com/api/v1/market/orderbook/level1", {"symbol": "BTC-USDT"},
+               lambda j: (float(j["data"]["price"]), _mid(j["data"]["bestBid"], j["data"]["bestAsk"]))),
+    "bitget": ("https://api.bitget.com/api/v2/spot/market/tickers", {"symbol": "BTCUSDT"},
+               lambda j: (lambda x: (float(x["lastPr"]), _mid(x["bidPr"], x["askPr"])))(j["data"][0])),
+    "gate": ("https://api.gateio.ws/api/v4/spot/tickers", {"currency_pair": "BTC_USDT"},
+             lambda j: (float(j[0]["last"]), _mid(j[0]["highest_bid"], j[0]["lowest_ask"]))),
+}
+# promedios candidatos para el precio de IQ Option (precio medio de cada bolsa)
+CANDIDATOS = {"Binance sola": ("binance",), "OKX sola": ("okx",), "3 bolsas (Binance, Bybit, OKX)": ("binance", "bybit", "okx"),
+              "5 bolsas (+ KuCoin, Bitget)": ("binance", "bybit", "okx", "kucoin", "bitget"),
+              "6 bolsas (+ Gate)": ("binance", "bybit", "okx", "kucoin", "bitget", "gate")}
+
+
+class PriceRecorder:
+    """Graba cada segundo el precio de las seis bolsas durante unos segundos tras un aviso (hilo aparte; si una bolsa
+    no responde, esa fila la deja vacía). Escribe solo `precios.jsonl`."""
+
+    def __init__(self, path: Path, clock, session=None, seconds: int = 25):
+        self.path, self.clock, self.seconds = Path(path), clock, seconds
+        self.session = session or requests.Session()
+        self.pool = ThreadPoolExecutor(max_workers=len(TICKERS))
+
+    def _one(self, venue: str):
+        url, params, parse = TICKERS[venue]
+        try:
+            r = self.session.get(url, params=params, timeout=2)
+            r.raise_for_status()
+            last, mid = parse(r.json())
+            return {"ultimo": last, "medio": mid}
+        except (requests.RequestException, ValueError, KeyError, IndexError, TypeError):
+            return None
+
+    def snapshot(self) -> dict:
+        t0 = pd.Timestamp(self.clock())
+        got = dict(zip(TICKERS, self.pool.map(self._one, TICKERS)))
+        t1 = pd.Timestamp(self.clock())
+        return {"t": (t0 + (t1 - t0) / 2).isoformat(), "duracion_s": round((t1 - t0).total_seconds(), 3), **got}
+
+    def record(self, alert_id: str) -> None:
+        end = time.monotonic() + self.seconds
+        while time.monotonic() < end:
+            start = time.monotonic()
+            jsonutil.append_line(self.path, jsonutil.dumps({"alert_id": alert_id, **self.snapshot()}))
+            time.sleep(max(0.0, 1.0 - (time.monotonic() - start)))
+
+    def start(self, alert_id: str) -> threading.Thread:
+        th = threading.Thread(target=self.record, args=(alert_id,), daemon=True)
+        th.start()
+        return th
+
+
+def comparar(runtime: Path, max_gap_s: float = 2.0) -> dict:
+    """Para cada operación con clic y precio de entrada anotado de la plataforma, el error de cada promedio candidato
+    en el segundo grabado más cercano al clic. El promedio con menor error es el que usa la plataforma."""
+    d = Path(runtime)
+    clics = {}
+    for c in read_rows(d / "clics.jsonl")[0]:
+        clics.setdefault(c.get("alert_id"), c)
+    entradas = {}
+    for g in read_rows(d / "registros.jsonl")[0]:
+        if g.get("entrada") not in (None, ""):
+            entradas[g["alert_id"]] = float(g["entrada"])
+    precios: dict[str, list] = {}
+    for p in read_rows(d / "precios.jsonl")[0]:
+        precios.setdefault(p.get("alert_id"), []).append(p)
+    filas = []
+    for aid, entrada in entradas.items():
+        c, rows = clics.get(aid), precios.get(aid)
+        if not c or not c.get("hora_binance") or not rows:
+            continue
+        t = pd.Timestamp(c["hora_binance"])
+        best = min(rows, key=lambda p: abs((pd.Timestamp(p["t"]) - t).total_seconds()))
+        gap = abs((pd.Timestamp(best["t"]) - t).total_seconds())
+        if gap > max_gap_s:
+            continue
+        fila = {"alert_id": aid, "clic": c["hora_binance"], "entrada_plataforma": entrada, "desfase_s": gap}
+        for name, venues in CANDIDATOS.items():
+            vals = [best[v]["medio"] for v in venues if best.get(v)]
+            fila[name] = entrada - float(np.mean(vals)) if len(vals) == len(venues) else None
+        filas.append(fila)
+    resumen = {}
+    for name in CANDIDATOS:
+        e = np.array([f[name] for f in filas if f[name] is not None], float)
+        resumen[name] = {"n": int(len(e)), "error_medio": float(e.mean()) if len(e) else None,
+                         "error_cuadratico": float(np.sqrt((e ** 2).mean())) if len(e) else None}
+    return {"operaciones": len(filas), "candidatos": resumen, "filas": filas}
+
+
 # ----------------------------------------------------------------------------------------------- bucle
 class BlitzLoop(SignalLoop):
     def __init__(self, bundle: dict, runtime: Path, feed=None, secfeed=None, venues=None, sound: bool = True,
-                 log=print, pago: float | None = None, umbral: float | None = None):
+                 log=print, pago: float | None = None, umbral: float | None = None, record: bool = True):
         super().__init__(bundle, runtime, feed=feed, secfeed=secfeed, sound=sound, log=log, pago=pago, umbral=umbral)
         self.venues = venues or UsdtCloses(self.feed.session)
         self.extra_state = {"modo": "blitz", "duracion_min": DUR, "precio": bundle.get("precio")}
+        self.recorder = PriceRecorder(self.dir / "precios.jsonl", self.feed.server_now) if record else None
 
     def step(self, now: datetime) -> dict:
         minute_open = pd.Timestamp(now).floor("min")
@@ -190,6 +301,8 @@ class BlitzLoop(SignalLoop):
             d["emitido"] = pd.Timestamp(self.feed.server_now()).isoformat()
             self._write({"evento": "aviso", "model_id": self.b["model_id"], **d})
             self._beep()
+            if self.recorder:
+                self.recorder.start(d["alert_id"])  # precios de las seis bolsas mientras el usuario hace clic
         self.last = d
         return d
 

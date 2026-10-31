@@ -90,7 +90,8 @@ def test_reference_is_the_composite_from_the_alert_close_to_three_minutes_later(
     class _Feed:
         offset_s, session = 0.0, None
 
-    loop = blitz.BlitzLoop(_bundle(), tmp_path, feed=_Feed(), secfeed=object(), venues=_Venues(), sound=False)
+    loop = blitz.BlitzLoop(_bundle(), tmp_path, feed=_Feed(), secfeed=object(), venues=_Venues(), sound=False,
+                           record=False)
     assert loop.fill_references(pd.Timestamp("2026-11-01T12:04:10", tz="UTC").to_pydatetime()) == 0  # aún no
     assert loop.fill_references(pd.Timestamp("2026-11-01T12:04:30", tz="UTC").to_pydatetime()) == 1
     ref = [r for r in map(json.loads, (tmp_path / "senales.jsonl").read_text().splitlines())
@@ -161,3 +162,49 @@ def test_panel_serves_the_blitz_mode_from_its_own_folder(tmp_path):
     finally:
         srv.shutdown()
         srv.server_close()
+
+
+def test_recorder_reads_the_six_venues_and_tolerates_one_failing(tmp_path):
+    answers = {
+        "binance": {"bidPrice": "100.00", "askPrice": "100.02"},
+        "bybit": {"result": {"list": [{"lastPrice": "99.5", "bid1Price": "99.4", "ask1Price": "99.6"}]}},
+        "okx": {"data": [{"last": "99.0", "bidPx": "98.9", "askPx": "99.1"}]},
+        "kucoin": {"data": {"price": "98.0", "bestBid": "97.9", "bestAsk": "98.1"}},
+        "bitget": {"data": [{"lastPr": "97.0", "bidPr": "96.9", "askPr": "97.1"}]},
+    }
+
+    class _Resp:
+        def __init__(self, j):
+            self.j = j
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return self.j
+
+    class _Session:
+        def get(self, url, params, timeout):
+            for v, j in answers.items():
+                if v in url:
+                    return _Resp(j)
+            raise blitz.requests.ConnectionError("sin respuesta")  # Gate no responde
+
+    rec = blitz.PriceRecorder(tmp_path / "precios.jsonl", lambda: pd.Timestamp("2026-11-01T12:00:59", tz="UTC"),
+                              session=_Session(), seconds=0)
+    snap = rec.snapshot()
+    assert snap["binance"]["medio"] == pytest.approx(100.01) and snap["binance"]["ultimo"] is None
+    assert snap["okx"] == {"ultimo": 99.0, "medio": 99.0} and snap["gate"] is None
+
+
+def test_comparar_finds_the_composite_that_matches_the_platform_price(tmp_path):
+    t = "2026-11-01T12:01:00.400000+00:00"
+    _jl(tmp_path / "clics.jsonl", [{"alert_id": "a1", "hora_binance": t}])
+    _jl(tmp_path / "registros.jsonl", [{"alert_id": "a1", "entrada": (100.0 + 98.0 + 99.0) / 3}])
+    row = {"alert_id": "a1", "t": "2026-11-01T12:01:00+00:00", "binance": {"medio": 100.0}, "bybit": {"medio": 98.0},
+           "okx": {"medio": 99.0}, "kucoin": {"medio": 90.0}, "bitget": {"medio": 90.0}, "gate": None}
+    _jl(tmp_path / "precios.jsonl", [row])
+    r = blitz.comparar(tmp_path)
+    c = r["candidatos"]
+    assert r["operaciones"] == 1 and c["3 bolsas (Binance, Bybit, OKX)"]["error_cuadratico"] == pytest.approx(0.0)
+    assert c["Binance sola"]["error_medio"] == pytest.approx(-1.0) and c["6 bolsas (+ Gate)"]["n"] == 0

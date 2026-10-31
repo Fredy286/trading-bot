@@ -768,6 +768,15 @@ def cmd_blitz(a) -> int:
             return 2
         print(json.dumps(meta, indent=2, ensure_ascii=False))
         return 0
+    if a.accion == "comparar":
+        r = blitz.comparar(Path(a.runtime))
+        print(f"Operaciones con precio de entrada anotado y precios grabados: {r['operaciones']}")
+        for name, x in sorted(r["candidatos"].items(), key=lambda kv: kv[1]["error_cuadratico"] or 1e9):
+            if x["n"]:
+                print(f"  {name:32s} error medio {x['error_medio']:+8.2f} USD · error cuadrático {x['error_cuadratico']:7.2f}"
+                      f" · {x['n']} operaciones")
+        print("El promedio con menor error es el que más se parece al precio de IQ Option.")
+        return 0
     try:
         bundle = anticipada.load_bundle(blitz.MODEL_PATH, blitz.REG_PATH)
     except FileNotFoundError:
@@ -1013,7 +1022,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_senal)
 
     x = sub.add_parser("blitz", help="avisos para el blitz de BTC de IQ Option (3 min) en cuenta DEMO (Estudio 42)")
-    x.add_argument("accion", choices=["entrenar", "vivo"])
+    x.add_argument("accion", choices=["entrenar", "vivo", "comparar"],
+                   help="comparar: qué promedio de bolsas se parece más al precio de entrada anotado de IQ Option")
     x.add_argument("--runtime", default="runtime/blitz")
     x.add_argument("--iteraciones", type=int, default=0, help="0 = sin límite")
     x.add_argument("--sin-sonido", action="store_true")

@@ -112,7 +112,9 @@ const MODE = BLITZ ? {api: "/api/blitz", ref: "promedio", contrato: "BTC · blit
   banner: "EXPERIMENTAL — SOLO CUENTA DEMO. Modelo del Estudio 42: 55,3 % en desarrollo con el precio de IQ Option " +
     "reconstruido (promedio de Binance, Bybit y OKX); hace falta 53,8 % con pago del 86 %. Pendiente de confirmación " +
     "con datos nuevos (Estudio 44, enero de 2027). Abre Bitcoin «Blitz» de 3 min y haz clic apenas suene. Nunca dinero real.",
-  nota: "Después de que venza cada operación (3 min después de tu clic), anota el resultado y el precio de salida que " +
+  nota: "Al hacer clic, anota el precio de entrada EXACTO que muestra IQ Option, con todos sus decimales: con eso el bot " +
+    "comprueba qué promedio de bolsas usa la plataforma (de eso depende la ventaja). " +
+    "Después de que venza cada operación (3 min después de tu clic), anota el resultado y el precio de salida que " +
     "muestra IQ Option. El bot compara con el promedio de Binance, Bybit y OKX (del cierre de la vela del aviso al " +
     "cierre 3 min después) para saber si IQ Option sigue ese precio y cuánto paga."}
   : {api: "/api/senal", ref: "Binance", contrato: "BTC/USD · 1 minuto"};
