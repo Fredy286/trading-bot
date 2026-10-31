@@ -161,9 +161,10 @@ Son las condiciones que exige el Estudio 5 antes de cualquier otra cosa. **Nunca
 
 ### Blitz de BTC de IQ Option (3 min) para practicar en cuenta DEMO (Estudios 41, 42 y 44)
 
-IQ Option paga el BTC con un **promedio de bolsas en USDT**, no con el precio de Binance solo. Lo comprobamos con
-dos capturas del usuario: el promedio de Binance, Bybit y OKX coincidió con su precio a pocos centavos. Este modo
-usa ese mismo promedio.
+IQ Option paga el BTC con un **promedio de bolsas en USDT**, no con el precio de Binance solo. Se leyeron 275 velas de
+seis capturas del usuario (Estudio 47): su precio es un promedio con pesos, aproximadamente Binance 0,34, OKX 0,22,
+Gate 0,37 y Bybit 0,07 (error de 1,5 USD). Con ese precio reconstruido, las señales aciertan lo mismo que con el
+promedio simple de Binance, Bybit y OKX que usa este modo (55,3 % en desarrollo).
 
 - **El contrato:** «Bitcoin Blitz» de **3 minutos** desde la compra, con pago del **86 %**. Para ganar a la larga
   hay que acertar más del **53,8 %**.
