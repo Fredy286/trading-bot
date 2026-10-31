@@ -37,6 +37,10 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     | Promedio de Binance, Bybit y OKX (el de IQ Option) | 55,5 % | **58,6 %** (pasa) |
 
     Se pierde en las bolsas en dólares (Coinbase, Deriv). Confirmación: Estudio 43 (después del 2027-01-18).
+  - **Ojo: la ventaja del blitz depende del promedio exacto** (nota de solidez del Estudio 42, 2026-10-31).
+    En octubre: con 3 bolsas 56,8 %; con 5 (+ KuCoin, Bitget) 54,4 %, y 14 de los 16 resultados distintos
+    favorecían al de 3. Las capturas apuntan al de 3 bolsas (evidencia débil). El modo blitz graba 6 bolsas
+    tras cada aviso y `tbot blitz comparar` lo resuelve con los precios de entrada que anote el usuario.
 
   Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**

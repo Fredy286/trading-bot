@@ -3505,3 +3505,42 @@ cuando la probabilidad de la dirección es ≥ 0,57.
 **Consecuencia:**
 - Si pasa, queda confirmado que en el blitz conviene filtrar por confianza cuando el usuario tenga más horas libres.
 - No cambia el modelo ni la política del Estudio 44.
+
+## Nota de solidez del Estudio 42: ¿qué promedio usa IQ Option? (2026-10-31, *post hoc*, solo datos de desarrollo)
+
+**Medición:** señales del Estudio 42 de octubre de 2026 (1 → 25), juzgadas con distintos promedios. Velas de 1 min de
+KuCoin y Bitget descargadas para ese mes; Gate solo guarda 7 días y queda fuera.
+
+| Promedio de juicio | Operaciones | Acierto | Resultados distintos del de 3 bolsas (a favor del de 3 / de este) |
+|---|---|---|---|
+| 3 bolsas (Binance, Bybit, OKX), con el que se entrenó | 569 | 56,77 % | — |
+| 5 bolsas (+ KuCoin, Bitget) | 559 | 54,38 % | 16 (14 / 2; p = 0,002) |
+| 4 bolsas, sin Binance | 558 | 54,48 % | 19 (15 / 4; p = 0,010) |
+| Binance sola | 543 | 55,80 % | 22 (13 / 9) |
+
+- Los resultados a 3 min del promedio de 3 bolsas y del de 5 coinciden en el 98,5 % de los minutos. Aun así, las
+  diferencias caen justo en las operaciones del modelo, como con Binance y Coinbase (Estudio 37).
+- La ventaja depende de **qué promedio exacto** use IQ Option. Con 5 bolsas, el acierto de octubre queda en ~54,4 %,
+  apenas por encima del equilibrio (53,76 %).
+
+**Lo que dicen las capturas del usuario hasta hoy** (evidencia débil, porque las lecturas de píxeles se hicieron a ojo):
+
+| Promedio | Error medio frente a 27 velas leídas | Error cuadrático |
+|---|---|---|
+| 3 bolsas | +0,93 USD | 3,26 |
+| 5 bolsas | +3,07 USD | 4,26 |
+| 6 bolsas | +4,29 USD | 5,13 |
+| Binance sola | −9,61 USD | 10,81 |
+
+- En el punto exacto de las 23:06:57: 3 bolsas 77 925,97; IQ Option 77 925,99; 5 bolsas 77 927,52.
+- Las capturas favorecen al de 3 bolsas, pero hace falta confirmarlo.
+
+**Cómo se resuelve:**
+- El modo blitz graba, tras cada aviso, el precio de 6 bolsas cada segundo (`precios.jsonl`).
+- `tbot blitz comparar` mide qué promedio coincide con el precio de entrada exacto que el usuario anota de IQ Option.
+
+**Regla fijada hoy:**
+- Con ≥ 10 operaciones comparables, si el promedio con menor error cuadrático no es el de 3 bolsas, se avisa al
+  usuario y el modo de práctica se marca «precio no verificado».
+- El Estudio 44 se evalúa igual con el promedio pre-registrado (3 bolsas). Su consecuencia práctica depende de esta
+  verificación.
