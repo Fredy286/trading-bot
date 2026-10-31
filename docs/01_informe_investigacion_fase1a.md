@@ -3601,3 +3601,31 @@ Estudio 42. Si falta alguna bolsa, la operación no se cuenta.
   precio reconstruido (desarrollo y confirmación propios).
 - **Si pasa:** se mantiene el modo de práctica. Se añade a la confirmación (antes de mirar datos nuevos) la misma
   medida con el precio reconstruido.
+
+**Resultado del Estudio 47 (aplicado mecánicamente; `results/estudio47/resultado.json`; Gate completo, 604 799
+minutos): H47a PASA.**
+
+| Precio de juicio | Operaciones | Acierto [lím. inf.] | EV [IC 97,5 %] | Meses con EV > 0 |
+|---|---|---|---|---|
+| **IQ reconstruido** (Binance 0,336, Bybit 0,071, OKX 0,223, Gate 0,370) | 13 066 | **55,32 %** [54,47 %] | +0,029 [+0,011; +0,049] | 12 de 13 |
+| *Promedio de 3 bolsas (Estudio 42)* | *13 066* | *55,34 %* | *+0,029* | *12 de 13* |
+
+**Informativo:**
+- con p ≥ 0,57: 56,83 % (2 896 operaciones);
+- en el horario del usuario: 56,68 % (1 589);
+- el resultado coincide con el de 3 bolsas en el 98,3 % de los minutos;
+- octubre de 2026: 56,3 % (570), frente a 56,8 % con 3 bolsas y 54,4 % con la mezcla de 5 bolsas de la nota de
+  solidez. **Esa mezcla no es la que usa IQ Option.**
+
+**Lectura:**
+- La ventaja de desarrollo del blitz **se sostiene con el precio que de verdad usa IQ Option**, reconstruido a partir
+  de las capturas del usuario.
+- La duda de la nota de solidez queda resuelta: el modelo es sensible a la mezcla de bolsas, pero la de IQ Option
+  (con mucho peso de Binance, OKX y Gate) se comporta como la de entrenamiento.
+- Sigue siendo desarrollo. Falta la confirmación con datos nuevos.
+
+**Enmienda 1 al Estudio 44 (2026-10-31, antes de mirar datos posteriores al 2026-10-25):** se añade **H44c**, la
+política de H44a juzgada con el precio IQ reconstruido (los mismos pesos, fijos), con los mismos criterios.
+- La consecuencia práctica (seguir practicando el blitz) exige que pasen H44a **y** H44c. Es una exigencia más
+  estricta, no una prueba más que pueda salir bien por azar.
+- Gate se descarga de sus archivos diarios públicos.

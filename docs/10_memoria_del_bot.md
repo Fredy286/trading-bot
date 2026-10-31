@@ -41,6 +41,10 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     En octubre: con 3 bolsas 56,8 %; con 5 (+ KuCoin, Bitget) 54,4 %, y 14 de los 16 resultados distintos
     favorecían al de 3. Las capturas apuntan al de 3 bolsas (evidencia débil). El modo blitz graba 6 bolsas
     tras cada aviso y `tbot blitz comparar` lo resuelve con los precios de entrada que anote el usuario.
+  - **Resuelto (Estudio 47, 2026-10-31):** se leyeron 275 velas de 6 capturas del usuario. El precio de BTC de
+    IQ Option es un promedio con pesos: Binance 0,34, OKX 0,22, Gate 0,37 y Bybit 0,07 (con MEXC, algo de peso
+    también); error de 1,5 USD. Con ese precio reconstruido, el blitz acierta 55,3 % en desarrollo (octubre 56,3 %),
+    igual que con 3 bolsas. Confirmación: H44c (enmienda del Estudio 44).
 
   Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**

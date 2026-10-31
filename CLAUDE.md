@@ -244,6 +244,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
          En bolsas en USDT la ventaja sobrevive; en las de dólares no. Confirmación: Estudio 43.
        - **Estudio 42 (blitz 3 min, 86 %): PASA en desarrollo.** El modelo entrenado con el promedio acierta 55,3 %
          (EV +0,029, 12 de 13 meses); en el horario del usuario, 56,8 % (*post hoc*).
+       - **Estudio 47:** 275 velas leídas de 6 capturas: IQ Option ≈ Binance 0,336 + Bybit 0,071 + OKX 0,223 + Gate 0,370
+         (error 1,5 USD). Con ese precio el blitz acierta 55,32 % (pasa); octubre 56,3 %. Gate: archivos diarios de
+         download.gatedata.org. Enmienda al Estudio 44: H44c (mismo juicio con ese precio).
        - Modelo congelado `BTCUSDT-blitz3-compuesto-0f8694` (config/senal_blitz.json). Confirmación: Estudio 44,
          después del 2027-01-18.
        - Modo de práctica: `scripts/iniciar_blitz.sh` → panel /blitz (el mismo `senales.html`, que elige el modo por
