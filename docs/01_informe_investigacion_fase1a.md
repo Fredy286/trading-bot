@@ -3544,3 +3544,60 @@ KuCoin y Bitget descargadas para ese mes; Gate solo guarda 7 días y queda fuera
   usuario y el modo de práctica se marca «precio no verificado».
 - El Estudio 44 se evalúa igual con el promedio pre-registrado (3 bolsas). Su consecuencia práctica depende de esta
   verificación.
+
+## Estudio 47 — el modelo del blitz juzgado con el precio reconstruido de IQ Option (pre-registro, 2026-10-31, ANTES de descargar el historial de Gate y de calcular nada)
+
+**Origen: seis capturas del usuario del 2026-10-31 (00:39:49 → 00:40:54 Bogotá)**, Bitcoin «Blitz» y «Binaria», con
+la hora de IQ Option al segundo.
+
+*Medición 1 — precio exacto:* las 6 etiquetas de precio, frente a 6 bolsas grabadas cada segundo:
+
+| Promedio | Error medio | Error cuadrático |
+|---|---|---|
+| Binance sola | −33,3 USD | 33,3 |
+| OKX sola | +14,0 USD | 14,2 |
+| 3 bolsas (Binance, Bybit, OKX) | −1,6 USD | 2,0 |
+| 5 bolsas (+ KuCoin, Bitget) | +1,7 USD | 2,0 |
+| 6 bolsas (+ Gate) | +4,7 USD | 4,8 |
+
+*Medición 2 — 275 cierres de velas de 1 min* (22:00 → 00:40 Bogotá):
+- Se leyeron píxel a píxel: la escala era de 1,8 a 3,2 píxeles por dólar. Las 116 velas que aparecen en dos capturas
+  difieren en 0,10 USD de media.
+- Se compararon con los cierres de 1 min de 11 bolsas en USDT:
+  - Binance −30,5 USD; OKX +16,5; promedio de 3 bolsas: error cuadrático 3,21;
+  - el mejor promedio simple es Binance + OKX + Gate: 1,61.
+- **Mezcla con pesos** (≥ 0, que suman 1):
+  - con las 11 bolsas: Binance 0,33, OKX 0,21, Gate 0,32 y MEXC 0,13, error 1,39 USD;
+  - es estable entre la primera y la segunda mitad de las velas;
+  - el error que queda (más que el ruido de lectura) probablemente es un pequeño retraso del precio de IQ Option.
+- MEXC no guarda historial en su API. Con las 4 bolsas que sí lo guardan, los pesos son:
+  **Binance 0,336, Bybit 0,071, OKX 0,223, Gate 0,370** (error 1,54 USD).
+
+**Precio «IQ reconstruido»:** ese promedio con pesos, con los cierres de 1 min de las cuatro bolsas. Para Gate se usan
+sus archivos diarios públicos de velas de 1 min (download.gatedata.org). Los pesos salen de comparar niveles de
+precio, no de resultados de operaciones: no adelantan nada sobre el acierto.
+
+**Señales:** las predicciones de desarrollo del Estudio 42 (`results/estudio42/predicciones.parquet`, 2025-09-01 →
+2026-10-25), con la política de H42a (EV ≥ 0,02 con pago del 86 %).
+
+**Resultado de cada operación:** signo(IQ reconstruido(t + 3) − IQ reconstruido(t)), con la misma alineación del
+Estudio 42. Si falta alguna bolsa, la operación no se cuenta.
+
+**Hipótesis H47a (α = 0,025). Criterios (todos):**
+1. ≥ 300 operaciones;
+2. p < 0,025 frente a 53,76 %;
+3. Wilson 95 % > 53,76 %;
+4. intervalo del EV (bootstrap por semanas, 97,5 %) > 0;
+5. EV > 0 en ≥ 60 % de los meses.
+
+**Informativo:**
+- con p ≥ 0,57;
+- en el horario del usuario;
+- coincidencia de resultados con el promedio de 3 bolsas.
+
+**Consecuencia:**
+- **Si H47a no pasa:** el modelo congelado no muestra ventaja con el precio que de verdad usa IQ Option. El modo de
+  práctica se marca «sin ventaja con el precio de IQ Option» y se pre-registra un modelo nuevo que aprenda con el
+  precio reconstruido (desarrollo y confirmación propios).
+- **Si pasa:** se mantiene el modo de práctica. Se añade a la confirmación (antes de mirar datos nuevos) la misma
+  medida con el precio reconstruido.
