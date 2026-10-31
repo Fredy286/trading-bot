@@ -2783,6 +2783,33 @@ pieza se lleva a H16b solo con un estudio nuevo pre-registrado y confirmación c
 **Expectativa declarada:** SIN SEÑAL o mejora muy pequeña (< 0,5 puntos de acierto). Dos indicios en contra: la
 hora del día ya está en el modelo, y en el Estudio 24 una mejora del log-loss no se tradujo en mejor política.
 
+### Resultado del Estudio 33 (ejecutado por la cola de GitHub Actions el 2026-10-29 18:03 UTC, código 3fd4d23; documentado el 2026-10-31)
+
+`results/estudio33/resultado.json`. Criterios aplicados tal como se pre-registraron:
+
+| Periodo | Mejora del log-loss (IC 95 %) | Base: acierto / EV / ops | Base + reloj: acierto / EV / ops |
+|---|---|---|---|
+| Desarrollo 2022-01 → 2025-08 | +0,00056 [+0,00047; +0,00065] | 56,60 % / +0,0437 / 219 856 | 56,55 % / +0,0435 / 311 660 |
+| Verificación 2025-09 → 2026-09 | +0,00010 [+0,00003; +0,00017] | 56,49 % / +0,0408 / 63 367 | 56,40 % / +0,0395 / 72 958 |
+
+| Criterio | ¿Cumple? |
+|---|---|
+| 1. Desarrollo: log-loss mejora, límite inferior > 0 | Sí |
+| 2. Desarrollo: EV por operación ≥ base | **No** (0,0435 < 0,0437) |
+| 3. Verificación: log-loss > 0 y EV ≥ base | Log-loss sí; EV **no** (0,0395 < 0,0408) |
+
+**Veredicto: H33 NO PASA → SIN SEÑAL** para la política (coincide con la expectativa declarada).
+
+Informativo (no decide): en los minutos :00/:15/:30/:45 del desarrollo, el modelo con reloj acierta 57,92 % (34 007
+ops, EV +0,070) frente a 55,11 % del base (14 310 ops); en el resto de minutos baja (56,37 % frente a 56,71 %). En la
+verificación esa diferencia casi desaparece: 55,19 % (5 395 ops, IC del EV [−0,009; +0,042]) frente a 54,48 %. En los
+5 minutos tras la financiación, la verificación empeora (52,6 % frente a 56,3 %, ~1 000 ops).
+
+**Lectura honesta:** el reloj sí dice algo sobre la probabilidad (el log-loss mejora en los dos periodos), pero
+añade operaciones de menor calidad y la política no gana. La ventaja aparente del cuarto de hora en desarrollo no se
+sostiene en el último año (patrón ya visto: ventajas hasta 2025 que se apagan). No se lleva a la demo ni a H16b; si
+alguna vez se retoma el cuarto de hora, es una hipótesis nueva, con pre-registro y datos posteriores al 2026-10-25.
+
 ## Estudio 34 — réplica de la reversión nocturna en un año nunca usado (2024-09 → 2025-08) y filtro de diferencial (pre-registro, 2026-10-29, ANTES de descargar ningún tick de ese periodo)
 
 **Origen:** diseño de la rutina autónoma del 2026-10-29 (docs/10, idea 5).
