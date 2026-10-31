@@ -1,0 +1,11 @@
+{
+ "pesos": {
+  "binance": 0.3361,
+  "bybit": 0.0707,
+  "okx": 0.2231,
+  "gate": 0.37
+ },
+ "error_cuadratico_usd": 1.5420725968121318,
+ "velas": 275,
+ "origen": "275 cierres de 1 min leídos en 6 capturas de IQ Option del usuario (2026-10-30 22:00 → 2026-10-31 00:40 Bogotá)"
+}

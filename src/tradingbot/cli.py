@@ -345,6 +345,14 @@ def cmd_research_study18(a) -> int:
     return 0
 
 
+def cmd_research_study47(a) -> int:
+    from .research import study47
+
+    r = study47.run()["H47a"]
+    print(f"H47a: pasa={r['pasa']} | {r['criterios']}")
+    return 0
+
+
 def cmd_research_study45(a) -> int:
     from .research import study45
 
@@ -847,6 +855,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study47", help="Estudio 47: el blitz juzgado con el precio reconstruido de IQ Option (pesos)")
+    x.set_defaults(func=cmd_research_study47)
     x = r.add_parser("study45", help="Estudio 45: las 5 estrategias típicas de ChatGPT para BTC; elegir 2 y medir después")
     x.set_defaults(func=cmd_research_study45)
     x = r.add_parser("study42", help="Estudio 42: blitz de BTC de IQ Option (3 min) con un modelo del precio compuesto")
