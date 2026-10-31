@@ -209,3 +209,12 @@ def test_comparar_finds_the_composite_that_matches_the_platform_price(tmp_path):
     assert r["operaciones"] == 1 and c["3 bolsas (Binance, Bybit, OKX)"]["error_cuadratico"] == pytest.approx(0.0)
     assert c["Binance sola"]["error_medio"] == pytest.approx(-1.0) and c["6 bolsas (+ Gate)"]["n"] == 0
     assert c[blitz.IQ_NAME]["n"] == 0  # sin Gate grabado no se puede calcular la mezcla con pesos
+
+
+def test_resultado_usa_la_regla_de_empate_del_estudio():
+    from tradingbot.live.blitz import _resultado
+    # 1/300 de dólar (paso típico de un promedio de 3 bolsas): empate para label3, también aquí
+    assert _resultado(100.0, 100.0 + 1 / 300, 1) == 0
+    assert _resultado(100.0, 100.004, -1) == 0
+    assert _resultado(100.0, 100.01, 1) == 1 and _resultado(100.0, 100.01, -1) == -1
+    assert _resultado(100.0, 99.99, -1) == 1

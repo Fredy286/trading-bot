@@ -137,6 +137,14 @@ def decide_blitz(bundle: dict, bars: pd.DataFrame, sec: pd.DataFrame, venues: di
             "compuesto": float(comp.loc[t1])}
 
 
+def _resultado(o: float, e: float, lado: int) -> int:
+    """+1 gana, −1 pierde, 0 empate, con la regla de `label3` (empate si |salida − entrada| < 0,005). Antes se usaba
+    round(d / 0,005), que con promedios (pasos de 1/300 o con pesos) contaba como gana/pierde lo que el estudio
+    trata como empate (registro de errores 51)."""
+    d = e - o
+    return 0 if abs(d) < 0.005 else int(np.sign(d)) * int(lado)
+
+
 # ----------------------------------------------------------------------------------------------- datos en vivo
 def _ms(t: pd.Timestamp) -> int:
     return int(t.timestamp() * 1000)
@@ -332,13 +340,13 @@ class BlitzLoop(SignalLoop):
             closes = {v: self.venues.get(v, t, end) for v in VENUES}
             closes["binance"] = self.venues.get("binance", t, end)
             o, e = (lambda c: (c.get(t), c.get(end)))(composite(closes))
-            res = None if o is None or e is None else int(np.sign(round((e - o) / 0.005)) * a["lado"])
+            res = None if o is None or e is None else _resultado(o, e, a["lado"])
             row = {"evento": "referencia", "alert_id": aid, "entrada_ref": o, "salida_ref": e, "resultado_ref": res,
                    "fuente_ref": "promedio de Binance, Bybit y OKX"}
             try:  # además, con el precio IQ reconstruido (Estudio 47): mismo juicio, otra mezcla
                 iq = iq_price({**closes, "gate": self.venues.get("gate", t, end)})
                 oi, ei = iq.get(t), iq.get(end)
-                row["resultado_iq"] = None if oi is None or ei is None else int(np.sign(round((ei - oi) / 0.005)) * a["lado"])
+                row["resultado_iq"] = None if oi is None or ei is None else _resultado(oi, ei, a["lado"])
             except (requests.RequestException, ValueError, KeyError):
                 row["resultado_iq"] = None
             self._write(row)

@@ -292,3 +292,49 @@ añadió ningún canal: no se pudo comprobar que publiquen antes de la entrada n
 - No pude buscar canales nuevos: desde la nube no se abre Telegram. Si me pasas nombres de canales que publiquen
   listas de divisas normales (no OTC), los agrego.
 - El bot y las señales no cambiaron.
+
+
+## 2026-10-31 (autónoma)
+
+Tema del sábado: robustez y calidad.
+
+**Tarea previa (paso 0.4):** el Estudio 33 (variables de «reloj») estaba en [hechas] desde el 2026-10-29 con su
+resultado en `results/estudio33/`, pero nunca se había documentado en docs/01. Quedó documentado mecánicamente:
+**NO PASA** — el log-loss mejora en desarrollo y verificación, pero el EV de la política baja (0,0437 → 0,0435;
+verificación 0,0408 → 0,0395). El cuarto de hora parecía fuerte en desarrollo (57,9 %), pero en el último año baja a
+55,2 % con un IC del EV que incluye 0. Actualizados docs/08 (P12) y docs/10 (idea 1, cerrada).
+
+**Flujos de GitHub (consultados con la API de Actions a las ~12:20 UTC):** todos los últimos en verde. Vigilancia de
+canales: última captura 2026-10-31 09:32 UTC. Cola de estudios: corrió a las 09:16 UTC (sin pendientes). Pruebas:
+verdes en los 5 últimos commits. Registro diario: el último es el del 2026-10-30 13:28 UTC (registró el 29 y auditó
+los canales del 29); el de hoy todavía no había corrido (está programado a las 06:40 UTC y GitHub lo viene lanzando
+unas 7 h tarde, ítem 46). No es una falla: `tbot registro pendientes` recupera los días que falten.
+
+**Revisión de código (fugas de futuro, unidades de tiempo, zonas horarias), en Estudios 41, 42, 47, `live/blitz.py`,
+`live/registro.py`, `live/nocturna.py` y Estudio 32:**
+- Sin fugas de futuro: las variables del compuesto usan solo cierres hasta t − 1; la purga entre ajuste y calibración
+  cubre los 5 min de la etiqueta; la probabilidad de empate se estima con 5 min de retraso.
+- Horario del usuario bien convertido (21:00–01:00 Bogotá = 02:00–06:00 UTC). HistData (velas y ticks) usa EST fijo
+  sin horario de verano: +5 h es correcto todo el año. La ventana nocturna en vivo es UTC fija (Estudio 28): el cambio
+  de hora de Nueva York de mañana (2026-11-01) no la mueve.
+- Corregido (ítem 51): la referencia en vivo del blitz juzgaba el empate con otra regla que el estudio. Impacto mínimo.
+- Anotado (ítem 52): la vela de las 23:59 UTC queda sin resultado en el registro diario (1 de 1 440 minutos; hasta hoy
+  ninguna señal cayó ahí). No se tocaron los archivos sellados.
+- Riesgo menor: la vigilancia de canales usa desfases horarios fijos. GavinVIPResults está en −5; si su hora fuera la
+  de Nueva York, hasta hoy era −4. Ese canal solo publica resultados después de la hora (no aporta señales
+  verificables), así que no cambia nada; revisar si algún día publica señales.
+
+**Estudio nuevo:** ninguno (el tema del día es revisar, no probar estrategias).
+
+**Pendientes con fecha**
+- 2026-11-01: confirmar que el registro diario registró el 30 y el 31 (`results/registro/btc/`) y auditó los canales.
+- 2026-11-01 (domingo): resumen semanal para Fredy y repriorizar docs/10.
+- Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44 y 46: evaluación única después del 2027-01-18; canales: 2027-01-31.
+
+**Para Fredy**
+- Hoy revisé que todo lo automático esté funcionando: sí funciona (captura de canales, cola de estudios y pruebas).
+- La prueba del «reloj» (minutos :00/:15/:30/:45) no mejora el bot: parecía buena hasta 2025 y en el último año no.
+- Arreglé un detalle pequeño en el modo blitz: cómo decide un empate. No cambia las señales.
+- Mañana cambia la hora en Nueva York; la ventana de divisas usa hora fija, así que no se mueve.
+- El bot y las señales no cambiaron.
+

@@ -53,6 +53,8 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   - el OTC no se puede verificar;
   - el acierto al cierre exacto de la vela desaparece con el clic humano;
   - unidades de tiempo de pandas (microsegundos).
+  - estudio y modo en vivo deben usar la MISMA función para juzgar gana/pierde/empate (ítem 51: con precios
+    promediados, una regla de redondeo copiada cambiaba el empate).
 - **Deriv, desarmado (2026-10-30, consultas `proposal` y `contracts_for` a las 03:55 UTC):**
   - el pago de «sube/baja» a 15 min en divisas **depende del movimiento reciente**: tras una caída, «sube» paga
     menos (NZDJPY −3,7 pb en 15 min: CALL 51,4 %, PUT 100,1 %; AUDCAD −3,4 pb: CALL 75,1 %, PUT 81,8 %). Su modelo de
