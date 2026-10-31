@@ -43,6 +43,8 @@ from ..execution.paper import read_rows
 from ..research.study41 import composite
 from ..research.study42 import comp_features, label3
 from ..research.study42 import closes as hist_closes
+from ..research.study47 import WEIGHTS as IQ_WEIGHTS
+from ..research.study47 import iq_price
 from ..timeutil import utcnow
 from .anticipada import CALIB_FRAC, K, LAT, TRAIN_END, TRAIN_START, SignalLoop, download_daily
 
@@ -153,6 +155,11 @@ REQUESTS = {
     "okx": ("https://www.okx.com/api/v5/market/history-candles",
             lambda a, b: {"instId": "BTC-USDT", "bar": "1m", "after": _ms(b) + 1, "before": _ms(a) - 1, "limit": 100},
             lambda j: [(int(x[0]), float(x[4])) for x in j["data"] if len(x) < 9 or x[8] == "1"]),
+    # Gate: solo para la referencia con el precio IQ reconstruido (Estudio 47); su API guarda ~7 días
+    "gate": ("https://api.gateio.ws/api/v4/spot/candlesticks",
+             lambda a, b: {"currency_pair": "BTC_USDT", "interval": "1m", "from": int(a.timestamp()),
+                           "to": int(b.timestamp())},
+             lambda j: [(int(x[0]) * 1000, float(x[2])) for x in j]),
 }
 
 
@@ -195,6 +202,7 @@ TICKERS = {
     "gate": ("https://api.gateio.ws/api/v4/spot/tickers", {"currency_pair": "BTC_USDT"},
              lambda j: (float(j[0]["last"]), _mid(j[0]["highest_bid"], j[0]["lowest_ask"]))),
 }
+IQ_NAME = "IQ reconstruido (pesos del Estudio 47)"
 # promedios candidatos para el precio de IQ Option (precio medio de cada bolsa)
 CANDIDATOS = {"Binance sola": ("binance",), "OKX sola": ("okx",), "3 bolsas (Binance, Bybit, OKX)": ("binance", "bybit", "okx"),
               "5 bolsas (+ KuCoin, Bitget)": ("binance", "bybit", "okx", "kucoin", "bitget"),
@@ -267,9 +275,12 @@ def comparar(runtime: Path, max_gap_s: float = 2.0) -> dict:
         for name, venues in CANDIDATOS.items():
             vals = [best[v]["medio"] for v in venues if best.get(v)]
             fila[name] = entrada - float(np.mean(vals)) if len(vals) == len(venues) else None
+        ok = all(best.get(v) for v in IQ_WEIGHTS)  # la mezcla con pesos del Estudio 47
+        fila[IQ_NAME] = (entrada - sum(best[v]["medio"] * w for v, w in IQ_WEIGHTS.items()) / sum(IQ_WEIGHTS.values())
+                         if ok else None)
         filas.append(fila)
     resumen = {}
-    for name in CANDIDATOS:
+    for name in [*CANDIDATOS, IQ_NAME]:
         e = np.array([f[name] for f in filas if f[name] is not None], float)
         resumen[name] = {"n": int(len(e)), "error_medio": float(e.mean()) if len(e) else None,
                          "error_cuadratico": float(np.sqrt((e ** 2).mean())) if len(e) else None}
@@ -320,11 +331,17 @@ class BlitzLoop(SignalLoop):
                 continue
             closes = {v: self.venues.get(v, t, end) for v in VENUES}
             closes["binance"] = self.venues.get("binance", t, end)
-            comp = composite(closes)
-            o, e = comp.get(t), comp.get(end)
+            o, e = (lambda c: (c.get(t), c.get(end)))(composite(closes))
             res = None if o is None or e is None else int(np.sign(round((e - o) / 0.005)) * a["lado"])
-            self._write({"evento": "referencia", "alert_id": aid, "entrada_ref": o, "salida_ref": e,
-                         "resultado_ref": res, "fuente_ref": "promedio de Binance, Bybit y OKX"})
+            row = {"evento": "referencia", "alert_id": aid, "entrada_ref": o, "salida_ref": e, "resultado_ref": res,
+                   "fuente_ref": "promedio de Binance, Bybit y OKX"}
+            try:  # además, con el precio IQ reconstruido (Estudio 47): mismo juicio, otra mezcla
+                iq = iq_price({**closes, "gate": self.venues.get("gate", t, end)})
+                oi, ei = iq.get(t), iq.get(end)
+                row["resultado_iq"] = None if oi is None or ei is None else int(np.sign(round((ei - oi) / 0.005)) * a["lado"])
+            except (requests.RequestException, ValueError, KeyError):
+                row["resultado_iq"] = None
+            self._write(row)
             self.referenced.add(aid)
             done += 1
         return done

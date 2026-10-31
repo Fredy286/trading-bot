@@ -84,7 +84,7 @@ def test_reference_is_the_composite_from_the_alert_close_to_three_minutes_later(
     class _Venues:
         def get(self, venue, a, b):
             idx = pd.date_range(a, b, freq="min")
-            base = {"binance": 100.0, "bybit": 99.0, "okx": 98.0}[venue]
+            base = {"binance": 100.0, "bybit": 99.0, "okx": 98.0, "gate": 97.0}[venue]
             return pd.Series(base - np.arange(len(idx)), index=idx)  # baja: la venta acierta
 
     class _Feed:
@@ -97,7 +97,7 @@ def test_reference_is_the_composite_from_the_alert_close_to_three_minutes_later(
     ref = [r for r in map(json.loads, (tmp_path / "senales.jsonl").read_text().splitlines())
            if r.get("evento") == "referencia"][0]
     assert ref["entrada_ref"] == pytest.approx(99.0) and ref["salida_ref"] == pytest.approx(96.0)
-    assert ref["resultado_ref"] == 1
+    assert ref["resultado_ref"] == 1 and ref["resultado_iq"] == 1
     assert loop.fill_references(pd.Timestamp("2026-11-01T12:06:00", tz="UTC").to_pydatetime()) == 0  # una vez
 
 
@@ -208,3 +208,4 @@ def test_comparar_finds_the_composite_that_matches_the_platform_price(tmp_path):
     c = r["candidatos"]
     assert r["operaciones"] == 1 and c["3 bolsas (Binance, Bybit, OKX)"]["error_cuadratico"] == pytest.approx(0.0)
     assert c["Binance sola"]["error_medio"] == pytest.approx(-1.0) and c["6 bolsas (+ Gate)"]["n"] == 0
+    assert c[blitz.IQ_NAME]["n"] == 0  # sin Gate grabado no se puede calcular la mezcla con pesos
