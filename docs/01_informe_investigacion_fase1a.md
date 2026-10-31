@@ -3474,3 +3474,34 @@ Con 4 h, el promedio de las elegidas en el semestre siguiente fue **+2,7 % por s
 - Además el método mezcla tres sesgos: probar varias y mostrar las mejores (5 → 2), mirar solo el pasado y no
   restar costos.
 - Nada de esto aplica al blitz: es otro mercado (contado o futuros con apalancamiento), no opciones de pago fijo.
+
+## Estudio 46 — confirmación: blitz con filtro de confianza p ≥ 0,57 (pre-registro, 2026-10-31, ANTES de mirar datos posteriores al 2026-10-25)
+
+**Origen:** exploración *post hoc* de las predicciones de desarrollo del Estudio 42
+(`results/estudio42/predicciones.parquet`, 2025-09 → 2026-10-25). Pago 86 %, equilibrio 53,76 %:
+
+| Filtro | Operaciones | Acierto | EV | Meses con EV > 0 |
+|---|---|---|---|---|
+| Política del Estudio 42 (p ≥ 0,548) | 13 066 | 55,34 % | +0,029 | 12 de 13 |
+| p ≥ 0,56 | 6 117 | 56,11 % | +0,044 | 10 de 11 |
+| p ≥ 0,57 | 2 896 | 56,94 % | +0,059 | 8 de 8 |
+| p ≥ 0,58 | 1 349 | 57,67 % | +0,073 | 5 de 6 |
+| p ≥ 0,60 | 242 | 60,33 % | +0,122 | 2 de 2 |
+
+- El acierto sube con la confianza del modelo, como en los Estudios 20 y 41, pero las operaciones caen rápido.
+- En el horario del usuario (21:00–01:00 Bogotá), p ≥ 0,57 deja 315 operaciones en 14 meses: menos de una por
+  noche. Para practicar sigue siendo mejor la política completa (unas 4–5 por noche).
+
+**Regla:** el modelo congelado del Estudio 44 (`BTCUSDT-blitz3-compuesto-0f8694`), con la política de H42a, solo
+cuando la probabilidad de la dirección es ≥ 0,57.
+
+**Datos y evaluación:** los mismos del Estudio 44 (2026-10-26 → 2027-01-18), evaluados una sola vez junto con él.
+
+**Hipótesis H46 (α = 0,025, para no inflar los falsos positivos junto al Estudio 44). Criterios (todos):**
+1. ≥ 300 operaciones (si no llega, se informa el conteo y se espera, con un máximo de 6 meses);
+2. p < 0,025 frente a 53,76 %;
+3. Wilson 95 % > 53,76 %.
+
+**Consecuencia:**
+- Si pasa, queda confirmado que en el blitz conviene filtrar por confianza cuando el usuario tenga más horas libres.
+- No cambia el modelo ni la política del Estudio 44.
