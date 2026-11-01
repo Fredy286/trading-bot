@@ -1,0 +1,2 @@
+{"vela": "2026-10-31T03:58:00+00:00", "lado": "CALL", "p": 0.5558, "ev85": 0.0274, "ev87": 0.0383, "umbral_060": false, "cuarto_hora": true, "resultado": "gana", "modelo": "ETHUSDT-anticipada-k50-L10-02b1e4"}
+{"vela": "2026-10-31T21:48:00+00:00", "lado": "CALL", "p": 0.5558, "ev85": 0.0274, "ev87": 0.0383, "umbral_060": false, "cuarto_hora": false, "resultado": "pierde", "modelo": "ETHUSDT-anticipada-k50-L10-02b1e4"}
