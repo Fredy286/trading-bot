@@ -338,3 +338,56 @@ unas 7 h tarde, ítem 46). No es una falla: `tbot registro pendientes` recupera 
 - Mañana cambia la hora en Nueva York; la ventana de divisas usa hora fija, así que no se mueve.
 - El bot y las señales no cambiaron.
 
+
+
+## 2026-11-01 (autónoma)
+
+Tema del domingo: resumen semanal y repriorizar docs/10.
+
+**Comprobaciones:** sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado
+(el Estudio 33 se documentó ayer). Registro diario (API de Actions): 4 ejecuciones, todas en verde; la última,
+2026-10-31 13:00 UTC, registró hasta el 30 de octubre. El 31 entrará con la ejecución de hoy (GitHub la lanza ~6 h
+tarde, ítem 46; `tbot registro pendientes` recupera los días que falten). Conteos (sin aciertos, sello hasta el
+2027-01-19), 26 → 30 de octubre: BTC 170 señales (7 con p ≥ 0,60; 6 de cuarto de hora), **ETH 0**, nocturna 927
+(fuerte 377; 22 UTC 314). Canales: 12 vigilados; auditados el 29 y el 30.
+
+### Resumen de la semana (2026-10-26 → 2026-11-01)
+
+**Qué se aprendió**
+1. **El precio manda.** Las señales de BTC solo funcionan con el precio de Binance o de un promedio de bolsas en USDT.
+   Con Coinbase (52,2 %) o con el BTC de Deriv (52,4 %) se pierden (Estudios 37–38).
+2. **IQ Option desarmado:** liquida BTC con un promedio con pesos (Binance 0,34, Gate 0,37, OKX 0,22, Bybit 0,07;
+   Estudio 47, leído de 275 velas de capturas). Su binaria de 15 min no tiene ventaja; su **blitz de 3 min (pago 86 %)
+   sí la tiene en desarrollo: 55,3 %** frente al 53,8 % necesario (Estudios 42 y 47). Modelo congelado y modo de práctica.
+3. **Reversión nocturna de divisas:** se replica en otro año (Estudio 34), pero vive en los minutos con diferencial
+   muy abierto; Deriv no deja operar en esas horas y cobra la reversión en el pago → no operable allí.
+4. **No funcionan:** variables de reloj (33), ETH/USDC como ayuda a BTC (24), estrategias de «ChatGPT» (45), los
+   indicadores clásicos y los canales de Telegram auditados.
+
+**Qué está en marcha (automático)**
+- Registro diario de señales (BTC, ETH, nocturna), sellado hasta el 2027-01-19.
+- Vigilancia de 12 canales cada hora y su auditoría (veredicto el 2027-01-31).
+- Cola de estudios y esta rutina diaria.
+
+**Próximas fechas**
+- 2027-01-19: evaluación única de las confirmaciones (Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44 y 46) y
+  apertura del registro.
+- 2027-01-31: veredicto de los canales (Estudio 32).
+
+**Repriorización de docs/10:** primero, el precio de la plataforma (blitz con el precio reconstruido); segundo,
+verificar en la demo el precio, el empate y el pago del blitz (necesita a Fredy); luego traders verificados y canales.
+ETH baja de prioridad (0 señales en 5 días). Las ideas cerradas quedan en su propia tabla para no repetirlas.
+
+**Estudio nuevo:** ninguno (domingo de resumen).
+
+**Pendientes con fecha**
+- 2026-11-02: confirmar que el registro del 31 de octubre y del 1 de noviembre quedó guardado.
+- Sesión local con Fredy: anotar precios de entrada del blitz en la demo (`tbot blitz comparar`) y buscar canales no OTC.
+
+**Para Fredy**
+- Esta semana el bot aprendió que lo más importante es usar el MISMO precio que tu plataforma.
+- Descubrimos cómo calcula IQ Option el precio de BTC (un promedio de 4 bolsas).
+- Con ese precio, el «blitz» de 3 minutos acierta 55 % en el pasado; hace falta 54 % para no perder. Es poco margen
+  y falta confirmarlo con datos nuevos en enero.
+- Si quieres ayudar: en la demo, anota el precio de entrada de algunas operaciones blitz; así comprobamos el precio.
+- Las divisas de noche no se pueden operar en Deriv. El bot y las señales no cambiaron hoy. Solo demo.
