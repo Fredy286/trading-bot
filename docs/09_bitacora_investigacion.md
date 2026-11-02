@@ -391,3 +391,56 @@ ETH baja de prioridad (0 señales en 5 días). Las ideas cerradas quedan en su p
   y falta confirmarlo con datos nuevos en enero.
 - Si quieres ayudar: en la demo, anota el precio de entrada de algunas operaciones blitz; así comprobamos el precio.
 - Las divisas de noche no se pueden operar en Deriv. El bot y las señales no cambiaron hoy. Solo demo.
+
+## 2026-11-02 (autónoma)
+
+Tema del lunes: literatura y microestructura. Pregunta concreta, ligada a la idea 0 de docs/10: ¿qué bolsa marca
+primero el precio de BTC, y eso deja anticipar un promedio de bolsas como el de IQ Option?
+
+**Comprobaciones:** sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y lo hecho ya está documentado.
+Registro diario: hay archivos hasta el 2026-10-31 (BTC, ETH y nocturna; el 31 fue sábado, sin divisas). El del
+1 de noviembre entrará con la ejecución de hoy (GitHub la lanza tarde, ítem 46). Conteos (sin aciertos, sellado):
+nocturna 927 señales en 6 días registrados; ETH 2 señales, ninguna con p ≥ 0,60. Vigilancia de canales: última
+captura 2026-11-02 10:54 UTC.
+
+**Búsquedas** (solo vi los resúmenes del buscador; alphaxiv.org, research-api.cbs.dk y coinapi.io no abren desde este
+entorno, así que las cifras no están comprobadas en el original):
+- Artículo de SSRN (2024), Binance frente a Coinbase: Binance lidera la formación del precio, y la integración entre
+  las dos se rompe a frecuencias muy altas (resumen del buscador).
+- Resumen de arXiv 2506.08718 (alphaxiv.org/overview/2506.08718v1): la «participación informativa» de Binance se
+  acercaría a 0,9996 entre 2023-09 y 2024-09. Sin verificar en el original.
+- Tesis de la CBS, «High Frequency Lead Lag Relationships in The Bitcoin Market»
+  (research-api.cbs.dk/ws/portalfiles/portal/59795067/…): con datos tick a tick, algunas bolsas siguen a otras con
+  hasta 15 s de retraso.
+- Tutorial de CoinAPI (coinapi.io/tutorials/analyzing-lead-lag-effects-between-exchanges-flat-files): entre Binance y
+  OKX no hay líder claro a 1 s. Es un tutorial, no un estudio revisado.
+- Tesis del MIT (dspace.mit.edu/handle/1721.1/121626): había oportunidades de arbitraje en el 0,03–40 % de los
+  intervalos de 5 s, según la moneda y la pareja de bolsas.
+
+**Lectura:**
+- Encaja con los Estudios 37, 38 y 41. Las bolsas en USDT copian a Binance en segundos, y por eso la ventaja
+  sobrevive en ellas; las bolsas en dólares tienen su propio ruido.
+- Pero el retraso entre bolsas es de **segundos**. El modelo decide en el segundo 50 con cierres de 1 min hasta t − 1,
+  así que ese retraso ya se agotó. El modelo del blitz ya tiene `c_disp` (Binance − compuesto).
+- Un estudio con más variables de «qué bolsa va adelantada» en velas de 1 min sería relleno con expectativa casi nula.
+  Con velas de 1 s de otras bolsas sería otro asunto, pero exige descargas grandes que la nube no alcanza.
+- La pieza útil es otra: si **el precio de IQ Option va atrasado** unos segundos frente a Binance (el Estudio 47 lo
+  sospechó), lo que Binance hizo en esos segundos anticiparía el precio del blitz. Eso solo se mide con la hora al
+  segundo y el precio de IQ Option. Queda como idea 1b en docs/10 (sesión local, junto con `tbot blitz comparar`).
+
+**Estudio nuevo:** ninguno. No lo forcé: la literatura no da una hipótesis que se pueda probar con datos de 1 min, y
+la versión al segundo necesita datos de IQ Option que solo el usuario puede capturar.
+
+**Pendientes con fecha**
+- 2026-11-03: confirmar que el registro del 1 y del 2 de noviembre quedó guardado.
+- Sesión local con Fredy: anotar, al segundo, la hora y el precio de entrada de algunas operaciones blitz en la demo
+  (ideas 1 y 1b).
+- Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44 y 46: evaluación única después del 2027-01-18; canales: 2027-01-31.
+
+**Para Fredy**
+- Hoy leí resúmenes de estudios sobre qué bolsa de bitcoin «marca» el precio: casi siempre es Binance, y las demás la
+  siguen con unos segundos de atraso.
+- Eso explica por qué nuestras señales funcionan con bolsas parecidas a Binance y no con otras.
+- Idea para cuando tengas un rato en la demo: anota la hora exacta (con segundos) y el precio de entrada de algunas
+  operaciones blitz. Si IQ Option va atrasado frente a Binance, eso podría ser una ventaja extra.
+- Hoy no hice ninguna prueba nueva: no había ninguna que valiera la pena. El bot y las señales no cambiaron. Solo demo.
