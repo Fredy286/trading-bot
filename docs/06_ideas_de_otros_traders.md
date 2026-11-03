@@ -117,6 +117,44 @@ Fuentes:
 - [eToro sobre sus Popular Investors (cifras propias)](https://etoro.com/news-and-analysis/copytrader/popular-investors-with-3-or-more-years-profit);
 - [Darwinex: atributos invertibles (compara contra 10 000 estrategias al azar)](https://help.darwinex.com/what-are-investable-attributes).
 
+## 3c. Copy trading, plataformas de señales y empresas de fondeo (2026-11-03)
+
+Segunda revisión (martes). Objetivo: encontrar cuentas concretas con historial largo y verificado y desarmar su estilo.
+**No se logró:** desde la nube no abren darwinex.com, mql5.com, ideas.repec.org ni thegodfunded.com; solo vi los
+resúmenes del buscador, así que las cifras de abajo no están comprobadas en el original.
+
+1. **Copiar aumenta el riesgo, no el acierto.** En un experimento publicado en *Management Science* (2020), ver el éxito
+   de otros subió la toma de riesgo y poder copiarlos la subió aún más. Unos dos tercios no copiaron; quienes copiaron
+   ya habían elegido antes los activos más riesgosos. Motivo: el que «va ganando» puede haber tenido suerte o haber
+   corrido más riesgo, y el que copia hereda ese riesgo sin saberlo.
+2. **Tras costos no queda ganancia.** Un estudio de 2018 sobre plataformas de social trading (*Quarterly Review of
+   Economics and Finance*) dice que ninguna estrategia de copia da rentabilidad anormal positiva tras costos de
+   transacción (modelo de cuatro factores de Carhart).
+3. **La persistencia es débil en los extremos.** En asesores de futuros (CTA), algo de persistencia a 3 meses, pero se
+   desvanece al mirar solo el mejor y el peor cuartil: el «número uno» de hoy no suele seguir arriba.
+4. **Las listas ya vienen filtradas.** MQL5 y Darwinex solo muestran las cuentas que siguen vivas; la mayoría termina
+   en silencio (se deja de operar o se cierra la cuenta), no con una pérdida visible. ZuluTrade tuvo que poner avisos a
+   proveedores con 100 % de operaciones ganadoras y un tope de pérdida flotante de 700 pips (señal de martingala y de
+   operar sin stop).
+5. **Empresas de fondeo (datos más grandes, aunque de segunda mano):** en un conjunto de más de 100 000 cuentas de
+   10 empresas, el 86 % falló el examen y solo ~7 % llegó a cobrar algo (en promedio ~4 % del tamaño de la cuenta).
+   FTMO publica solo totales pagados, no qué parte de sus clientes cobra.
+
+**Pieza útil para el bot:** ninguna regla nueva. Se confirma lo de la sección 3b: no hay evidencia pública verificable
+de alguien con ≥ 60 % sostenido en plazos cortos sin martingala; los historiales «verificados» se eligen después de ver
+quién sobrevivió. Para desarmar una cuenta concreta hace falta su lista completa de operaciones (CSV de Myfxbook o
+Darwinex), y eso solo se puede bajar en una sesión local.
+
+Fuentes (resúmenes del buscador):
+- [Apesteguia, Oechssler y Weidenholzer, *Copy Trading*, Management Science 66(12), 2020](https://bse.eu/research/publications/copy-trading)
+  y [resumen de la BSE](https://focus.bse.eu/copy-trading-risk-taking/);
+- [Estudio de 2018 sobre social trading (QREF, vol. 70)](https://ideas.repec.org/a/eee/quaeco/v70y2018icp160-171.html) (no abrió);
+- [Persistencia de CTA (J. Futures Markets, 2010)](https://ideas.repec.org/a/wly/jfutmk/v30y2010i8p725-752.html) (no abrió);
+- [MQL5: sesgo de supervivencia en las listas de señales](https://www.mql5.com/en/blogs/post/777995) (no abrió);
+- [ZuluTrade explicado (forexop)](https://forexop.com/signals/zulutrade);
+- [Tasa de cobro en empresas de fondeo (tradeinformer)](https://www.tradeinformer.com/prop-weekly/what-ftmo-tells-us-about-prop-firm-finances)
+  y [The Funded Trader: 1 de cada 20 aprueba (Finance Magnates)](https://www.financemagnates.com/forex/only-1-in-20-traders-pass-prop-firm-challenges-reports-the-funded-trader/).
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:

@@ -444,3 +444,45 @@ la versión al segundo necesita datos de IQ Option que solo el usuario puede cap
 - Idea para cuando tengas un rato en la demo: anota la hora exacta (con segundos) y el precio de entrada de algunas
   operaciones blitz. Si IQ Option va atrasado frente a Binance, eso podría ser una ventaja extra.
 - Hoy no hice ninguna prueba nueva: no había ninguna que valiera la pena. El bot y las señales no cambiaron. Solo demo.
+
+## 2026-11-03 (autónoma)
+
+Tema del martes: estrategias de otras personas con historial verificado (idea 2 de docs/10). Meta: cuentas concretas
+con historial largo y desarmar su estilo.
+
+**Comprobaciones:** sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado.
+Registro diario: archivos hasta el 2026-11-01 (BTC, ETH y nocturna); el del 2 de noviembre entrará con la ejecución de
+hoy (GitHub la lanza tarde, ítem 46). Conteos (sin aciertos, sellado): nocturna 927 señales en 7 días registrados
+(fuerte 377; 22 UTC 314). Vigilancia de canales: última captura 2026-11-03 10:45 UTC.
+
+**Búsquedas** (solo resúmenes del buscador; darwinex.com, mql5.com, ideas.repec.org y thegodfunded.com no abren desde
+este entorno, así que no pude leer ninguna cuenta concreta ni los textos completos):
+- Apesteguia, Oechssler y Weidenholzer, *Copy Trading* (Management Science, 2020;
+  https://bse.eu/research/publications/copy-trading): ver y poder copiar a los que ganan **aumenta la toma de riesgo**;
+  quienes copian heredan el riesgo (o la suerte) del copiado.
+- Estudio de 2018 sobre social trading (QREF 70, https://ideas.repec.org/a/eee/quaeco/v70y2018icp160-171.html): sin
+  rentabilidad anormal tras costos para ninguna estrategia de copia.
+- Asesores de futuros (J. Futures Markets 2010): persistencia a 3 meses que desaparece en el mejor y el peor cuartil.
+- ZuluTrade (https://forexop.com/signals/zulutrade): avisos para proveedores con 100 % de ganadoras y tope de 700 pips de
+  pérdida flotante: el acierto «perfecto» suele ser martingala u operar sin stop.
+- Empresas de fondeo (https://www.tradeinformer.com/prop-weekly/what-ftmo-tells-us-about-prop-firm-finances): en más de
+  100 000 cuentas de 10 empresas, ~7 % cobra algo. FTMO no publica qué parte de sus clientes cobra.
+
+**Lectura:** nada nuevo que probar. Refuerza la sección 3b de docs/06 (añadida la 3c): los historiales «verificados» se
+eligen por supervivencia y el acierto alto suele esconder riesgo. Para desarmar una cuenta real hace falta su CSV
+completo de operaciones, que solo se puede bajar en una sesión local.
+
+**Estudio nuevo:** ninguno. No lo forcé: sin datos de operaciones de una cuenta concreta no hay regla que pre-registrar.
+
+**Pendientes con fecha**
+- 2026-11-04: confirmar que el registro del 2 y del 3 de noviembre quedó guardado.
+- Sesión local con Fredy: anotar precios de entrada del blitz en la demo (ideas 1 y 1b); si quiere, bajar el CSV de
+  2–3 cuentas verificadas de Myfxbook/Darwinex con ≥ 3 años para desarmarlas (idea 2).
+- Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44 y 46: evaluación única después del 2027-01-18; canales: 2027-01-31.
+
+**Para Fredy**
+- Hoy busqué traders con historial verificado que acierten mucho. Los estudios dicen lo mismo de siempre: son muy pocos.
+- Copiar a quien va ganando hace que corras más riesgo, no que aciertes más; tras costos, nadie gana copiando en promedio.
+- En las empresas de fondeo (FTMO y parecidas) solo ~7 de cada 100 cobran algo.
+- No pude abrir cuentas concretas desde la nube. Si un día quieres, bajamos juntos el historial completo de alguna.
+- Hoy no hice ninguna prueba nueva. El bot y las señales no cambiaron. Solo demo.
