@@ -111,7 +111,8 @@ const MODE = BLITZ ? {api: "/api/blitz", ref: "promedio", contrato: "BTC · blit
   titulo: "Blitz de IQ Option · BTC 3 minutos", pago: "86",
   banner: "EXPERIMENTAL — SOLO CUENTA DEMO. Modelo del Estudio 42: 55,3 % en desarrollo con el precio de IQ Option " +
     "reconstruido (promedio de Binance, Bybit y OKX); hace falta 53,8 % con pago del 86 %. Pendiente de confirmación " +
-    "con datos nuevos (Estudio 44, enero de 2027). Abre Bitcoin «Blitz» de 3 min y haz clic apenas suene. Nunca dinero real.",
+    "con datos nuevos (Estudio 44, enero de 2027). Abre Bitcoin «Blitz» de 3 min y haz clic apenas suene: lo ideal, " +
+    "antes de 15 s; hasta 30 s aún queda algo de ventaja; después, no entres. Nunca dinero real.",
   nota: "Al hacer clic, anota el precio de entrada EXACTO que muestra IQ Option, con todos sus decimales: con eso el bot " +
     "comprueba qué promedio de bolsas usa la plataforma (de eso depende la ventaja). " +
     "Después de que venza cada operación (3 min después de tu clic), anota el resultado y el precio de salida que " +
@@ -123,8 +124,9 @@ if (BLITZ) {
   $("nota_diario").textContent = MODE.nota; $("f_pago").placeholder = MODE.pago;
   $("th_ref1").textContent = "Promedio entrada → salida"; $("th_ref2").textContent = "Promedio";
 }
-// Pasados 15 s desde el aviso (5 s después del cierre) ya no hay ventaja medida: no se debe entrar (Estudio 16).
-const LATE_S = 15;
+// Pasados LATE_S segundos desde el aviso ya no hay ventaja medida: no se debe entrar. Modo de 1 min: 15 s
+// (Estudio 16). Blitz: 30 s, lo ideal antes de 15 s (nota de la demora del clic, 2026-11-03).
+const LATE_S = BLITZ ? 30 : 15, IDEAL_S = BLITZ ? 15 : null;
 let lastAlert = null, clicked = new Set(), audio = null, offsetMs = 0, current = null;
 const fmtT = (iso) => iso ? new Date(iso).toLocaleTimeString("es-CO", {timeZone: "America/Bogota", hour12: false}) : "—";
 const pct = (x) => x == null ? "—" : (100 * x).toFixed(1) + " %";
@@ -182,7 +184,8 @@ function renderSignal(st) {
     const since = (now - new Date(u.decidido).getTime()) / 1000;
     const late = since > LATE_S && !clicked.has(u.alert_id);
     big.className = late ? "none" : (u.lado > 0 ? "up" : "down");
-    big.textContent = late ? "TARDE — no entres en esta" : (u.lado > 0 ? "↑ SUBE" : "↓ BAJA");
+    const slow = IDEAL_S && since > IDEAL_S && !late && !clicked.has(u.alert_id);
+    big.textContent = late ? "TARDE — no entres en esta" : (u.lado > 0 ? "↑ SUBE" : "↓ BAJA") + (slow ? " · aún vale" : "");
     if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;
     $("countdown").textContent = left > 0 ? `cierre en ${left.toFixed(1)} s` : `${(-left).toFixed(1)} s después del cierre`;

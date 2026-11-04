@@ -188,7 +188,8 @@ promedio simple de Binance, Bybit y OKX que usa este modo (55,3 % en desarrollo)
    - abra **Bitcoin Blitz (3 min)** en IQ Option, en la cuenta de **práctica**, en la dirección indicada;
    - pulse **«YA HICE CLIC»** (o la barra espaciadora).
 
-   Lo ideal es hacer clic antes del cierre de la vela. Pasados 15 s el panel dice «TARDE»: no entre.
+   Lo ideal es hacer clic antes de 15 s desde el aviso. Entre 15 y 30 s el panel dice «aún vale»: queda ventaja, pero
+   la mitad (54,6 % en desarrollo). Pasados 30 s dice «TARDE»: no entre.
 4. **Cuando venza** (3 min después del clic): anote en el diario «ganó», «perdió» o «empate» y el precio de
    salida. El bot calcula el resultado de referencia con el promedio de las tres bolsas y muestra si coinciden.
 

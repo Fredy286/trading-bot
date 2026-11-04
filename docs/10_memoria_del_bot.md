@@ -45,6 +45,8 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     IQ Option es un promedio con pesos: Binance 0,34, OKX 0,22, Gate 0,37 y Bybit 0,07 (con MEXC, algo de peso
     también); error de 1,5 USD. Con ese precio reconstruido, el blitz acierta 55,3 % en desarrollo (octubre 56,3 %),
     igual que con 3 bolsas. Confirmación: H44c (enmienda del Estudio 44).
+  - **Demora del clic en el blitz (2026-11-03):** 10 s → 55,3 %; 20 s → 54,9 %; 30 s → 54,6 %; 40 s → 54,2 %. El panel
+    blitz marca «aún vale» entre 15 y 30 s y «TARDE» después (antes eran 15 s, copiados del modelo de 1 min).
 
   Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**

@@ -1,0 +1,51 @@
+{
+  "nota": "Nota del blitz: cuánto puede tardar el clic (regla fijada antes de calcular, commit e677375)",
+  "git_sha": "a1bcdd662ff13fd724fe2e5c276d11ebdf059c5a",
+  "equilibrio": 0.5376344086021506,
+  "por_demora": {
+    "L=0s": {
+      "operaciones": 13066,
+      "acierto": 0.5532322303921569,
+      "lo95": 0.5446898420961197,
+      "ev": 0.028989744374712977,
+      "limite_desde_el_aviso_s": 10
+    },
+    "L=5s": {
+      "operaciones": 13066,
+      "acierto": 0.552244522751647,
+      "lo95": 0.5436999732506996,
+      "ev": 0.027149854584417557,
+      "limite_desde_el_aviso_s": 15
+    },
+    "L=10s": {
+      "operaciones": 13066,
+      "acierto": 0.549031616014698,
+      "lo95": 0.5404853530437805,
+      "ev": 0.021193938466248258,
+      "limite_desde_el_aviso_s": 20
+    },
+    "L=15s": {
+      "operaciones": 13066,
+      "acierto": 0.5463593905520251,
+      "lo95": 0.5378088683227306,
+      "ev": 0.01622225623756312,
+      "limite_desde_el_aviso_s": 25
+    },
+    "L=20s": {
+      "operaciones": 13066,
+      "acierto": 0.5462757406415065,
+      "lo95": 0.5377257650429912,
+      "ev": 0.016069187203428724,
+      "limite_desde_el_aviso_s": 30
+    },
+    "L=30s": {
+      "operaciones": 13066,
+      "acierto": 0.5418613558023746,
+      "lo95": 0.5333033587929243,
+      "ev": 0.00785550283177711,
+      "limite_desde_el_aviso_s": 40
+    }
+  },
+  "control_L0_reproduce_55_32": true,
+  "limite_tarde_s": 30
+}

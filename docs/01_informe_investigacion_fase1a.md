@@ -3675,3 +3675,21 @@ llega L segundos después del cierre de la vela, con L = 0, 5, 10, 15, 20 y 30 s
   53,76 %, contado desde el aviso (segundo 50): límite = 10 + L.
 - Si el control con L = 0 no reproduce el 55,32 % (±0,1 puntos), no se cambia nada.
 - No cambia el modelo congelado ni ninguna confirmación: solo cuánto tiempo deja el panel para hacer clic.
+
+**Resultado de la nota de la demora del clic (`results/estudio47/latencia.json`):** el control con L = 0 reproduce el
+55,32 %.
+
+| Demora tras el cierre (L) | Clic tras el aviso | Acierto [lím. inf.] | EV por operación |
+|---|---|---|---|
+| 0 s | 10 s | 55,32 % [54,47 %] | +0,029 |
+| 5 s | 15 s | 55,22 % [54,37 %] | +0,027 |
+| 10 s | 20 s | 54,90 % [54,05 %] | +0,021 |
+| 15 s | 25 s | 54,64 % [53,78 %] | +0,016 |
+| 20 s | 30 s | 54,63 % [53,77 %] | +0,016 |
+| 30 s | 40 s | 54,19 % [53,33 %] | +0,008 |
+
+- La ventaja del blitz baja despacio con la demora, porque el contrato dura 3 min.
+- Por la regla fijada, el límite «TARDE» del panel blitz pasa a **30 s desde el aviso**. Con 30 s el límite inferior
+  queda justo en el borde (53,77 % frente a 53,76 %), así que el panel recomienda clic **antes de 15 s**. Entre 15 y
+  30 s muestra «aún vale», con la mitad de la ganancia esperada.
+- El modo de 1 min (`/senales`) sigue con 15 s (Estudio 16).
