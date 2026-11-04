@@ -259,6 +259,8 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        recomendar cualquier operación real o en demo, verificar la fuente de precio de la plataforma.
      - Horarios de GitHub poco fiables (ítem 46): la integración de la rutina dispara la cola y la vigilancia.
        Deriv entrega como mucho 1 000 velas/ticks por petición y, fuera de su historial, devuelve las de hoy (ítems 47–48).
+   - **Estudio 48 (2026-11-04, rutina):** filtro de «racha reciente» del propio GBM de BTC 1 min (operar solo si sus
+     últimas 500 operaciones resueltas o las de 7 días aciertan ≥ 54,05 %). Pre-registro 10677d7; en la cola de GitHub.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.

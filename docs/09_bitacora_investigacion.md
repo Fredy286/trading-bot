@@ -486,3 +486,37 @@ completo de operaciones, que solo se puede bajar en una sesión local.
 - En las empresas de fondeo (FTMO y parecidas) solo ~7 de cada 100 cobran algo.
 - No pude abrir cuentas concretas desde la nube. Si un día quieres, bajamos juntos el historial completo de alguna.
 - Hoy no hice ninguna prueba nueva. El bot y las señales no cambiaron. Solo demo.
+
+## 2026-11-04 (autónoma)
+
+Tema del miércoles: mejorar el modelo de BTC 1 min (o el de ETH).
+
+**Comprobaciones:** sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado.
+Registro diario con archivos hasta el 2026-11-03 en BTC, ETH, nocturna y blitz (el del 2 y el 3 de noviembre quedaron
+guardados). Conteos (sin aciertos, sellado): blitz 73 señales en 9 días (p ≥ 0,57: 47; horario del usuario: 8).
+Vigilancia de canales: última captura 2026-11-04 06:06 UTC. Desde este entorno, Binance (data.binance.vision y la API)
+sigue bloqueado (403 del proxy), así que el estudio se ejecuta en GitHub Actions.
+
+**Idea del día:** las dos palancas que han movido el acierto son filtrar por confianza y usar el precio exacto de
+liquidación (docs/10). Del precio ya hay mucho; de la confianza solo se ha probado la probabilidad del modelo
+(p ≥ 0,60). Pero la ventaja va por épocas: se concentra en algunos meses (Estudios 20 y 41). Si el acierto del modelo
+persiste de una semana a otra, su **acierto reciente ya conocido** sería otra forma de confianza. En la literatura es
+el «meta-etiquetado» (López de Prado, *Advances in Financial Machine Learning*, 2018, cap. 3; no leí el texto, solo lo
+cito como origen) o «operar la curva de capital», con resultados mixtos en foros. No estaba probado aquí (busqué en
+docs/).
+
+**Estudio 48** (pre-registro 10677d7, código en otro commit, en la cola de GitHub): con el GBM de BTC 1 min del Estudio
+33, se opera solo si el acierto de las últimas 500 operaciones ya resueltas (H48a) o el de los últimos 7 días (H48b)
+llega al equilibrio (54,05 %). Debe ganar en desarrollo (2022-01 → 2025-08, con intervalo por semanas) y repetirse en
+verificación (2025-09 → 2026-09). Datos hasta 2026-09: nada reservado. Expectativa: dudosa.
+
+**Pendientes con fecha**
+- 2026-11-05: documentar el resultado del Estudio 48 (results/estudio48/) según su pre-registro.
+- Sesión local con Fredy: anotar precios de entrada del blitz en la demo (ideas 1 y 1b de docs/10).
+- Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44 y 46: evaluación única después del 2027-01-18; canales: 2027-01-31.
+
+**Para Fredy**
+- Hoy probé una idea nueva para el modelo de bitcoin: «si el bot viene acertando, seguir; si viene fallando, parar».
+- Es lo que hace mucha gente con su racha. Lo dejé escrito antes de mirar datos, para no engañarnos.
+- La prueba corre sola en GitHub; mañana sabremos si sirve o no.
+- El bot y las señales no cambiaron. Solo demo.
