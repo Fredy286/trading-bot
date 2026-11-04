@@ -1,0 +1,619 @@
+{
+  "estudio": "Estudio 48 — filtro de racha reciente del GBM de BTC 1 min (pre-registro 10677d7)",
+  "git_sha": "7c7902a8ccc2b3fd021a111b5ad3a4c0252b5384",
+  "periodos": {
+    "desarrollo": [
+      "2022-01-01",
+      "2025-09-01"
+    ],
+    "verificacion": [
+      "2025-09-01",
+      "2026-10-01"
+    ]
+  },
+  "equilibrio": 0.5405405405405405,
+  "reglas": {
+    "H48a": "últimas 500 resueltas",
+    "H48b": "últimos 7 días (≥ 50)"
+  },
+  "hipotesis": {
+    "H48a": {
+      "desarrollo": {
+        "muestra_comun": 219355,
+        "base": {
+          "operaciones": 219355,
+          "sin_empate": 203436,
+          "aciertos": 115150,
+          "acierto": 0.5660256788375705,
+          "lo95": 0.5638707171086155,
+          "hi95": 0.5681781470112235,
+          "ev": 0.04372592373093843,
+          "ev_ic95": [
+            0.036430644680479546,
+            0.0509444754584358
+          ],
+          "trimestres_ev_positivo": 0.8666666666666667,
+          "operaciones_por_dia": 167.31884057971016,
+          "ev_total_por_dia": 7.316170861937451
+        },
+        "tomadas": {
+          "operaciones": 169477,
+          "sin_empate": 155255,
+          "aciertos": 88798,
+          "acierto": 0.5719493736111558,
+          "lo95": 0.5694863510165685,
+          "hi95": 0.5744088356907887,
+          "ev": 0.0532302318308679,
+          "ev_ic95": [
+            0.04596766793114537,
+            0.06018503820590493
+          ],
+          "trimestres_ev_positivo": 0.8666666666666667,
+          "operaciones_por_dia": 152.27044025157232,
+          "ev_total_por_dia": 8.105390835579515
+        },
+        "saltadas": {
+          "operaciones": 49878,
+          "sin_empate": 48181,
+          "aciertos": 26352,
+          "acierto": 0.5469375895062369,
+          "lo95": 0.5424890812706018,
+          "hi95": 0.551378613419506,
+          "ev": 0.011431893820923049,
+          "ev_ic95": [
+            0.002145950345960945,
+            0.021773579847730363
+          ],
+          "trimestres_ev_positivo": 0.8,
+          "operaciones_por_dia": 98.37869822485207,
+          "ev_total_por_dia": 1.1246548323471397
+        },
+        "diferencia_acierto": {
+          "diferencia": 0.025011784104918888,
+          "lo": 0.018046486985793364,
+          "hi": 0.03178598604096262
+        },
+        "trimestres_tomadas": {
+          "2022Q1": {
+            "operaciones": 454,
+            "acierto": 0.4955947136563877
+          },
+          "2022Q2": {
+            "operaciones": 7393,
+            "acierto": 0.5603949682131746
+          },
+          "2022Q3": {
+            "operaciones": 5034,
+            "acierto": 0.5597934048470401
+          },
+          "2022Q4": {
+            "operaciones": 2279,
+            "acierto": 0.5884159719175077
+          },
+          "2023Q1": {
+            "operaciones": 3703,
+            "acierto": 0.5498244666486632
+          },
+          "2023Q2": {
+            "operaciones": 4460,
+            "acierto": 0.5318385650224215
+          },
+          "2023Q3": {
+            "operaciones": 33892,
+            "acierto": 0.5857134427003423
+          },
+          "2023Q4": {
+            "operaciones": 30872,
+            "acierto": 0.561090956206271
+          },
+          "2024Q1": {
+            "operaciones": 12630,
+            "acierto": 0.5775930324623911
+          },
+          "2024Q2": {
+            "operaciones": 14558,
+            "acierto": 0.5869624948481934
+          },
+          "2024Q3": {
+            "operaciones": 8361,
+            "acierto": 0.5599808635330702
+          },
+          "2024Q4": {
+            "operaciones": 5260,
+            "acierto": 0.5777566539923954
+          },
+          "2025Q1": {
+            "operaciones": 4869,
+            "acierto": 0.5699322242760321
+          },
+          "2025Q2": {
+            "operaciones": 12595,
+            "acierto": 0.5677649861055974
+          },
+          "2025Q3": {
+            "operaciones": 8895,
+            "acierto": 0.5849353569421023
+          }
+        },
+        "trimestres_saltadas": {
+          "2022Q1": {
+            "operaciones": 603,
+            "acierto": 0.5538971807628524
+          },
+          "2022Q2": {
+            "operaciones": 2664,
+            "acierto": 0.5536786786786787
+          },
+          "2022Q3": {
+            "operaciones": 1357,
+            "acierto": 0.5401621223286662
+          },
+          "2022Q4": {
+            "operaciones": 406,
+            "acierto": 0.5615763546798029
+          },
+          "2023Q1": {
+            "operaciones": 1512,
+            "acierto": 0.5601851851851852
+          },
+          "2023Q2": {
+            "operaciones": 6050,
+            "acierto": 0.5370247933884298
+          },
+          "2023Q3": {
+            "operaciones": 2314,
+            "acierto": 0.5777873811581676
+          },
+          "2023Q4": {
+            "operaciones": 18802,
+            "acierto": 0.5438783108179981
+          },
+          "2024Q1": {
+            "operaciones": 3197,
+            "acierto": 0.5461370034407257
+          },
+          "2024Q2": {
+            "operaciones": 1973,
+            "acierto": 0.5473897617840852
+          },
+          "2024Q3": {
+            "operaciones": 5612,
+            "acierto": 0.5290449037776194
+          },
+          "2024Q4": {
+            "operaciones": 691,
+            "acierto": 0.5904486251808972
+          },
+          "2025Q1": {
+            "operaciones": 482,
+            "acierto": 0.5995850622406639
+          },
+          "2025Q2": {
+            "operaciones": 1823,
+            "acierto": 0.575973669775096
+          },
+          "2025Q3": {
+            "operaciones": 695,
+            "acierto": 0.5482014388489208
+          }
+        }
+      },
+      "verificacion": {
+        "muestra_comun": 62856,
+        "base": {
+          "operaciones": 62856,
+          "sin_empate": 56832,
+          "aciertos": 32106,
+          "acierto": 0.5649282094594594,
+          "lo95": 0.5608479326317343,
+          "hi95": 0.5689997091422551,
+          "ev": 0.040793241695303545,
+          "ev_ic95": [
+            0.025350722096218265,
+            0.052537652354917655
+          ],
+          "trimestres_ev_positivo": 1.0,
+          "operaciones_por_dia": 159.93893129770993,
+          "ev_total_por_dia": 6.524427480916029
+        },
+        "tomadas": {
+          "operaciones": 47928,
+          "sin_empate": 42803,
+          "aciertos": 24590,
+          "acierto": 0.5744924421185431,
+          "lo95": 0.5698019852497679,
+          "hi95": 0.5791695286869202,
+          "ev": 0.056094558504423304,
+          "ev_ic95": [
+            0.044851110971845534,
+            0.0650667117117156
+          ],
+          "trimestres_ev_positivo": 1.0,
+          "operaciones_por_dia": 164.13698630136986,
+          "ev_total_por_dia": 9.207191780821917
+        },
+        "saltadas": {
+          "operaciones": 14928,
+          "sin_empate": 14029,
+          "aciertos": 7516,
+          "acierto": 0.5357473804262599,
+          "lo95": 0.5274859447559525,
+          "hi95": 0.5439892438473309,
+          "ev": -0.00833333333333334,
+          "ev_ic95": [
+            -0.02668370571584621,
+            0.015643621076130404
+          ],
+          "trimestres_ev_positivo": 0.6,
+          "operaciones_por_dia": 81.1304347826087,
+          "ev_total_por_dia": -0.6760869565217397
+        },
+        "diferencia_acierto": {
+          "diferencia": 0.0387450616922832,
+          "lo": 0.025490710554210736,
+          "hi": 0.04992171036941475
+        },
+        "trimestres_tomadas": {
+          "2025Q3": {
+            "operaciones": 9086,
+            "acierto": 0.5822143957737178
+          },
+          "2025Q4": {
+            "operaciones": 8591,
+            "acierto": 0.5562798277266907
+          },
+          "2026Q1": {
+            "operaciones": 4836,
+            "acierto": 0.5715467328370554
+          },
+          "2026Q2": {
+            "operaciones": 4143,
+            "acierto": 0.5669804489500362
+          },
+          "2026Q3": {
+            "operaciones": 16147,
+            "acierto": 0.5826469313185112
+          }
+        },
+        "trimestres_saltadas": {
+          "2025Q3": {
+            "operaciones": 702,
+            "acierto": 0.6054131054131054
+          },
+          "2025Q4": {
+            "operaciones": 6623,
+            "acierto": 0.5251396648044693
+          },
+          "2026Q1": {
+            "operaciones": 3758,
+            "acierto": 0.5250133049494412
+          },
+          "2026Q2": {
+            "operaciones": 1910,
+            "acierto": 0.5413612565445026
+          },
+          "2026Q3": {
+            "operaciones": 1036,
+            "acierto": 0.584942084942085
+          }
+        }
+      },
+      "criterios": {
+        "dev_diferencia_ic": true,
+        "dev_ev": true,
+        "verif_acierto": true,
+        "verif_ev": true,
+        "min_300": true
+      },
+      "pasa": true
+    },
+    "H48b": {
+      "desarrollo": {
+        "muestra_comun": 219806,
+        "base": {
+          "operaciones": 219806,
+          "sin_empate": 203886,
+          "aciertos": 115406,
+          "acierto": 0.566031998273545,
+          "lo95": 0.5638794208495601,
+          "hi95": 0.5681820874075536,
+          "ev": 0.04374357387878401,
+          "ev_ic95": [
+            0.03650716002276959,
+            0.05115105490804906
+          ],
+          "trimestres_ev_positivo": 0.9333333333333333,
+          "operaciones_por_dia": 164.64868913857677,
+          "ev_total_por_dia": 7.202322097378276
+        },
+        "tomadas": {
+          "operaciones": 185559,
+          "sin_empate": 170806,
+          "aciertos": 97331,
+          "acierto": 0.5698336124023746,
+          "lo95": 0.5674840747951051,
+          "hi95": 0.5721800088228965,
+          "ev": 0.04988359497518309,
+          "ev_ic95": [
+            0.04222358219453709,
+            0.05780614905563072
+          ],
+          "trimestres_ev_positivo": 0.8666666666666667,
+          "operaciones_por_dia": 162.91395961369622,
+          "ev_total_por_dia": 8.126733977172957
+        },
+        "saltadas": {
+          "operaciones": 34247,
+          "sin_empate": 33080,
+          "aciertos": 18075,
+          "acierto": 0.5464026602176542,
+          "lo95": 0.5410326395790682,
+          "hi95": 0.551761904570847,
+          "ev": 0.010475370105410687,
+          "ev_ic95": [
+            0.0012709964023319474,
+            0.020317768987390007
+          ],
+          "trimestres_ev_positivo": 0.8,
+          "operaciones_por_dia": 82.32451923076923,
+          "ev_total_por_dia": 0.8623798076923072
+        },
+        "diferencia_acierto": {
+          "diferencia": 0.023430952184720466,
+          "lo": 0.01625989419020203,
+          "hi": 0.03085834322515348
+        },
+        "trimestres_tomadas": {
+          "2022Q1": {
+            "operaciones": 804,
+            "acierto": 0.5298507462686567
+          },
+          "2022Q2": {
+            "operaciones": 7475,
+            "acierto": 0.5591973244147157
+          },
+          "2022Q3": {
+            "operaciones": 4944,
+            "acierto": 0.5608818770226537
+          },
+          "2022Q4": {
+            "operaciones": 2243,
+            "acierto": 0.5898350423539902
+          },
+          "2023Q1": {
+            "operaciones": 3593,
+            "acierto": 0.5510715279710549
+          },
+          "2023Q2": {
+            "operaciones": 4568,
+            "acierto": 0.5400612959719789
+          },
+          "2023Q3": {
+            "operaciones": 35012,
+            "acierto": 0.5862847023877528
+          },
+          "2023Q4": {
+            "operaciones": 42973,
+            "acierto": 0.5553952481790891
+          },
+          "2024Q1": {
+            "operaciones": 14568,
+            "acierto": 0.575164744645799
+          },
+          "2024Q2": {
+            "operaciones": 14795,
+            "acierto": 0.5865495099695843
+          },
+          "2024Q3": {
+            "operaciones": 7868,
+            "acierto": 0.5503304524656838
+          },
+          "2024Q4": {
+            "operaciones": 5190,
+            "acierto": 0.5824662813102119
+          },
+          "2025Q1": {
+            "operaciones": 4957,
+            "acierto": 0.5699011498890458
+          },
+          "2025Q2": {
+            "operaciones": 12520,
+            "acierto": 0.5702076677316293
+          },
+          "2025Q3": {
+            "operaciones": 9296,
+            "acierto": 0.5824010327022375
+          }
+        },
+        "trimestres_saltadas": {
+          "2022Q1": {
+            "operaciones": 703,
+            "acierto": 0.5533428165007113
+          },
+          "2022Q2": {
+            "operaciones": 2582,
+            "acierto": 0.5569326103795508
+          },
+          "2022Q3": {
+            "operaciones": 1447,
+            "acierto": 0.5376641326883207
+          },
+          "2022Q4": {
+            "operaciones": 442,
+            "acierto": 0.5565610859728507
+          },
+          "2023Q1": {
+            "operaciones": 1622,
+            "acierto": 0.5567200986436498
+          },
+          "2023Q2": {
+            "operaciones": 5942,
+            "acierto": 0.5307977112083474
+          },
+          "2023Q3": {
+            "operaciones": 1194,
+            "acierto": 0.5536013400335008
+          },
+          "2023Q4": {
+            "operaciones": 6701,
+            "acierto": 0.5493209968661393
+          },
+          "2024Q1": {
+            "operaciones": 1259,
+            "acierto": 0.5258141382049245
+          },
+          "2024Q2": {
+            "operaciones": 1736,
+            "acierto": 0.5455069124423964
+          },
+          "2024Q3": {
+            "operaciones": 6105,
+            "acierto": 0.543980343980344
+          },
+          "2024Q4": {
+            "operaciones": 761,
+            "acierto": 0.557161629434954
+          },
+          "2025Q1": {
+            "operaciones": 394,
+            "acierto": 0.6065989847715736
+          },
+          "2025Q2": {
+            "operaciones": 1898,
+            "acierto": 0.559536354056902
+          },
+          "2025Q3": {
+            "operaciones": 294,
+            "acierto": 0.5782312925170068
+          }
+        }
+      },
+      "verificacion": {
+        "muestra_comun": 63316,
+        "base": {
+          "operaciones": 63316,
+          "sin_empate": 57282,
+          "aciertos": 32359,
+          "acierto": 0.5649069515729199,
+          "lo95": 0.5608427281848005,
+          "hi95": 0.56896246961472,
+          "ev": 0.040781950849706226,
+          "ev_ic95": [
+            0.025358900522800713,
+            0.05245341570955101
+          ],
+          "trimestres_ev_positivo": 1.0,
+          "operaciones_por_dia": 160.29367088607594,
+          "ev_total_por_dia": 6.537088607594936
+        },
+        "tomadas": {
+          "operaciones": 51059,
+          "sin_empate": 45862,
+          "aciertos": 26315,
+          "acierto": 0.5737865771226723,
+          "lo95": 0.5692545428878475,
+          "hi95": 0.5783062510255035,
+          "ev": 0.055244912747997414,
+          "ev_ic95": [
+            0.04391514738999657,
+            0.06489536353344796
+          ],
+          "trimestres_ev_positivo": 1.0,
+          "operaciones_por_dia": 167.95723684210526,
+          "ev_total_por_dia": 9.278782894736842
+        },
+        "saltadas": {
+          "operaciones": 12257,
+          "sin_empate": 11420,
+          "aciertos": 6044,
+          "acierto": 0.5292469352014011,
+          "lo95": 0.5200838360422079,
+          "hi95": 0.5383903640902591,
+          "ev": -0.01946642734763809,
+          "ev_ic95": [
+            -0.038012474771908195,
+            -0.0027379074058830727
+          ],
+          "trimestres_ev_positivo": 0.6,
+          "operaciones_por_dia": 85.7132867132867,
+          "ev_total_por_dia": -1.6685314685314692
+        },
+        "diferencia_acierto": {
+          "diferencia": 0.044539641921271245,
+          "lo": 0.032366774787804635,
+          "hi": 0.056983775206089715
+        },
+        "trimestres_tomadas": {
+          "2025Q3": {
+            "operaciones": 10215,
+            "acierto": 0.5829662261380323
+          },
+          "2025Q4": {
+            "operaciones": 8543,
+            "acierto": 0.5555425494556947
+          },
+          "2026Q1": {
+            "operaciones": 6035,
+            "acierto": 0.5635459817729909
+          },
+          "2026Q2": {
+            "operaciones": 4026,
+            "acierto": 0.5675608544461004
+          },
+          "2026Q3": {
+            "operaciones": 17043,
+            "acierto": 0.5825265504899372
+          }
+        },
+        "trimestres_saltadas": {
+          "2025Q3": {
+            "operaciones": 23,
+            "acierto": 0.5652173913043478
+          },
+          "2025Q4": {
+            "operaciones": 6671,
+            "acierto": 0.5263078998650877
+          },
+          "2026Q1": {
+            "operaciones": 2559,
+            "acierto": 0.5220789370847988
+          },
+          "2026Q2": {
+            "operaciones": 2027,
+            "acierto": 0.5416872224963
+          },
+          "2026Q3": {
+            "operaciones": 140,
+            "acierto": 0.6142857142857143
+          }
+        }
+      },
+      "criterios": {
+        "dev_diferencia_ic": true,
+        "dev_ev": true,
+        "verif_acierto": true,
+        "verif_ev": true,
+        "min_300": true
+      },
+      "pasa": true
+    }
+  },
+  "persistencia": {
+    "desarrollo": {
+      "semanas": 187,
+      "correlacion_semana_siguiente": 0.35566296507033196,
+      "acierto_semanal_min_max": [
+        0.5018450184501845,
+        0.6454545454545455
+      ]
+    },
+    "verificacion": {
+      "semanas": 57,
+      "correlacion_semana_siguiente": 0.3989936065395899,
+      "acierto_semanal_min_max": [
+        0.4462809917355372,
+        0.628099173553719
+      ]
+    }
+  }
+}
