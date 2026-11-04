@@ -3656,3 +3656,22 @@ política de H44a juzgada con el precio IQ reconstruido (los mismos pesos, fijos
 - La consecuencia práctica (seguir practicando el blitz) exige que pasen H44a **y** H44c. Es una exigencia más
   estricta, no una prueba más que pueda salir bien por azar.
 - Gate se descarga de sus archivos diarios públicos.
+
+## Nota del blitz: ¿cuánto puede tardar el clic? (2026-11-03, informativa, solo datos de desarrollo; regla fijada ANTES de calcular)
+
+**Pregunta:** el panel del blitz marca «TARDE» a los 15 s del aviso, un límite que viene del modelo de 1 min
+(Estudio 16). El blitz dura 3 min y podría tolerar más demora. Se mide el acierto de la política de H42a si el clic
+llega L segundos después del cierre de la vela, con L = 0, 5, 10, 15, 20 y 30 s.
+
+**Método:**
+- El precio IQ reconstruido (Estudio 47) solo existe en cierres de 1 min. Dentro de cada minuto se aproxima como el
+  precio de Binance al segundo menos la diferencia entre Binance y el precio reconstruido, interpolada en línea recta
+  entre los cierres de cada minuto.
+- Con L = 0 la aproximación es exacta y debe reproducir el 55,32 % del Estudio 47 (control).
+- Resultado = signo(IQ(t + 60 + L + 180) − IQ(t + 60 + L)).
+
+**Regla fijada antes de calcular:**
+- El nuevo límite «TARDE» del panel blitz será el mayor L cuyo límite inferior de Wilson (95 %) siga por encima de
+  53,76 %, contado desde el aviso (segundo 50): límite = 10 + L.
+- Si el control con L = 0 no reproduce el 55,32 % (±0,1 puntos), no se cambia nada.
+- No cambia el modelo congelado ni ninguna confirmación: solo cuánto tiempo deja el panel para hacer clic.
