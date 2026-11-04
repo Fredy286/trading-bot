@@ -437,6 +437,19 @@ def cmd_research_study26(a) -> int:
     return 0
 
 
+def cmd_research_study48(a) -> int:
+    from .research import study48
+
+    rep = study48.run()
+    for h, r in rep["hipotesis"].items():
+        for per in ("desarrollo", "verificacion"):
+            e = r[per]
+            print(f"{h} {per}: base {e['base'].get('acierto')} | tomadas {e['tomadas'].get('acierto')} | "
+                  f"saltadas {e['saltadas'].get('acierto')} | Δ {e['diferencia_acierto']}")
+        print(f"{h}: pasa={r['pasa']} | {r['criterios']}")
+    return 0
+
+
 def cmd_research_study33(a) -> int:
     from .research import study33
 
@@ -879,6 +892,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study34)
     x = r.add_parser("study26", help="Estudio 26: aviso anticipado + umbral p ≥ 0,60 en XRP, SOL, ETH y DOGE")
     x.set_defaults(func=cmd_research_study26)
+    x = r.add_parser("study48", help="Estudio 48: filtro de racha reciente del propio GBM de BTC 1 min")
+    x.set_defaults(func=cmd_research_study48)
     x = r.add_parser("study33", help="Estudio 33: variables de reloj (cuarto de hora, financiación) en el GBM de BTC 1 min")
     x.set_defaults(func=cmd_research_study33)
     x = r.add_parser("study24", help="Estudio 24: ETH y BTC/USDC en los segundos 0–49 como mejora de H16b")
