@@ -5,10 +5,13 @@ acertaron:
 - **BTC 1 min** (modelo congelado H16b, aviso en el segundo 50, clic a +10 s) con las velas de 1 s de Binance;
 - **reversión nocturna en divisas** (21–24 UTC, variantes «actual» y «fuerte», clic a +10 s) con los precios
   medios de la API pública de Deriv.
+- **blitz de BTC de IQ Option** (modelo congelado del Estudio 44, 3 min, pago 86 %) con Binance (archivos diarios),
+  Bybit (archivo público de operaciones), OKX (API) y Gate (archivo diario); resultado con el promedio de 3 bolsas y con
+  el precio IQ reconstruido (Estudio 47).
 
 Se guarda un archivo por día en `results/registro/<estrategia>/AAAA-MM-DD.jsonl`. No envía órdenes.
 
-**Sello:** las confirmaciones pre-registradas (Estudios 16, 21 y 29) se evalúan una sola vez, después del 2027-01-18.
+**Sello:** las confirmaciones pre-registradas (Estudios 16, 21, 29, 44 y 46) se evalúan una sola vez, después del 2027-01-18.
 Hasta esa fecha `resumen` solo muestra conteos; los aciertos se abren con `abrir=True`, y cada apertura queda anotada.
 """
 
@@ -87,6 +90,129 @@ def eth_day(day: str) -> list[dict]:
     return btc_day(day, CACHE / "eth", load_bundle(MODEL_PATH, REG_PATH), "ETHUSDT")
 
 
+# ----------------------------------------------------------------------------------------------- blitz de IQ Option
+# Desde los servidores de GitHub (EE. UU.) la API de Bybit está bloqueada; su archivo público diario de operaciones,
+# no. Su último precio de cada minuto coincide con el cierre de sus velas (comprobado el 2026-11-01: 1 440 de 1 440).
+BYBIT_URL = "https://public.bybit.com/spot/BTCUSDT/BTCUSDT_{d}.csv.gz"
+
+
+def _cached(path: Path, make) -> pd.Series:
+    if path.exists():
+        return pd.read_parquet(path)["c"]
+    s = make()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    s.to_frame("c").to_parquet(path)
+    return s
+
+
+def bybit_closes(day: pd.Timestamp, cache: Path = CACHE / "blitz") -> pd.Series:
+    """Cierres de 1 min de BTC/USDT al contado de Bybit: último precio de cada minuto de su archivo diario."""
+    import gzip
+    import io
+
+    from ..data.http import NotFound, get_bytes, make_session
+
+    def make():
+        try:
+            raw = get_bytes(make_session(), BYBIT_URL.format(d=f"{day:%Y-%m-%d}"), timeout=300)
+        except NotFound as exc:
+            raise FileNotFoundError(f"Bybit aún no publica el {day:%Y-%m-%d}") from exc
+        df = pd.read_csv(io.BytesIO(gzip.decompress(raw)), usecols=["timestamp", "price"])
+        s = pd.Series(df["price"].to_numpy(float), index=pd.to_datetime(df["timestamp"], unit="ms", utc=True))
+        s = s.sort_index()
+        return s.groupby(s.index.floor("min")).last()
+
+    return _cached(Path(cache) / "bybit" / f"{day:%Y-%m-%d}.parquet", make)
+
+
+def gate_closes(day: pd.Timestamp, cache: Path = CACHE / "blitz") -> pd.Series:
+    """Cierres de 1 min de Gate (archivo diario público), para el precio IQ reconstruido (Estudio 47)."""
+    from ..data.http import NotFound, get_bytes, make_session
+    from ..research.study47 import GATE_URL, parse_gate
+
+    def make():
+        try:
+            return parse_gate(get_bytes(make_session(), GATE_URL.format(ym=f"{day:%Y%m}", d=f"{day:%Y%m%d}"), timeout=120))
+        except NotFound as exc:
+            raise FileNotFoundError(f"Gate aún no publica el {day:%Y-%m-%d}") from exc
+
+    return _cached(Path(cache) / "gate" / f"{day:%Y-%m-%d}.parquet", make)
+
+
+def okx_closes(a: pd.Timestamp, b: pd.Timestamp) -> pd.Series:
+    """Cierres de 1 min de OKX entre a y b (API pública, con reintentos)."""
+    import requests
+
+    from ..research.study41 import PAGE, pages
+
+    fetch, size, _ = PAGE["okx"]
+    s, rows = requests.Session(), []
+    for x, y in pages(a, b, size):
+        rows.extend(r for r in fetch(s, x, y) if int(x.timestamp() * 1000) <= r[0] <= int(y.timestamp() * 1000))
+    ser = pd.Series(dict(rows), dtype=float).sort_index()
+    ser.index = pd.to_datetime(ser.index, unit="ms", utc=True)
+    return ser
+
+
+def _maybe(fn, *args) -> pd.Series:
+    try:
+        return fn(*args)
+    except FileNotFoundError:
+        return pd.Series(dtype=float, index=pd.DatetimeIndex([], tz="UTC"))
+
+
+def blitz_day(day: str, cache: Path = CACHE) -> list[dict]:
+    """Blitz de BTC de IQ Option (modelo congelado del Estudio 44, aviso en el segundo 50, 3 min, pago 86 %): señales del
+    día y su resultado con el promedio de 3 bolsas (H44a, el pre-registrado) y con el precio IQ reconstruido (H44c)."""
+    from ..research.study41 import composite
+    from ..research.study42 import comp_features, label3
+    from ..research.study47 import iq_price
+    from .blitz import MODEL_PATH, REG_PATH
+
+    b = load_bundle(MODEL_PATH, REG_PATH)
+    d0 = pd.Timestamp(day, tz="UTC")
+    d1 = d0 + pd.Timedelta(days=1)
+    m1 = download_daily("1m", f"{d0 - pd.Timedelta(days=3):%Y-%m-%d}", f"{d1:%Y-%m-%d}", cache)
+    sec = download_daily("1s", f"{d0:%Y-%m-%d}", f"{d1:%Y-%m-%d}", cache)
+    try:
+        nxt = download_daily("1s", f"{d1:%Y-%m-%d}", f"{d1 + pd.Timedelta(days=1):%Y-%m-%d}", cache)
+        sec = pd.concat([sec, nxt[nxt.index < d1 + pd.Timedelta(minutes=6)]])
+    except FileNotFoundError:
+        pass
+    try:  # las últimas velas del día cierran su etiqueta de 3 min en el día siguiente
+        m_next = download_daily("1m", f"{d1:%Y-%m-%d}", f"{d1 + pd.Timedelta(days=1):%Y-%m-%d}", cache)
+        m1 = pd.concat([m1, m_next[m_next.index < d1 + pd.Timedelta(minutes=6)]])
+    except FileNotFoundError:
+        pass
+    bars = spot_bars(m1[~m1.index.duplicated(keep="last")].sort_index())
+    tab = minute_table(sec, pd.date_range(d0, d1, freq="min", tz="UTC", inclusive="left")).reindex(bars.index)
+    prev = compute_features(bars).shift(1)
+    vol = np.exp(prev["lvol60"])
+    by = pd.concat([bybit_closes(d0 - pd.Timedelta(days=1)), bybit_closes(d0), _maybe(bybit_closes, d1)])
+    ok = okx_closes(d0 - pd.Timedelta(hours=2), d1 + pd.Timedelta(minutes=5))
+    ga = pd.concat([gate_closes(d0), _maybe(gate_closes, d1)])
+    bn = bars["c"]
+    comp = composite({"binance": bn, "bybit": by[~by.index.duplicated()], "okx": ok})
+    X = pd.concat([prev[FEATURES], partial_features(tab, bars["o"], vol, b["k"]), comp_features(comp, bn, vol, bars.index)],
+                  axis=1)[b["features"]]
+    day_rows = (bars.index >= d0) & (bars.index < d1) & X.notna().all(axis=1).to_numpy()
+    idx = bars.index[day_rows]
+    p_up = b["calibrator"].transform(b["model"].predict_proba(X[day_rows].to_numpy())[:, 1])
+    side = np.where(p_up >= 0.5, 1, -1)
+    p_dir = np.where(side == 1, p_up, 1 - p_up)
+    ev = BinaryContract(b["payout"], "refund").ev(p_dir, np.full(len(p_dir), b["q"]))
+    y3 = label3(comp, idx)
+    yiq = label3(iq_price({"binance": bn, "bybit": by[~by.index.duplicated()], "okx": ok, "gate": ga[~ga.index.duplicated()]}), idx)
+
+    def res(y, i):
+        return None if np.isnan(y[i]) else ("empate" if y[i] == 0 else ("gana" if y[i] == side[i] else "pierde"))
+
+    return [{"vela": idx[i].isoformat(), "lado": "CALL" if side[i] > 0 else "PUT", "p": round(float(p_dir[i]), 4),
+             "ev86": round(float(ev[i]), 4), "p057": bool(p_dir[i] >= 0.57),
+             "horario_usuario": bool(2 <= idx[i].hour < 6), "resultado": res(y3, i), "resultado_iq": res(yiq, i),
+             "modelo": b["model_id"]} for i in np.flatnonzero(ev >= b["ev_margin"])]
+
+
 # ----------------------------------------------------------------------------------------------- divisas
 def night_day(day: str, feed: DerivFeed | None = None, pairs=PAIRS) -> list[dict]:
     """Señales de la reversión nocturna (21–24 UTC del día `day`) con velas y ticks de Deriv, clic a +10 s."""
@@ -141,7 +267,7 @@ def night_day(day: str, feed: DerivFeed | None = None, pairs=PAIRS) -> list[dict
 # --------------------------------------------------------------------------------------------- orquestación
 def run_day(day: str, root: Path = ROOT, log=print) -> dict:
     out = {}
-    for name, fn in (("btc", btc_day), ("eth", eth_day), ("nocturna", night_day)):
+    for name, fn in (("btc", btc_day), ("eth", eth_day), ("nocturna", night_day), ("blitz", blitz_day)):
         path = Path(root) / name / f"{day}.jsonl"
         if path.exists():
             out[name] = "ya existía"
@@ -178,14 +304,15 @@ def resumen(root: Path = ROOT, abrir: bool = False, now: pd.Timestamp | None = N
     groups = {"btc": [("todas", None), ("p ≥ 0,60", "umbral_060"), ("cuarto de hora", "cuarto_hora")],
               "eth": [("todas", None), ("p ≥ 0,60", "umbral_060")],
               "nocturna": [("actual", ("variante", "actual")), ("fuerte", ("variante", "fuerte")),
-                           ("actual, hora fuerte", "hora_fuerte")]}
+                           ("actual, hora fuerte", "hora_fuerte")],
+              "blitz": [("todas", None), ("p ≥ 0,57", "p057"), ("horario del usuario", "horario_usuario")]}
     for name, specs in groups.items():
         df = _load(root, name)
         out[name] = {"dias": len(list((Path(root) / name).glob("*.jsonl")))}
         for lab, cond in specs:
             g = df
             if isinstance(cond, str) and len(df):
-                g = df[df[cond]] if name in ("btc", "eth") else df[(df[cond]) & (df["variante"] == "actual")]
+                g = df[df[cond]] if name in ("btc", "eth", "blitz") else df[(df[cond]) & (df["variante"] == "actual")]
             elif isinstance(cond, tuple) and len(df):
                 g = df[df[cond[0]] == cond[1]]
             n = int(len(g))

@@ -40,3 +40,24 @@ def test_summary_is_sealed_until_the_confirmation_date(tmp_path):
     o = registro.resumen(tmp_path, abrir=True, now=pd.Timestamp("2026-11-01", tz="UTC"))
     assert o["btc"]["todas"]["acierto"] == 1.0 and (tmp_path / "aperturas_del_sello.log").exists()
     assert registro.resumen(tmp_path, now=pd.Timestamp("2027-02-01", tz="UTC"))["btc"]["p ≥ 0,60"]["acierto"] == 1.0
+
+
+def test_bybit_closes_take_the_last_trade_of_each_minute(tmp_path, monkeypatch):
+    import gzip
+
+    csv = ("id,timestamp,price,volume,side,rpi\n"
+           "1,1793491200292,100.0,0.1,buy,0\n2,1793491230000,101.5,0.1,sell,0\n3,1793491262000,99.0,0.1,buy,1\n")
+    monkeypatch.setattr("tradingbot.data.http.get_bytes", lambda session, url, timeout=30: gzip.compress(csv.encode()))
+    s = registro.bybit_closes(pd.Timestamp("2026-11-01", tz="UTC"), cache=tmp_path)
+    assert list(s) == [101.5, 99.0]
+    assert (tmp_path / "bybit" / "2026-11-01.parquet").exists()  # la segunda vez sale de la caché
+
+
+def test_blitz_summary_is_sealed_and_counts_its_groups(tmp_path):
+    (tmp_path / "blitz").mkdir()
+    rows = [{"lado": "CALL", "p057": True, "horario_usuario": False, "resultado": "gana", "resultado_iq": "gana"},
+            {"lado": "PUT", "p057": False, "horario_usuario": True, "resultado": "pierde", "resultado_iq": "pierde"}]
+    (tmp_path / "blitz" / "2026-11-02.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    s = registro.resumen(tmp_path, now=pd.Timestamp("2026-11-04", tz="UTC"))
+    assert s["blitz"]["todas"] == {"senales": 2} and s["blitz"]["p ≥ 0,57"] == {"senales": 1}
+    assert s["blitz"]["horario del usuario"] == {"senales": 1}

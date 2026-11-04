@@ -2,7 +2,9 @@ name: Registro diario de señales
 
 # Prueba hacia adelante sin intervención del usuario (src/tradingbot/live/registro.py): cada mañana registra las
 # señales del día anterior de las estrategias congeladas (BTC 1 min H16b con Binance; reversión nocturna en divisas
-# con Deriv) y su resultado, y audita las señales capturadas de los canales vigilados (Estudio 32). No envía órdenes. Los aciertos quedan sellados hasta el 2027-01-19 (Estudios 16, 21, 29).
+# con Deriv; blitz de BTC de IQ Option con Binance, Bybit, OKX y Gate) y su resultado, y audita las señales capturadas de
+# los canales vigilados (Estudio 32). No envía órdenes. Los aciertos quedan sellados hasta el 2027-01-19 (Estudios 16, 21,
+# 29, 44 y 46).
 
 on:
   schedule:
