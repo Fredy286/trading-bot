@@ -348,6 +348,9 @@ def cmd_research_study18(a) -> int:
 def cmd_research_study47(a) -> int:
     from .research import study47
 
+    if a.latencia:
+        study47.latency()
+        return 0
     r = study47.run()["H47a"]
     print(f"H47a: pasa={r['pasa']} | {r['criterios']}")
     return 0
@@ -856,6 +859,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
     x = r.add_parser("study47", help="Estudio 47: el blitz juzgado con el precio reconstruido de IQ Option (pesos)")
+    x.add_argument("--latencia", action="store_true", help="nota del blitz: acierto según la demora del clic")
     x.set_defaults(func=cmd_research_study47)
     x = r.add_parser("study45", help="Estudio 45: las 5 estrategias típicas de ChatGPT para BTC; elegir 2 y medir después")
     x.set_defaults(func=cmd_research_study45)

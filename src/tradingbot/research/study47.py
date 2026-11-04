@@ -105,3 +105,95 @@ def run(out_dir: Path = Path("results/estudio47"), n_boot: int = 1000, log=print
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "resultado.json").write_text(json.dumps(jsonable(rep), indent=2, ensure_ascii=False), encoding="utf-8")
     return rep
+
+
+# ----------------------------------------------------------------------------------------------- demora del clic
+LAGS = (0, 5, 10, 15, 20, 30)
+SEC_DIRS = (Path("data/processed/estudio16/seg"), Path("data/processed/senal/seg"))
+SEC_DAILY = Path("data/processed/senal/diario/1s")
+
+
+def _ns(x) -> np.ndarray:
+    """Nanosegundos explícitos (pandas 3 guarda microsegundos; registro de errores, ítem 44)."""
+    return pd.DatetimeIndex(x).as_unit("ns").asi8
+
+
+def last_before(sec_index, sec_close, T, max_gap_s: int = 5) -> np.ndarray:
+    """Último precio de Binance antes del instante T (vela de 1 s que abre como mucho en T − 1 s)."""
+    si, target = _ns(sec_index), _ns(T) - 10**9
+    i = np.searchsorted(si, target, side="right") - 1
+    ok = (i >= 0) & ((target - si[np.maximum(i, 0)]) <= max_gap_s * 10**9)
+    return np.where(ok, np.asarray(sec_close, float)[np.maximum(i, 0)], np.nan)
+
+
+def iq_at(T: np.ndarray, sec_index, sec_close, basis: pd.Series) -> np.ndarray:
+    """Precio IQ reconstruido en el instante T: Binance al segundo menos la diferencia Binance − IQ, interpolada en
+    línea recta entre los cierres de minuto (exacta en cada cierre)."""
+    Tm = pd.DatetimeIndex(T)
+    m0 = (Tm - pd.Timedelta(seconds=60)).floor("min")  # el cierre de m0 cae en m0 + 60 s ≤ T
+    b0 = basis.reindex(m0).to_numpy()
+    b1 = basis.reindex(m0 + pd.Timedelta(minutes=1)).to_numpy()
+    frac = ((Tm - (m0 + pd.Timedelta(seconds=60))) / pd.Timedelta(seconds=60)).to_numpy()
+    b = np.where(frac == 0, b0, b0 + (b1 - b0) * frac)
+    return last_before(sec_index, sec_close, T) - b
+
+
+def _seconds_for(month: str) -> pd.Series:
+    files = [d / f"{month}.parquet" for d in SEC_DIRS if (d / f"{month}.parquet").exists()]
+    if files:
+        return pd.read_parquet(files[-1])["c"]
+    days = sorted(SEC_DAILY.glob(f"{month}-*.parquet"))
+    return pd.concat([pd.read_parquet(f)["c"] for f in days]) if days else pd.Series(dtype=float)
+
+
+def latency(out_dir: Path = Path("results/estudio47"), lags=LAGS, log=print) -> dict:
+    """Nota del blitz: acierto de la política de H42a si el clic llega L s después del cierre de la vela."""
+    margin = load_config("config/research.toml")["contracts"]["binary_ev_margin"]
+    contract = BinaryContract(PAYOUT, "refund")
+    P = pd.read_parquet(PRED)
+    side = np.where(P["p"] >= 0.5, 1, -1)
+    pdir = np.where(side == 1, P["p"], 1 - P["p"])
+    take = contract.ev(pdir, P["q"].to_numpy()) >= margin
+    sig = P[take].assign(side=side[take])
+    cl = {v: pd.concat([month_closes(v, m) for m in MONTHS]).sort_index() for v in ("binance", "bybit", "okx")}
+    cl["gate"] = pd.concat([gate_month(m) for m in MONTHS]).sort_index()
+    cl = {v: x[~x.index.duplicated(keep="last")] for v, x in cl.items()}
+    basis = (cl["binance"] - iq_price(cl)).dropna()
+    res = {L: np.full(len(sig), np.nan) for L in lags}
+    for k, m in enumerate(MONTHS):
+        rows = np.flatnonzero(sig.index.strftime("%Y-%m") == m)
+        if not len(rows):
+            continue
+        nxt = MONTHS[k + 1] if k + 1 < len(MONTHS) else None
+        sec = pd.concat([_seconds_for(m)] + ([_seconds_for(nxt).iloc[:7200]] if nxt else [])).sort_index()
+        sec = sec[~sec.index.duplicated(keep="last")]
+        si, sc = sec.index, sec.to_numpy()
+        t = sig.index[rows]
+        for L in lags:
+            t_in = (t + pd.Timedelta(seconds=60 + L)).to_numpy()
+            t_out = (t + pd.Timedelta(seconds=240 + L)).to_numpy()
+            d = iq_at(t_out, si, sc, basis) - iq_at(t_in, si, sc, basis)
+            res[L][rows] = np.where(np.isnan(d), np.nan, np.sign(np.where(np.abs(d) < 0.005, 0.0, d)))
+        log(f"  {m}: {len(rows)} operaciones")
+    from .metrics import wilson
+    out = {}
+    for L in lags:
+        r = sig["side"].to_numpy() * res[L]
+        m = ~np.isnan(r)
+        n, w = int((r[m] != 0).sum()), int((r[m] > 0).sum())
+        lo, _ = wilson(w, n)
+        pnl = np.where(r[m] == 0, 0.0, np.where(r[m] > 0, PAYOUT, -1.0))
+        out[f"L={L}s"] = {"operaciones": int(m.sum()), "acierto": w / n if n else None, "lo95": float(lo),
+                          "ev": float(pnl.mean()) if len(pnl) else None, "limite_desde_el_aviso_s": 10 + L}
+        log(f"L = {L:2d} s (clic {10 + L} s después del aviso): {out[f'L={L}s']['operaciones']} ops, "
+            f"acierto {out[f'L={L}s']['acierto']:.4f} [{lo:.4f}], EV {out[f'L={L}s']['ev']:+.4f}")
+    be = 1 / (1 + PAYOUT)
+    control_ok = abs(out["L=0s"]["acierto"] - 0.5532) <= 0.001
+    ok = [L for L in lags if out[f"L={L}s"]["lo95"] > be]
+    rep = {"nota": "Nota del blitz: cuánto puede tardar el clic (regla fijada antes de calcular, commit e677375)",
+           "git_sha": git_sha(), "equilibrio": be, "por_demora": out, "control_L0_reproduce_55_32": control_ok,
+           "limite_tarde_s": (10 + max(ok)) if (control_ok and ok) else None}
+    Path(out_dir).mkdir(parents=True, exist_ok=True)
+    (Path(out_dir) / "latencia.json").write_text(json.dumps(jsonable(rep), indent=2, ensure_ascii=False), encoding="utf-8")
+    log(f"control L = 0 reproduce el 55,32 %: {control_ok} → nuevo límite TARDE: {rep['limite_tarde_s']} s")
+    return rep
