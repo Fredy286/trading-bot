@@ -3693,3 +3693,51 @@ llega L segundos después del cierre de la vela, con L = 0, 5, 10, 15, 20 y 30 s
   queda justo en el borde (53,77 % frente a 53,76 %), así que el panel recomienda clic **antes de 15 s**. Entre 15 y
   30 s muestra «aún vale», con la mitad de la ganancia esperada.
 - El modo de 1 min (`/senales`) sigue con 15 s (Estudio 16).
+
+## Estudio 48 — filtro de «racha reciente» del propio modelo de BTC 1 min (pre-registro, 2026-11-04, ANTES de calcular nada)
+
+**Origen:**
+- Lección de docs/10: lo único que sube el acierto es filtrar por confianza; las variables nuevas mejoran el log-loss
+  pero no la política (Estudios 24 y 33).
+- Las señales y la ventaja se concentran en algunos meses (Estudios 20 y 41; patrón de la Fase 1B: ventajas de ~55 %
+  que se apagan por épocas). Si el acierto del modelo **persiste** de una semana a la siguiente, el acierto reciente ya
+  conocido sería una segunda forma de «confianza», distinta de la probabilidad del modelo.
+- En la literatura se conoce como *meta-etiquetado* (López de Prado, *Advances in Financial Machine Learning*, 2018,
+  cap. 3) y, en su forma más simple, como «operar la curva de capital». Los foros de trading lo discuten mucho, con
+  resultados mixtos. No lo encontré probado con un protocolo pre-registrado; ese texto no lo leí completo (solo lo cito
+  como origen de la idea).
+
+**Base (sin cambios):** el GBM de BTC/USDT 1 min del Estudio 33 sin las variables de reloj (`FEATURES` de la Fase 1B),
+etiqueta a 1 min con entrada en la apertura de t + 1, walk-forward trimestral con 12 meses de entrenamiento y los
+ajustes de `config/research.toml` (solo se lee). Mismos periodos: desarrollo 2022-01-01 → 2025-09-01 y verificación
+2025-09-01 → 2026-10-01 (datos de Binance hasta 2026-09; nada posterior al 2026-10-25). Política base: EV estimado ≥
+margen, pago 85 %, empate reembolsado.
+
+**Filtro (reglas fijas, sin ajustar nada):** para cada operación de la política base decidida en la vela t se cuentan
+solo las operaciones base anteriores **ya resueltas** (fin de su etiqueta ≤ apertura de t), sin empates:
+- **H48a:** acierto de las últimas 500 operaciones resueltas ≥ 54,05 % (equilibrio con pago 85 %) → se opera; si no,
+  se salta;
+- **H48b:** acierto de las operaciones resueltas en los 7 días anteriores ≥ 54,05 %, si son al menos 50 → se opera.
+
+La racha se calcula siempre con las operaciones **base** (también las que el filtro saltó), así que no se vuelve ciega
+tras una mala racha. Muestra común: solo las operaciones base en las que la racha está definida (los primeros días de
+cada periodo quedan fuera, para la base y para el filtro).
+
+**Hipótesis (Bonferroni α = 0,025 cada una).** Criterios, todos:
+1. desarrollo: acierto de las operaciones **tomadas** − acierto de las **saltadas** > 0, con el límite inferior del
+   intervalo bootstrap por semanas (97,5 %, unilateral) por encima de 0;
+2. desarrollo: EV por operación filtrado > EV base;
+3. verificación: acierto tomadas > acierto saltadas y EV por operación filtrado > EV base;
+4. ≥ 300 operaciones tomadas y ≥ 300 saltadas en cada periodo.
+
+**Informativo:** operaciones por día y EV total por día (filtrado frente a base); acierto por trimestre; la correlación
+entre el acierto de una semana y el de la siguiente (persistencia), sin veredicto.
+
+**Expectativa declarada:** dudosa. Con decenas de miles de operaciones por trimestre, un acierto que cambia por épocas
+debería verse; pero el filtro puede solo quitar operaciones al azar (como pasó con el filtro de DXY del Estudio 10).
+
+**Consecuencia:**
+- Si pasa: se pre-registra su confirmación con datos posteriores al 2026-10-25 (evaluación única después del
+  2027-01-18), aplicada a las señales ya registradas del modelo congelado (H16b) y del blitz; no se toca ningún modelo
+  congelado ni los modos en vivo.
+- Si no pasa: «racha reciente del modelo» queda cerrada en docs/10.
