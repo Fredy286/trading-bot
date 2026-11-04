@@ -27,7 +27,8 @@ jobs:
             "https://api.bybit.com/v5/market/kline?category=spot&symbol=BTCUSDT&interval=1&limit=2" \
             "https://www.okx.com/api/v5/market/history-candles?instId=BTC-USDT&bar=1m&limit=2" \
             "https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=BTC_USDT&interval=1m&limit=2" \
-            "https://download.gatedata.org/spot/candlesticks_1m/202611/BTC_USDT-20261101.csv.gz"; do
+            "https://download.gatedata.org/spot/candlesticks_1m/202611/BTC_USDT-20261101.csv.gz" \
+            "https://public.bybit.com/spot/BTCUSDT/BTCUSDT_2026-11-01.csv.gz"; do
             echo "$(curl -s -o /tmp/r -w '%{http_code}' --max-time 20 "$u") $(head -c 120 /tmp/r | tr -d '\n') ← $u"
           done
       - name: Cabeceras completas de Dukascopy (curl)
