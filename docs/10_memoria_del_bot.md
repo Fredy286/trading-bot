@@ -47,6 +47,11 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     igual que con 3 bolsas. Confirmación: H44c (enmienda del Estudio 44).
   - **Demora del clic en el blitz (2026-11-03):** 10 s → 55,3 %; 20 s → 54,9 %; 30 s → 54,6 %; 40 s → 54,2 %. El panel
     blitz marca «aún vale» entre 15 y 30 s y «TARDE» después (antes eran 15 s, copiados del modelo de 1 min).
+  - **El blitz ya está en el registro diario de la nube (2026-11-04):** señales del modelo congelado con su resultado
+    sellado (3 bolsas y precio IQ reconstruido). Desde GitHub (EE. UU.) la API de Binance (451) y la de Bybit (403)
+    están bloqueadas. Se usan los archivos públicos (data.binance.vision, public.bybit.com), la API de OKX y los
+    archivos de Gate. Las variables son idénticas a las del entrenamiento (diferencia 0). Del 26-10 al 03-11: 73
+    señales (unas 8 por día).
 
   Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**

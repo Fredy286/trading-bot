@@ -249,6 +249,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
          download.gatedata.org. Enmienda al Estudio 44: H44c (mismo juicio con ese precio).
        - Modelo congelado `BTCUSDT-blitz3-compuesto-0f8694` (config/senal_blitz.json). Confirmación: Estudio 44,
          después del 2027-01-18.
+       - **Registro diario del blitz en la nube** (`registro.blitz_day`, desde el 2026-10-26; sellado): Binance y Bybit desde
+         sus archivos públicos (sus API están bloqueadas desde EE. UU.), OKX por API y Gate por sus archivos diarios.
+       - Demora del clic: 10 s → 55,3 %, 30 s → 54,6 %; el panel blitz dice «aún vale» de 15 a 30 s y «TARDE» después.
        - Modo de práctica: `scripts/iniciar_blitz.sh` → panel /blitz (el mismo `senales.html`, que elige el modo por
          la ruta). Datos en `data/raw/bolsas_usdt/`.
        - Deriv también desarmado (docs/10): cobra la reversión en el pago (tope 81,8 %). Descartado.
