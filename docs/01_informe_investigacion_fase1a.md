@@ -3778,3 +3778,47 @@ datos hasta 2026-09).
   cambia eso.
 - Consecuencia (según el pre-registro): confirmación con datos posteriores al 2026-10-25, **Estudio 49**. No se toca
   ningún modelo congelado ni los modos en vivo.
+
+## Estudio 49 — confirmación: filtro de «racha reciente» sobre las señales registradas del modelo congelado de BTC (H16b) (pre-registro, 2026-11-05, ANTES de mirar datos posteriores al 2026-10-25)
+
+**Origen:** el Estudio 48 pasó (H48a y H48b, sección anterior). Su pre-registro manda confirmarlo con datos nuevos,
+una sola vez, sin tocar modelos ni modos en vivo. No he leído ningún acierto de `results/registro/` (sellado hasta el
+2027-01-19); solo los conteos de `tbot registro resumen` (BTC: 583 señales en 9 días, unas 65 por día).
+
+**Datos:** las señales ya registradas cada día por la nube del modelo congelado `BTCUSDT-anticipada-k50-L10-35b764`
+(H16b: aviso en el segundo 50, clic a +10 s, juicio con Binance), archivos `results/registro/btc/*.jsonl` con
+`vela` de 2026-10-26 00:00 a 2027-01-18 23:59 UTC. Señales base = todas las registradas (EV con pago 85 % ≥ margen),
+campo `resultado` («gana», «pierde», «empate»; las que queden sin resultado se excluyen).
+
+**Filtro (las mismas reglas del Estudio 48, sin ajustar nada):** para cada señal de la vela t se usan solo señales
+base anteriores ya resueltas, `vela` ≤ t − 3 min (el contrato vence a más tardar a los 2 min), sin empates:
+- **H49a:** acierto de las últimas 500 resueltas ≥ 54,05 % → se toma; si no, se salta;
+- **H49b:** acierto de las resueltas en los 7 días anteriores ≥ 54,05 %, si son ≥ 50 → se toma.
+
+La racha usa todas las señales base (también las saltadas). Solo señales de la ventana; no se usa nada anterior al
+2026-10-26 para calentar la racha. Muestra común: las señales en las que la racha está definida (base y filtro).
+
+**Hipótesis (Bonferroni α = 0,025 cada una). Criterios, todos:**
+1. acierto tomadas − acierto saltadas > 0, con el límite inferior del intervalo bootstrap por semanas ISO completas
+   (10 000 remuestreos, semilla 12345, 97,5 % unilateral) por encima de 0;
+2. EV por operación de las tomadas > EV de la base (pago 85 %, empate reembolsado);
+3. ≥ 300 tomadas y ≥ 300 saltadas. Si no llega, se informa el conteo y se amplía la ventana con datos registrados
+   después, hasta un máximo de 6 meses (2027-04-26); entonces se evalúa con lo que haya y, si sigue sin llegar,
+   queda «sin datos suficientes».
+
+**Informativo:** EV × operaciones (ganancia total) de tomadas frente a base; persistencia semanal; lo mismo con p ≥ 0,60.
+
+**Potencia declarada:** con unas 5 000 señales y ~1 000–1 500 saltadas, una diferencia real de 3 puntos da una
+potencia de ~45 %. Un «no pasa» será «no confirmado», no «refutado».
+
+**Por qué no el blitz:** el pre-registro del 48 lo nombraba, pero el blitz registra unas 8 señales por día; en 84 días
+no llega a 300 saltadas. Se deja fuera antes de mirar nada.
+
+**Expectativa:** dudosa, por la potencia baja y porque la ventaja de base (Estudio 16) también está por confirmar.
+
+**Consecuencia:**
+- Si pasa: el modo de práctica podría mostrar «racha baja: mejor no operar» como aviso informativo. Solo con un cambio
+  documentado, y nunca cambiando el modelo.
+- Si no pasa: el filtro queda como «no confirmado» en docs/10.
+
+**Evaluación:** una sola vez, después del 2027-01-19 (cuando se abra el sello del registro), junto con el Estudio 16.
