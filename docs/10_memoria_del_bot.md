@@ -95,6 +95,9 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   claro entre Binance y OKX a 1 s. Encaja con lo nuestro: las bolsas en USDT copian a Binance en segundos (la ventaja
   sobrevive), y las de dólares tienen su propio ruido. Consecuencia: variables de «qué bolsa va adelantada» solo
   pueden servir al segundo, no con velas de 1 min.
+- **El acierto del modelo va por rachas (Estudio 48, 2026-11-05):** si viene fallando una semana, suele seguir algo
+  peor la siguiente (correlación 0,36–0,40). Saltar las malas rachas sube el acierto por operación (~57,4 % frente a
+  56,5 %), pero casi no sube la ganancia total. Es una 4.ª forma de «confianza», útil para operar menos.
 - **Copy trading (2026-11-03):** copiar a quien va ganando aumenta el riesgo heredado, no el acierto; las listas de
   cuentas «verificadas» ya están filtradas por supervivencia. No buscar ahí reglas; como mucho, piezas medibles con
   su historial completo.
@@ -111,7 +114,7 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 | 2 | Traders con historial **verificado** (Myfxbook, Darwinex, eToro, ranking de TradingView): ¿quién acierta ≥ 60 % de verdad y cómo? | El usuario cree que hay algo detrás de quien acierta a diario | Primera revisión hecha (docs/06, sección 3b): menos del 1 % gana de forma repetida; el acierto alto suele esconder pérdidas grandes. Segunda revisión (2026-11-03, docs/06 sección 3c): copiar sube el riesgo (Management Science 2020), sin ganancia tras costos; ~7 % cobra en empresas de fondeo. Las páginas de cuentas concretas no abren desde la nube. **Siguiente:** solo en sesión local, bajar el CSV completo de 2–3 cuentas verificadas con ≥ 3 años (Myfxbook/Darwinex) y desarmar hora, duración y riesgo; los martes en la nube, pasar a la idea pendiente de mayor prioridad |
 | 3 | Auditoría prospectiva de canales (Estudio 32) y más canales con señales **no OTC** publicadas antes de la entrada | Comprobar con datos frescos si alguien acierta | En marcha (captura cada hora, 12 canales; auditados el 29 y el 30). Solo 2 canales dan señales verificables. Canales nuevos: solo en sesión local (t.me no abre desde la nube). Veredicto único el 2027-01-31 |
 | 4 | Selector BTC + ETH con p ≥ 0,60 en el horario del usuario (21:00–01:00 Bogotá) | Más señales de alta confianza en sus horas | **Baja prioridad:** el modelo congelado de ETH (Estudio 35) dio 0 señales en sus primeros 5 días registrados (conteo, sin aciertos); además el usuario no tiene BTC/ETH a 1 min en su plataforma |
-| 4b | **Filtro de «racha reciente» del propio modelo** (acierto de sus últimas 500 operaciones o de los últimos 7 días ≥ equilibrio) | Tercera forma de «confianza»; la ventaja va por épocas (Estudios 20 y 41) | **Estudio 48** pre-registrado (10677d7) y programado el 2026-11-04; en la cola de GitHub. Documentar su resultado al día siguiente |
+| 4b | **Filtro de «racha reciente» del propio modelo** (acierto de sus últimas 500 operaciones o de los últimos 7 días ≥ equilibrio) | Tercera forma de «confianza»; la ventaja va por épocas (Estudios 20 y 41) | **Estudio 48 PASA** (2026-11-05): +2,3–2,5 puntos entre tomadas y saltadas en desarrollo, +3,9–4,5 en verificación; persistencia semanal 0,36–0,40. Pero la ganancia total casi no cambia (−6 % / +5 %): sirve para operar menos con la misma ganancia. Confirmación pre-registrada: **Estudio 49** (señales registradas de H16b, código listo, se niega a correr antes del 2027-01-19; potencia ~45 %). Nada que hacer hasta entonces |
 | 5 | Comparar precios de Deriv con HistData en los mismos minutos | Validar la fuente del registro nocturno | **Baja:** Deriv quedó descartado para operar; solo afecta a la medida científica |
 
 ### Ideas cerradas (no repetir)

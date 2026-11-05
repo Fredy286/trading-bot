@@ -520,3 +520,52 @@ verificación (2025-09 → 2026-09). Datos hasta 2026-09: nada reservado. Expect
 - Es lo que hace mucha gente con su racha. Lo dejé escrito antes de mirar datos, para no engañarnos.
 - La prueba corre sola en GitHub; mañana sabremos si sirve o no.
 - El bot y las señales no cambiaron. Solo demo.
+
+## 2026-11-05 (autónoma)
+
+Tema del jueves: mejorar la reversión nocturna en divisas. Antes, la tarea obligatoria: documentar el Estudio 48.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes.
+- Cola: `study48` hecha el 2026-11-04 12:24 UTC, sin documentar → documentada hoy.
+- Registro diario: archivos hasta el 2026-11-03. La corrida programada de hoy aún no había arrancado a las 12:15 UTC.
+  En los días anteriores arrancó entre las 14:00 y las 16:30 UTC (horarios de GitHub poco fiables, ítem 46): normal.
+- Conteos sellados (sin aciertos): BTC 583 señales en 9 días, nocturna 1 375, blitz 73, ETH 13.
+- Vigilancia de canales: última captura 2026-11-05 10:45 UTC.
+
+**Estudio 48 (resultado, aplicado mecánicamente): H48a y H48b PASAN.**
+- Con el filtro, las operaciones tomadas aciertan 57,2–57,5 % y las saltadas 52,9–54,7 % (desarrollo y verificación).
+- La diferencia es de +2,3 a +4,5 puntos, con el intervalo por semanas lejos de 0.
+- El acierto de una semana se parece al de la siguiente (correlación 0,36–0,40).
+- Sin fuga de futuro: la racha solo usa operaciones resueltas antes de la apertura de la vela.
+- La trampa que encontré: la «ganancia por día» del informe compara días distintos (ítem 53 del registro de errores).
+  Con totales, la ganancia casi no cambia (desarrollo −6 %, verificación +5 %). El filtro sirve para operar menos con
+  la misma ganancia; no es una ventaja nueva.
+
+**Estudio 49 (nuevo, el único del día):**
+- Confirmación del filtro con las señales que la nube ya registra del modelo congelado H16b (2026-10-26 → 2027-01-18).
+- Pasos: pre-registro (commit propio), código y pruebas en otro commit (`tbot research study49`).
+- El código se niega a correr antes del 2027-01-19 (sello del registro). No va a la cola.
+- Potencia declarada ~45 %. El blitz queda fuera: tiene muy pocas señales.
+
+**Tema del jueves (búsqueda breve):**
+- No encontré un estudio riguroso nuevo sobre la reversión a las 17:00 de Nueva York.
+- Lo más cercano: Krohn, Mueller y Whelan, borrador de la conferencia AEA 2020
+  (https://benny.aeaweb.org/conference/2020/preliminary/paper/2dedYfDH). Según el resumen del buscador:
+  - a esa hora el diferencial es máximo y el volumen mínimo;
+  - los vaivenes intradía son reales, pero cuesta ganar con ellos tras costos.
+  - No leí el texto completo.
+- Encaja con el Estudio 34: la reversión vive en los minutos de diferencial abierto. Nada nuevo que probar hoy.
+- Las páginas de brókeres con cifras («4–12 veces el diferencial») no dicen su método; no las uso.
+
+**Pendientes con fecha**
+- Sesión local con Fredy: anotar precios de entrada del blitz en la demo (ideas 1 y 1b de docs/10).
+- Después del 2027-01-18: evaluar una sola vez los Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44, 46 y 49.
+- Canales: veredicto el 2027-01-31.
+
+**Para Fredy**
+- La idea de ayer funcionó en los datos viejos: cuando el bot de bitcoin viene fallando, conviene parar un rato.
+- Así se aciertan más operaciones (cerca de 57 de cada 100), pero se gana casi lo mismo en total: se opera menos.
+- No es una ventaja nueva; sirve para cansarse menos y arriesgar menos en las malas semanas.
+- Dejé escrita la prueba de verdad con datos nuevos; se hace en enero, una sola vez.
+- El bot y las señales no cambiaron. Solo demo.

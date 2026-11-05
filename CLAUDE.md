@@ -261,6 +261,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        Deriv entrega como mucho 1 000 velas/ticks por petición y, fuera de su historial, devuelve las de hoy (ítems 47–48).
    - **Estudio 48 (2026-11-04, rutina):** filtro de «racha reciente» del propio GBM de BTC 1 min (operar solo si sus
      últimas 500 operaciones resueltas o las de 7 días aciertan ≥ 54,05 %). Pre-registro 10677d7; en la cola de GitHub.
+   - **Estudio 48 (2026-11-05): PASA** (H48a últimas 500, H48b 7 días): tomadas 57,2–57,5 % frente a saltadas 52,9–54,7 %,
+     pero la ganancia total casi no cambia (−6 % / +5 %): operar menos con la misma ganancia. **Estudio 49** pre-registrado
+     (confirmación con las señales registradas de H16b); `tbot research study49` se niega a correr antes del 2027-01-19.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
