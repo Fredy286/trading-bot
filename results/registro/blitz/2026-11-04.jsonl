@@ -1,0 +1,6 @@
+{"vela": "2026-11-04T00:03:00+00:00", "lado": "CALL", "p": 0.5872, "ev86": 0.0919, "p057": true, "horario_usuario": false, "resultado": "gana", "resultado_iq": "gana", "modelo": "BTCUSDT-blitz3-compuesto-0f8694"}
+{"vela": "2026-11-04T00:40:00+00:00", "lado": "CALL", "p": 0.5571, "ev86": 0.0361, "p057": false, "horario_usuario": false, "resultado": "pierde", "resultado_iq": "pierde", "modelo": "BTCUSDT-blitz3-compuesto-0f8694"}
+{"vela": "2026-11-04T00:43:00+00:00", "lado": "CALL", "p": 0.5545, "ev86": 0.0314, "p057": false, "horario_usuario": false, "resultado": "gana", "resultado_iq": "gana", "modelo": "BTCUSDT-blitz3-compuesto-0f8694"}
+{"vela": "2026-11-04T03:00:00+00:00", "lado": "CALL", "p": 0.5548, "ev86": 0.0318, "p057": false, "horario_usuario": true, "resultado": "pierde", "resultado_iq": "pierde", "modelo": "BTCUSDT-blitz3-compuesto-0f8694"}
+{"vela": "2026-11-04T03:02:00+00:00", "lado": "CALL", "p": 0.5582, "ev86": 0.0382, "p057": false, "horario_usuario": true, "resultado": "pierde", "resultado_iq": "pierde", "modelo": "BTCUSDT-blitz3-compuesto-0f8694"}
+{"vela": "2026-11-04T03:13:00+00:00", "lado": "CALL", "p": 0.5871, "ev86": 0.0918, "p057": true, "horario_usuario": true, "resultado": "gana", "resultado_iq": "gana", "modelo": "BTCUSDT-blitz3-compuesto-0f8694"}
