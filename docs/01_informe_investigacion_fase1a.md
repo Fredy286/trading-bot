@@ -3741,3 +3741,40 @@ debería verse; pero el filtro puede solo quitar operaciones al azar (como pasó
   2027-01-18), aplicada a las señales ya registradas del modelo congelado (H16b) y del blitz; no se toca ningún modelo
   congelado ni los modos en vivo.
 - Si no pasa: «racha reciente del modelo» queda cerrada en docs/10.
+
+### Resultado del Estudio 48 (2026-11-05; ejecutado en GitHub Actions el 2026-11-04 12:24 UTC, código 7c7902a; aplicado mecánicamente)
+
+Archivo: `results/estudio48/resultado.json`. Pago 85 %, equilibrio 54,05 %, empate reembolsado.
+
+| Hipótesis | Periodo | Base: ops / acierto / EV | Tomadas: ops / acierto / EV | Saltadas: ops / acierto / EV | Tomadas − saltadas [lím. inf. 97,5 %] |
+|---|---|---|---|---|---|
+| H48a (últimas 500) | Desarrollo | 219 355 / 56,60 % / +0,044 | 169 477 / 57,19 % / +0,053 | 49 878 / 54,69 % / +0,011 | +2,50 pp [+1,80] |
+| H48a | Verificación | 62 856 / 56,49 % / +0,041 | 47 928 / 57,45 % / +0,056 | 14 928 / 53,57 % / −0,008 | +3,87 pp [+2,55] |
+| H48b (7 días, ≥ 50) | Desarrollo | 219 806 / 56,60 % / +0,044 | 185 559 / 56,98 % / +0,050 | 34 247 / 54,64 % / +0,011 | +2,34 pp [+1,63] |
+| H48b | Verificación | 63 316 / 56,49 % / +0,041 | 51 059 / 57,38 % / +0,055 | 12 257 / 52,92 % / −0,020 | +4,45 pp [+3,24] |
+
+Criterios 1–4: todos se cumplen en H48a y en H48b. **Veredicto: H48a PASA y H48b PASA** (desarrollo y verificación,
+datos hasta 2026-09).
+
+**Informativo (sin veredicto):**
+- Persistencia: la correlación del acierto de una semana con el de la siguiente es 0,36 en desarrollo (187 semanas) y
+  0,40 en verificación (57 semanas). El acierto semanal va de 50,2 % a 64,5 % (desarrollo) y de 44,6 % a 62,8 %
+  (verificación).
+- **Ganancia total, no solo por operación.** El campo `ev_total_por_dia` divide entre los días en que cada grupo tuvo
+  operaciones, así que no sirve para comparar grupos (registro de errores, ítem 53). Calculado como EV × operaciones:
+  - desarrollo: base ≈ 9 590 unidades, tomadas ≈ 9 020 (−6 %): las saltadas todavía ganaban (EV +0,011);
+  - verificación: base ≈ 2 560, tomadas ≈ 2 690 (+5 %): las saltadas perdían.
+
+**Lectura honesta:**
+- Busqué la trampa:
+  - fuga de futuro: no la hay. Una operación cuenta para la racha solo si su etiqueta terminó (apertura + 2 min) antes de
+    la **apertura** de la vela que se decide, un minuto antes de lo necesario;
+  - la racha se calcula con todas las operaciones base, también las saltadas.
+- El filtro funciona como se esperaba: cuando el modelo viene fallando, sigue fallando un poco más (persistencia 0,36–0,40).
+  Sube el acierto por operación alrededor de 0,6–0,9 puntos y quita las operaciones peores (53–55 %).
+- Pero la ganancia total casi no cambia (−6 % y +5 %). Sirve sobre todo para **operar menos con casi la misma ganancia**:
+  menos clics y menos exposición en las malas épocas. No es una ventaja nueva.
+- Sigue valiendo la advertencia de los Estudios 37–38: el modelo predice el último precio de **Binance**. El filtro no
+  cambia eso.
+- Consecuencia (según el pre-registro): confirmación con datos posteriores al 2026-10-25, **Estudio 49**. No se toca
+  ningún modelo congelado ni los modos en vivo.
