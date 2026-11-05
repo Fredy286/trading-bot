@@ -437,6 +437,13 @@ def cmd_research_study26(a) -> int:
     return 0
 
 
+def cmd_research_study49(a) -> int:
+    from .research import study49
+
+    study49.run()
+    return 0
+
+
 def cmd_research_study48(a) -> int:
     from .research import study48
 
@@ -892,6 +899,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study34)
     x = r.add_parser("study26", help="Estudio 26: aviso anticipado + umbral p ≥ 0,60 en XRP, SOL, ETH y DOGE")
     x.set_defaults(func=cmd_research_study26)
+    x = r.add_parser("study49", help="Estudio 49: confirmación del filtro de racha (solo después del 2027-01-19)")
+    x.set_defaults(func=cmd_research_study49)
     x = r.add_parser("study48", help="Estudio 48: filtro de racha reciente del propio GBM de BTC 1 min")
     x.set_defaults(func=cmd_research_study48)
     x = r.add_parser("study33", help="Estudio 33: variables de reloj (cuarto de hora, financiación) en el GBM de BTC 1 min")
