@@ -569,3 +569,48 @@ Tema del jueves: mejorar la reversión nocturna en divisas. Antes, la tarea obli
 - No es una ventaja nueva; sirve para cansarse menos y arriesgar menos en las malas semanas.
 - Dejé escrita la prueba de verdad con datos nuevos; se hace en enero, una sola vez.
 - El bot y las señales no cambiaron. Solo demo.
+
+## 2026-11-06 (autónoma)
+
+Tema del viernes: canales de señales.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado.
+- Vigilancia de canales: corre (última captura 2026-11-06 06:34 UTC, 12 canales).
+- Auditoría con precios (Estudio 32): días juzgados del 2026-10-29 al 2026-11-04.
+- Registro diario: archivos hasta el 2026-11-04 (el del 5 aún no llega a las 12:15 UTC; horarios de GitHub, ítem 46).
+  Conteos sellados (sin aciertos): BTC 632 señales en 10 días (p ≥ 0,60: 46), ETH 14, nocturna 1 575 (fuerte 600).
+
+**Tabla descriptiva `tbot canales tabla` (sin veredicto antes del 2027-01-31):**
+
+| Canal | Señales | Verificadas | Acierto 1.ª entrada | Límite inf. 95 % | p frente al azar |
+|---|---|---|---|---|---|
+| QuotexSignalfreee | 141 | 94 | 56,4 % | 46,3 % | 0,13 |
+| gotraderssinaisfree | 63 | 58 | 48,3 % | 35,9 % | 0,65 |
+
+Lectura: ninguno se distingue del azar todavía (los dos intervalos incluyen 50 %); con 94 señales eso es lo esperable
+aunque hubiera ventaja. Lo nuevo: **gotraderssinaisfree no publica señales desde el 2026-10-31**; lo capturado del 3 y
+el 5 de noviembre es solo publicidad (tarjetas y registro en Quotex). En la práctica queda un solo canal verificable,
+así que el veredicto del 2027-01-31 tendrá poca potencia.
+
+**Búsqueda de canales nuevos:** sin resultado útil. t.me sigue sin abrir desde este entorno (curl sin respuesta). Dos
+búsquedas web: apareció el canal vfxAlert_binarysignals (https://t.me/s/vfxAlert_binarysignals/1029), pero según el
+resumen del buscador sus estrategias son de «Pocket Option OTC» (no pude abrir la página): no sirve. El resto fueron
+listas de advertencia de estafas (https://brokerlistings.com/scams/signals-telegram) y foros de denuncias
+(https://www.forexpeacearmy.com/community/tags/telegram-scam/). No se añadió ningún canal.
+
+**Estudio nuevo:** ninguno (no había material que lo justificara; no fuerzo uno).
+
+**Pendientes con fecha**
+- Sesión local con Fredy: buscar 3–5 canales con listas NO OTC fechadas (t.me sí abre desde su PC) y anotar precios de
+  entrada del blitz en la demo.
+- Después del 2027-01-18: evaluar una sola vez los Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44, 46 y 49.
+- Canales: veredicto único el 2027-01-31.
+
+**Para Fredy**
+- Revisé los canales de señales que el bot vigila. De los dos que se pueden comprobar, uno acierta 56 de cada 100 y el
+  otro 48, pero con tan pocas señales eso todavía no se distingue de lanzar una moneda.
+- Uno de los dos dejó de publicar señales el 31 de octubre: ahora solo pone publicidad.
+- No encontré canales nuevos que sirvan (desde la nube no abre Telegram). Si ves canales con listas de divisas
+  normales (no OTC) y con la hora antes de entrar, pásame el nombre.
+- El bot y las señales no cambiaron. Solo demo.
