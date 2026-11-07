@@ -3926,3 +3926,72 @@ fallará el criterio 6 o el 7.
 
 Código: `src/tradingbot/research/study50.py`, `tbot research study50`; pruebas en `tests/test_study50.py` (causalidad de
 las variables deslizantes, espera de 60 s, submuestra).
+
+## Estudio 51 — blitz de ETH en IQ Option con la receta del Estudio 42: más señales vigilando otra moneda (pre-registro, 2026-11-07, ANTES de calcular nada de ETH con el compuesto)
+
+**Origen:** el usuario pide más señales con buena probabilidad. El Estudio 50 mostró que revisar BTC más seguido no las
+da: H50a dio 8,0 señales por día con 54,7 % de acierto, frente a 6,9 por día con 56,8 % del blitz actual. La otra vía
+es vigilar más monedas con la misma receta.
+
+**Supuestos que el usuario debe verificar (no deciden este estudio, sí su uso):**
+- que IQ Option tenga «Ethereum Blitz» de 3 min con pago del 86 %. Si el pago o la duración cambian, este estudio no
+  aplica tal cual;
+- que su precio de ETH sea un promedio de bolsas como el de BTC. Se comprobará con capturas y con
+  `tbot blitz comparar`.
+
+**Datos:**
+- velas de 1 min de ETH/USDT de Binance: las del Estudio 3 hasta 2026-08 y las del Estudio 26 para
+  2025-09 → 2026-10;
+- tabla de velas de 1 s de ETH del Estudio 26 (bloque parcial hasta el segundo 50);
+- cierres de 1 min de ETH/USDT en Binance, Bybit y OKX (API) desde 2024-08, y en Gate (archivos diarios) desde
+  2025-09. Se descargaron el 2026-11-07, solo hasta el 2026-10-26 00:05 (`data/raw/bolsas_usdt/ETHUSDT/`).
+
+**Precio:**
+- **Entrenamiento y juicio principal:** compuesto de 3 bolsas (promedio simple de Binance, Bybit y OKX), como en el
+  Estudio 42.
+- **Juicio adicional obligatorio:** compuesto de 4 bolsas con los pesos de BTC del Estudio 47 (Binance 0,336,
+  Bybit 0,071, OKX 0,223, Gate 0,370). Como no se conocen los pesos de ETH, la señal debe pasar con los dos.
+
+**Receta:** la del Estudio 42, sin cambios:
+- mismas variables, con datos de ETH;
+- GBM mes a mes, 2025-09-01 → 2026-10-25, con 12 meses de entrenamiento (el último 20 % para calibrar) y purga de
+  5 min;
+- decisión en el segundo 50; clic a +10 s, al cierre de la vela; vencimiento 3 min después;
+- empate si la diferencia es menor de 0,005; tasa de empates estimada con las 1 440 etiquetas anteriores.
+
+**Política:** EV estimado ≥ 0,02 con pago del 86 % y empate reembolsado.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H51a:** todas las operaciones de la política;
+- **H51b:** solo las de p ≥ 0,57 (el filtro del Estudio 46).
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p < 0,025 frente a 53,76 % (binomial, compuesto de 3 bolsas);
+3. Wilson 95 % > 53,76 % con el compuesto de 3 bolsas;
+4. Wilson 95 % > 53,76 % con el compuesto de 4 bolsas;
+5. intervalo del EV (bootstrap por semanas ISO, 97,5 %) por encima de 0;
+6. EV > 0 en ≥ 60 % de los meses.
+
+**Informativo:**
+- señales por día y por noche (horario del usuario);
+- juicio con Binance sola;
+- solapamiento con las señales del blitz de BTC (mismo minuto) y minutos con alguna señal (BTC o ETH) por día.
+
+**Expectativa declarada:** dudosa. ETH a 1 min con el precio de Binance tuvo ventaja con p ≥ 0,60 (Estudio 26:
+58,8 % en 653 operaciones). Pero en BTC la ventaja bajó al pasar de Binance al compuesto (Estudio 41).
+
+**Consecuencia:**
+- **Si H51a o H51b pasa:**
+  - se entrena una vez el modelo congelado de ETH (12 meses hasta el 2026-10-25);
+  - el modo de práctica del blitz vigila BTC y ETH, y cada aviso dice la moneda;
+  - ETH se suma al registro diario en la nube;
+  - se pre-registra su confirmación con datos posteriores al 2026-10-25.
+
+  Se usa **solo** si el usuario confirma que IQ Option tiene «Ethereum Blitz» de 3 min y cuál es su pago.
+- **Si no pasa:** ETH queda sin señal para el blitz.
+
+El informe completo del Estudio 50 (H50b y lo informativo) se lee después de este commit y no cambia este diseño.
+
+Código: `src/tradingbot/research/study51.py`, `tbot research study51`; descarga de bolsas en
+`src/tradingbot/research/bolsas.py`.
