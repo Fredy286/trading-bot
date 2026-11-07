@@ -2,6 +2,7 @@
 # Avisos para el blitz de BTC de IQ Option (3 min, pago 86 %) en cuenta DEMO (Estudio 42) + panel web.
 # Abre http://127.0.0.1:8765/blitz. Para detener: Ctrl+C en esta ventana (detiene ambos procesos).
 # Si IQ Option muestra otro pago, páselo:  scripts/iniciar_blitz.sh --pago 85
+# Avisos también en el celular (Telegram del .env):  scripts/iniciar_blitz.sh --telegram
 cd "$(dirname "$(readlink -f "$0")")/.." || exit 1
 TBOT=.venv/bin/tbot
 if [ ! -f config/senal_blitz.json ]; then

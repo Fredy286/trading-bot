@@ -196,6 +196,11 @@ promedio simple de Binance, Bybit y OKX que usa este modo (55,3 % en desarrollo)
 Si IQ Option muestra otro pago, páselo con `scripts/iniciar_blitz.sh --pago 85`: con menos pago, el bot avisa
 menos. **Nunca con dinero real.**
 
+**Avisos en el celular (Telegram):** con `scripts/iniciar_blitz.sh --telegram`, cada aviso llega también al chat de
+Telegram configurado en `.env` (`TB_TELEGRAM_BOT_TOKEN` y `TB_TELEGRAM_CHAT_ID`). Así se puede operar desde la app de
+IQ Option en el celular, con el PC encendido calculando. Para comprobar la conexión: `.venv/bin/tbot telegram probar`
+(manda un solo mensaje de prueba). Si Telegram falla, el aviso igual suena en el PC.
+
 ### Reversión nocturna en divisas para practicar en cuenta DEMO (Estudios 25, 27 y 28)
 
 ```bash
