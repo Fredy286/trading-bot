@@ -118,6 +118,44 @@ Polymarket, comisiones (https://unchainedcrypto.com/polymarket-introduces-taker-
 https://bitquery.io/investigations/polymarket-five-minute-casino) y bloqueo en Colombia
 (https://docs.polymarket.com/developers/CLOB/geoblock ; https://startpolymarket.com/countries/colombia/).
 
+### 2.3 Revisión del 2026-11-07: ETH con precio real y vencimiento corto
+
+Pedido del usuario después de comprobar que el blitz de ETH de IQ Option es OTC (docs/01, comprobación del
+2026-11-07).
+
+| Plataforma | ETH a precio real | Vencimiento corto | Costo (equilibrio) | Colombia | Veredicto |
+|---|---|---|---|---|---|
+| **IQ Option** | Solo como binaria (15 min) y digital (cada 5 min) | Blitz de ETH solo OTC (precio propio) | 84–87 % de pago (54,4 % / 53,5 %) | Extranjera, sin SFC | El modelo de ETH no deja ventaja en esos formatos |
+| Pocket Option, Olymp Trade, Quotex, Binomo, ExpertOption | Dicen tener ETH «no OTC», pero con feed propio no auditable | Desde segundos | Pagos anunciados 80–92 % | Extranjeras, sin SFC; sin API oficial | Igual que IQ: habría que verificar su precio vela a vela; contraparte = la plataforma |
+| Deriv | **No** (cripto solo con multiplicadores) | — | — | Extranjera | No sirve (sección 2.1) |
+| Polymarket («Up or Down» 5/15 min) | Sí | 5 y 15 min | ~50 % + comisión del tomador | **Bloqueada por Coljuegos** (2025) | No |
+| Kalshi, Robinhood (15 min) | Sí | 15 min | — | Solo EE. UU. | No |
+| **OKX «Event Contracts»** | **Sí: índice de OKX** (OKX 25 %, Binance 25 %, Bybit 18,75 %, Coinbase 18,75 %, Bitget 12,5 %) | **5 y 15 min** (BTC, ETH, SOL), ventanas fijas (:00, :05…); se compra antes de que empiece la ventana | Antes de la ventana se compra a 0,51–0,52 USDT y se cobra 1 USDT si se acierta. Comisión del tomador = 0,045 × P × (1 − P) (~0,011 a P = 0,52); sin comisión de liquidación desde el 2026-05-06 → **equilibrio ≈ 52,1–53,1 %** | OKX dice ofrecerlos en Latinoamérica; Colombia no se nombra. Sin SFC; podrían considerarse juego (Coljuegos) | **La mejor candidata:** Estudio 54 |
+| Binance «Event Contracts» (abril de 2026) | Probablemente (precio de Binance) | Sin detalles públicos encontrados | — | — | Pendiente |
+
+**Datos de OKX verificados con su API pública (sin cuenta):**
+- series `ETH-UPDOWN-5MIN`, `BTC-UPDOWN-5MIN`, `SOL-UPDOWN-5MIN` y las de 15 min;
+- partida = índice al comenzar la ventana; liquidación = media de los 30 cierres de 1 s antes del vencimiento (comprobado
+  con 6 contratos de ETH);
+- libro de órdenes (`market/books`) y resultados oficiales (`floorStrike`, `settleValue`, `outcome`);
+- historia de 1 min del índice desde al menos 2024-09 (`history-index-candles`), y de 1 s en fechas recientes.
+
+**Lo que falta saber (lo comprueba el usuario en la app de OKX, sin depositar):**
+1. si a un residente en Colombia le aparece la categoría «Events» / «Eventos» y le deja operar;
+2. si hay modo de práctica para estos contratos.
+
+Sin práctica gratuita, la única forma sin dinero es seguir las señales en papel con el resultado oficial de la API.
+
+Fuentes: [OKX — lanzamiento](https://www.zawya.com/en/press-release/companies-news/okx-launches-event-contracts-providing-a-simpler-way-to-trade-btc-and-eth-price-movements-y4nqgepu);
+[reglas de liquidación](https://www.okx.com/help/how-to-trade-event-contracts-and-settlement-logic);
+[actualización de mayo](https://www.okx.com/help/okx-event-contract-may-product-update);
+[preguntas frecuentes](https://www.okx.com/help/event-contracts-faq);
+[comisiones](https://www.okx.com/help/notice-on-event-contracts-fee-updates);
+[Binance y OKX entran a los mercados de predicción](https://blog.1token.tech/binance-and-okx-launch-prediction-market-contracts.md);
+[Polymarket bloqueada en Colombia](https://focusgn.com/polymarket-barred-in-colombia);
+[Robinhood «BTC Up or Down 15 min»](https://robinhood.com/us/en/prediction-markets/crypto/events/btc-up-or-down-15-minutes-mar-09-2026/);
+[Pocket Option (reseña)](https://kelaenderkoe.pages.dev/Using-https-www.binaryoptions.net/pocket-option).
+
 ## 3. Recomendación condicionada
 
 1. **Hoy no hay base para ejecutar automáticamente.** Primero debe existir una configuración
