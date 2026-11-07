@@ -3996,7 +3996,7 @@ El informe completo del Estudio 50 (H50b y lo informativo) se lee después de es
 Código: `src/tradingbot/research/study51.py`, `tbot research study51`; descarga de bolsas en
 `src/tradingbot/research/bolsas.py`.
 
-### Resultado del Estudio 50 (2026-11-07; código 7d8108c y d58a587, aplicado mecánicamente): NO PASA
+### Resultado del Estudio 50 (2026-11-07; código 0ad5de4 y 1b3688a, aplicado mecánicamente): NO PASA
 
 La primera ejecución se cayó al imprimir H50b, después de calcular todo (registro de errores, ítem 55). Se corrigió
 solo el mensaje y se repitió igual; H50a dio lo mismo. `results/estudio50/resultado.json`: 3 628 394 decisiones con
@@ -4031,7 +4031,7 @@ modo continuo (el código preparado se retiró sin usarse). No hay Estudio de co
 **Idea nueva, solo para datos posteriores al 2026-10-25 (*post hoc*):** una segunda decisión en el segundo 40 con un
 modelo propio de esa fase. Lo que se vio aquí (57,8 %, 353 señales) sale del modelo genérico y de datos ya mirados.
 
-### Resultado del Estudio 51 (2026-11-07; código 42144b0, aplicado mecánicamente): PASA (H51a y H51b)
+### Resultado del Estudio 51 (2026-11-07; código 596a400, aplicado mecánicamente): PASA (H51a y H51b)
 
 `results/estudio51/resultado.json`. Cierres de ETH completos en las 4 bolsas: 1 175 045 minutos por bolsa desde
 2024-08 (Gate: 604 705 desde 2025-09).
@@ -4098,3 +4098,18 @@ Si aun así no llega, queda «sin datos suficientes».
 - **Si no pasa:** el blitz vuelve a vigilar solo BTC.
 - **Si el usuario comprueba que IQ Option no tiene «Ethereum Blitz»:** el modo de práctica no vigila ETH. El registro
   sigue como medida científica.
+
+**Nota sobre los identificadores de commit de los Estudios 50–52 (2026-11-07):** al subirlos, los commits se
+reordenaron sobre uno automático de la nube («Vigilancia de canales», 18:42 UTC), así que cambiaron de identificador.
+Fecha, autor y contenido son los mismos; los originales siguen en GitHub con la etiqueta `prerregistros-2026-11-07`.
+
+| Original | Nuevo | Qué es |
+|---|---|---|
+| 7d8108c | 0ad5de4 | Estudio 50: pre-registro y código |
+| d58a587 | 1b3688a | Estudio 50: arreglo del mensaje (ítem 55) |
+| 42144b0 | 596a400 | Estudio 51: pre-registro y código |
+| 706b6ab | ad3ce59 | Estudio 51: resultado; Estudio 52: pre-registro |
+| 1cdb459 | ecf3ed0 | código con el que se entrenó el modelo congelado de ETH |
+| 68a00d5 | d1ca213 | Estudio 52: modelo congelado de ETH |
+
+`config/senal_blitz_eth.json` cita los originales (706b6ab y 1cdb459), tal como quedaron al entrenar.

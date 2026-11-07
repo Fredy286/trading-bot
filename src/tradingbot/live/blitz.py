@@ -86,7 +86,7 @@ def train_frozen_blitz(root3: Path = Path("data/raw/estudio3"), daily_cache: Pat
         spot = study51.minute_bars(root3)
         tab_all = pd.read_parquet(study51.TAB)
         cl = {v: x for v, x in study51.closes("2025-10", "2026-10").items() if v in ("binance", "bybit", "okx")}
-        registro = "Estudio 52 (pre-registro 706b6ab): modelo congelado del blitz de ETH para la confirmación y la demo"
+        registro = "Estudio 52 (pre-registro ad3ce59): modelo congelado del blitz de ETH para la confirmación y la demo"
     else:
         raise ValueError(f"Moneda sin datos para el blitz: {symbol}")
     spot = spot[~spot.index.duplicated(keep="last")].sort_index()
