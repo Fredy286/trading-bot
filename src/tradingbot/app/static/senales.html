@@ -185,13 +185,14 @@ function renderSignal(st) {
     const late = since > LATE_S && !clicked.has(u.alert_id);
     big.className = late ? "none" : (u.lado > 0 ? "up" : "down");
     const slow = IDEAL_S && since > IDEAL_S && !late && !clicked.has(u.alert_id);
-    big.textContent = late ? "TARDE — no entres en esta" : (u.lado > 0 ? "↑ SUBE" : "↓ BAJA") + (slow ? " · aún vale" : "");
+    const coin = BLITZ && u.activo ? u.activo + " " : "";  // blitz con varias monedas: cuál abrir en IQ Option
+    big.textContent = late ? "TARDE — no entres en esta" : coin + (u.lado > 0 ? "↑ SUBE" : "↓ BAJA") + (slow ? " · aún vale" : "");
     if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;
     $("countdown").textContent = left > 0 ? `cierre en ${left.toFixed(1)} s` : `${(-left).toFixed(1)} s después del cierre`;
     if (!$("sub").textContent) $("sub").textContent = u.vence && !BLITZ
       ? `BTC/USD · vencimiento a elegir: ${fmtT(u.vence).slice(0, 5)} · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`
-      : `${MODE.contrato} · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
+      : `${BLITZ && u.activo ? MODE.contrato.replace("BTC", u.activo) : MODE.contrato} · probabilidad ${pct(u.p)} · aviso ${fmtT(u.decidido)}`;
   } else {
     current = null; $("clickbtn").disabled = true; big.className = "none";
     big.textContent = u.estado === "error" ? "Error de datos (reintentando)" :
@@ -221,7 +222,7 @@ function renderMetrics(r) {
 function renderRows(rows) {
   if (!rows.length) return;
   $("rows").innerHTML = rows.map((f) => `<tr>
-    <td>${fmtT(f.decidido)}</td><td>${f.lado > 0 ? "↑ sube" : "↓ baja"}</td><td class="num">${pct(f.p)}</td>
+    <td>${fmtT(f.decidido)}</td><td>${f.activo ? f.activo + " " : ""}${f.lado > 0 ? "↑ sube" : "↓ baja"}</td><td class="num">${pct(f.p)}</td>
     <td class="num">${f.latencia_s == null ? "sin clic" : num(f.latencia_s, 1) + " s"}</td>
     <td class="num">${num(f.entrada_ref)} → ${num(f.salida_ref)}</td><td>${res(f.resultado_ref)}</td>
     <td class="num">${num(f.entrada_plataforma)} → ${num(f.salida_plataforma)}</td><td class="num">${f.pago == null ? "—" : f.pago + " %"}</td>
@@ -246,6 +247,12 @@ async function poll() {
     offsetMs = (st.desfase_reloj_s || 0) * 1000;
     $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ${st.minutos} minutos · ${st.avisos} avisos` +
       (st.umbral ? ` · solo p ≥ ${st.umbral}` : "") + (st.cuarto_r ? ` · cuarto de hora` : "");
+    if (BLITZ && st.activos && st.activos.length > 1 && !$("banner").dataset.eth) {
+      $("titulo").textContent = `Blitz de IQ Option · ${st.activos.join(" y ")} 3 minutos`;
+      $("banner").textContent = MODE.banner + " ETH (Estudio 51): 56,9 % con p ≥ 0,57 en desarrollo; " +
+        "el aviso dice qué moneda abrir. Usa «Ethereum Blitz» solo si tu IQ Option lo tiene (confirmación: Estudio 52).";
+      $("banner").dataset.eth = "1";
+    }
     renderSignal(st); renderMetrics(st.resumen);
     if (!editing) renderRows(st.diario);
   } catch (e) { $("status").textContent = "sin conexión con el panel"; }

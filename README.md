@@ -201,6 +201,37 @@ Telegram configurado en `.env` (`TB_TELEGRAM_BOT_TOKEN` y `TB_TELEGRAM_CHAT_ID`)
 IQ Option en el celular, con el PC encendido calculando. Para comprobar la conexión: `.venv/bin/tbot telegram probar`
 (manda un solo mensaje de prueba). Si Telegram falla, el aviso igual suena en el PC.
 
+### Más señales: el blitz de ETH (Estudios 50, 51 y 52)
+
+El 2026-11-07 se buscó cómo tener **más señales sin perder probabilidad**:
+
+- **Revisar BTC cada 10 s en vez de una vez por minuto no sirve** (Estudio 50). Daba 8 señales por día con 54,7 %,
+  frente a 6,9 por día con 56,8 % del blitz actual. La ventaja de BTC vive en los últimos 20 s de cada minuto, y el bot
+  ya decide ahí (segundo 50).
+- **Vigilar también ETH, sí** (Estudio 51, misma receta con los precios de ETH):
+  - en desarrollo, con p ≥ 0,57, **31 señales por día con 56,9 %**, frente a 6,9 de BTC con 56,8 %;
+  - con el promedio de 4 bolsas (pesos de BTC), 56,7 %;
+  - casi nunca coinciden con las de BTC;
+  - en el horario de 21:00 a 01:00 de Bogotá, unas 4 por noche (58,4 %, lectura *post hoc*);
+  - todas las señales (EV ≥ 0,02): 112 por día con 54,9 %.
+- **Falta la confirmación con datos nuevos** (Estudio 52, enero de 2027). El registro diario en la nube ya la anota
+  (`results/registro/blitz_eth/`, sellado). **Solo cuenta demo.**
+
+**Antes de usarlo, compruebe en IQ Option** que existe «Ethereum Blitz» de 3 minutos y cuál es su pago. Si no existe
+o dura otra cosa, no use `--eth`.
+
+```bash
+scripts/iniciar_blitz.sh --eth --telegram
+```
+
+En cada minuto el bot decide para BTC y ETH a la vez. Si las dos dan señal, avisa solo la de mayor probabilidad: el
+panel y el Telegram dicen qué moneda abrir (por ejemplo, «ETH ↓ BAJA»). Lo demás es igual que en el blitz de BTC:
+- clic antes de 15 s (hasta 30 s «aún vale»);
+- anotar el precio de entrada exacto y el resultado.
+
+El modelo congelado es `ETHUSDT-blitz3-compuesto-5d7319` (`tbot blitz entrenar --eth`; huella en
+`config/senal_blitz_eth.json`).
+
 ### Reversión nocturna en divisas para practicar en cuenta DEMO (Estudios 25, 27 y 28)
 
 ```bash

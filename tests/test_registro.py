@@ -61,3 +61,14 @@ def test_blitz_summary_is_sealed_and_counts_its_groups(tmp_path):
     s = registro.resumen(tmp_path, now=pd.Timestamp("2026-11-04", tz="UTC"))
     assert s["blitz"]["todas"] == {"senales": 2} and s["blitz"]["p ≥ 0,57"] == {"senales": 1}
     assert s["blitz"]["horario del usuario"] == {"senales": 1}
+
+
+def test_blitz_eth_is_in_the_daily_registry_and_summary(tmp_path, monkeypatch):
+    calls = []
+    for name in ("btc_day", "eth_day", "night_day", "blitz_day", "blitz_eth_day"):
+        monkeypatch.setattr(registro, name, (lambda n: (lambda day: calls.append((n, day)) or []))(name))
+    out = registro.run_day("2026-11-01", root=tmp_path, log=lambda *_: None)
+    assert out["blitz_eth"] == 0 and ("blitz_eth_day", "2026-11-01") in calls
+    assert (tmp_path / "blitz_eth" / "2026-11-01.jsonl").exists()
+    r = registro.resumen(tmp_path, now=pd.Timestamp("2026-11-07", tz="UTC"))
+    assert r["blitz_eth"]["dias"] == 1 and r["sellado_hasta"] == "2027-01-19"
