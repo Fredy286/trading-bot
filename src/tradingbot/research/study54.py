@@ -190,6 +190,22 @@ def run_symbol(symbol: str, cfg, log=print, durs=(5, 15)) -> dict:
     return out
 
 
+CACHE = Path("data/processed/estudio54")
+
+
+def run_symbol_cached(symbol: str, cfg, log=print) -> dict:
+    """`run_symbol` con caché en disco (las predicciones son deterministas: misma semilla, mismos datos)."""
+    f = CACHE / f"{symbol}.parquet"
+    if f.exists():
+        df = pd.read_parquet(f)
+        return {int(d): {"p": g["p"].to_numpy(), "y": g["y"].to_numpy(), "t": pd.DatetimeIndex(g.index)}
+                for d, g in df.groupby("dur")}
+    r = run_symbol(symbol, cfg, log)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    pd.concat([pd.DataFrame({"dur": d, "p": x["p"], "y": x["y"]}, index=x["t"]) for d, x in r.items()]).to_parquet(f)
+    return r
+
+
 def run(out_dir: Path = Path("results/estudio54"), n_boot: int = 1000, log=print) -> dict:
     cfg = load_config("config/research.toml")  # solo se lee
     rep = {"estudio": "Estudio 54 — event contracts de OKX «Up or Down 5min» con aviso anticipado (pre-registro en docs/01)",
@@ -197,7 +213,7 @@ def run(out_dir: Path = Path("results/estudio54"), n_boot: int = 1000, log=print
            "equilibrio": EQUILIBRIO, "hipotesis": {}, "informativo": {}}
     preds = []
     for symbol, meta in SIMBOLOS.items():
-        r = run_symbol(symbol, cfg, log)
+        r = run_symbol_cached(symbol, cfg, log)
         for d, x in r.items():
             ev = evaluate(x["p"], x["y"], x["t"], n_boot=n_boot)
             user = (x["t"].hour >= 2) & (x["t"].hour < 6)
