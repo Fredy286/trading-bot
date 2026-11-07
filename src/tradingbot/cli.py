@@ -869,6 +869,9 @@ def cmd_blitz(a) -> int:
         except FileNotFoundError:
             print("Falta el modelo de ETH. Ejecute primero: tbot blitz entrenar --eth")
             return 2
+    if extra:
+        print("AVISO: en IQ Option el blitz de ETH es «ETH/USD (OTC)», con un precio que fabrica la plataforma "
+              "(comprobado el 2026-11-07). Este aviso de ETH no sirve para ese activo.")
     monedas = "BTC y ETH" if extra else "BTC"
     print(f"Blitz de {monedas} (3 min): aviso en el segundo {bundle['k']} de cada vela "
           f"({', '.join([bundle['model_id']] + [x['bundle']['model_id'] for x in extra])}). "
@@ -1134,8 +1137,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="avisar solo si la probabilidad de la dirección es ≥ este valor (solo práctica)")
     x.add_argument("--telegram", action="store_true", help="mandar también cada aviso al Telegram del .env")
     x.add_argument("--eth", action="store_true",
-                   help="vigilar también ETH (Estudio 51; solo si IQ Option tiene «Ethereum Blitz»). Con «entrenar», "
-                        "entrena el modelo de ETH")
+                   help="vigilar también ETH (Estudio 51). NO sirve en IQ Option: su blitz de ETH es «ETH/USD (OTC)», "
+                        "con precio propio (2026-11-07). Con «entrenar», entrena el modelo de ETH")
     x.set_defaults(func=cmd_blitz)
 
     x = sub.add_parser("telegram", help="Telegram de los avisos de práctica")

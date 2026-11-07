@@ -219,8 +219,14 @@ El 2026-11-07 se buscó cómo tener **más señales sin perder probabilidad**:
 - **Falta la confirmación con datos nuevos** (Estudio 52, enero de 2027). El registro diario en la nube ya la anota
   (`results/registro/blitz_eth/`, sellado). **Solo cuenta demo.**
 
-**Antes de usarlo, compruebe en IQ Option** que existe «Ethereum Blitz» de 3 minutos y cuál es su pago. Si no existe
-o dura otra cosa, no use `--eth`.
+**Comprobado en IQ Option (2026-11-07): NO usar `--eth` allí.**
+- El único Ethereum del blitz es «ETH/USD (OTC)», con un precio que fabrica la plataforma: iba unos 140 USD por
+  encima del real y en otra dirección.
+- El Ethereum de precio real solo está como binaria de 15 min y como digital de vencimiento cada 5 min. En esas
+  condiciones el modelo no deja ventaja.
+- El modo `--eth` queda para otra plataforma que pague con el precio real de ETH.
+
+**Nunca opere activos «(OTC)»:** su precio no viene del mercado y ningún estudio de este proyecto aplica a ellos.
 
 ```bash
 scripts/iniciar_blitz.sh --eth --telegram

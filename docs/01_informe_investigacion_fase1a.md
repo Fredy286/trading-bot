@@ -4113,3 +4113,31 @@ Fecha, autor y contenido son los mismos; los originales siguen en GitHub con la 
 | 68a00d5 | d1ca213 | Estudio 52: modelo congelado de ETH |
 
 `config/senal_blitz_eth.json` cita los originales (706b6ab y 1cdb459), tal como quedaron al entrenar.
+
+### Comprobación en IQ Option (2026-11-07, 16:07–16:30 de Bogotá; sesión abierta por el usuario, solo lectura, sin operar)
+
+El usuario envió una captura de «ETH/USD (OTC)» en Blitz (vencimiento desde 30 s, pago 84 %) y abrió su sesión para que
+se revisara directamente. Velas de 1 min leídas en la plataforma (pasando el cursor), comparadas con las de las bolsas
+en los mismos minutos:
+
+| Activo de IQ Option | 16:07–16:12 (cierres) | Bolsas (Binance, Bybit, OKX, Gate) | Conclusión |
+|---|---|---|---|
+| **ETH/USD (OTC)**, Blitz | 2 364,97 → 2 348,78 (bajó 16 USD) | 2 226,6 → 2 228,6 (subió 2 USD) | **precio propio de IQ Option** (≈ +140 USD y otra dirección) |
+| **Ethereum**, Digital (16:11–16:19, 7 velas) | 2 227,57; 2 228,51; … | diferencia de 0,15–0,30 USD en apertura, máximo, mínimo y cierre | **precio real** (mezcla de bolsas, como el BTC del blitz) |
+
+Lista de activos de IQ Option ese sábado:
+- **Blitz con precio real:** solo **Bitcoin** y **Solana**, las dos cerradas el fin de semana («abre mañana 22:00»).
+- **Solo versión OTC (precio propio):** Ethereum, XRP, Litecoin, Dogecoin, Cardano y Polkadot.
+- **«Ethereum» real:** como binaria (pago 87 %, vencimientos cada 15 min; no hay binarias de 1 min) y como digital
+  (pago 84 %, un único vencimiento en la próxima marca de 5 min; la compra cierra 30 s antes).
+
+**Consecuencias:**
+1. **Estudio 52:** la condición de uso no se cumple, porque IQ Option no tiene «Ethereum Blitz» con precio real. El
+   modo de práctica no debe vigilar ETH (`--eth`) para el ETH/USD (OTC). El registro diario `blitz_eth` sigue como
+   medida científica, como dice el pre-registro.
+2. **Ethereum digital (lectura *post hoc* de las predicciones del Estudio 51):** solo sirven las entradas 3 min antes de
+   una marca de 5 min (decisión en el segundo 50 de los minutos :x1 y :x6). Con p ≥ 0,57 serían 6,1 señales por día con
+   55,0 % [53,1 %]; con pago del 84 % el equilibrio es 54,35 % y el EV queda en +0,012. **Sin señal útil.**
+3. **Los activos OTC no se pueden estudiar ni predecir con datos de mercado:** su precio lo produce la plataforma, que
+   además es la contraparte. Ningún modelo de este proyecto aplica a ellos.
+4. **Siguiente:** Solana es la única otra criptomoneda con blitz de precio real → Estudio 53.

@@ -271,8 +271,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      56,9 % (4 bolsas 56,7 %); todas 112/día con 54,9 %; casi no coinciden con BTC; horario del usuario ~4/noche (58,4 %,
      *post hoc*); en meses tranquilos muchas menos (octubre: ETH 10,5/día y 1,4/noche; BTC 0 con p ≥ 0,57). Modelo congelado `ETHUSDT-blitz3-compuesto-5d7319` (config/senal_blitz_eth.json); confirmación:
      **Estudio 52** (enero de 2027; registro diario `blitz_eth`, sellado). Modo: `scripts/iniciar_blitz.sh --eth
-     [--telegram]` (decide BTC y ETH a la vez; avisa la de mayor p). **Usar solo si el usuario confirma que IQ Option
-     tiene «Ethereum Blitz» de 3 min y su pago.** Cierres de otras monedas: `research/bolsas.py`
+     [--telegram]` (decide BTC y ETH a la vez; avisa la de mayor p). **NO aplica a IQ Option (comprobado 2026-11-07 en la
+     sesión del usuario): su blitz de ETH es «ETH/USD (OTC)», precio propio (+140 USD, otra dirección).** Blitz con precio
+     real en IQ: solo Bitcoin y Solana (cerrados el fin de semana, abren dom 22:00). Activos OTC: nunca. Cierres de otras monedas: `research/bolsas.py`
      (`data/raw/bolsas_usdt/<SÍMBOLO>/`; SOL/XRP/DOGE en descarga, sin OKX aún).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca

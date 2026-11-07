@@ -182,6 +182,7 @@ Si una oferta cumple **dos o más**, trátala como sospechosa:
 8. Presiona con urgencia («últimos cupos», «precio sube mañana»).
 9. Explica las pérdidas después con historias («cazaron stops») en lugar de reglas fijadas antes.
 10. Muestra solo las estrategias que salieron bien en una prueba sobre el pasado (por ejemplo, «2 de 5») y no las prueba en un periodo posterior (Estudio 45).
+11. Da señales para activos «(OTC)» de las plataformas de binarias: su precio lo produce la propia plataforma, que también es la contraparte. En IQ Option, el «ETH/USD (OTC)» iba 140 USD por encima del Ethereum real y en otra dirección (2026-11-07, docs/01). Ninguna estrategia basada en el mercado aplica ahí.
 
 **TradingView:** guía de uso y trampas de su backtest en `docs/07_tradingview.md`.
 
