@@ -54,8 +54,24 @@ def test_resueltas_tres_minutos_antes():
 
 def test_run_sintetico(tmp_path):
     d = _write(tmp_path)
-    rep = study49.run(d, tmp_path / "o", hoy=pd.Timestamp("2027-02-01", tz="UTC"), n_boot=200, log=lambda *_: None)
+    rep = study49.run(d, tmp_path / "o", hoy=pd.Timestamp("2027-02-01", tz="UTC"), n_boot=200, log=lambda *_: None,
+                     exigir_completo=False)
     assert set(rep["hipotesis"]) == {"H49a", "H49b"}
     assert (tmp_path / "o" / "resultado.json").exists()
     for h in rep["hipotesis"].values():
         assert set(h["criterios"]) == {"diferencia_ic", "ev", "min_300"}
+
+
+def test_no_evalua_si_faltan_dias(tmp_path):
+    d = tmp_path / "btc"
+    d.mkdir()
+    for day in pd.date_range(study49.START, study49.END, freq="D", inclusive="left"):
+        if day != pd.Timestamp("2027-01-18", tz="UTC"):  # falta justo el último día
+            (d / f"{day:%Y-%m-%d}.jsonl").write_text("", encoding="utf-8")
+    assert study49.missing_days(d) == ["2027-01-18"]
+    with pytest.raises(SystemExit, match="faltan 1 días"):
+        study49.run(d, tmp_path / "o", hoy=pd.Timestamp("2027-01-19", tz="UTC"), log=lambda *_: None)
+    assert not (tmp_path / "o").exists()
+    (d / "2027-01-18.jsonl").write_text("", encoding="utf-8")
+    assert study49.missing_days(d) == []
+    assert study49._last_contiguous_end(d) == study49.END

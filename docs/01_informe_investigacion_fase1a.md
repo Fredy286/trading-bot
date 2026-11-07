@@ -3822,3 +3822,9 @@ no llega a 300 saltadas. Se deja fuera antes de mirar nada.
 - Si no pasa: el filtro queda como «no confirmado» en docs/10.
 
 **Evaluación:** una sola vez, después del 2027-01-19 (cuando se abra el sello del registro), junto con el Estudio 16.
+
+**Nota de procedimiento (2026-11-07, rutina del sábado; sin mirar ningún acierto ni cambiar criterios):** como la
+evaluación es única, `tbot research study49` ahora se niega a correr si falta el archivo de algún día de la ventana
+(2026-10-26 → 2027-01-18) en `results/registro/btc/` (el registro diario reintenta los días pendientes, y su horario en
+GitHub no es fiable, ítem 46). La ampliación de la ventana, si hiciera falta, solo usa días seguidos ya registrados.
+No cambia datos, reglas, hipótesis ni umbrales (registro de errores, ítem 54).

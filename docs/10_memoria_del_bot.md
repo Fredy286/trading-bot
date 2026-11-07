@@ -98,6 +98,9 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 - **El acierto del modelo va por rachas (Estudio 48, 2026-11-05):** si viene fallando una semana, suele seguir algo
   peor la siguiente (correlación 0,36–0,40). Saltar las malas rachas sube el acierto por operación (~57,4 % frente a
   56,5 %), pero casi no sube la ganancia total. Es una 4.ª forma de «confianza», útil para operar menos.
+- **Evaluaciones únicas (2026-11-07):** antes de calcular, comprobar que no falte ningún día de datos (el registro
+  diario a veces llega tarde). El Estudio 49 ya lo hace; las confirmaciones que se programen en enero (12, 14, 15, 16,
+  19, 21, 29, 35, 40, 43, 44, 46) deben hacerlo igual.
 - **Copy trading (2026-11-03):** copiar a quien va ganando aumenta el riesgo heredado, no el acierto; las listas de
   cuentas «verificadas» ya están filtradas por supervivencia. No buscar ahí reglas; como mucho, piezas medibles con
   su historial completo.

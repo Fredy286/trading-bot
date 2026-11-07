@@ -614,3 +614,38 @@ listas de advertencia de estafas (https://brokerlistings.com/scams/signals-teleg
 - No encontré canales nuevos que sirvan (desde la nube no abre Telegram). Si ves canales con listas de divisas
   normales (no OTC) y con la hora antes de entrar, pásame el nombre.
 - El bot y las señales no cambiaron. Solo demo.
+
+## 2026-11-07 (autónoma)
+
+Tema del sábado: robustez y calidad.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y lo hecho ya documentado.
+- `git fetch` avisó de una «actualización forzada» de la rama principal: era solo el clon superficial de este
+  entorno (la referencia vieja 14ff9e7, del 2026-10-31, sí está en la historia actual). Nada se reescribió.
+- Registro diario: 11 días seguidos (2026-10-26 → 11-05), sin huecos. Conteos sellados (sin aciertos): BTC 651
+  señales, nocturna 1 809 (fuerte 687), blitz 84 (p ≥ 0,57: 52).
+- Vigilancia de canales: captura de hoy (07:02 UTC). Unidos no publica desde el 2026-11-01 y gotraderssinaisfree
+  desde el 11-05 (solo publicidad, ver el 11-06). Auditoría con precios hasta el 2026-11-05.
+- Pruebas: todas en verde.
+
+**Revisión de código (Estudio 49, la confirmación del filtro de racha):** coincide con su pre-registro (racha solo con
+señales resueltas 3 min antes, bootstrap por semanas ISO con semilla 12345, criterios y ampliación). Fallo hallado:
+no comprobaba que el registro tuviera todos los días antes de su evaluación única. Si se lanzaba el 19 de enero antes
+de que llegara el archivo del 18, se gastaba con datos incompletos. Arreglado: se niega a correr si falta algún día
+(ítem 54 del registro de errores; nota de procedimiento en docs/01, sin tocar criterios). Prueba nueva.
+
+**Estudio nuevo:** ninguno (sábado de revisión; no fuerzo uno).
+
+**Pendientes con fecha**
+- Sesión local con Fredy: precios de entrada del blitz en la demo (ideas 1 y 1b de docs/10) y canales no OTC.
+- Después del 2027-01-18: evaluar una sola vez los Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44, 46 y 49,
+  comprobando antes que no falte ningún día de datos.
+- Canales: veredicto único el 2027-01-31.
+- Mañana (domingo): resumen semanal.
+
+**Para Fredy**
+- Hoy revisé que todo lo automático siga funcionando: el registro diario y la vigilancia de canales van bien.
+- Encontré y arreglé un descuido: la prueba de enero del «filtro de racha» podía correr con un día de datos faltante.
+  Ahora espera a tener todos los días.
+- No hubo estudio nuevo. El bot y las señales no cambiaron. Solo demo.

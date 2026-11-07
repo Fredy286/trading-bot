@@ -44,6 +44,21 @@ def load_signals(reg_dir: Path, end: pd.Timestamp = END) -> pd.DataFrame:
     return df
 
 
+def missing_days(reg_dir: Path, end: pd.Timestamp = END) -> list[str]:
+    """Días de la ventana [START, end) sin archivo `AAAA-MM-DD.jsonl` en el registro (el registro diario los reintenta)."""
+    have = {f.stem for f in Path(reg_dir).glob("*.jsonl")}
+    return [f"{d:%Y-%m-%d}" for d in pd.date_range(START, end, freq="D", inclusive="left") if f"{d:%Y-%m-%d}" not in have]
+
+
+def _last_contiguous_end(reg_dir: Path) -> pd.Timestamp:
+    """Fin (exclusivo) del tramo de días seguidos con archivo, empezando en START."""
+    have = {f.stem for f in Path(reg_dir).glob("*.jsonl")}
+    d = START
+    while f"{d:%Y-%m-%d}" in have and d < END_MAX:
+        d += pd.Timedelta(days=1)
+    return d
+
+
 def evaluate(df: pd.DataFrame, n_boot: int = N_BOOT) -> dict:
     times = pd.DatetimeIndex(df["vela"])
     res = df["res"].to_numpy()
@@ -65,18 +80,27 @@ def evaluate(df: pd.DataFrame, n_boot: int = N_BOOT) -> dict:
 
 
 def run(reg_dir: Path = Path("results/registro/btc"), out_dir: Path = Path("results/estudio49"),
-        hoy: pd.Timestamp | None = None, n_boot: int = N_BOOT, log=print) -> dict:
+        hoy: pd.Timestamp | None = None, n_boot: int = N_BOOT, log=print, exigir_completo: bool = True) -> dict:
     hoy = hoy or pd.Timestamp.now(tz="UTC")
     if hoy < SELLO:
         raise SystemExit(f"Estudio 49: el registro está sellado hasta {SELLO:%Y-%m-%d}; no se evalúa antes.")
+    # Evaluación única: no gastarla con días sin registrar (nota de procedimiento del 2026-11-07 en docs/01).
+    falta = missing_days(reg_dir, END) if exigir_completo else []
+    if falta:
+        raise SystemExit(f"Estudio 49: faltan {len(falta)} días en el registro ({', '.join(falta[:10])}…); "
+                         "esperar a que el registro diario los complete. No se evaluó nada.")
+    tope = _last_contiguous_end(reg_dir) if exigir_completo else END_MAX
     end = END
     rep = None
     while True:
         rep = evaluate(load_signals(reg_dir, end), n_boot)
         short = not all(h["criterios"]["min_300"] for h in rep["hipotesis"].values())
-        if not short or end >= END_MAX or end >= hoy.normalize():
+        if not short or end >= END_MAX or end >= hoy.normalize() or end >= tope:
             break
-        end = min(end + pd.Timedelta(days=7), END_MAX, hoy.normalize())
+        nuevo = min(end + pd.Timedelta(days=7), END_MAX, hoy.normalize(), max(tope, end))
+        if nuevo <= end:
+            break
+        end = nuevo
     rep.update({"estudio": "Estudio 49 — confirmación del filtro de racha con señales registradas de H16b",
                 "git_sha": git_sha(), "ventana": [str(START.date()), str((end - pd.Timedelta(days=1)).date())],
                 "equilibrio": BE})
