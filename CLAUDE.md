@@ -267,9 +267,13 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    - **Estudio 50 (2026-11-07, pedido «más señales y mejor probabilidad»): blitz «continuo» (decidir cada 10 s): NO PASA.**
      8,0 señales/día con 54,7 % frente a 6,9 con 56,8 % del blitz actual; nunca llega a p ≥ 0,60. La ventaja vive en los
      segundos 40–50 de cada minuto (58 %); a mitad del minuto, 51 %. El código del modo continuo se retiró sin usarse.
-   - **Estudio 51 (pre-registrado 2026-11-07): blitz de ETH** con la receta del 42 (compuesto de 3 bolsas; debe pasar
-     también con 4 bolsas y pesos de BTC). Descarga de cierres de otras monedas en `research/bolsas.py`
-     (`data/raw/bolsas_usdt/<SÍMBOLO>/`). Solo útil si el usuario confirma que IQ Option tiene «Ethereum Blitz».
+   - **Estudio 51 (2026-11-07): blitz de ETH PASA** (receta del 42 con datos de ETH): p ≥ 0,57 → 31 señales/día con
+     56,9 % (4 bolsas 56,7 %); todas 112/día con 54,9 %; casi no coinciden con BTC; horario del usuario ~4/noche (58,4 %,
+     *post hoc*). Modelo congelado `ETHUSDT-blitz3-compuesto-5d7319` (config/senal_blitz_eth.json); confirmación:
+     **Estudio 52** (enero de 2027; registro diario `blitz_eth`, sellado). Modo: `scripts/iniciar_blitz.sh --eth
+     [--telegram]` (decide BTC y ETH a la vez; avisa la de mayor p). **Usar solo si el usuario confirma que IQ Option
+     tiene «Ethereum Blitz» de 3 min y su pago.** Cierres de otras monedas: `research/bolsas.py`
+     (`data/raw/bolsas_usdt/<SÍMBOLO>/`; SOL/XRP/DOGE en descarga, sin OKX aún).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
