@@ -52,6 +52,10 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     están bloqueadas. Se usan los archivos públicos (data.binance.vision, public.bybit.com), la API de OKX y los
     archivos de Gate. Las variables son idénticas a las del entrenamiento (diferencia 0). Del 26-10 al 03-11: 73
     señales (unas 8 por día).
+  - Gate publica su archivo diario de velas con 1–2 días de retraso: el día del blitz queda «pendiente» y se completa
+    en la corrida siguiente. Para evaluar el Estudio 44 en enero, esperar a que exista el archivo del 2027-01-18.
+  - **Avisos en el celular (2026-11-07):** `scripts/iniciar_blitz.sh --telegram` manda cada aviso al Telegram del
+    `.env` (el usuario ya tenía token y chat configurados). `tbot telegram probar` manda un solo mensaje de prueba.
 
   Regla: una señal solo sirve si se calcula con el MISMO precio con el que liquida la plataforma.
 - **Trampas ya vistas:**
