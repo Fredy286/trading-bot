@@ -228,6 +228,10 @@ El 2026-11-07 se buscó cómo tener **más señales sin perder probabilidad**:
 
 **Nunca opere activos «(OTC)»:** su precio no viene del mercado y ningún estudio de este proyecto aplica a ellos.
 
+**Solana** es la otra criptomoneda con blitz de precio real en IQ Option (abre de domingo 22:00 a viernes, como el de
+BTC), pero con la misma receta no tiene ventaja (Estudio 53: 55,2 % con límite inferior de 52,1 %). Hoy, en IQ Option,
+el único contrato con ventaja medida es el **blitz de Bitcoin**.
+
 ```bash
 scripts/iniciar_blitz.sh --eth --telegram
 ```
