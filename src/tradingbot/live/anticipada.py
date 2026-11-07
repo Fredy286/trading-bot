@@ -206,6 +206,16 @@ def aviso_texto(d: dict, modo: str | None = None) -> str:
     hora = pd.Timestamp(d["decidido"]).tz_convert(BOGOTA).strftime("%H:%M:%S")
     flecha = "↑ SUBE" if d["lado"] == 1 else "↓ BAJA"
     prob = f"{100 * d['p']:.1f}".replace(".", ",") + " %"
+    if modo == "okx":
+        lado = "Up" if d["lado"] == 1 else "Down"
+        ini = pd.Timestamp(d["ventana"]).tz_convert(BOGOTA)
+        fin = (pd.Timestamp(d["ventana"]) + pd.Timedelta(minutes=5)).tz_convert(BOGOTA)
+        cabeza = f"OKX {d.get('activo') or 'ETH'} 5 min"
+        regla = (f"Compra «{lado}» de la ventana {ini:%H:%M}–{fin:%H:%M} ANTES de las {ini:%H:%M:%S} "
+                 f"(precio ahora {d.get('precio_compra')}; no pagues más de 0,53).")
+        prob = f"{100 * d['p']:.1f}".replace(".", ",") + " %"
+        return (f"🔔 {cabeza}: {'↑ SUBE' if d['lado'] == 1 else '↓ BAJA'}\n{regla}\nProbabilidad {prob} · aviso "
+                f"{hora} (Bogotá)\nSin dinero real: solo anótalo.")
     if modo == "blitz":
         cabeza = f"{d.get('activo') or 'BTC'} blitz 3 min"
         regla = "Haz clic ya: lo ideal, antes de 15 s; hasta 30 s aún vale."

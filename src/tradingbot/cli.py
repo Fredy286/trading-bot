@@ -747,7 +747,7 @@ def cmd_serve(a) -> int:
 
     return serve(host=a.host, port=a.port, runtime_dir=Path(a.runtime), results_dir=Path(a.results),
                  senal_dir=Path(a.senal_runtime), nocturna_dir=Path(a.nocturna_runtime),
-                 blitz_dir=Path(a.blitz_runtime))
+                 blitz_dir=Path(a.blitz_runtime), okx_dir=Path(a.okx_runtime))
 
 
 def cmd_canales(a) -> int:
@@ -900,6 +900,41 @@ def cmd_blitz(a) -> int:
         blitz.BlitzLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, pago=a.pago / 100 if a.pago else None,
                         umbral=a.umbral, telegram=_telegram_sender() if a.telegram else None,
                         extra=extra).run(a.iteraciones)
+    except KeyboardInterrupt:
+        pass
+    return 0
+
+
+def cmd_okx(a) -> int:
+    """Event contracts de OKX «Up or Down 5min» (Estudios 54 y 55): avisos para practicar SIN dinero."""
+    from .live import anticipada, okx_eventos
+
+    simbolos = [s for s, f in (("ETHUSDT", a.eth), ("BTCUSDT", a.btc)) if f] or ["ETHUSDT"]
+    if a.accion == "entrenar":
+        for s in simbolos:
+            try:
+                meta = okx_eventos.train_frozen_okx(s)
+            except FileExistsError as exc:
+                print(exc)
+                continue
+            print(json.dumps({k: meta[k] for k in ("model_id", "model_sha256", "n_ajuste", "n_calibracion")},
+                             ensure_ascii=False))
+        return 0
+    bundles = []
+    for s in simbolos:
+        try:
+            bundles.append((s, anticipada.load_bundle(*okx_eventos.MODELOS[s])))
+        except FileNotFoundError:
+            print(f"Falta el modelo de {s}. Ejecute primero: tbot okx entrenar --{s[:3].lower()}")
+            return 2
+    (s0, b0), extra = bundles[0], [{"symbol": s, "bundle": b} for s, b in bundles[1:]]
+    print(f"OKX «Up or Down 5min» de {' y '.join(s[:3] for s, _ in bundles)}: aviso en el segundo 50 antes de cada "
+          f"ventana; compra solo si cuesta ≤ {a.precio_max}. Panel: http://127.0.0.1:8765/okx — Ctrl+C para detener. "
+          "SIN DINERO REAL: solo anotar.")
+    try:
+        okx_eventos.OkxLoop(b0, Path(a.runtime), sound=not a.sin_sonido, umbral=a.umbral,
+                            telegram=_telegram_sender() if a.telegram else None, extra=extra,
+                            precio_max=a.precio_max).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -1165,6 +1200,18 @@ def build_parser() -> argparse.ArgumentParser:
                         "con precio propio (2026-11-07). Con «entrenar», entrena el modelo de ETH")
     x.set_defaults(func=cmd_blitz)
 
+    x = sub.add_parser("okx", help="avisos para los event contracts de OKX de 5 min, SIN dinero (Estudios 54 y 55)")
+    x.add_argument("accion", choices=["entrenar", "vivo"])
+    x.add_argument("--eth", action="store_true", help="ETH (por defecto si no se elige ninguna)")
+    x.add_argument("--btc", action="store_true", help="BTC")
+    x.add_argument("--runtime", default="runtime/okx")
+    x.add_argument("--iteraciones", type=int, default=0, help="0 = sin límite")
+    x.add_argument("--sin-sonido", action="store_true")
+    x.add_argument("--umbral", type=float, default=None, help="avisar solo si la probabilidad es ≥ este valor")
+    x.add_argument("--precio-max", type=float, default=0.53, help="no avisar si comprar cuesta más (USDT por acción)")
+    x.add_argument("--telegram", action="store_true", help="mandar también cada aviso al Telegram del .env")
+    x.set_defaults(func=cmd_okx)
+
     x = sub.add_parser("telegram", help="Telegram de los avisos de práctica")
     x.add_argument("accion", choices=["probar"], help="probar: manda UN mensaje de prueba al chat del .env")
     x.set_defaults(func=cmd_telegram)
@@ -1177,6 +1224,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--senal-runtime", default="runtime/senales")
     x.add_argument("--nocturna-runtime", default="runtime/nocturna")
     x.add_argument("--blitz-runtime", default="runtime/blitz")
+    x.add_argument("--okx-runtime", default="runtime/okx")
     x.set_defaults(func=cmd_serve)
 
     x = sub.add_parser("canales", help="vigilar canales públicos de señales y auditarlos con precios reales (Estudio 32)")

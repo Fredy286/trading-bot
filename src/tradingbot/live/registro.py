@@ -12,7 +12,7 @@ acertaron:
 
 Se guarda un archivo por día en `results/registro/<estrategia>/AAAA-MM-DD.jsonl`. No envía órdenes.
 
-**Sello:** las confirmaciones pre-registradas (Estudios 16, 21, 29, 44, 46 y 52) se evalúan una sola vez, después del 2027-01-18.
+**Sello:** las confirmaciones pre-registradas (Estudios 16, 21, 29, 44, 46, 52 y 55) se evalúan una sola vez, después del 2027-01-18.
 Hasta esa fecha `resumen` solo muestra conteos; los aciertos se abren con `abrir=True`, y cada apertura queda anotada.
 """
 
@@ -223,6 +223,125 @@ def blitz_day(day: str, cache: Path = CACHE, symbol: str = "BTCUSDT") -> list[di
              "modelo": b["model_id"]} for i in np.flatnonzero(ev >= b["ev_margin"])]
 
 
+def okx_resultados(symbol: str, d0: pd.Timestamp, d1: pd.Timestamp, session=None) -> dict[str, dict]:
+    """Resultados oficiales de los contratos de 5 min de OKX que vencen en [d0, d1] (API pública, página a página)."""
+    import requests
+
+    from .okx_eventos import OKX, SERIES
+
+    s = session or requests.Session()
+    out, after = {}, int((d1 + pd.Timedelta(minutes=10)).timestamp() * 1000)
+    for _ in range(40):
+        r = s.get(OKX + "/api/v5/public/event-contract/markets",
+                  params={"seriesId": SERIES[symbol], "state": "expired", "after": after}, timeout=20).json()
+        data = r.get("data") or []
+        if not data:
+            break
+        for x in data:
+            if x.get("settleValue"):
+                out[x["instId"]] = {"outcome": x["outcome"], "partida": float(x["floorStrike"]),
+                                    "liquidacion": float(x["settleValue"]), "vence": int(x["expTime"])}
+        oldest = min(int(x["expTime"]) for x in data)
+        if oldest <= d0.timestamp() * 1000:
+            break
+        after = oldest
+    return out
+
+
+def okx_day(day: str, symbol: str = "ETHUSDT", cache: Path = CACHE) -> list[dict]:
+    """Event contracts de OKX de 5 min (modelo congelado del Estudio 55): señales del día (decisión en el segundo 50
+    antes de cada ventana, compra a 0,52 con comisión) y su resultado OFICIAL de OKX."""
+    from ..research.study41 import composite
+    from ..research.study42 import comp_features
+    from .okx_eventos import MODELOS, PRECIO_REF, costo, inst_id
+
+    b = load_bundle(*MODELOS[symbol])
+    bin_cache = Path(cache) if symbol == "BTCUSDT" else Path(cache) / "eth"
+    ven_cache = Path(cache) / ("blitz" if symbol == "BTCUSDT" else "blitz_eth")
+    d0 = pd.Timestamp(day, tz="UTC")
+    d1 = d0 + pd.Timedelta(days=1)
+    m1 = download_daily("1m", f"{d0 - pd.Timedelta(days=3):%Y-%m-%d}", f"{d1:%Y-%m-%d}", bin_cache, symbol)
+    sec = download_daily("1s", f"{d0:%Y-%m-%d}", f"{d1:%Y-%m-%d}", bin_cache, symbol)
+    bars = spot_bars(m1[~m1.index.duplicated(keep="last")].sort_index())
+    tab = minute_table(sec, pd.date_range(d0, d1, freq="min", tz="UTC", inclusive="left")).reindex(bars.index)
+    prev = compute_features(bars).shift(1)
+    vol = np.exp(prev["lvol60"])
+    by = pd.concat([bybit_closes(d0 - pd.Timedelta(days=1), ven_cache, symbol), bybit_closes(d0, ven_cache, symbol)])
+    okc = okx_closes(d0 - pd.Timedelta(hours=2), d1, symbol)
+    comp = composite({"binance": bars["c"], "bybit": by[~by.index.duplicated()], "okx": okc[~okc.index.duplicated()]})
+    X = pd.concat([prev[FEATURES], partial_features(tab, bars["o"], vol, b["k"]),
+                   comp_features(comp, bars["c"], vol, bars.index)], axis=1)[b["features"]]
+    grid = ((bars.index.minute + 1) % b["duracion_min"]) == 0
+    rows_ok = (bars.index >= d0) & (bars.index < d1) & grid & X.notna().all(axis=1).to_numpy()
+    idx = bars.index[rows_ok]
+    if not len(idx):
+        return []
+    p_up = b["calibrator"].transform(b["model"].predict_proba(X[rows_ok].to_numpy())[:, 1])
+    side = np.where(p_up >= 0.5, 1, -1)
+    p_dir = np.where(side == 1, p_up, 1 - p_up)
+    ev = p_dir - costo(PRECIO_REF)
+    oficiales = okx_resultados(symbol, d0, d1 + pd.Timedelta(minutes=10))
+    take = np.flatnonzero(ev >= 0.02)
+    # OKX guarda los contratos vencidos solo unos días: si falta el oficial, se usa la etiqueta reconstruida del
+    # Estudio 54 (índice de OKX de 1 min + velas de 1 s de Binance), que coincidió con el oficial en 97,8–100 %.
+    recon = np.full(len(idx), np.nan)
+    faltan = [i for i in take if inst_id(symbol, idx[i] + pd.Timedelta(minutes=1), b["duracion_min"]) not in oficiales]
+    if faltan:
+        from ..research.study54 import SIMBOLOS, settle_labels
+
+        ix = okx_index_closes(SIMBOLOS[symbol]["indice"], d0 - pd.Timedelta(minutes=30), d1 + pd.Timedelta(minutes=10))
+        try:
+            nxt = download_daily("1s", f"{d1:%Y-%m-%d}", f"{d1 + pd.Timedelta(days=1):%Y-%m-%d}", bin_cache, symbol)
+            sec2 = pd.concat([sec, nxt[nxt.index < d1 + pd.Timedelta(minutes=10)]])
+        except FileNotFoundError:
+            sec2 = sec
+        sec2 = sec2[~sec2.index.duplicated(keep="last")].sort_index()
+        recon[faltan] = settle_labels(idx[faltan], b["duracion_min"], ix, bars["c"], sec2.index,
+                                      sec2["c"].to_numpy(float))
+    out = []
+    for i in take:
+        ventana = idx[i] + pd.Timedelta(minutes=1)
+        inst = inst_id(symbol, ventana, b["duracion_min"])
+        r = oficiales.get(inst)
+        if r is not None:
+            res, fuente = ("gana" if (r["outcome"] == "1") == (side[i] == 1) else "pierde"), "oficial"
+        elif not np.isnan(recon[i]):
+            res, fuente = ("gana" if recon[i] == side[i] else "pierde"), "reconstruido"
+        else:
+            res, fuente = None, None
+        out.append({"ventana": ventana.isoformat(), "instrumento": inst, "lado": "Up" if side[i] > 0 else "Down",
+                    "p": round(float(p_dir[i]), 4), "ev_accion": round(float(ev[i]), 4),
+                    "horario_usuario": bool(2 <= ventana.hour < 6), "resultado": res, "fuente": fuente,
+                    "partida": r and r["partida"], "liquidacion": r and r["liquidacion"], "modelo": b["model_id"]})
+    return out
+
+
+def okx_index_closes(indice: str, a: pd.Timestamp, b: pd.Timestamp) -> pd.Series:
+    """Cierres de 1 min del índice de OKX entre a y b (API pública `history-index-candles`)."""
+    import requests
+
+    s, rows, after = requests.Session(), [], int(b.timestamp() * 1000)
+    while after > a.timestamp() * 1000:
+        r = s.get("https://www.okx.com/api/v5/market/history-index-candles",
+                  params={"instId": indice, "bar": "1m", "after": after, "limit": 100}, timeout=20).json()
+        data = r.get("data") or []
+        if not data:
+            break
+        rows += [(int(x[0]), float(x[4])) for x in data]
+        after = min(int(x[0]) for x in data)
+    ser = pd.Series(dict(rows), dtype=float).sort_index()
+    ser.index = pd.to_datetime(ser.index, unit="ms", utc=True)
+    return ser
+
+
+def okx_eth_day(day: str) -> list[dict]:
+    return okx_day(day, "ETHUSDT")
+
+
+def okx_btc_day(day: str) -> list[dict]:
+    return okx_day(day, "BTCUSDT")
+
+
 # ----------------------------------------------------------------------------------------------- divisas
 def night_day(day: str, feed: DerivFeed | None = None, pairs=PAIRS) -> list[dict]:
     """Señales de la reversión nocturna (21–24 UTC del día `day`) con velas y ticks de Deriv, clic a +10 s."""
@@ -282,8 +401,14 @@ def blitz_eth_day(day: str) -> list[dict]:
 
 def run_day(day: str, root: Path = ROOT, log=print) -> dict:
     out = {}
-    for name, fn in (("btc", btc_day), ("eth", eth_day), ("nocturna", night_day), ("blitz", blitz_day),
-                     ("blitz_eth", blitz_eth_day)):
+    from .okx_eventos import MODELOS as OKX_MODELOS
+
+    tareas = [("btc", btc_day), ("eth", eth_day), ("nocturna", night_day), ("blitz", blitz_day),
+              ("blitz_eth", blitz_eth_day)]
+    for nombre, sym, fn in (("okx_eth", "ETHUSDT", okx_eth_day), ("okx_btc", "BTCUSDT", okx_btc_day)):
+        if OKX_MODELOS[sym][0].exists():  # solo después de congelar su modelo (Estudio 55)
+            tareas.append((nombre, fn))
+    for name, fn in tareas:
         path = Path(root) / name / f"{day}.jsonl"
         if path.exists():
             out[name] = "ya existía"
@@ -322,14 +447,16 @@ def resumen(root: Path = ROOT, abrir: bool = False, now: pd.Timestamp | None = N
               "nocturna": [("actual", ("variante", "actual")), ("fuerte", ("variante", "fuerte")),
                            ("actual, hora fuerte", "hora_fuerte")],
               "blitz": [("todas", None), ("p ≥ 0,57", "p057"), ("horario del usuario", "horario_usuario")],
-              "blitz_eth": [("todas", None), ("p ≥ 0,57", "p057"), ("horario del usuario", "horario_usuario")]}
+              "blitz_eth": [("todas", None), ("p ≥ 0,57", "p057"), ("horario del usuario", "horario_usuario")],
+              "okx_eth": [("todas", None), ("horario del usuario", "horario_usuario")],
+              "okx_btc": [("todas", None), ("horario del usuario", "horario_usuario")]}
     for name, specs in groups.items():
         df = _load(root, name)
         out[name] = {"dias": len(list((Path(root) / name).glob("*.jsonl")))}
         for lab, cond in specs:
             g = df
             if isinstance(cond, str) and len(df):
-                g = (df[df[cond]] if name in ("btc", "eth", "blitz", "blitz_eth")
+                g = (df[df[cond]] if name in ("btc", "eth", "blitz", "blitz_eth", "okx_eth", "okx_btc")
                      else df[(df[cond]) & (df["variante"] == "actual")])
             elif isinstance(cond, tuple) and len(df):
                 g = df[df[cond[0]] == cond[1]]

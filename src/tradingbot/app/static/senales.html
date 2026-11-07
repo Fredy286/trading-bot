@@ -106,8 +106,18 @@
 const $ = (id) => document.getElementById(id);
 // La misma página sirve dos modos: /senales (BTC 1 min, precio de Binance) y /blitz (blitz de BTC de IQ Option, 3 min,
 // precio promedio de Binance, Bybit y OKX; Estudio 42).
-const BLITZ = location.pathname.startsWith("/blitz");
-const MODE = BLITZ ? {api: "/api/blitz", ref: "promedio", contrato: "BTC · blitz de 3 min (vence 3 min después de tu clic)",
+const OKX = location.pathname.startsWith("/okx");  // event contracts de OKX (Estudios 54 y 55)
+const BLITZ = OKX || location.pathname.startsWith("/blitz");
+const MODE = OKX ? {api: "/api/okx", ref: "OKX oficial", contrato: "BTC · sube o baja en la ventana de 5 min de OKX",
+  titulo: "Event contracts de OKX · 5 minutos", pago: "88",
+  banner: "EXPERIMENTAL — SIN DINERO REAL. Estudio 54: con el aviso anticipado, ETH acertó 55,9 % en desarrollo en los " +
+    "contratos «Up or Down 5min» de OKX (hace falta ~53,1 % comprando a 0,52 con comisión). Pendiente de confirmación " +
+    "con datos nuevos (Estudio 55, enero de 2027). Compra ANTES de que empiece la ventana (el aviso llega 10 s antes) y " +
+    "solo si el precio es ≤ 0,53; dentro de la ventana el precio se dispara. Aquí solo se anota: nunca dinero real " +
+    "sin decidirlo tú expresamente.",
+  nota: "Anota qué habrías comprado y a qué precio. El bot trae el resultado OFICIAL de OKX de cada ventana " +
+    "(precio de partida y de liquidación) en cuanto vence."}
+  : BLITZ ? {api: "/api/blitz", ref: "promedio", contrato: "BTC · blitz de 3 min (vence 3 min después de tu clic)",
   titulo: "Blitz de IQ Option · BTC 3 minutos", pago: "86",
   banner: "EXPERIMENTAL — SOLO CUENTA DEMO. Modelo del Estudio 42: 55,3 % en desarrollo con el precio de IQ Option " +
     "reconstruido (promedio de Binance, Bybit y OKX); hace falta 53,8 % con pago del 86 %. Pendiente de confirmación " +
@@ -125,8 +135,9 @@ if (BLITZ) {
   $("th_ref1").textContent = "Promedio entrada → salida"; $("th_ref2").textContent = "Promedio";
 }
 // Pasados LATE_S segundos desde el aviso ya no hay ventaja medida: no se debe entrar. Modo de 1 min: 15 s
-// (Estudio 16). Blitz: 30 s, lo ideal antes de 15 s (nota de la demora del clic, 2026-11-03).
-const LATE_S = BLITZ ? 30 : 15, IDEAL_S = BLITZ ? 15 : null;
+// (Estudio 16). Blitz: 30 s, lo ideal antes de 15 s (nota de la demora del clic, 2026-11-03). OKX: 10 s, porque
+// la ventana empieza 10 s después del aviso y desde ahí el libro de órdenes se abre.
+const LATE_S = OKX ? 10 : BLITZ ? 30 : 15, IDEAL_S = OKX ? null : BLITZ ? 15 : null;
 let lastAlert = null, clicked = new Set(), audio = null, offsetMs = 0, current = null;
 const fmtT = (iso) => iso ? new Date(iso).toLocaleTimeString("es-CO", {timeZone: "America/Bogota", hour12: false}) : "—";
 const pct = (x) => x == null ? "—" : (100 * x).toFixed(1) + " %";
@@ -185,7 +196,10 @@ function renderSignal(st) {
     const late = since > LATE_S && !clicked.has(u.alert_id);
     big.className = late ? "none" : (u.lado > 0 ? "up" : "down");
     const slow = IDEAL_S && since > IDEAL_S && !late && !clicked.has(u.alert_id);
-    const coin = BLITZ && u.activo ? u.activo + " " : "";  // blitz con varias monedas: cuál abrir en IQ Option
+    const coin = BLITZ && u.activo ? (OKX ? "OKX " : "") + u.activo + " " : "";  // qué moneda abrir
+    if (OKX && u.lado != null && !$("sub").textContent) $("sub").textContent =
+      `Compra «${u.lado > 0 ? "Up" : "Down"}» de la ventana ${fmtT(u.ventana).slice(0, 5)}–${fmtT(u.vence).slice(0, 5)} ` +
+      `antes de las ${fmtT(u.ventana)} · precio ahora ${u.precio_compra ?? "—"} (máx. ${st.precio_max ?? 0.53}) · probabilidad ${pct(u.p)}`;
     big.textContent = late ? "TARDE — no entres en esta" : coin + (u.lado > 0 ? "↑ SUBE" : "↓ BAJA") + (slow ? " · aún vale" : "");
     if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;
@@ -197,7 +211,7 @@ function renderSignal(st) {
     current = null; $("clickbtn").disabled = true; big.className = "none";
     big.textContent = u.estado === "error" ? "Error de datos (reintentando)" :
       u.estado === "sin datos" ? "Sin datos suficientes este minuto" :
-      u.estado === "fuera de turno" ? "Esperando el turno del vencimiento" : "Sin señal — esperando el segundo 50";
+      u.estado === "fuera de turno" ? (OKX ? "Esperando la próxima ventana de 5 min" : "Esperando el turno del vencimiento") : "Sin señal — esperando el segundo 50";
     if (u.estado === "fuera de turno" && u.proximo) {
       const wait = (new Date(u.proximo).getTime() - now) / 1000;
       $("countdown").textContent = `próxima decisión a las ${fmtT(u.proximo)} (en ${Math.max(0, wait).toFixed(0)} s)`;

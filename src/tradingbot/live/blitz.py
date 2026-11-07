@@ -356,6 +356,7 @@ class BlitzLoop(SignalLoop):
                                 "sec": x.get("sec") or SecondsFeed(f.session, symbol=sym),
                                 "venues": x.get("venues") or UsdtCloses(f.session, symbol=sym)})
         self.by_symbol = {a["symbol"]: a for a in self.assets}
+        self.dur = DUR  # el modo de OKX (live/okx_eventos.py) usa 5
         self.extra_state = {"modo": "blitz", "duracion_min": DUR, "precio": bundle.get("precio"),
                             "activos": [CORTO.get(a["symbol"], a["symbol"]) for a in self.assets]}
         self.record = record
@@ -387,7 +388,7 @@ class BlitzLoop(SignalLoop):
         d = signals[0] if signals else next((x for x in decisions if x["estado"] != "error"), decisions[0])
         d.update({"vela": minute_open.isoformat(), "decidido": pd.Timestamp(now).isoformat(),
                   "cierre": (minute_open + pd.Timedelta(minutes=1)).isoformat(),
-                  "vence": (minute_open + pd.Timedelta(minutes=1 + DUR)).isoformat()})
+                  "vence": (minute_open + pd.Timedelta(minutes=1 + self.dur)).isoformat()})
         if len(self.assets) > 1:
             d["otras"] = [{"activo": x["activo"], "estado": x["estado"], "lado": x.get("lado"), "p": x.get("p")}
                           for x in decisions if x is not d]
