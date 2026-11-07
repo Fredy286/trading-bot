@@ -218,3 +218,41 @@ def test_resultado_usa_la_regla_de_empate_del_estudio():
     assert _resultado(100.0, 100.004, -1) == 0
     assert _resultado(100.0, 100.01, 1) == 1 and _resultado(100.0, 100.01, -1) == -1
     assert _resultado(100.0, 99.99, -1) == 1
+
+
+def test_phone_alert_text_and_telegram_send_and_failure_does_not_stop_the_loop(tmp_path):
+    from tradingbot.live.anticipada import aviso_texto
+    from tradingbot.notify import send_telegram_text
+
+    d = {"decidido": "2026-11-07T02:34:50+00:00", "lado": -1, "p": 0.5663, "alert_id": "x1"}
+    t = aviso_texto(d, "blitz")
+    assert "↓ BAJA" in t and "21:34:50" in t and "56,6 %" in t and "15 s" in t and "demo" in t
+
+    class _S:
+        def post(self, url, json, timeout):
+            self.url, self.body = url, json
+
+            class R:
+                def raise_for_status(self):
+                    pass
+            return R()
+
+    s = _S()
+    send_telegram_text("TOKEN", "123", "hola", session=s)
+    assert s.url == "https://api.telegram.org/botTOKEN/sendMessage" and s.body == {"chat_id": "123", "text": "hola"}
+
+    class _Feed:
+        offset_s, session = 0.0, None
+
+    got, logs = [], []
+    loop = blitz.BlitzLoop(_bundle(), tmp_path, feed=_Feed(), secfeed=object(), venues=object(), sound=False,
+                           record=False, telegram=got.append, log=logs.append)
+    loop._notify(d).join(5)
+    assert got and got[0].startswith("🔔 BTC blitz 3 min: ↓ BAJA")
+
+    def broken(_):
+        raise ConnectionError("sin internet")
+
+    loop.telegram = broken
+    loop._notify(d).join(5)
+    assert logs and "Telegram" in logs[-1]  # se anota y el bucle sigue

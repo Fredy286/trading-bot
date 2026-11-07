@@ -85,6 +85,13 @@ class WebhookNotifier(Notifier):
         return utcnow()
 
 
+def send_telegram_text(token: str, chat_id: str, text: str, session=None, timeout: float = 5.0) -> None:
+    """Mensaje de texto simple al chat del usuario (avisos de los modos de práctica). Lanza si Telegram da error."""
+    r = (session or requests).post(f"https://api.telegram.org/bot{token}/sendMessage",
+                                   json={"chat_id": chat_id, "text": text}, timeout=timeout)
+    r.raise_for_status()
+
+
 def build_notifiers(settings: Settings, runtime_dir: Path, verbose: bool = True) -> list[Notifier]:
     out: list[Notifier] = []
     for ch in settings.notify:

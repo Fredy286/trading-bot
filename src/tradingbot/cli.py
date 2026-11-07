@@ -12,6 +12,7 @@ Ejemplos:
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import sys
 from datetime import date
@@ -781,9 +782,37 @@ def cmd_senal(a) -> int:
             print(f"Aviso: el modelo congelado se validó para entrar 1 min antes del vencimiento; --cuarto {a.cuarto} "
                   "requiere su propio modelo (Estudio 19). Se usa igualmente, solo como práctica.")
         anticipada.SignalLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, cuarto_r=a.cuarto,
-                              pago=a.pago / 100 if a.pago else None, umbral=a.umbral).run(a.iteraciones)
+                              pago=a.pago / 100 if a.pago else None, umbral=a.umbral,
+                              telegram=_telegram_sender() if a.telegram else None).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
+    return 0
+
+
+def _telegram_sender():
+    """Función que manda un texto al chat de Telegram del .env (TB_TELEGRAM_BOT_TOKEN y TB_TELEGRAM_CHAT_ID), o None."""
+    from .config import load_dotenv
+    from .notify import send_telegram_text
+
+    load_dotenv()
+    token, chat = os.environ.get("TB_TELEGRAM_BOT_TOKEN"), os.environ.get("TB_TELEGRAM_CHAT_ID")
+    if not token or not chat:
+        print("Falta TB_TELEGRAM_BOT_TOKEN o TB_TELEGRAM_CHAT_ID en el archivo .env: los avisos solo sonarán en el PC.")
+        return None
+    return lambda text: send_telegram_text(token, chat, text)
+
+
+def cmd_telegram(a) -> int:
+    """Manda UN mensaje de prueba al chat de Telegram configurado en .env (solo cuando el usuario lo pide)."""
+    send = _telegram_sender()
+    if not send:
+        return 2
+    try:
+        send("Prueba del bot de trading: si ves este mensaje, los avisos del blitz pueden llegar aquí. Solo cuenta demo.")
+    except Exception as exc:  # noqa: BLE001
+        print(f"Telegram no aceptó el mensaje ({type(exc).__name__}). Revise el token y el chat en .env.")
+        return 2
+    print("Mensaje de prueba enviado. Revise su Telegram.")
     return 0
 
 
@@ -817,7 +846,7 @@ def cmd_blitz(a) -> int:
           f"Panel: http://127.0.0.1:8765/blitz — Ctrl+C para detener. SOLO CUENTA DEMO.")
     try:
         blitz.BlitzLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, pago=a.pago / 100 if a.pago else None,
-                        umbral=a.umbral).run(a.iteraciones)
+                        umbral=a.umbral, telegram=_telegram_sender() if a.telegram else None).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -1057,6 +1086,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--pago", type=float, default=None, help="pago real de la plataforma, en porcentaje (p. ej. 87)")
     x.add_argument("--umbral", type=float, default=None,
                    help="avisar solo si la probabilidad de la dirección es ≥ este valor (p. ej. 0.60; Estudio 21)")
+    x.add_argument("--telegram", action="store_true", help="mandar también cada aviso al Telegram del .env")
     x.set_defaults(func=cmd_senal)
 
     x = sub.add_parser("blitz", help="avisos para el blitz de BTC de IQ Option (3 min) en cuenta DEMO (Estudio 42)")
@@ -1068,7 +1098,12 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--pago", type=float, default=None, help="pago real del blitz en porcentaje (por defecto 86)")
     x.add_argument("--umbral", type=float, default=None,
                    help="avisar solo si la probabilidad de la dirección es ≥ este valor (solo práctica)")
+    x.add_argument("--telegram", action="store_true", help="mandar también cada aviso al Telegram del .env")
     x.set_defaults(func=cmd_blitz)
+
+    x = sub.add_parser("telegram", help="Telegram de los avisos de práctica")
+    x.add_argument("accion", choices=["probar"], help="probar: manda UN mensaje de prueba al chat del .env")
+    x.set_defaults(func=cmd_telegram)
 
     x = sub.add_parser("serve", help="panel web local")
     x.add_argument("--host", default="127.0.0.1")

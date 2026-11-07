@@ -298,8 +298,9 @@ def comparar(runtime: Path, max_gap_s: float = 2.0) -> dict:
 # ----------------------------------------------------------------------------------------------- bucle
 class BlitzLoop(SignalLoop):
     def __init__(self, bundle: dict, runtime: Path, feed=None, secfeed=None, venues=None, sound: bool = True,
-                 log=print, pago: float | None = None, umbral: float | None = None, record: bool = True):
-        super().__init__(bundle, runtime, feed=feed, secfeed=secfeed, sound=sound, log=log, pago=pago, umbral=umbral)
+                 log=print, pago: float | None = None, umbral: float | None = None, record: bool = True, telegram=None):
+        super().__init__(bundle, runtime, feed=feed, secfeed=secfeed, sound=sound, log=log, pago=pago, umbral=umbral,
+                         telegram=telegram)
         self.venues = venues or UsdtCloses(self.feed.session)
         self.extra_state = {"modo": "blitz", "duracion_min": DUR, "precio": bundle.get("precio")}
         self.recorder = PriceRecorder(self.dir / "precios.jsonl", self.feed.server_now) if record else None
@@ -320,6 +321,7 @@ class BlitzLoop(SignalLoop):
             d["emitido"] = pd.Timestamp(self.feed.server_now()).isoformat()
             self._write({"evento": "aviso", "model_id": self.b["model_id"], **d})
             self._beep()
+            self._notify(d)
             if self.recorder:
                 self.recorder.start(d["alert_id"])  # precios de las seis bolsas mientras el usuario hace clic
         self.last = d

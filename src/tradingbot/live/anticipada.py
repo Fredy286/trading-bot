@@ -20,6 +20,7 @@ import os
 import pickle
 import shutil
 import subprocess
+import threading
 import time
 import uuid
 import zipfile
@@ -199,6 +200,18 @@ def last_before(sec: pd.DataFrame, t: pd.Timestamp, max_gap_s: int = 5) -> float
 
 
 # ----------------------------------------------------------------------------------------------- bucle
+def aviso_texto(d: dict, modo: str | None = None) -> str:
+    """Texto corto del aviso para el celular (Telegram)."""
+    hora = pd.Timestamp(d["decidido"]).tz_convert(BOGOTA).strftime("%H:%M:%S")
+    flecha = "↑ SUBE" if d["lado"] == 1 else "↓ BAJA"
+    prob = f"{100 * d['p']:.1f}".replace(".", ",") + " %"
+    if modo == "blitz":
+        cabeza, regla = "BTC blitz 3 min", "Haz clic ya: lo ideal, antes de 15 s; hasta 30 s aún vale."
+    else:
+        cabeza, regla = "BTC 1 min", "Haz clic antes del cierre de la vela; pasados 15 s, no entres."
+    return f"🔔 {cabeza}: {flecha}\n{regla}\nProbabilidad {prob} · aviso {hora} (Bogotá)\nSolo cuenta demo."
+
+
 def quarter_turn(minute_open: pd.Timestamp, r: int) -> bool:
     """Vencimiento fijo cada 15 min (Estudio 19): la vela del aviso deja el vencimiento, R min después de la
     entrada, justo en :00, :15, :30 o :45."""
@@ -207,8 +220,9 @@ def quarter_turn(minute_open: pd.Timestamp, r: int) -> bool:
 
 class SignalLoop:
     def __init__(self, bundle: dict, runtime: Path, feed=None, secfeed=None, sound: bool = True, log=print,
-                 cuarto_r: int | None = None, pago: float | None = None, umbral: float | None = None):
+                 cuarto_r: int | None = None, pago: float | None = None, umbral: float | None = None, telegram=None):
         self.b, self.dir = bundle, Path(runtime)
+        self.telegram = telegram  # función(texto) que manda el aviso al celular, o None
         self.cuarto_r, self.pago, self.umbral = cuarto_r, pago, umbral
         self.dir.mkdir(parents=True, exist_ok=True)
         self.feed = feed or BinancePollingFeed("BTCUSDT")
@@ -248,8 +262,24 @@ class SignalLoop:
             d["emitido"] = pd.Timestamp(self.feed.server_now()).isoformat()  # retraso propio: datos + modelo
             self._write({"evento": "aviso", "model_id": self.b["model_id"], **d})
             self._beep()
+            self._notify(d)
         self.last = d
         return d
+
+    def _notify(self, d: dict):
+        """Manda el aviso al celular en un hilo aparte (no retrasa el sonido ni el panel); un fallo solo se anota."""
+        if not self.telegram:
+            return None
+
+        def go():
+            try:
+                self.telegram(aviso_texto(d, self.extra_state.get("modo")))
+            except Exception as exc:  # noqa: BLE001 - sin internet o Telegram caído: el bucle sigue
+                self.log(f"Telegram: no se pudo mandar el aviso ({type(exc).__name__})")
+
+        th = threading.Thread(target=go, daemon=True)
+        th.start()
+        return th
 
     def _beep(self) -> None:
         if self.sound and shutil.which("paplay") and Path(SOUND).exists():
