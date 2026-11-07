@@ -3995,3 +3995,38 @@ El informe completo del Estudio 50 (H50b y lo informativo) se lee después de es
 
 Código: `src/tradingbot/research/study51.py`, `tbot research study51`; descarga de bolsas en
 `src/tradingbot/research/bolsas.py`.
+
+### Resultado del Estudio 50 (2026-11-07; código 7d8108c y d58a587, aplicado mecánicamente): NO PASA
+
+La primera ejecución se cayó al imprimir H50b, después de calcular todo (registro de errores, ítem 55). Se corrigió
+solo el mensaje y se repitió igual; H50a dio lo mismo. `results/estudio50/resultado.json`: 3 628 394 decisiones con
+predicción.
+
+| Hipótesis | Operaciones (por día) | Acierto [lím. inf.] | EV | Blitz actual, mismo umbral | Veredicto |
+|---|---|---|---|---|---|
+| H50a (p ≥ 0,57) | 3 368 (8,0) | 54,68 % [52,99 %] | +0,017 | 2 896 (6,9), 56,83 %, EV +0,057 | **no pasa** (falla todo salvo el mínimo de 300) |
+| H50b (p ≥ 0,60) | **0** | — | — | 242 (0,6), 60,33 % | **no pasa** (el modelo continuo nunca llega a 0,60) |
+
+**Lo informativo dice dónde vive la ventaja.** Acierto de las señales de H50a según el segundo del minuto en que se
+decidió (la entrada es 10 s después):
+
+| Segundo | 0 | 10 | 20 | 30 | 40 | 50 |
+|---|---|---|---|---|---|---|
+| Señales | 1 176 | 607 | 479 | 430 | 353 | 323 |
+| Acierto | 54,8 % | 55,9 % | **50,9 %** | **51,6 %** | 57,8 % | 58,2 % |
+
+- La ventaja está en las decisiones cercanas al cierre del minuto (segundos 40–50, entrada en el 50–60). A mitad del
+  minuto es azar. Coincide con las ráfagas de algoritmos en las marcas de minuto (Kim y Hansen, docs/06, 3d). El blitz
+  actual ya decide en el mejor momento (segundo 50).
+- En todos los umbrales (0,55–0,59) el modelo continuo acierta menos que el blitz actual (54,0–55,4 % frente a
+  55,5–62,9 %), aunque da más señales.
+- Sin la espera de 60 s: 20 por día con 55,6 %. La espera se queda con la primera señal de cada racha (a menudo a
+  mitad del minuto) y bloquea las mejores.
+- **Horario del usuario:** 1,0 por noche con 53,5 %, frente a 0,75 con 58,0 % del blitz actual.
+- Con clic a +20 s, 54,4 %; a +30 s, 54,0 %.
+
+**Consecuencia (pre-registrada):** el blitz sigue decidiendo una vez por minuto, en el segundo 50. No se construye el
+modo continuo (el código preparado se retiró sin usarse). No hay Estudio de confirmación del blitz continuo.
+
+**Idea nueva, solo para datos posteriores al 2026-10-25 (*post hoc*):** una segunda decisión en el segundo 40 con un
+modelo propio de esa fase. Lo que se vio aquí (57,8 %, 353 señales) sale del modelo genérico y de datos ya mirados.

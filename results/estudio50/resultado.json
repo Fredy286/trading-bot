@@ -1,0 +1,672 @@
+{
+  "estudio": "Estudio 50 — blitz continuo: decisión cada 10 s (pre-registro en docs/01)",
+  "git_sha": "0549bc46ced709f0b39f873c7addc1c2659b19b9",
+  "periodo_prueba": [
+    "2025-09-01",
+    "2026-10-26"
+  ],
+  "pago": 0.86,
+  "equilibrio": 0.5376344086021506,
+  "decisiones_con_prediccion": 3628394,
+  "hipotesis": {
+    "H50a": {
+      "operaciones": 3368,
+      "por_dia": 8.019047619047619,
+      "acierto": 0.5467775467775468,
+      "lo95": 0.5299187871367282,
+      "p": 0.14758276595570352,
+      "ev": 0.01700118764845604,
+      "ev_ic": [
+        -0.018040428440437465,
+        0.04952099544600508
+      ],
+      "ganancia_por_dia": 0.1363333333333332,
+      "meses_ev_positivo": 0.375,
+      "mensual": {
+        "2025-10": {
+          "operaciones": 415,
+          "ev": -0.018457831325301235
+        },
+        "2025-11": {
+          "operaciones": 152,
+          "ev": -0.11894736842105266
+        },
+        "2026-02": {
+          "operaciones": 417,
+          "ev": 0.15079136690647482
+        },
+        "2026-03": {
+          "operaciones": 367,
+          "ev": -0.016784741144414188
+        },
+        "2026-06": {
+          "operaciones": 597,
+          "ev": -0.015477386934673388
+        },
+        "2026-07": {
+          "operaciones": 631,
+          "ev": 0.0362282091917591
+        },
+        "2026-08": {
+          "operaciones": 515,
+          "ev": 0.047378640776698996
+        },
+        "2026-09": {
+          "operaciones": 274,
+          "ev": -0.042846715328467164
+        }
+      },
+      "umbral": 0.57,
+      "acierto_minimo": 0.56,
+      "referencia_blitz_actual": {
+        "operaciones": 2896,
+        "por_dia": 6.895238095238096,
+        "acierto": 0.5682605682605683,
+        "lo95": 0.5501101836759825,
+        "p": 0.0005066833699203737,
+        "ev": 0.056767955801104955,
+        "ev_ic": [
+          0.008175929791408678,
+          0.11517616117822158
+        ],
+        "ganancia_por_dia": 0.3914285714285713,
+        "meses_ev_positivo": 0.875,
+        "mensual": {
+          "2025-11": {
+            "operaciones": 129,
+            "ev": 0.12465116279069766
+          },
+          "2026-03": {
+            "operaciones": 299,
+            "ev": 0.11351170568561872
+          },
+          "2026-04": {
+            "operaciones": 92,
+            "ev": 0.01086956521739127
+          },
+          "2026-05": {
+            "operaciones": 148,
+            "ev": 0.09337837837837835
+          },
+          "2026-06": {
+            "operaciones": 386,
+            "ev": 0.12756476683937823
+          },
+          "2026-07": {
+            "operaciones": 737,
+            "ev": 0.019592944369063753
+          },
+          "2026-08": {
+            "operaciones": 818,
+            "ev": -0.0032029339853300995
+          },
+          "2026-09": {
+            "operaciones": 287,
+            "ev": 0.13414634146341464
+          }
+        }
+      },
+      "criterios": {
+        "min_300": true,
+        "p_bonferroni": false,
+        "wilson": false,
+        "ev_ic": false,
+        "meses_60": false,
+        "mas_senales": false,
+        "acierto_minimo": false
+      },
+      "pasa": false
+    },
+    "H50b": {
+      "operaciones": 0,
+      "por_dia": 0.0,
+      "acierto": null,
+      "lo95": null,
+      "p": 1.0,
+      "ev": null,
+      "ev_ic": [
+        null,
+        null
+      ],
+      "ganancia_por_dia": 0.0,
+      "meses_ev_positivo": 0.0,
+      "mensual": {},
+      "umbral": 0.6,
+      "acierto_minimo": 0.58,
+      "referencia_blitz_actual": {
+        "operaciones": 242,
+        "por_dia": 0.5761904761904761,
+        "acierto": 0.6033057851239669,
+        "lo95": 0.5405161657688432,
+        "p": 0.023217254685744693,
+        "ev": 0.12214876033057849,
+        "ev_ic": [
+          -0.006600736148779561,
+          0.20522539346246976
+        ],
+        "ganancia_por_dia": 0.07038095238095236,
+        "meses_ev_positivo": 1.0,
+        "mensual": {
+          "2025-11": {
+            "operaciones": 81,
+            "ev": 0.05629629629629627
+          },
+          "2026-06": {
+            "operaciones": 161,
+            "ev": 0.15527950310559005
+          }
+        }
+      },
+      "criterios": {
+        "min_300": false,
+        "p_bonferroni": false,
+        "wilson": false,
+        "ev_ic": false,
+        "meses_60": false,
+        "mas_senales": false,
+        "acierto_minimo": false
+      },
+      "pasa": false
+    }
+  },
+  "informativo": {
+    "H50a": {
+      "horario_usuario": {
+        "operaciones": 429,
+        "por_dia": 1.0214285714285714,
+        "acierto": 0.5350467289719626,
+        "lo95": 0.4876909974146107,
+        "p": 0.5623797915246904,
+        "ev": -0.004801864801864824,
+        "ev_ic": [
+          -0.10482226257467961,
+          0.10724362684744164
+        ],
+        "ganancia_por_dia": -0.004904761904761927,
+        "meses_ev_positivo": 0.375,
+        "por_noche": 1.0214285714285714
+      },
+      "horario_usuario_referencia": {
+        "operaciones": 315,
+        "por_dia": 0.75,
+        "acierto": 0.5796178343949044,
+        "lo95": 0.5243790130698583,
+        "p": 0.07529327698180682,
+        "ev": 0.07784126984126984,
+        "ev_ic": [
+          -0.009300036067446144,
+          0.16584403633698094
+        ],
+        "ganancia_por_dia": 0.05838095238095238,
+        "meses_ev_positivo": 0.75,
+        "por_noche": 0.75
+      },
+      "sin_espera": {
+        "operaciones": 8408,
+        "por_dia": 20.01904761904762,
+        "acierto": 0.5563221125252765,
+        "lo95": 0.5456785845248475,
+        "p": 0.00030282485770012705,
+        "ev": 0.034754995242626055,
+        "ev_ic": [
+          0.0006795346195525077,
+          0.06167330976106272
+        ],
+        "ganancia_por_dia": 0.6957619047619045,
+        "meses_ev_positivo": 0.625
+      },
+      "juicio_compuesto_3": {
+        "operaciones": 3368,
+        "por_dia": 8.019047619047619,
+        "acierto": 0.5464805464805464,
+        "lo95": 0.5296211872598079,
+        "p": 0.15570716779831703,
+        "ev": 0.01644893111638953,
+        "ev_ic": [
+          -0.016700406704113234,
+          0.04445145810262085
+        ],
+        "ganancia_por_dia": 0.13190476190476177,
+        "meses_ev_positivo": 0.375
+      },
+      "juicio_binance": {
+        "operaciones": 3368,
+        "por_dia": 8.019047619047619,
+        "acierto": 0.5424486148346738,
+        "lo95": 0.5255565649907037,
+        "p": 0.2939681755609873,
+        "ev": 0.008925178147268394,
+        "ev_ic": [
+          -0.02312407598490607,
+          0.036619989897344066
+        ],
+        "ganancia_por_dia": 0.07157142857142845,
+        "meses_ev_positivo": 0.375
+      },
+      "demora_20s": {
+        "operaciones": 3368,
+        "por_dia": 8.019047619047619,
+        "acierto": 0.5444015444015444,
+        "lo95": 0.527538156814651,
+        "p": 0.22061879947746496,
+        "ev": 0.01258313539192397,
+        "ev_ic": [
+          -0.019134220738433495,
+          0.043893668637913746
+        ],
+        "ganancia_por_dia": 0.10090476190476175,
+        "meses_ev_positivo": 0.375
+      },
+      "demora_30s": {
+        "operaciones": 3368,
+        "por_dia": 8.019047619047619,
+        "acierto": 0.5404040404040404,
+        "lo95": 0.5235312258767827,
+        "p": 0.3803348640656071,
+        "ev": 0.005148456057007108,
+        "ev_ic": [
+          -0.025811193346364586,
+          0.03551285678078296
+        ],
+        "ganancia_por_dia": 0.04128571428571414,
+        "meses_ev_positivo": 0.25
+      },
+      "por_segundo_del_minuto": {
+        "0": {
+          "operaciones": 1176,
+          "acierto": 0.5480851063829787
+        },
+        "10": {
+          "operaciones": 607,
+          "acierto": 0.5584843492586491
+        },
+        "20": {
+          "operaciones": 479,
+          "acierto": 0.5093945720250522
+        },
+        "30": {
+          "operaciones": 430,
+          "acierto": 0.5162790697674419
+        },
+        "40": {
+          "operaciones": 353,
+          "acierto": 0.5779036827195467
+        },
+        "50": {
+          "operaciones": 323,
+          "acierto": 0.5820433436532507
+        }
+      }
+    },
+    "H50b": {
+      "horario_usuario": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "ganancia_por_dia": 0.0,
+        "meses_ev_positivo": 0.0,
+        "por_noche": 0.0
+      },
+      "horario_usuario_referencia": {
+        "operaciones": 20,
+        "por_dia": 0.047619047619047616,
+        "acierto": 0.5,
+        "lo95": 0.2992949144298199,
+        "p": 0.7136304778319242,
+        "ev": -0.07000000000000002,
+        "ev_ic": [
+          -0.5356838235294118,
+          0.24
+        ],
+        "ganancia_por_dia": -0.003333333333333334,
+        "meses_ev_positivo": 0.5,
+        "por_noche": 0.047619047619047616
+      },
+      "sin_espera": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "ganancia_por_dia": 0.0,
+        "meses_ev_positivo": 0.0
+      },
+      "juicio_compuesto_3": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "ganancia_por_dia": 0.0,
+        "meses_ev_positivo": 0.0
+      },
+      "juicio_binance": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "ganancia_por_dia": 0.0,
+        "meses_ev_positivo": 0.0
+      },
+      "demora_20s": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "ganancia_por_dia": 0.0,
+        "meses_ev_positivo": 0.0
+      },
+      "demora_30s": {
+        "operaciones": 0,
+        "por_dia": 0.0,
+        "acierto": null,
+        "lo95": null,
+        "p": 1.0,
+        "ev": null,
+        "ev_ic": [
+          null,
+          null
+        ],
+        "ganancia_por_dia": 0.0,
+        "meses_ev_positivo": 0.0
+      },
+      "por_segundo_del_minuto": {
+        "0": {
+          "operaciones": 0,
+          "acierto": null
+        },
+        "10": {
+          "operaciones": 0,
+          "acierto": null
+        },
+        "20": {
+          "operaciones": 0,
+          "acierto": null
+        },
+        "30": {
+          "operaciones": 0,
+          "acierto": null
+        },
+        "40": {
+          "operaciones": 0,
+          "acierto": null
+        },
+        "50": {
+          "operaciones": 0,
+          "acierto": null
+        }
+      }
+    },
+    "umbrales": {
+      "0.55": {
+        "nuevo": {
+          "operaciones": 30664,
+          "por_dia": 73.00952380952381,
+          "acierto": 0.5410317486213985,
+          "lo95": 0.5354478449936058,
+          "p": 0.11757207887195488,
+          "ev": 0.00631554917818939,
+          "ev_ic": [
+            -0.0029585472259200693,
+            0.01918508790123001
+          ],
+          "ganancia_por_dia": 0.4610952380952368,
+          "meses_ev_positivo": 0.7142857142857143
+        },
+        "referencia": {
+          "operaciones": 11966,
+          "por_dia": 28.49047619047619,
+          "acierto": 0.5552860488457678,
+          "lo95": 0.5463620795306204,
+          "p": 5.541269169946236e-05,
+          "ev": 0.03280461307036602,
+          "ev_ic": [
+            0.0168525958108733,
+            0.04942081183816342
+          ],
+          "ganancia_por_dia": 0.9346190476190472,
+          "meses_ev_positivo": 0.9230769230769231
+        }
+      },
+      "0.56": {
+        "nuevo": {
+          "operaciones": 10039,
+          "por_dia": 23.902380952380952,
+          "acierto": 0.547438708391469,
+          "lo95": 0.537683150790843,
+          "p": 0.024967062952288985,
+          "ev": 0.01822691503137761,
+          "ev_ic": [
+            0.003530384146769819,
+            0.03596377933625103
+          ],
+          "ganancia_por_dia": 0.43566666666666626,
+          "meses_ev_positivo": 0.5833333333333334
+        },
+        "referencia": {
+          "operaciones": 6117,
+          "por_dia": 14.564285714285715,
+          "acierto": 0.5618143114458818,
+          "lo95": 0.5493350853138209,
+          "p": 7.776134198152185e-05,
+          "ev": 0.04490109530815758,
+          "ev_ic": [
+            0.023477309940129587,
+            0.07115895822522048
+          ],
+          "ganancia_por_dia": 0.6539523809523807,
+          "meses_ev_positivo": 0.9090909090909091
+        }
+      },
+      "0.57": {
+        "nuevo": {
+          "operaciones": 3368,
+          "por_dia": 8.019047619047619,
+          "acierto": 0.5467775467775468,
+          "lo95": 0.5299187871367282,
+          "p": 0.14758276595570352,
+          "ev": 0.01700118764845604,
+          "ev_ic": [
+            -0.014457773862545145,
+            0.04489883353290896
+          ],
+          "ganancia_por_dia": 0.1363333333333332,
+          "meses_ev_positivo": 0.375
+        },
+        "referencia": {
+          "operaciones": 2896,
+          "por_dia": 6.895238095238096,
+          "acierto": 0.5682605682605683,
+          "lo95": 0.5501101836759825,
+          "p": 0.0005066833699203737,
+          "ev": 0.056767955801104955,
+          "ev_ic": [
+            0.01331183074205518,
+            0.10390832639983648
+          ],
+          "ganancia_por_dia": 0.3914285714285713,
+          "meses_ev_positivo": 0.875
+        }
+      },
+      "0.58": {
+        "nuevo": {
+          "operaciones": 1681,
+          "por_dia": 4.002380952380952,
+          "acierto": 0.5428571428571428,
+          "lo95": 0.5189647960457678,
+          "p": 0.34297490525322105,
+          "ev": 0.009708506841165952,
+          "ev_ic": [
+            -0.01996085178751151,
+            0.03899599053026556
+          ],
+          "ganancia_por_dia": 0.03885714285714277,
+          "meses_ev_positivo": 0.6
+        },
+        "referencia": {
+          "operaciones": 1349,
+          "por_dia": 3.211904761904762,
+          "acierto": 0.5759822090437361,
+          "lo95": 0.5494308138714286,
+          "p": 0.0025272452200322585,
+          "ev": 0.07132690882134912,
+          "ev_ic": [
+            0.014438023855576998,
+            0.14170649975591043
+          ],
+          "ganancia_por_dia": 0.22909523809523802,
+          "meses_ev_positivo": 0.8333333333333334
+        }
+      },
+      "0.59": {
+        "nuevo": {
+          "operaciones": 775,
+          "por_dia": 1.8452380952380953,
+          "acierto": 0.5400516795865633,
+          "lo95": 0.5048279491880484,
+          "p": 0.4609937470288828,
+          "ev": 0.004490322580645132,
+          "ev_ic": [
+            -0.045231789570562245,
+            0.05183650209374581
+          ],
+          "ganancia_por_dia": 0.008285714285714233,
+          "meses_ev_positivo": 0.6666666666666666
+        },
+        "referencia": {
+          "operaciones": 377,
+          "por_dia": 0.8976190476190476,
+          "acierto": 0.6286472148541115,
+          "lo95": 0.5788054894563793,
+          "p": 0.00021871797165809247,
+          "ev": 0.16928381962864722,
+          "ev_ic": [
+            0.08154644597646496,
+            0.24707177400671843
+          ],
+          "ganancia_por_dia": 0.15195238095238095,
+          "meses_ev_positivo": 1.0
+        }
+      },
+      "0.6": {
+        "nuevo": {
+          "operaciones": 0,
+          "por_dia": 0.0,
+          "acierto": null,
+          "lo95": null,
+          "p": 1.0,
+          "ev": null,
+          "ev_ic": [
+            null,
+            null
+          ],
+          "ganancia_por_dia": 0.0,
+          "meses_ev_positivo": 0.0
+        },
+        "referencia": {
+          "operaciones": 242,
+          "por_dia": 0.5761904761904761,
+          "acierto": 0.6033057851239669,
+          "lo95": 0.5405161657688432,
+          "p": 0.023217254685744693,
+          "ev": 0.12214876033057849,
+          "ev_ic": [
+            -0.0015833938294011161,
+            0.2003611689106487
+          ],
+          "ganancia_por_dia": 0.07038095238095236,
+          "meses_ev_positivo": 1.0
+        }
+      },
+      "0.61": {
+        "nuevo": {
+          "operaciones": 0,
+          "por_dia": 0.0,
+          "acierto": null,
+          "lo95": null,
+          "p": 1.0,
+          "ev": null,
+          "ev_ic": [
+            null,
+            null
+          ],
+          "ganancia_por_dia": 0.0,
+          "meses_ev_positivo": 0.0
+        },
+        "referencia": {
+          "operaciones": 198,
+          "por_dia": 0.4714285714285714,
+          "acierto": 0.6111111111111112,
+          "lo95": 0.5417082748542982,
+          "p": 0.02218990743212141,
+          "ev": 0.13666666666666663,
+          "ev_ic": [
+            0.02919340425531912,
+            0.21205845122859265
+          ],
+          "ganancia_por_dia": 0.06442857142857142,
+          "meses_ev_positivo": 1.0
+        }
+      },
+      "0.62": {
+        "nuevo": {
+          "operaciones": 0,
+          "por_dia": 0.0,
+          "acierto": null,
+          "lo95": null,
+          "p": 1.0,
+          "ev": null,
+          "ev_ic": [
+            null,
+            null
+          ],
+          "ganancia_por_dia": 0.0,
+          "meses_ev_positivo": 0.0
+        },
+        "referencia": {
+          "operaciones": 0,
+          "por_dia": 0.0,
+          "acierto": null,
+          "lo95": null,
+          "p": 1.0,
+          "ev": null,
+          "ev_ic": [
+            null,
+            null
+          ],
+          "ganancia_por_dia": 0.0,
+          "meses_ev_positivo": 0.0
+        }
+      }
+    }
+  }
+}

@@ -36,9 +36,13 @@ def _binance(s, name, a, b):
 
 
 def _bybit(s, name, a, b):
-    r = _get(s, "https://api.bybit.com/v5/market/kline",
-             {"category": "spot", "symbol": name, "interval": "1", "start": _ms(a), "end": _ms(b), "limit": 1000})
-    return [(int(x[0]), float(x[4])) for x in r["result"]["list"]]
+    for intento in range(6):  # con límite de velocidad Bybit responde 200 con retCode ≠ 0 y sin «list»
+        r = _get(s, "https://api.bybit.com/v5/market/kline",
+                 {"category": "spot", "symbol": name, "interval": "1", "start": _ms(a), "end": _ms(b), "limit": 1000})
+        if r.get("retCode") == 0 and "list" in r.get("result", {}):
+            return [(int(x[0]), float(x[4])) for x in r["result"]["list"]]
+        time.sleep(2 * (intento + 1))
+    raise RuntimeError(f"Bybit no respondió bien: {r.get('retCode')} {r.get('retMsg')}")
 
 
 def _okx(s, name, a, b):
