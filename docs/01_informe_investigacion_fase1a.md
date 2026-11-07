@@ -4030,3 +4030,71 @@ modo continuo (el código preparado se retiró sin usarse). No hay Estudio de co
 
 **Idea nueva, solo para datos posteriores al 2026-10-25 (*post hoc*):** una segunda decisión en el segundo 40 con un
 modelo propio de esa fase. Lo que se vio aquí (57,8 %, 353 señales) sale del modelo genérico y de datos ya mirados.
+
+### Resultado del Estudio 51 (2026-11-07; código 42144b0, aplicado mecánicamente): PASA (H51a y H51b)
+
+`results/estudio51/resultado.json`. Cierres de ETH completos en las 4 bolsas: 1 175 045 minutos por bolsa desde
+2024-08 (Gate: 604 705 desde 2025-09).
+
+| Hipótesis | Operaciones (por día) | Acierto, 3 bolsas [lím. inf.] | Acierto, 4 bolsas con pesos de BTC [lím. inf.] | EV [IC 97,5 %] | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|---|
+| H51a (todas, EV ≥ 0,02) | 47 127 (112,2) | 54,94 % [54,49 %] | 54,80 % [54,34 %] | +0,022 [+0,008; +0,035] | 10 de 14 | **pasa** |
+| H51b (p ≥ 0,57) | 13 032 (31,0) | **56,92 %** [56,07 %] | 56,71 % [55,86 %] | +0,059 [+0,033; +0,083] | 9 de 12 | **pasa** |
+
+**Informativo:**
+- **Pocas coincidencias con BTC:** de los 13 032 minutos con señal de ETH (p ≥ 0,57), solo 793 tienen también señal del
+  blitz de BTC. Entre las dos monedas hay unos 36 minutos con señal por día, frente a 6,9 con BTC sola.
+- **Horario del usuario (02–06 UTC):** H51b, 4,3 señales por noche con 58,4 % (EV +0,086). H51a, 16,5 por noche con
+  56,3 %.
+- **Juicio con Binance sola:** 56,85 % (H51b). La ventaja no depende de la mezcla de bolsas.
+- **Umbrales más altos no mejoran mucho (*post hoc*):** 0,58 → 56,9 %; 0,60 → 57,7 % (2,5 por día).
+- **Meses irregulares:** H51b no tuvo ninguna señal en 2025-12 ni en 2026-01, y en 2026-09 acertó 53,3 %. La cantidad
+  de señales cambia mucho de un mes a otro.
+
+**Consecuencia (pre-registrada):**
+- se entrena el modelo congelado de ETH;
+- el modo de práctica del blitz vigila BTC y ETH;
+- ETH entra al registro diario en la nube;
+- su confirmación es el Estudio 52.
+
+Se usa solo si el usuario confirma que IQ Option tiene «Ethereum Blitz» de 3 min y su pago.
+
+## Estudio 52 — confirmación del blitz de ETH con datos nuevos (pre-registro, 2026-11-07, ANTES de entrenar el modelo congelado de ETH y de mirar datos de ETH posteriores al 2026-10-25)
+
+**Modelo congelado:**
+- la receta del Estudio 51, sin cambios;
+- se entrena una sola vez con los 12 meses que terminan el 2026-10-25 (decisiones desde el 2025-10-26);
+- el último 20 % (desde el inicio de su día) sirve para calibrar, con 5 min de purga; semilla 2024;
+- `tbot blitz entrenar --eth`; el SHA-256 queda en `config/senal_blitz_eth.json`.
+
+**Datos:** del 2026-10-26 al 2027-01-18. Se registran cada día en la nube (`results/registro/blitz_eth/`), con las
+mismas fuentes que el blitz de BTC, pero de ETH/USDT:
+- velas de 1 s y de 1 min de Binance (archivos diarios);
+- Bybit (archivo público de operaciones);
+- OKX (API);
+- Gate (archivo diario).
+
+Los aciertos quedan sellados hasta el 2027-01-19.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H52a:** todas las operaciones de la política (EV ≥ 0,02);
+- **H52b:** solo las de p ≥ 0,57.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p < 0,025 frente a 53,76 % (binomial, compuesto de 3 bolsas);
+3. Wilson 95 % > 53,76 % con el compuesto de 3 bolsas;
+4. Wilson 95 % > 53,76 % con el compuesto de 4 bolsas (pesos de BTC del Estudio 47);
+5. intervalo del EV (bootstrap por semanas ISO, 97,5 %) por encima de 0.
+
+Si no hay 300 operaciones el 2027-01-18, se amplía la ventana con días seguidos ya registrados, hasta el 2027-04-26.
+Si aun así no llega, queda «sin datos suficientes».
+
+**Evaluación:** una sola vez, después del 2027-01-19. Antes se comprueba que estén los archivos de todos los días
+(ítem 54).
+
+**Consecuencia:**
+- **Si pasa:** ETH queda en el modo de práctica del blitz, siempre en demo.
+- **Si no pasa:** el blitz vuelve a vigilar solo BTC.
+- **Si el usuario comprueba que IQ Option no tiene «Ethereum Blitz»:** el modo de práctica no vigila ETH. El registro
+  sigue como medida científica.
