@@ -178,11 +178,12 @@ class SecondsFeed:
 
     URL = "https://api.binance.com/api/v3/klines"
 
-    def __init__(self, session=None):
+    def __init__(self, session=None, symbol: str = "BTCUSDT"):
         self.session = session or requests.Session()
+        self.symbol = symbol
 
     def get(self, start: pd.Timestamp, now: datetime, limit: int = 120) -> pd.DataFrame:
-        r = self.session.get(self.URL, params={"symbol": "BTCUSDT", "interval": "1s",
+        r = self.session.get(self.URL, params={"symbol": self.symbol, "interval": "1s",
                                                "startTime": int(start.value // 10**6), "limit": limit}, timeout=5)
         r.raise_for_status()
         rows = [k for k in r.json() if k[6] < pd.Timestamp(now).value // 10**6]  # solo velas ya cerradas
@@ -206,7 +207,8 @@ def aviso_texto(d: dict, modo: str | None = None) -> str:
     flecha = "↑ SUBE" if d["lado"] == 1 else "↓ BAJA"
     prob = f"{100 * d['p']:.1f}".replace(".", ",") + " %"
     if modo == "blitz":
-        cabeza, regla = "BTC blitz 3 min", "Haz clic ya: lo ideal, antes de 15 s; hasta 30 s aún vale."
+        cabeza = f"{d.get('activo') or 'BTC'} blitz 3 min"
+        regla = "Haz clic ya: lo ideal, antes de 15 s; hasta 30 s aún vale."
     else:
         cabeza, regla = "BTC 1 min", "Haz clic antes del cierre de la vela; pasados 15 s, no entres."
     return f"🔔 {cabeza}: {flecha}\n{regla}\nProbabilidad {prob} · aviso {hora} (Bogotá)\nSolo cuenta demo."
@@ -382,7 +384,8 @@ def diario(runtime: Path, limit: int = 50) -> list[dict]:
             lat = (pd.Timestamp(c["hora_binance"]) - pd.Timestamp(a["decidido"])).total_seconds()
         res_p = RESULTADOS.get(g.get("resultado"))
         ref = {k: r.get(f"{k}_ref", r.get(f"{k}_binance")) for k in ("entrada", "salida", "resultado")}
-        out.append({"alert_id": aid, "decidido": a["decidido"], "cierre": a["cierre"], "vence": a.get("vence"),
+        out.append({"alert_id": aid, "activo": a.get("activo"), "decidido": a["decidido"], "cierre": a["cierre"],
+                    "vence": a.get("vence"),
                     "lado": a["lado"], "p": a["p"], "ev": a["ev"], "clic": c.get("hora_binance"), "latencia_s": lat,
                     "entrada_binance": r.get("entrada_binance"), "salida_binance": r.get("salida_binance"),
                     "resultado_binance": r.get("resultado_binance"), "entrada_ref": ref["entrada"],

@@ -842,7 +842,7 @@ def cmd_blitz(a) -> int:
 
     if a.accion == "entrenar":
         try:
-            meta = blitz.train_frozen_blitz()
+            meta = blitz.train_frozen_blitz(symbol="ETHUSDT" if a.eth else "BTCUSDT")
         except (FileExistsError, FileNotFoundError) as exc:
             print(exc)
             return 2
@@ -862,11 +862,21 @@ def cmd_blitz(a) -> int:
     except FileNotFoundError:
         print("Falta el modelo. Ejecute primero: tbot blitz entrenar")
         return 2
-    print(f"Blitz de BTC (3 min) con {bundle['model_id']}: aviso en el segundo {bundle['k']} de cada vela. "
+    extra = []
+    if a.eth:
+        try:
+            extra = [{"symbol": "ETHUSDT", "bundle": anticipada.load_bundle(*blitz.MODELOS["ETHUSDT"])}]
+        except FileNotFoundError:
+            print("Falta el modelo de ETH. Ejecute primero: tbot blitz entrenar --eth")
+            return 2
+    monedas = "BTC y ETH" if extra else "BTC"
+    print(f"Blitz de {monedas} (3 min): aviso en el segundo {bundle['k']} de cada vela "
+          f"({', '.join([bundle['model_id']] + [x['bundle']['model_id'] for x in extra])}). "
           f"Panel: http://127.0.0.1:8765/blitz — Ctrl+C para detener. SOLO CUENTA DEMO.")
     try:
         blitz.BlitzLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, pago=a.pago / 100 if a.pago else None,
-                        umbral=a.umbral, telegram=_telegram_sender() if a.telegram else None).run(a.iteraciones)
+                        umbral=a.umbral, telegram=_telegram_sender() if a.telegram else None,
+                        extra=extra).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -1123,6 +1133,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--umbral", type=float, default=None,
                    help="avisar solo si la probabilidad de la dirección es ≥ este valor (solo práctica)")
     x.add_argument("--telegram", action="store_true", help="mandar también cada aviso al Telegram del .env")
+    x.add_argument("--eth", action="store_true",
+                   help="vigilar también ETH (Estudio 51; solo si IQ Option tiene «Ethereum Blitz»). Con «entrenar», "
+                        "entrena el modelo de ETH")
     x.set_defaults(func=cmd_blitz)
 
     x = sub.add_parser("telegram", help="Telegram de los avisos de práctica")

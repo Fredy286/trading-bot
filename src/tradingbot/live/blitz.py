@@ -46,31 +46,56 @@ from ..research.study42 import closes as hist_closes
 from ..research.study47 import WEIGHTS as IQ_WEIGHTS
 from ..research.study47 import iq_price
 from ..timeutil import utcnow
-from .anticipada import CALIB_FRAC, K, LAT, TRAIN_END, TRAIN_START, SignalLoop, download_daily
+from .anticipada import CALIB_FRAC, K, LAT, TRAIN_END, TRAIN_START, SecondsFeed, SignalLoop, download_daily
+from .feeds import BinancePollingFeed
 
 PAYOUT, DUR = 0.86, 3
 MODEL_PATH = Path("config/modelos/BTCUSDT_blitz3_compuesto.pkl")
 REG_PATH = Path("config/senal_blitz.json")
+ETH_MODEL_PATH = Path("config/modelos/ETHUSDT_blitz3_compuesto.pkl")  # Estudios 51 y 52
+ETH_REG_PATH = Path("config/senal_blitz_eth.json")
+MODELOS = {"BTCUSDT": (MODEL_PATH, REG_PATH), "ETHUSDT": (ETH_MODEL_PATH, ETH_REG_PATH)}
+CORTO = {"BTCUSDT": "BTC", "ETHUSDT": "ETH"}
+NOMBRES = {  # nombre del par en cada bolsa
+    "BTCUSDT": {"binance": "BTCUSDT", "bybit": "BTCUSDT", "okx": "BTC-USDT", "gate": "BTC_USDT", "kucoin": "BTC-USDT",
+                "bitget": "BTCUSDT"},
+    "ETHUSDT": {"binance": "ETHUSDT", "bybit": "ETHUSDT", "okx": "ETH-USDT", "gate": "ETH_USDT", "kucoin": "ETH-USDT",
+                "bitget": "ETHUSDT"},
+}
 HIST_MIN = 70  # cierres que necesitan las variables del compuesto (media de 60 min + 4 + margen)
 VENUES = ("bybit", "okx")  # Binance llega por el feed de 1 min de siempre
 
 
 # ----------------------------------------------------------------------------------------------- entrenamiento
 def train_frozen_blitz(root3: Path = Path("data/raw/estudio3"), daily_cache: Path = Path("data/processed/senal/diario"),
-                       out: Path = MODEL_PATH, reg: Path = REG_PATH, log=print) -> dict:
-    """Entrena UNA vez el modelo del Estudio 42 con los 12 meses hasta el 2026-10-25 (Estudio 44)."""
-    if Path(out).exists():
+                       out: Path | None = None, reg: Path | None = None, log=print, symbol: str = "BTCUSDT") -> dict:
+    """Entrena UNA vez el modelo del blitz con los 12 meses hasta el 2026-10-25: BTC (Estudio 42, confirmación en el
+    44) o ETH (Estudio 51, confirmación en el 52), con la misma receta."""
+    out, reg = Path(out or MODELOS[symbol][0]), Path(reg or MODELOS[symbol][1])
+    if out.exists():
         raise FileExistsError(f"{out} ya existe: el modelo se entrena una sola vez (pre-registro).")
-    m_daily = download_daily("1m", "2026-10-01", "2026-10-26", daily_cache)
-    spot = pd.concat([load(root3, "BTCUSDT", "spot"), m_daily])
+    if symbol == "BTCUSDT":
+        m_daily = download_daily("1m", "2026-10-01", "2026-10-26", daily_cache)
+        spot = pd.concat([load(root3, "BTCUSDT", "spot"), m_daily])
+        tab_all = build_table()
+        cl = hist_closes("2025-10", "2026-10")
+        registro = "Estudio 44 (pre-registro c6ef641): modelo congelado del blitz para la confirmación y la demo"
+    elif symbol == "ETHUSDT":
+        from ..research import study51
+
+        spot = study51.minute_bars(root3)
+        tab_all = pd.read_parquet(study51.TAB)
+        cl = {v: x for v, x in study51.closes("2025-10", "2026-10").items() if v in ("binance", "bybit", "okx")}
+        registro = "Estudio 52 (pre-registro 706b6ab): modelo congelado del blitz de ETH para la confirmación y la demo"
+    else:
+        raise ValueError(f"Moneda sin datos para el blitz: {symbol}")
     spot = spot[~spot.index.duplicated(keep="last")].sort_index()
     bars = spot_bars(spot)
     bars = bars[(bars.index >= TRAIN_START - pd.Timedelta(days=3)) & (bars.index < TRAIN_END)]
     idx = bars.index
-    tab = build_table().reindex(idx)
+    tab = tab_all.reindex(idx)
     prev = compute_features(bars).shift(1)
     vol_prev = np.exp(prev["lvol60"])
-    cl = hist_closes("2025-10", "2026-10")
     comp = composite(cl)
     X = pd.concat([prev[FEATURES], partial_features(tab, bars["o"], vol_prev, K),
                    comp_features(comp, cl["binance"], vol_prev, idx)], axis=1)
@@ -88,15 +113,16 @@ def train_frozen_blitz(root3: Path = Path("data/raw/estudio3"), daily_cache: Pat
     bundle = {"model": model, "calibrator": calib, "features": list(X.columns), "k": K, "latencia": LAT,
               "duracion_min": DUR, "q": q, "train_start": str(TRAIN_START), "train_end": str(TRAIN_END),
               "calib_desde": str(cut), "n_ajuste": int(fit.sum()), "n_calibracion": int(cal.sum()),
-              "payout": PAYOUT, "ev_margin": 0.02, "precio": "promedio de Binance, Bybit y OKX (BTC/USDT, 1 min)",
-              "model_id": f"BTCUSDT-blitz3-compuesto-{uuid.uuid4().hex[:6]}"}
+              "payout": PAYOUT, "ev_margin": 0.02, "symbol": symbol,
+              "precio": f"promedio de Binance, Bybit y OKX ({CORTO[symbol]}/USDT, 1 min)",
+              "model_id": f"{symbol}-blitz3-compuesto-{uuid.uuid4().hex[:6]}"}
     Path(out).parent.mkdir(parents=True, exist_ok=True)
     with open(out, "wb") as fh:
         pickle.dump(bundle, fh)
     sha = hashlib.sha256(Path(out).read_bytes()).hexdigest()
     meta = {k: v for k, v in bundle.items() if k not in ("model", "calibrator")}
     meta.update({"model_file": str(out), "model_sha256": sha, "git_sha": git_sha(), "creado": utcnow().isoformat(),
-                 "registro": "Estudio 44 (pre-registro c6ef641): modelo congelado del blitz para la confirmación y la demo"})
+                 "registro": registro})
     Path(reg).write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     log(f"Modelo {bundle['model_id']}: ajuste={fit.sum():,} calibración={cal.sum():,} q={q:.4f} sha256={sha[:12]}…")
     return meta
@@ -152,33 +178,42 @@ def _ms(t: pd.Timestamp) -> int:
 
 # Las mismas peticiones del Estudio 41, pero con un solo intento y 5 s de espera: en vivo no se puede bloquear el bucle
 # (el Estudio 41 reintenta hasta seis veces). Ventanas de ≤ 100 min (tope de OKX por petición).
-REQUESTS = {
-    "binance": ("https://api.binance.com/api/v3/klines",
-                lambda a, b: {"symbol": "BTCUSDT", "interval": "1m", "startTime": _ms(a), "endTime": _ms(b), "limit": 100},
-                lambda j: [(int(x[0]), float(x[4])) for x in j]),
-    "bybit": ("https://api.bybit.com/v5/market/kline",
-              lambda a, b: {"category": "spot", "symbol": "BTCUSDT", "interval": "1", "start": _ms(a), "end": _ms(b),
-                            "limit": 100},
-              lambda j: [(int(x[0]), float(x[4])) for x in j["result"]["list"]]),
-    "okx": ("https://www.okx.com/api/v5/market/history-candles",
-            lambda a, b: {"instId": "BTC-USDT", "bar": "1m", "after": _ms(b) + 1, "before": _ms(a) - 1, "limit": 100},
-            lambda j: [(int(x[0]), float(x[4])) for x in j["data"] if len(x) < 9 or x[8] == "1"]),
-    # Gate: solo para la referencia con el precio IQ reconstruido (Estudio 47); su API guarda ~7 días
-    "gate": ("https://api.gateio.ws/api/v4/spot/candlesticks",
-             lambda a, b: {"currency_pair": "BTC_USDT", "interval": "1m", "from": int(a.timestamp()),
-                           "to": int(b.timestamp())},
-             lambda j: [(int(x[0]) * 1000, float(x[2])) for x in j]),
-}
+def requests_for(symbol: str = "BTCUSDT") -> dict:
+    n = NOMBRES[symbol]
+    return {
+        "binance": ("https://api.binance.com/api/v3/klines",
+                    lambda a, b: {"symbol": n["binance"], "interval": "1m", "startTime": _ms(a), "endTime": _ms(b),
+                                  "limit": 100},
+                    lambda j: [(int(x[0]), float(x[4])) for x in j]),
+        "bybit": ("https://api.bybit.com/v5/market/kline",
+                  lambda a, b: {"category": "spot", "symbol": n["bybit"], "interval": "1", "start": _ms(a),
+                                "end": _ms(b), "limit": 100},
+                  lambda j: [(int(x[0]), float(x[4])) for x in j["result"]["list"]]),
+        "okx": ("https://www.okx.com/api/v5/market/history-candles",
+                lambda a, b: {"instId": n["okx"], "bar": "1m", "after": _ms(b) + 1, "before": _ms(a) - 1, "limit": 100},
+                lambda j: [(int(x[0]), float(x[4])) for x in j["data"] if len(x) < 9 or x[8] == "1"]),
+        # Gate: solo para la referencia con el precio IQ reconstruido (Estudio 47); su API guarda ~7 días
+        "gate": ("https://api.gateio.ws/api/v4/spot/candlesticks",
+                 lambda a, b: {"currency_pair": n["gate"], "interval": "1m", "from": int(a.timestamp()),
+                               "to": int(b.timestamp())},
+                 lambda j: [(int(x[0]) * 1000, float(x[2])) for x in j]),
+    }
+
+
+REQUESTS = requests_for("BTCUSDT")
 
 
 class UsdtCloses:
-    """Cierres de 1 min ya cerrados de BTC/USDT en Binance, Bybit y OKX (API públicas, sin credenciales)."""
+    """Cierres de 1 min ya cerrados de una moneda en USDT en Binance, Bybit, OKX y Gate (API públicas, sin
+    credenciales)."""
 
-    def __init__(self, session=None):
+    def __init__(self, session=None, symbol: str = "BTCUSDT"):
         self.session = session or requests.Session()
+        self.symbol = symbol
+        self.requests = requests_for(symbol)
 
     def get(self, venue: str, a: pd.Timestamp, b: pd.Timestamp) -> pd.Series:
-        url, params, parse = REQUESTS[venue]
+        url, params, parse = self.requests[venue]
         r = self.session.get(url, params=params(a, b), timeout=5)
         r.raise_for_status()
         s = pd.Series({pd.Timestamp(t, unit="ms", tz="UTC"): c for t, c in parse(r.json())}, dtype=float).sort_index()
@@ -196,20 +231,25 @@ def _mid(b, a):
 
 # bolsa → (url, parámetros, lectura → (último, medio)); Binance no da el último en esta respuesta (su diferencial es
 # de 0,01, así que el medio sirve igual)
-TICKERS = {
-    "binance": ("https://api.binance.com/api/v3/ticker/bookTicker", {"symbol": "BTCUSDT"},
-                lambda j: (None, _mid(j["bidPrice"], j["askPrice"]))),
-    "bybit": ("https://api.bybit.com/v5/market/tickers", {"category": "spot", "symbol": "BTCUSDT"},
-              lambda j: (lambda x: (float(x["lastPrice"]), _mid(x["bid1Price"], x["ask1Price"])))(j["result"]["list"][0])),
-    "okx": ("https://www.okx.com/api/v5/market/ticker", {"instId": "BTC-USDT"},
-            lambda j: (lambda x: (float(x["last"]), _mid(x["bidPx"], x["askPx"])))(j["data"][0])),
-    "kucoin": ("https://api.kucoin.com/api/v1/market/orderbook/level1", {"symbol": "BTC-USDT"},
-               lambda j: (float(j["data"]["price"]), _mid(j["data"]["bestBid"], j["data"]["bestAsk"]))),
-    "bitget": ("https://api.bitget.com/api/v2/spot/market/tickers", {"symbol": "BTCUSDT"},
-               lambda j: (lambda x: (float(x["lastPr"]), _mid(x["bidPr"], x["askPr"])))(j["data"][0])),
-    "gate": ("https://api.gateio.ws/api/v4/spot/tickers", {"currency_pair": "BTC_USDT"},
-             lambda j: (float(j[0]["last"]), _mid(j[0]["highest_bid"], j[0]["lowest_ask"]))),
-}
+def tickers_for(symbol: str = "BTCUSDT") -> dict:
+    n = NOMBRES[symbol]
+    return {
+        "binance": ("https://api.binance.com/api/v3/ticker/bookTicker", {"symbol": n["binance"]},
+                    lambda j: (None, _mid(j["bidPrice"], j["askPrice"]))),
+        "bybit": ("https://api.bybit.com/v5/market/tickers", {"category": "spot", "symbol": n["bybit"]},
+                  lambda j: (lambda x: (float(x["lastPrice"]), _mid(x["bid1Price"], x["ask1Price"])))(j["result"]["list"][0])),
+        "okx": ("https://www.okx.com/api/v5/market/ticker", {"instId": n["okx"]},
+                lambda j: (lambda x: (float(x["last"]), _mid(x["bidPx"], x["askPx"])))(j["data"][0])),
+        "kucoin": ("https://api.kucoin.com/api/v1/market/orderbook/level1", {"symbol": n["kucoin"]},
+                   lambda j: (float(j["data"]["price"]), _mid(j["data"]["bestBid"], j["data"]["bestAsk"]))),
+        "bitget": ("https://api.bitget.com/api/v2/spot/market/tickers", {"symbol": n["bitget"]},
+                   lambda j: (lambda x: (float(x["lastPr"]), _mid(x["bidPr"], x["askPr"])))(j["data"][0])),
+        "gate": ("https://api.gateio.ws/api/v4/spot/tickers", {"currency_pair": n["gate"]},
+                 lambda j: (float(j[0]["last"]), _mid(j[0]["highest_bid"], j[0]["lowest_ask"]))),
+    }
+
+
+TICKERS = tickers_for("BTCUSDT")
 IQ_NAME = "IQ reconstruido (pesos del Estudio 47)"
 # promedios candidatos para el precio de IQ Option (precio medio de cada bolsa)
 CANDIDATOS = {"Binance sola": ("binance",), "OKX sola": ("okx",), "3 bolsas (Binance, Bybit, OKX)": ("binance", "bybit", "okx"),
@@ -221,13 +261,14 @@ class PriceRecorder:
     """Graba cada segundo el precio de las seis bolsas durante unos segundos tras un aviso (hilo aparte; si una bolsa
     no responde, esa fila la deja vacía). Escribe solo `precios.jsonl`."""
 
-    def __init__(self, path: Path, clock, session=None, seconds: int = 25):
+    def __init__(self, path: Path, clock, session=None, seconds: int = 25, symbol: str = "BTCUSDT"):
         self.path, self.clock, self.seconds = Path(path), clock, seconds
         self.session = session or requests.Session()
-        self.pool = ThreadPoolExecutor(max_workers=len(TICKERS))
+        self.tickers = tickers_for(symbol)
+        self.pool = ThreadPoolExecutor(max_workers=len(self.tickers))
 
     def _one(self, venue: str):
-        url, params, parse = TICKERS[venue]
+        url, params, parse = self.tickers[venue]
         try:
             r = self.session.get(url, params=params, timeout=2)
             r.raise_for_status()
@@ -238,7 +279,7 @@ class PriceRecorder:
 
     def snapshot(self) -> dict:
         t0 = pd.Timestamp(self.clock())
-        got = dict(zip(TICKERS, self.pool.map(self._one, TICKERS)))
+        got = dict(zip(self.tickers, self.pool.map(self._one, self.tickers)))
         t1 = pd.Timestamp(self.clock())
         return {"t": (t0 + (t1 - t0) / 2).isoformat(), "duracion_s": round((t1 - t0).total_seconds(), 3), **got}
 
@@ -297,33 +338,71 @@ def comparar(runtime: Path, max_gap_s: float = 2.0) -> dict:
 
 # ----------------------------------------------------------------------------------------------- bucle
 class BlitzLoop(SignalLoop):
+    """Una decisión por minuto (segundo 50) para cada moneda vigilada. Si varias dan señal en el mismo minuto, avisa
+    solo la de mayor probabilidad (una operación a la vez) y anota las demás en el aviso."""
+
     def __init__(self, bundle: dict, runtime: Path, feed=None, secfeed=None, venues=None, sound: bool = True,
-                 log=print, pago: float | None = None, umbral: float | None = None, record: bool = True, telegram=None):
+                 log=print, pago: float | None = None, umbral: float | None = None, record: bool = True, telegram=None,
+                 extra: list[dict] | None = None):
         super().__init__(bundle, runtime, feed=feed, secfeed=secfeed, sound=sound, log=log, pago=pago, umbral=umbral,
                          telegram=telegram)
         self.venues = venues or UsdtCloses(self.feed.session)
-        self.extra_state = {"modo": "blitz", "duracion_min": DUR, "precio": bundle.get("precio")}
-        self.recorder = PriceRecorder(self.dir / "precios.jsonl", self.feed.server_now) if record else None
+        self.assets = [{"symbol": bundle.get("symbol", "BTCUSDT"), "bundle": bundle, "feed": self.feed,
+                        "sec": self.sec, "venues": self.venues}]
+        for x in extra or []:  # otras monedas: {"symbol", "bundle"} y, en pruebas, sus propios feed/sec/venues
+            sym = x["symbol"]
+            f = x.get("feed") or BinancePollingFeed(sym)
+            self.assets.append({"symbol": sym, "bundle": x["bundle"], "feed": f,
+                                "sec": x.get("sec") or SecondsFeed(f.session, symbol=sym),
+                                "venues": x.get("venues") or UsdtCloses(f.session, symbol=sym)})
+        self.by_symbol = {a["symbol"]: a for a in self.assets}
+        self.extra_state = {"modo": "blitz", "duracion_min": DUR, "precio": bundle.get("precio"),
+                            "activos": [CORTO.get(a["symbol"], a["symbol"]) for a in self.assets]}
+        self.record = record
+        self.recorders: dict[str, PriceRecorder] = {}
+        self.pool = ThreadPoolExecutor(max_workers=max(1, len(self.assets)))
+
+    def _decide(self, a: dict, now: datetime, minute_open: pd.Timestamp) -> dict:
+        try:
+            bars, _ = a["feed"].get(now)
+            sec = a["sec"].get(minute_open, now)
+            venues = a["venues"].recent(minute_open - pd.Timedelta(minutes=1))
+            d = decide_blitz(a["bundle"], bars, sec, venues, minute_open, self.pago, self.umbral)
+        except (requests.RequestException, ValueError, KeyError) as exc:
+            if len(self.assets) == 1:
+                raise  # una sola moneda: el bucle informa el error como siempre
+            d = {"estado": "error", "motivo": f"{type(exc).__name__}: {exc}"[:200]}
+        d.update({"activo": CORTO.get(a["symbol"], a["symbol"]), "symbol": a["symbol"],
+                  "model_id": a["bundle"]["model_id"]})
+        return d
 
     def step(self, now: datetime) -> dict:
         minute_open = pd.Timestamp(now).floor("min")
-        bars, _ = self.feed.get(now)
-        sec = self.sec.get(minute_open, now)
-        venues = self.venues.recent(minute_open - pd.Timedelta(minutes=1))
-        d = decide_blitz(self.b, bars, sec, venues, minute_open, self.pago, self.umbral)
+        if len(self.assets) == 1:
+            decisions = [self._decide(self.assets[0], now, minute_open)]
+        else:  # en paralelo: el aviso no debe llegar más tarde por vigilar más monedas
+            decisions = list(self.pool.map(lambda a: self._decide(a, now, minute_open), self.assets))
         self.n_minutes += 1
+        signals = sorted((x for x in decisions if x["estado"] == "señal"), key=lambda x: -x["p"])
+        d = signals[0] if signals else next((x for x in decisions if x["estado"] != "error"), decisions[0])
         d.update({"vela": minute_open.isoformat(), "decidido": pd.Timestamp(now).isoformat(),
                   "cierre": (minute_open + pd.Timedelta(minutes=1)).isoformat(),
                   "vence": (minute_open + pd.Timedelta(minutes=1 + DUR)).isoformat()})
+        if len(self.assets) > 1:
+            d["otras"] = [{"activo": x["activo"], "estado": x["estado"], "lado": x.get("lado"), "p": x.get("p")}
+                          for x in decisions if x is not d]
         if d["estado"] == "señal":
             self.n_signals += 1
             d["alert_id"] = uuid.uuid4().hex[:12]
             d["emitido"] = pd.Timestamp(self.feed.server_now()).isoformat()
-            self._write({"evento": "aviso", "model_id": self.b["model_id"], **d})
+            self._write({"evento": "aviso", **d})
             self._beep()
             self._notify(d)
-            if self.recorder:
-                self.recorder.start(d["alert_id"])  # precios de las seis bolsas mientras el usuario hace clic
+            if self.record:  # precios de las seis bolsas mientras el usuario hace clic
+                sym = d["symbol"]
+                if sym not in self.recorders:
+                    self.recorders[sym] = PriceRecorder(self.dir / "precios.jsonl", self.feed.server_now, symbol=sym)
+                self.recorders[sym].start(d["alert_id"])
         self.last = d
         return d
 
@@ -339,14 +418,16 @@ class BlitzLoop(SignalLoop):
             end = t + pd.Timedelta(minutes=DUR)
             if pd.Timestamp(now) < end + pd.Timedelta(seconds=80):  # la vela t + 3 cierra en t + 4 min
                 continue
-            closes = {v: self.venues.get(v, t, end) for v in VENUES}
-            closes["binance"] = self.venues.get("binance", t, end)
+            sym = a.get("symbol", "BTCUSDT")
+            src = self.by_symbol[sym]["venues"] if sym in self.by_symbol else UsdtCloses(self.feed.session, symbol=sym)
+            closes = {v: src.get(v, t, end) for v in VENUES}
+            closes["binance"] = src.get("binance", t, end)
             o, e = (lambda c: (c.get(t), c.get(end)))(composite(closes))
             res = None if o is None or e is None else _resultado(o, e, a["lado"])
             row = {"evento": "referencia", "alert_id": aid, "entrada_ref": o, "salida_ref": e, "resultado_ref": res,
                    "fuente_ref": "promedio de Binance, Bybit y OKX"}
             try:  # además, con el precio IQ reconstruido (Estudio 47): mismo juicio, otra mezcla
-                iq = iq_price({**closes, "gate": self.venues.get("gate", t, end)})
+                iq = iq_price({**closes, "gate": src.get("gate", t, end)})
                 oi, ei = iq.get(t), iq.get(end)
                 row["resultado_iq"] = None if oi is None or ei is None else _resultado(oi, ei, a["lado"])
             except (requests.RequestException, ValueError, KeyError):

@@ -256,3 +256,47 @@ def test_phone_alert_text_and_telegram_send_and_failure_does_not_stop_the_loop(t
     loop.telegram = broken
     loop._notify(d).join(5)
     assert logs and "Telegram" in logs[-1]  # se anota y el bucle sigue
+
+
+def test_loop_watches_two_coins_and_alerts_the_most_probable(tmp_path, bars):
+    t = bars.index[-1] + pd.Timedelta(minutes=1)
+    now = (t + pd.Timedelta(seconds=50.3)).to_pydatetime()
+
+    class _Feed:
+        offset_s, session = 0.0, None
+
+        def get(self, now=None):
+            return bars, now
+
+        def server_now(self):
+            return now
+
+    class _Sec:
+        def get(self, start, now, limit=120):
+            return _sec(t)
+
+    class _V:
+        def recent(self, t1):
+            return _venues(bars, t1)
+
+    btc = {**_bundle(0.62), "symbol": "BTCUSDT", "model_id": "B"}
+    eth = {**_bundle(0.70), "symbol": "ETHUSDT", "model_id": "E"}
+    loop = blitz.BlitzLoop(btc, tmp_path, feed=_Feed(), secfeed=_Sec(), venues=_V(), sound=False, record=False,
+                           extra=[{"symbol": "ETHUSDT", "bundle": eth, "feed": _Feed(), "sec": _Sec(), "venues": _V()}])
+    d = loop.step(now)
+    assert d["estado"] == "señal" and d["activo"] == "ETH" and d["model_id"] == "E"
+    assert d["otras"] == [{"activo": "BTC", "estado": "señal", "lado": 1, "p": pytest.approx(0.62, abs=0.03)}]
+    rows = [json.loads(x) for x in (tmp_path / "senales.jsonl").read_text().splitlines()]
+    assert len(rows) == 1 and rows[0]["symbol"] == "ETHUSDT"
+    assert loop.extra_state["activos"] == ["BTC", "ETH"]
+    from tradingbot.live.anticipada import aviso_texto
+    assert aviso_texto(d, "blitz").startswith("🔔 ETH blitz 3 min: ↑ SUBE")
+
+
+def test_closes_and_tickers_use_each_coin_name():
+    eth = blitz.requests_for("ETHUSDT")
+    a, b = pd.Timestamp("2026-11-01T12:00", tz="UTC"), pd.Timestamp("2026-11-01T12:05", tz="UTC")
+    assert eth["okx"][1](a, b)["instId"] == "ETH-USDT" and eth["gate"][1](a, b)["currency_pair"] == "ETH_USDT"
+    assert eth["binance"][1](a, b)["symbol"] == "ETHUSDT" and eth["bybit"][1](a, b)["symbol"] == "ETHUSDT"
+    assert blitz.tickers_for("ETHUSDT")["okx"][1] == {"instId": "ETH-USDT"}
+    assert blitz.REQUESTS["okx"][1](a, b)["instId"] == "BTC-USDT"  # BTC sigue igual por defecto
