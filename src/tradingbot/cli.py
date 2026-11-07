@@ -367,6 +367,16 @@ def cmd_research_study45(a) -> int:
     return 0
 
 
+def cmd_research_study53(a) -> int:
+    from .research import study53
+
+    rep = study53.run()
+    for h, r in rep["hipotesis"].items():
+        print(f"{h}: pasa={r['pasa']} | {r['operaciones']} ops ({r['por_dia_calendario']:.1f}/día), acierto "
+              f"{r['acierto']} | {r['criterios']}")
+    return 0
+
+
 def cmd_research_study51(a) -> int:
     from .research import study51
 
@@ -940,6 +950,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--study4", action="store_true", help="Estudio 4: confirmación de ETH 15 min (solo precio)")
     x.add_argument("--n-boot", type=int, default=1000)
     x.set_defaults(func=cmd_research_study3)
+    x = r.add_parser("study53", help="Estudio 53: blitz de Solana de IQ Option (3 min) con la receta del Estudio 42")
+    x.set_defaults(func=cmd_research_study53)
     x = r.add_parser("study51", help="Estudio 51: blitz de ETH de IQ Option (3 min) con la receta del Estudio 42")
     x.set_defaults(func=cmd_research_study51)
     x = r.add_parser("study50", help="Estudio 50: blitz continuo de BTC (decisión cada 10 s, no solo en el segundo 50)")

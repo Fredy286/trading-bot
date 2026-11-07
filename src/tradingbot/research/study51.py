@@ -36,19 +36,20 @@ M1 = Path("data/processed/estudio26/ETHUSDT/1m")
 N_DAYS = 420  # 2025-09-01 → 2026-10-25
 
 
-def closes(first: str = "2024-08", last: str = "2026-10", gate_first: str = "2025-09") -> dict[str, pd.Series]:
+def closes(first: str = "2024-08", last: str = "2026-10", gate_first: str = "2025-09",
+           symbol: str = SYMBOL) -> dict[str, pd.Series]:
     out = {}
     for v in ("binance", "bybit", "okx", "gate"):
         months = [p.strftime("%Y-%m") for p in pd.period_range(gate_first if v == "gate" else first, last, freq="M")]
-        x = pd.concat([bolsas.month_closes(SYMBOL, v, m) for m in months]).sort_index()
+        x = pd.concat([bolsas.month_closes(symbol, v, m) for m in months]).sort_index()
         out[v] = x[~x.index.duplicated(keep="last")]
     return out
 
 
-def minute_bars(root3: Path = Path("data/raw/estudio3")) -> pd.DataFrame:
+def minute_bars(root3: Path = Path("data/raw/estudio3"), symbol: str = SYMBOL, m1: Path = M1) -> pd.DataFrame:
     """Velas de 1 min de ETH/USDT de Binance: las del Estudio 3 (hasta 2026-08) y las del Estudio 26 (2025-09 → 2026-10)."""
-    late = pd.concat([pd.read_parquet(f) for f in sorted(Path(M1).glob("*.parquet"))])
-    spot = pd.concat([load(root3, SYMBOL, "spot"), late[["o", "h", "l", "c", "volume", "trades", "taker_buy_base"]]])
+    late = pd.concat([pd.read_parquet(f) for f in sorted(Path(m1).glob("*.parquet"))])
+    spot = pd.concat([load(root3, symbol, "spot"), late[["o", "h", "l", "c", "volume", "trades", "taker_buy_base"]]])
     spot = spot[~spot.index.duplicated(keep="last")].sort_index()
     return spot
 
@@ -64,17 +65,20 @@ def btc_signals(margin: float, umbral: float | None) -> pd.DatetimeIndex:
     return P.index[take]
 
 
-def run(out_dir: Path = Path("results/estudio51"), n_boot: int = 1000, log=print) -> dict:
+def run(out_dir: Path = Path("results/estudio51"), n_boot: int = 1000, log=print, symbol: str = SYMBOL,
+        tab_path: Path = TAB, m1: Path = M1, prefijo: str = "H51",
+        estudio: str = "Estudio 51 — blitz de ETH de IQ Option con la receta del Estudio 42 (pre-registro en docs/01)") -> dict:
+    """Con los valores por defecto es exactamente el Estudio 51 (ETH); el Estudio 53 lo usa con Solana."""
     cfg = load_config("config/research.toml")  # solo se lee
     margin = cfg["contracts"]["binary_ev_margin"]
-    bars = spot_bars(minute_bars())
+    bars = spot_bars(minute_bars(symbol=symbol, m1=m1))
     data_start = pd.Timestamp(TEST_START, tz="UTC") - pd.DateOffset(months=12) - pd.Timedelta(days=7)
     bars = bars[(bars.index >= data_start) & (bars.index < pd.Timestamp(TEST_END, tz="UTC"))]
     idx = bars.index
-    tab = pd.read_parquet(TAB).reindex(idx)
+    tab = pd.read_parquet(tab_path).reindex(idx)
     prev = compute_features(bars).shift(1)  # vela t − 1, ya cerrada en el segundo 50 de t
     vol_prev = np.exp(prev["lvol60"])
-    cl = closes()
+    cl = closes(symbol=symbol)
     comp = composite({v: cl[v] for v in ("binance", "bybit", "okx")})
     iq = iq_price(cl, WEIGHTS)
     X = pd.concat([prev[FEATURES], partial_features(tab, bars["o"], vol_prev, K),
@@ -89,13 +93,13 @@ def run(out_dir: Path = Path("results/estudio51"), n_boot: int = 1000, log=print
     be = 1 / (1 + PAYOUT)
     sel = ~np.isnan(p)
     times = idx[sel]
-    rep = {"estudio": "Estudio 51 — blitz de ETH de IQ Option con la receta del Estudio 42 (pre-registro en docs/01)",
+    rep = {"estudio": estudio,
            "git_sha": git_sha(), "periodo_prueba": [TEST_START, TEST_END], "pago": PAYOUT, "equilibrio": be,
            "hipotesis": {}, "informativo": {}}
     user_hours = (times.hour >= 2) & (times.hour < 6)  # 21:00–01:00 Bogotá
     side = np.where(p[sel] >= 0.5, 1, -1)
     pmax = np.where(side == 1, p[sel], 1 - p[sel])
-    for h, umbral in HYPS.items():
+    for h, umbral in ((prefijo + k[3:], u) for k, u in HYPS.items()):
         x = evaluate(p[sel], y[sel], q_hat[sel], times, contract, margin, n_boot, 1 - ALPHA, umbral=umbral)
         xiq = evaluate(p[sel], y_iq[sel], q_hat[sel], times, contract, margin, n_boot, 1 - ALPHA, umbral=umbral)
         crit = {"min_300": x["operaciones"] >= 300, "p_bonferroni": x["p"] < ALPHA, "wilson": x["lo95"] > be,

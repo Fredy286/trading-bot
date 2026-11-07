@@ -4141,3 +4141,53 @@ Lista de activos de IQ Option ese sábado:
 3. **Los activos OTC no se pueden estudiar ni predecir con datos de mercado:** su precio lo produce la plataforma, que
    además es la contraparte. Ningún modelo de este proyecto aplica a ellos.
 4. **Siguiente:** Solana es la única otra criptomoneda con blitz de precio real → Estudio 53.
+
+## Estudio 53 — blitz de Solana en IQ Option con la receta del Estudio 42 (pre-registro, 2026-11-07, ANTES de calcular nada de SOL con el compuesto)
+
+**Origen:**
+- El usuario pide más señales.
+- La revisión de IQ Option del 2026-11-07 mostró que, además de Bitcoin, solo **Solana** tiene blitz con precio real
+  (cerrado el fin de semana); el de ETH es OTC.
+- El Estudio 51 mostró que la receta del blitz funciona con otra moneda (ETH: 56,9 % con p ≥ 0,57).
+
+**Supuestos que se verificarán cuando abra (domingo 22:00 de Bogotá), sin cambiar este estudio:**
+- que el blitz de Solana dure 3 min y pague 86 %, como el de BTC. Si dura otra cosa, este estudio no aplica tal cual;
+- que su precio sea una mezcla de bolsas, como el de BTC. Se compararán sus velas con las de las bolsas, igual que el
+  2026-11-07.
+
+**Datos:**
+- velas de 1 min de SOL/USDT de Binance: las del Estudio 3 hasta 2025-08 y las del Estudio 26 para 2025-09 → 2026-10;
+- tabla de velas de 1 s de SOL del Estudio 26;
+- cierres de 1 min de SOL/USDT en Binance, Bybit y OKX desde 2024-08, y en Gate desde 2025-09, descargados el
+  2026-11-07 solo hasta el 2026-10-26 00:05.
+
+**Receta, precio, política, hipótesis y criterios:** idénticos a los del Estudio 51, cambiando ETH por SOL:
+- **Precio:** compuesto de 3 bolsas para entrenar y juzgar. Juicio adicional obligatorio con 4 bolsas y los pesos de
+  BTC del Estudio 47.
+- **Política:** EV ≥ 0,02 con pago del 86 %.
+- **H53a:** todas las operaciones de la política; **H53b:** p ≥ 0,57. Bonferroni α = 0,025.
+- **Criterios (cada una, todos):**
+  1. ≥ 300 operaciones;
+  2. p < 0,025;
+  3. Wilson 95 % > 53,76 % con 3 bolsas;
+  4. Wilson 95 % > 53,76 % con 4 bolsas;
+  5. intervalo del EV (bootstrap por semanas, 97,5 %) > 0;
+  6. EV > 0 en ≥ 60 % de los meses.
+
+**Informativo:**
+- señales por día y en el horario del usuario;
+- juicio con Binance sola;
+- solapamiento con las señales del blitz de BTC.
+
+**Expectativa declarada:** dudosa. En SOL a 1 min con el precio de Binance, el modelo nunca llegó a p ≥ 0,60 con clic a
++10 s (Estudio 26).
+
+**Consecuencia:**
+- **Si H53a o H53b pasa:**
+  - se pre-registra su confirmación (Estudio 54) antes de entrenar el modelo congelado de SOL;
+  - el modo de práctica del blitz podrá vigilar BTC y SOL, solo cuando se compruebe en IQ Option la duración, el pago
+    y el precio del blitz de Solana.
+- **Si no pasa:** Solana queda sin señal.
+
+Código: `src/tradingbot/research/study53.py` (usa `study51.run` con SOL; con sus valores por defecto, `study51.run`
+sigue siendo exactamente el Estudio 51), `tbot research study53`.
