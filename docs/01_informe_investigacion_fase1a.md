@@ -4211,3 +4211,87 @@ para vigilar SOL se retiró sin usarse.
 **Situación de IQ Option tras los Estudios 50–53:** el único contrato donde el bot tiene ventaja medida sigue siendo el
 **blitz de Bitcoin**, que abre de domingo 22:00 a viernes. Revisar más seguido no ayuda (Estudio 50). ETH tiene ventaja
 con su precio real (Estudio 51), pero IQ Option solo lo ofrece en blitz como OTC. Solana no tiene ventaja (Estudio 53).
+
+## Estudio 54 — «event contracts» de OKX: ETH y BTC «Up or Down 5min» con el aviso anticipado (pre-registro, 2026-11-07, ANTES de calcular nada con el índice de OKX)
+
+**Origen:** el usuario pidió buscar una plataforma con ETH a precio real y vencimiento corto (2026-11-07).
+
+OKX, una de las bolsas más grandes, ofrece desde mayo de 2026 «event contracts» Up/Down («sube o baja») de 5 y 15 min
+sobre BTC, ETH y SOL. Se liquidan con su índice, que es una mezcla de bolsas. Consulta pública del 2026-11-07, sin
+cuenta:
+- **Índice ETH-USDT:** OKX 25 %, Binance 25 %, Bybit 18,75 %, Coinbase (ETH/USD) 18,75 % y Bitget 12,5 %. BTC-USDT usa
+  los mismos pesos.
+- **Reglas, verificadas con 6 contratos vencidos de ETH 5 min (coincidencia exacta):**
+  - partida = índice al comenzar la ventana;
+  - liquidación = media de los 30 cierres de 1 s antes del vencimiento;
+  - «sube» si la liquidación es mayor o igual que la partida.
+- **Libro de órdenes:**
+  - antes de que empiece cada ventana: compra a 0,51–0,52 USDT y venta a 0,48–0,49 (20–500 acciones);
+  - dentro de la ventana el diferencial se abre (por ejemplo, 0,81/0,11).
+
+  Cada acción ganadora paga 1 USDT, menos una comisión de liquidación que OKX no publica.
+
+**Costos supuestos (fijos):**
+- compra antes de la ventana a 0,52 USDT por acción;
+- comisión de liquidación del 2 % del pago (0,02 USDT);
+- equilibrio = 0,52 / 0,98 = **53,06 %**.
+
+Si la comisión real (la verá el usuario en la app) es otra, el resultado se recalcula con ella como información. El
+veredicto queda con estos valores.
+
+**Aviso:**
+- decisión en el segundo 50 del minuto anterior a la ventana (las ventanas empiezan en minutos múltiplos de 5);
+- receta del Estudio 42: vela anterior de Binance, bloque parcial hasta el segundo 50 y compuesto de 3 bolsas;
+- el usuario compra antes de que empiece la ventana (≤ 10 s).
+
+**Etiqueta:** la regla de OKX, con el índice reconstruido al segundo:
+- cierres de 1 s de Binance más la diferencia índice − Binance, interpolada entre cierres de minuto;
+- los cierres de minuto del índice vienen de la API pública `history-index-candles`;
+- partida = cierre de minuto del índice justo antes de la ventana (exacta);
+- liquidación = media de los 30 cierres de 1 s antes del vencimiento.
+
+**Modelo:**
+- GBM mes a mes, 2025-09-01 → 2026-10-25, 12 meses de entrenamiento (20 % para calibrar), purga de 8 min;
+- entrena con todos los minutos (cada minuto como posible ventana);
+- se evalúa solo en los minutos de decisión de las ventanas reales (:04, :09, …).
+
+**Política:** p de la dirección × 0,98 − 0,52 ≥ 0,02, es decir, p ≥ 0,551.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H54a:** ETH a 5 min;
+- **H54b:** BTC a 5 min.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p < 0,025 frente a 53,06 % (binomial);
+3. Wilson 95 % > 53,06 %;
+4. intervalo del EV por acción (bootstrap por semanas ISO, 97,5 %) por encima de 0;
+5. EV > 0 en ≥ 60 % de los meses.
+
+**Informativo:**
+- contratos de 15 min (mismo procedimiento, liquidación con 60 s);
+- precio de 0,51 sin comisión;
+- umbrales de 0,53 a 0,60;
+- horario del usuario;
+- proporción de ventanas que suben.
+
+**Advertencias:**
+1. OKX no está supervisada por la SFC. Los event contracts podrían considerarse juego: Coljuegos bloqueó Polymarket en
+   2025. No se encontró ningún bloqueo a OKX.
+2. No se sabe si OKX ofrece estos contratos a residentes en Colombia ni si hay cuenta de práctica para ellos. Lo
+   comprueba el usuario en la app, sin depositar.
+3. Nunca dinero real sin autorización expresa.
+
+**Expectativa declarada:** incierta. El equilibrio es más bajo que en IQ Option (53,06 % frente a 53,76 %). Pero el
+horizonte es de 5 min, y a 5 min el aviso anticipado de BTC dio 54,70 % con el precio de Binance (Estudio 18).
+
+**Consecuencia:**
+- **Si H54a o H54b pasa:**
+  - se pre-registra su confirmación con datos posteriores al 2026-10-25. La API de OKX publica la partida, la
+    liquidación y el resultado oficial de cada contrato (`floorStrike`, `settleValue`, `outcome`);
+  - se construye un modo de aviso (Telegram) para seguir las señales sin dinero, anotando la decisión y comparándola con
+    el resultado oficial.
+- **Si no pasa:** sin señal.
+
+Código: `src/tradingbot/research/study54.py`, `tbot research study54`; pruebas en `tests/test_study54.py`. Descarga del
+índice en `research/bolsas.py` (`okx_index_month`).

@@ -111,3 +111,56 @@ def download(symbol: str, first: str = "2024-08", last: str = "2026-10", gate_fi
         return
     with ThreadPoolExecutor(max_workers=workers) as ex:
         list(ex.map(one, jobs))
+
+
+# ----------------------------------------------------------------------------------------------- índice de OKX
+INDICE = Path("data/raw/okx_indice")
+
+
+def okx_index_month(index: str, ym: str, work: Path = INDICE, session=None, pause: float = 0.45, log=print) -> pd.Series:
+    """Cierres de 1 min del índice de OKX (p. ej., ETH-USDT, con el que liquidan sus «event contracts») en el mes `ym`.
+
+    Usa la API pública `history-index-candles` (100 velas por consulta, límite de 10 consultas cada 2 s), con caché por
+    mes y solo hasta `END` (lo posterior está reservado)."""
+    f = Path(work) / index / f"{ym}.parquet"
+    if f.exists():
+        return pd.read_parquet(f)["c"]
+    s = session or requests.Session()
+    start = pd.Timestamp(ym + "-01", tz="UTC")
+    end = min(start + pd.offsets.MonthBegin(1), END)
+    rows, after = [], _ms(end)
+    while after > _ms(start):
+        r = _get(s, "https://www.okx.com/api/v5/market/history-index-candles",
+                 {"instId": index, "bar": "1m", "after": after, "limit": 100})
+        if str(r.get("code")) != "0":  # límite de velocidad u otro error: se espera y se repite la misma consulta
+            time.sleep(2.0)
+            continue
+        data = r.get("data", [])
+        if not data:
+            break
+        rows.extend((int(x[0]), float(x[4])) for x in data)
+        after = min(int(x[0]) for x in data)
+        time.sleep(pause)
+    df = pd.DataFrame(rows, columns=["t", "c"]).drop_duplicates("t")
+    ser = pd.Series(df["c"].to_numpy(), index=pd.to_datetime(df["t"], unit="ms", utc=True)).sort_index()
+    ser = ser[(ser.index >= start) & (ser.index < END)]
+    f.parent.mkdir(parents=True, exist_ok=True)
+    tmp = f.with_suffix(f".{uuid.uuid4().hex[:6]}.tmp")
+    ser.to_frame("c").to_parquet(tmp)
+    tmp.replace(f)
+    log(f"  índice OKX {index} {ym}: {len(ser):,} velas")
+    return ser
+
+
+def download_okx_index(indices=("ETH-USDT", "BTC-USDT"), first: str = "2024-08", last: str = "2026-10",
+                       workers: int = 2, log=print) -> None:
+    jobs = [(i, p.strftime("%Y-%m")) for i in indices for p in pd.period_range(first, last, freq="M")]
+
+    def one(job):
+        try:
+            okx_index_month(*job, session=requests.Session(), log=log)
+        except (RuntimeError, requests.RequestException) as exc:
+            log(f"  índice OKX {job}: falló ({type(exc).__name__}); se reintenta en la próxima ejecución")
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        list(ex.map(one, jobs))
