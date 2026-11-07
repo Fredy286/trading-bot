@@ -344,9 +344,10 @@ def run(out_dir: Path = Path("results/estudio50"), n_boot: int = 1000, log=print
         info["horario_usuario"]["por_noche"] = info["horario_usuario"]["por_dia"]
         info["horario_usuario_referencia"]["por_noche"] = info["horario_usuario_referencia"]["por_dia"]
         rep["informativo"][h] = info
+        fmt = lambda v, f: "—" if v is None else format(v, f)  # noqa: E731 (sin operaciones: None)
         log(f"{h} (p ≥ {umbral}): pasa={x['pasa']} | {x['operaciones']} ops ({x['por_dia']:.1f}/día), acierto "
-            f"{x['acierto']:.4f} [{x['lo95']:.4f}] EV {x['ev']:+.4f} | referencia {ref['operaciones']} ops "
-            f"({ref['por_dia']:.1f}/día) acierto {ref['acierto']} | {crit}")
+            f"{fmt(x['acierto'], '.4f')} [{fmt(x['lo95'], '.4f')}] EV {fmt(x['ev'], '+.4f')} | referencia "
+            f"{ref['operaciones']} ops ({ref['por_dia']:.1f}/día) acierto {fmt(ref['acierto'], '.4f')} | {crit}")
     rep["informativo"]["umbrales"] = {
         str(u): {"nuevo": {k: v for k, v in ours(u)[0].items() if k != "mensual"},
                  "referencia": {k: v for k, v in baseline(u).items() if k != "mensual"}} for u in UMBRALES_INFO}
