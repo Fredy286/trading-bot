@@ -213,6 +213,8 @@ El 2026-11-07 se buscó cómo tener **más señales sin perder probabilidad**:
   - con el promedio de 4 bolsas (pesos de BTC), 56,7 %;
   - casi nunca coinciden con las de BTC;
   - en el horario de 21:00 a 01:00 de Bogotá, unas 4 por noche (58,4 %, lectura *post hoc*);
+  - **la cantidad depende de cuánto se mueva el mercado:** en agosto de 2026, 54 por día; en octubre, que fue
+    tranquilo, 10,5 por día (1,4 por noche). En octubre BTC no dio ninguna con p ≥ 0,57;
   - todas las señales (EV ≥ 0,02): 112 por día con 54,9 %.
 - **Falta la confirmación con datos nuevos** (Estudio 52, enero de 2027). El registro diario en la nube ya la anota
   (`results/registro/blitz_eth/`, sellado). **Solo cuenta demo.**

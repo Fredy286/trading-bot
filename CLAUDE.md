@@ -269,7 +269,7 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      segundos 40–50 de cada minuto (58 %); a mitad del minuto, 51 %. El código del modo continuo se retiró sin usarse.
    - **Estudio 51 (2026-11-07): blitz de ETH PASA** (receta del 42 con datos de ETH): p ≥ 0,57 → 31 señales/día con
      56,9 % (4 bolsas 56,7 %); todas 112/día con 54,9 %; casi no coinciden con BTC; horario del usuario ~4/noche (58,4 %,
-     *post hoc*). Modelo congelado `ETHUSDT-blitz3-compuesto-5d7319` (config/senal_blitz_eth.json); confirmación:
+     *post hoc*); en meses tranquilos muchas menos (octubre: ETH 10,5/día y 1,4/noche; BTC 0 con p ≥ 0,57). Modelo congelado `ETHUSDT-blitz3-compuesto-5d7319` (config/senal_blitz_eth.json); confirmación:
      **Estudio 52** (enero de 2027; registro diario `blitz_eth`, sellado). Modo: `scripts/iniciar_blitz.sh --eth
      [--telegram]` (decide BTC y ETH a la vez; avisa la de mayor p). **Usar solo si el usuario confirma que IQ Option
      tiene «Ethereum Blitz» de 3 min y su pago.** Cierres de otras monedas: `research/bolsas.py`
