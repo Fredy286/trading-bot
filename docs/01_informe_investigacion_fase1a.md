@@ -3828,3 +3828,101 @@ evaluación es única, `tbot research study49` ahora se niega a correr si falta 
 (2026-10-26 → 2027-01-18) en `results/registro/btc/` (el registro diario reintenta los días pendientes, y su horario en
 GitHub no es fiable, ítem 46). La ampliación de la ventana, si hiciera falta, solo usa días seguidos ya registrados.
 No cambia datos, reglas, hipótesis ni umbrales (registro de errores, ítem 54).
+
+## Estudio 50 — «blitz continuo»: el modelo del blitz decide cada 10 s y no una vez por minuto (pre-registro, 2026-11-07, ANTES de calcular nada con este diseño)
+
+**Origen:** pedido del usuario del 2026-11-07: «la prioridad ahora es tener mejores probabilidades en las señales y
+tener más señales».
+
+El blitz de BTC de IQ Option dura 3 min **desde la compra**, así que se puede comprar en cualquier segundo, no solo al
+cierre de cada minuto. Hoy el bot decide una sola vez por minuto (segundo 50, Estudio 42). Con p ≥ 0,57 da unas
+7 señales por día y menos de 1 por noche en el horario del usuario. Si el modelo decide cada 10 s, tiene 6 veces más
+momentos para encontrar una señal de alta confianza.
+
+**Antecedente externo:** Kim y Hansen (arXiv 2607.09426, futuros perpetuos de Binance 2021–2024) encuentran ráfagas de
+volumen y volatilidad en las marcas de 1, 5 y 15 min (algoritmos que operan con el reloj). Puede que la ventaja del
+modelo viva solo en los cierres de minuto. Este estudio lo mide (informativo por segundo del minuto).
+
+**Precio:**
+- **Entrenamiento:** el compuesto de 3 bolsas del Estudio 42 (promedio simple de los cierres de 1 min de Binance,
+  Bybit y OKX). Es el único disponible desde 2024-08; Gate solo existe desde 2025-09.
+- **Juicio (decide):** el precio de IQ reconstruido con los pesos del Estudio 47 (Binance 0,336, Bybit 0,071,
+  OKX 0,223, Gate 0,370).
+- **Al segundo:** último precio de Binance (vela de 1 s cerrada antes del instante) menos la diferencia
+  Binance − compuesto, interpolada en línea recta entre cierres de minuto. Es exacta en cada cierre; es el mismo método
+  de la nota de demora del blitz.
+
+**Decisión, clic y etiqueta:**
+- se decide en cada instante t múltiplo de 10 s (segundos 0, 10, 20, 30, 40 y 50 de cada minuto);
+- solo se usan velas de 1 s cerradas antes de t (abiertas en t − 1 s o antes) y velas de 1 min cerradas;
+- clic a t + 10 s: entrada = precio en t + 10 s; vencimiento = t + 190 s;
+- resultado = signo(precio(t + 190 s) − precio(t + 10 s)); empate si la diferencia es menor de 0,005 (reembolso);
+- si en la entrada o el vencimiento faltan velas de Binance (más de 5 s sin velas), no hay resultado.
+
+**Variables (51, fijas):**
+1. las 27 `FEATURES` de la vela de 1 min de Binance anterior (ya cerrada) y las 3 del compuesto del Estudio 42
+   (`c_r1`, `c_r3`, `c_disp`) de esa misma vela;
+2. 21 variables «deslizantes» con las velas de 1 s cerradas antes de t (vol = exp(lvol60) de la vela de 1 min
+   anterior):
+   - `s_r{k}` = log(precio / precio k s antes) / (vol · √(k/60)), con k = 5, 10, 20, 30, 60, 120, 180 y 300;
+   - `s_pos{w}` = posición del último precio entre el mínimo y el máximo de los últimos w s (0,5 si no hay rango),
+     con w = 30, 60, 180 y 300;
+   - `s_rng{w}` = log(máximo / mínimo) de los últimos w s / (vol · √(w/60)), con w = 60 y 300;
+   - `s_tib{w}` = 2 · volumen comprador agresor / volumen − 1 de los últimos w s (0 sin volumen), con w = 10, 30, 60
+     y 300;
+   - `s_vrel60` = log(volumen de los últimos 60 s / volumen medio por minuto de la última hora);
+   - `s_rv300` = log(desvío de los rendimientos de 1 s de los últimos 300 s · √60 / vol);
+   - `s_sec` = segundo del minuto (0–50).
+
+Si faltan más de 10 de las últimas 60 velas de 1 s, no hay decisión.
+
+**Modelo:**
+- GBM de `config/research.toml`, sin cambios, mes a mes;
+- prueba 2025-09-01 → 2026-10-25, entrenando con los 12 meses anteriores (el último 20 % para calibrar, isotónica);
+- purga de 5 min;
+- el ajuste usa como mucho 400 000 filas (`max_fit_rows`), con una submuestra regular cuyo paso no es múltiplo de 2
+  ni de 3, para que entren los seis segundos del minuto.
+
+**Política:**
+- p de la dirección ≥ umbral, y EV ≥ 0,02 con pago 86 % y empate reembolsado;
+- después de cada señal, **60 s de espera** antes de la siguiente (como mucho una por minuto, igual que hoy).
+
+**Referencia (el blitz actual):** las predicciones del Estudio 42 (decisión en el segundo 50, entrada al cierre del
+minuto), con el mismo umbral y juzgadas con el mismo precio de IQ al segundo. En los cierres de minuto ese precio es
+exacto, así que reproduce el 55,32 % del Estudio 47.
+
+**Hipótesis (Bonferroni α = 0,025 cada una):**
+- **H50a:** umbral 0,57 (el filtro del Estudio 46);
+- **H50b:** umbral 0,60.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones;
+2. p < 0,025 frente a 53,76 % (binomial);
+3. Wilson 95 % > 53,76 %;
+4. intervalo del EV (bootstrap por semanas ISO, 97,5 %) por encima de 0;
+5. EV > 0 en ≥ 60 % de los meses;
+6. **más señales:** operaciones por día (sobre los 420 días del periodo) ≥ 1,5 veces las de la referencia con el
+   mismo umbral;
+7. **buena probabilidad:** acierto ≥ 56,0 % (H50a) o ≥ 58,0 % (H50b).
+
+**Informativo (no decide nada):**
+- demora del clic de 20 y 30 s;
+- horario del usuario (21:00–01:00 Bogotá = 02–06 UTC): señales por noche y acierto, nuevo frente a referencia;
+- sin la espera de 60 s;
+- acierto por segundo del minuto;
+- umbrales de 0,55 a 0,62;
+- juicio con el compuesto de 3 bolsas y con Binance solo.
+
+**Expectativa declarada:** incierta. Si la ventaja vive en los cierres de minuto, los segundos 10–40 aportarán poco y
+fallará el criterio 6 o el 7.
+
+**Consecuencia:**
+- **Si H50a o H50b pasa:**
+  - se entrena una sola vez el modelo congelado (12 meses hasta el 2026-10-25);
+  - se construye el modo de práctica «blitz continuo»: aviso cada vez que aparezca una señal, con Telegram;
+  - se pre-registra su confirmación (Estudio 51) con datos posteriores al 2026-10-25: evaluación única después del
+    2027-01-18, con registro diario sellado en la nube.
+- **Si ninguna pasa:** el blitz sigue decidiendo una vez por minuto.
+
+Código: `src/tradingbot/research/study50.py`, `tbot research study50`; pruebas en `tests/test_study50.py` (causalidad de
+las variables deslizantes, espera de 60 s, submuestra).
