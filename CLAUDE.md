@@ -273,7 +273,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      **Estudio 52** (enero de 2027; registro diario `blitz_eth`, sellado). Modo: `scripts/iniciar_blitz.sh --eth
      [--telegram]` (decide BTC y ETH a la vez; avisa la de mayor p). **NO aplica a IQ Option (comprobado 2026-11-07 en la
      sesión del usuario): su blitz de ETH es «ETH/USD (OTC)», precio propio (+140 USD, otra dirección).** Blitz con precio
-     real en IQ: solo Bitcoin y Solana (cerrados el fin de semana, abren dom 22:00). Activos OTC: nunca. Cierres de otras monedas: `research/bolsas.py`
+     real en IQ: solo Bitcoin y Solana (cerrados el fin de semana, abren dom 22:00). Activos OTC: nunca.
+   - **Estudio 53 (2026-11-07): blitz de Solana NO PASA** (p ≥ 0,57: 55,2 % [52,1 %], 2,6/día; todas 53,7 %). En IQ Option solo
+     queda el blitz de BTC (dom 22:00 → vie). `study51.run` admite otra moneda (con sus valores por defecto es el 51). Cierres de otras monedas: `research/bolsas.py`
      (`data/raw/bolsas_usdt/<SÍMBOLO>/`; SOL/XRP/DOGE en descarga, sin OKX aún).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca

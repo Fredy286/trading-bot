@@ -4191,3 +4191,23 @@ Lista de activos de IQ Option ese sábado:
 
 Código: `src/tradingbot/research/study53.py` (usa `study51.run` con SOL; con sus valores por defecto, `study51.run`
 sigue siendo exactamente el Estudio 51), `tbot research study53`.
+
+### Resultado del Estudio 53 (2026-11-07; código 3205a36, aplicado mecánicamente): NO PASA
+
+`results/estudio53/resultado.json`. Cierres de SOL completos (1 175 045 minutos por bolsa; Gate 604 462).
+
+| Hipótesis | Operaciones (por día) | Acierto, 3 bolsas [lím. inf.] | 4 bolsas [lím. inf.] | EV [IC 97,5 %] | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|---|
+| H53a (todas) | 7 803 (18,6) | 53,68 % [52,54 %] | 53,75 % [52,62 %] | −0,002 [−0,027; +0,026] | 56 % | **no pasa** |
+| H53b (p ≥ 0,57) | 1 073 (2,6) | 55,17 % [52,10 %] | 55,08 % [52,02 %] | +0,025 [−0,041; +0,100] | 100 % (pocos meses con señales) | **no pasa** (p, Wilson, IC) |
+
+**Informativo:**
+- horario del usuario: H53a 2,4 por noche con 53,7 %; H53b 0,26 por noche;
+- juicio con Binance sola: 53,8 % / 54,9 %.
+
+**Consecuencia (pre-registrada):** Solana queda sin señal. No se congela modelo ni hay Estudio 54. El código preparado
+para vigilar SOL se retiró sin usarse.
+
+**Situación de IQ Option tras los Estudios 50–53:** el único contrato donde el bot tiene ventaja medida sigue siendo el
+**blitz de Bitcoin**, que abre de domingo 22:00 a viernes. Revisar más seguido no ayuda (Estudio 50). ETH tiene ventaja
+con su precio real (Estudio 51), pero IQ Option solo lo ofrece en blitz como OTC. Solana no tiene ventaja (Estudio 53).
