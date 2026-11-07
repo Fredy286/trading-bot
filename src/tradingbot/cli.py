@@ -842,12 +842,7 @@ def cmd_blitz(a) -> int:
 
     if a.accion == "entrenar":
         try:
-            if a.continuo:
-                from .live import continuo
-
-                meta = continuo.train_frozen_continuo()
-            else:
-                meta = blitz.train_frozen_blitz()
+            meta = blitz.train_frozen_blitz()
         except (FileExistsError, FileNotFoundError) as exc:
             print(exc)
             return 2
@@ -861,24 +856,6 @@ def cmd_blitz(a) -> int:
                 print(f"  {name:32s} error medio {x['error_medio']:+8.2f} USD · error cuadrático {x['error_cuadratico']:7.2f}"
                       f" · {x['n']} operaciones")
         print("El promedio con menor error es el que más se parece al precio de IQ Option.")
-        return 0
-    if a.continuo:
-        from .live import continuo
-
-        try:
-            bundle = anticipada.load_bundle(continuo.MODEL_PATH, continuo.REG_PATH)
-        except FileNotFoundError:
-            print("Falta el modelo. Ejecute primero: tbot blitz entrenar --continuo")
-            return 2
-        u = a.umbral if a.umbral is not None else bundle["umbral"]
-        print(f"Blitz continuo de BTC (3 min) con {bundle['model_id']}: revisa cada 10 s y avisa si p ≥ {u} "
-              f"(después, 60 s de pausa). Panel: http://127.0.0.1:8765/blitz — Ctrl+C para detener. SOLO CUENTA DEMO.")
-        try:
-            continuo.ContinuoLoop(bundle, Path(a.runtime), sound=not a.sin_sonido,
-                                  pago=a.pago / 100 if a.pago else None, umbral=a.umbral,
-                                  telegram=_telegram_sender() if a.telegram else None).run(a.iteraciones)
-        except KeyboardInterrupt:
-            pass
         return 0
     try:
         bundle = anticipada.load_bundle(blitz.MODEL_PATH, blitz.REG_PATH)
@@ -1146,8 +1123,6 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--umbral", type=float, default=None,
                    help="avisar solo si la probabilidad de la dirección es ≥ este valor (solo práctica)")
     x.add_argument("--telegram", action="store_true", help="mandar también cada aviso al Telegram del .env")
-    x.add_argument("--continuo", action="store_true",
-                   help="blitz continuo (Estudio 50): revisa cada 10 s en vez de una vez por minuto")
     x.set_defaults(func=cmd_blitz)
 
     x = sub.add_parser("telegram", help="Telegram de los avisos de práctica")

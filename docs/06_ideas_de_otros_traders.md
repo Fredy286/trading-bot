@@ -156,6 +156,17 @@ Fuentes (resúmenes del buscador):
 - [Tasa de cobro en empresas de fondeo (tradeinformer)](https://www.tradeinformer.com/prop-weekly/what-ftmo-tells-us-about-prop-firm-finances)
   y [The Funded Trader: 1 de cada 20 aprueba (Finance Magnates)](https://www.financemagnates.com/forex/only-1-in-20-traders-pass-prop-firm-challenges-reports-the-funded-trader/).
 
+## 3d. Investigación académica reciente sobre BTC a segundos y minutos (2026-11-07)
+
+Búsqueda pedida por el usuario («busca estrategias, investiga»). Sirvió para diseñar el Estudio 50, no para copiar
+nada:
+
+| Trabajo | Qué encontró | Qué nos sirve |
+|---|---|---|
+| Kim y Hansen, *The Quarter-Hour Effect* (arXiv 2607.09426, 2026). Futuros perpetuos de Binance (BTC, ETH, XRP, SOL, DOGE, ADA), 2021–2024 | Ráfagas de volumen y volatilidad en las marcas de 1, 5 y 15 min (algoritmos que operan con el reloj). El rendimiento de los primeros 10 s tras cada cuarto de hora se puede predecir fuera de muestra (acierto medio 57 %), pero vale unos 0,5 puntos básicos: menos que cualquier costo. El desequilibrio de órdenes del primer tramo anticipa movimientos de 4 a 12 h | La ventaja de nuestro modelo podría vivir en los cierres de minuto. El Estudio 50 lo mide (acierto por segundo del minuto). Nada operable a 3 min |
+| Bieganowski y Ślepaczuk, *Explainable Patterns in Cryptocurrency Microstructure* (arXiv 2602.00776, 2026). Libro de órdenes y operaciones de futuros de Binance cada segundo, 2022–2025 | El desequilibrio del flujo de órdenes y el diferencial explican el rendimiento de corto plazo de forma parecida en BTC, LTC, ETC y otras | Apoya usar el desequilibrio comprador/vendedor de las velas de 1 s (`s_tib`, ya en el Estudio 50). El libro de órdenes completo no está en los archivos públicos que usamos |
+| Descubrimiento de precio entre futuros de CME y contado de Binance (arXiv 2506.08718, 2025) | Los futuros de CME van ~0,05 s por delante del contado de Binance | Demasiado rápido para una operación manual |
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:
@@ -187,6 +198,9 @@ Si la regla es vaga, la reconstrucción se declara como interpretación nuestra 
 BIAS).
 
 ## Fuentes
+
+- Efecto del cuarto de hora: https://arxiv.org/abs/2607.09426 ; microestructura explicable: https://arxiv.org/abs/2602.00776 ;
+  descubrimiento de precio CME/Binance: https://arxiv.org/abs/2506.08718
 
 - Finfluencers: https://www.sfi.ch/en/publications/n-23-30-finfluencers ;
   https://www.aeaweb.org/conference/2025/program/paper/i3ry3n4t ; resumen:
