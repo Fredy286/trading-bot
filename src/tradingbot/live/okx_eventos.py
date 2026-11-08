@@ -141,15 +141,21 @@ class OkxEventos:
         r.raise_for_status()
         return r.json()
 
-    def precio_compra(self, inst: str, lado: int) -> float | None:
-        """Mejor precio para comprar «Up» (lado 1: el ask) o «Down» (lado −1: 1 − el bid de «Up»)."""
-        d = self._get("/api/v5/market/ticker", instId=inst).get("data") or []
-        if not d:
-            return None
-        ask, bid = d[0].get("askPx"), d[0].get("bidPx")
-        if lado == 1:
-            return float(ask) if ask not in (None, "") else None
-        return round(1 - float(bid), 6) if bid not in (None, "") else None
+    def libro(self, inst: str, niveles: int = 5) -> dict:
+        """Libro del contrato: «a» = ventas de «Al alza», «b» = compras (comprar «A la baja» cuesta 1 − b)."""
+        j = self._get("/api/v5/market/books", instId=inst, sz=niveles)
+        if str(j.get("code")) != "0":
+            raise ValueError(f"OKX {j.get('code')}: {j.get('msg')}")
+        d = (j.get("data") or [{}])[0]
+        return {k: [[float(x[0]), float(x[1])] for x in d.get(src) or []] for k, src in (("a", "asks"), ("b", "bids"))}
+
+    def precio_compra(self, inst: str, lado: int, cantidad: float = 1.0, tope: float = PRECIO_MAX):
+        """(precio medio para comprar `cantidad` contratos del lado, contratos disponibles a ≤ `tope`). Precio None si
+        no alcanzan. Es la misma regla del Estudio 56 (`study56.precio_un_contrato`): el mejor precio a veces trae solo
+        0,3 contratos (libro grabado del 2026-11-08)."""
+        from ..research.study56 import precio_un_contrato
+
+        return precio_un_contrato(self.libro(inst), "Up" if lado == 1 else "Down", cantidad, tope)
 
     def resultado(self, symbol: str, inst: str, after_ms: int | None = None) -> dict | None:
         """Resultado oficial de un contrato vencido (o None si aún no está)."""
@@ -190,13 +196,17 @@ class OkxLoop(BlitzLoop):
         ventana = minute_open + pd.Timedelta(minutes=1)
         inst = inst_id(a["symbol"], ventana)
         try:
-            precio = self.eventos.precio_compra(inst, d["lado"])
-        except (requests.RequestException, ValueError, KeyError):
-            precio = None
-        d.update({"instrumento": inst, "ventana": ventana.isoformat(), "precio_compra": precio})
-        if precio is None or precio > self.precio_max:
+            precio, disponible = self.eventos.precio_compra(inst, d["lado"], tope=self.precio_max)
+        except (requests.RequestException, ValueError, KeyError, IndexError):
+            precio, disponible = None, None
+        if disponible is not None:
+            disponible = round(disponible, 1)
+        d.update({"instrumento": inst, "ventana": ventana.isoformat(), "precio_compra": precio,
+                  "disponible": disponible})
+        if precio is None:  # ni 1 contrato completo a ≤ precio_max (la regla del Estudio 56)
             d.update({"estado": "sin señal",
-                      "motivo": f"comprar cuesta {precio} (> {self.precio_max})" if precio else "sin precio en OKX"})
+                      "motivo": "sin precio en OKX" if disponible is None else
+                      f"comprar 1 contrato cuesta más de {self.precio_max:g} (a ese precio hay {disponible:g})"})
         else:  # ganancia esperada por acción con el precio real del libro y la comisión
             d["ev_accion"] = round(d["p"] - costo(precio), 4)
         return d

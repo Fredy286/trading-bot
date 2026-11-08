@@ -216,8 +216,11 @@ def aviso_texto(d: dict, modo: str | None = None) -> str:
         fin = (pd.Timestamp(d["ventana"]) + pd.Timedelta(minutes=5)).tz_convert(BOGOTA)
         cabeza = f"OKX {d.get('activo') or 'ETH'} 5 min"
         limite = ini - pd.Timedelta(seconds=OKX_MARGEN_S)  # OKX retira los precios 1–2 s antes del inicio
+        precio, disp = d.get("precio_compra"), d.get("disponible")
+        cuanto = (f"; a ≤ 0,53 hay {disp:g} contratos, unos {disp * precio:.1f} USDT".replace(".", ",")
+                  if disp is not None and precio else "")
         regla = (f"Compra «{lado}» en la pestaña «{fin:%H:%M}» (ventana {ini:%H:%M}–{fin:%H:%M}) ANTES de las "
-                 f"{limite:%H:%M:%S} (precio ahora {d.get('precio_compra')}; no pagues más de 0,53).")
+                 f"{limite:%H:%M:%S} (precio ahora {precio}{cuanto}; no pagues más de 0,53).")
         prob = f"{100 * d['p']:.1f}".replace(".", ",") + " %"
         return (f"🔔 {cabeza}: {'↑ SUBE' if d['lado'] == 1 else '↓ BAJA'}\n{regla}\nProbabilidad {prob} · aviso "
                 f"{hora} (Bogotá)\nSin dinero real: solo anótalo.")

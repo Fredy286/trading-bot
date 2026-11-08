@@ -209,7 +209,8 @@ function renderSignal(st) {
       `Compra «${u.lado > 0 ? "Al alza" : "A la baja"}» en la pestaña «${fmtT(u.vence).slice(0, 5)}» ` +
       `(ventana ${fmtT(u.ventana).slice(0, 5)}–${fmtT(u.vence).slice(0, 5)}) antes de las ` +
       `${fmtT(new Date(new Date(u.ventana).getTime() - 3000))} · ` +
-      `precio ahora ${u.precio_compra ?? "—"} (máx. ${st.precio_max ?? 0.53}) · probabilidad ${pct(u.p)}`;
+      `precio ahora ${u.precio_compra ?? "—"} (máx. ${st.precio_max ?? 0.53}` +
+      (u.disponible != null ? `; a ese precio hay ${u.disponible} contratos` : "") + `) · probabilidad ${pct(u.p)}`;
     big.textContent = late ? "TARDE — no entres en esta" : coin + (u.lado > 0 ? "↑ SUBE" : "↓ BAJA") + (slow ? " · aún vale" : "");
     if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;

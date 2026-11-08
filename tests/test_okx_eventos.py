@@ -54,12 +54,15 @@ def bars():
     return b
 
 
-class _Eventos:
-    def __init__(self, ask=0.51, bid=0.49, outcome="1"):
-        self.ask, self.bid, self.outcome = ask, bid, outcome
+class _Eventos(ok.OkxEventos):
+    """Libro fijo; `precio_compra` es el real (la regla del Estudio 56: 1 contrato completo a ≤ 0,53)."""
 
-    def precio_compra(self, inst, lado):
-        return self.ask if lado == 1 else round(1 - self.bid, 6)
+    def __init__(self, ask=0.51, bid=0.49, cant=13.1, outcome="1"):
+        super().__init__(session=object())
+        self.ask, self.bid, self.cant, self.outcome = ask, bid, cant, outcome
+
+    def libro(self, inst, niveles=5):
+        return {"a": [[self.ask, self.cant], [0.6, 50.0]], "b": [[self.bid, self.cant], [0.4, 50.0]]}
 
     def resultado(self, symbol, inst, after_ms=None):
         return {"outcome": self.outcome, "partida": 100.0, "liquidacion": 101.0}
@@ -101,7 +104,8 @@ def test_loop_decides_only_before_each_window_and_checks_the_price(tmp_path, bar
     off = loop.step((grid - pd.Timedelta(minutes=1) + pd.Timedelta(seconds=50.3)).to_pydatetime())
     assert off["estado"] == "fuera de turno"
     d = loop.step((grid + pd.Timedelta(seconds=50.3)).to_pydatetime())
-    assert d["estado"] == "señal" and d["lado"] == 1 and d["precio_compra"] == 0.51
+    assert d["estado"] == "señal" and d["lado"] == 1 and d["precio_compra"] == pytest.approx(0.51)
+    assert d["disponible"] == pytest.approx(13.1)
     ventana = grid + pd.Timedelta(minutes=1)
     assert d["ventana"] == ventana.isoformat() and d["instrumento"] == ok.inst_id("ETHUSDT", ventana)
     assert d["vence"] == (ventana + pd.Timedelta(minutes=5)).isoformat()
@@ -112,9 +116,14 @@ def test_loop_decides_only_before_each_window_and_checks_the_price(tmp_path, bar
     assert f"Compra «Al alza» en la pestaña «{fin:%H:%M}»" in texto  # como la web de OKX en español
     limite = (ventana - pd.Timedelta(seconds=3)).tz_convert("America/Bogota")  # OKX retira los precios 1–2 s antes
     assert f"ANTES de las {limite:%H:%M:%S}" in texto
+    assert "a ≤ 0,53 hay 13,1 contratos, unos 6,7 USDT" in texto  # cuánto se puede comprar a buen precio
     caro = _loop(tmp_path / "caro", bars_g, _Eventos(ask=0.60), grid)
     x = caro.step((grid + pd.Timedelta(seconds=50.3)).to_pydatetime())
-    assert x["estado"] == "sin señal" and "0.6" in x["motivo"]
+    assert x["estado"] == "sin señal" and "más de 0.53" in x["motivo"]
+    # el mejor precio sirve, pero no alcanza para 1 contrato completo (pasa: 0,3 contratos a 0,52)
+    poco = _loop(tmp_path / "poco", bars_g, _Eventos(ask=0.52, cant=0.3), grid)
+    y = poco.step((grid + pd.Timedelta(seconds=50.3)).to_pydatetime())
+    assert y["estado"] == "sin señal" and "hay 0.3" in y["motivo"]
 
 
 def test_main_coin_reads_its_own_prices(tmp_path):
