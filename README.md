@@ -230,7 +230,7 @@ El 2026-11-07 se buscó cómo tener **más señales sin perder probabilidad**:
 
 **Solana** es la otra criptomoneda con blitz de precio real en IQ Option (abre de domingo 22:00 a viernes, como el de
 BTC), pero con la misma receta no tiene ventaja (Estudio 53: 55,2 % con límite inferior de 52,1 %). Hoy, en IQ Option,
-el único contrato con ventaja medida es el **blitz de Bitcoin**.
+el único contrato con ventaja medida es el **blitz de Bitcoin**. Fuera de IQ Option, la mejor vía son los **event contracts de OKX** (sección siguiente).
 
 ```bash
 scripts/iniciar_blitz.sh --eth --telegram
@@ -243,6 +243,53 @@ panel y el Telegram dicen qué moneda abrir (por ejemplo, «ETH ↓ BAJA»). Lo 
 
 El modelo congelado es `ETHUSDT-blitz3-compuesto-5d7319` (`tbot blitz entrenar --eth`; huella en
 `config/senal_blitz_eth.json`).
+
+### Event contracts de OKX: ETH y BTC a 5 minutos con precio real (Estudios 54 y 55)
+
+La mejor vía encontrada para tener **más señales sin bajar el acierto** (búsqueda del 2026-11-07, docs/03, 2.3).
+
+**El contrato:** OKX, una de las bolsas más grandes, tiene «Up or Down 5min» de ETH y de BTC.
+- **Ventanas:** empiezan cada 5 minutos (:00, :05…).
+- **Partida:** el índice de OKX al empezar la ventana. Ese índice es una mezcla de OKX, Binance, Bybit, Coinbase y
+  Bitget.
+- **Liquidación:** el promedio de los últimos 30 segundos del índice.
+- **Precio:** antes de que empiece la ventana cada acción se compra a unos **0,51–0,52 USDT** y paga **1 USDT** si se
+  acierta.
+- **Comisión:** solo la del comprador, unos 0,011 USDT por acción; no hay comisión al vencer.
+- **Equilibrio:** hay que acertar **≈ 53,1 %** (en el blitz de IQ Option, 53,8 %).
+
+**En desarrollo (Estudio 54, mes a mes de 2025-09 a 2026-10):**
+
+| Moneda | Señales por día | Acierto | En tu horario (21:00–01:00) | Ganancia esperada por operación |
+|---|---|---|---|---|
+| ETH | 25,5 | **55,9 %** | 3,7 por noche | +5,3 % de lo invertido |
+| BTC | 11,5 | **56,5 %** | 1,5 por noche | +6,5 % |
+
+Ganan en 13 de 14 meses. La cantidad de señales baja en meses tranquilos.
+
+**Falta la confirmación con datos nuevos** (Estudio 55, enero de 2027). El registro diario en la nube ya la va anotando
+con el resultado **oficial** de OKX.
+
+**Cómo practicar SIN dinero:**
+
+```bash
+scripts/iniciar_okx.sh --eth --btc --telegram
+```
+
+1. Abre el panel http://127.0.0.1:8765/okx. Pulse **«Activar sonido»**.
+2. El aviso llega en el **segundo 50 del minuto anterior** a cada ventana (por ejemplo, a las 21:34:50 para la ventana
+   21:35–21:40). Dice qué comprar («Up» o «Down»), de qué moneda y a qué precio máximo.
+3. **Hay que comprar antes de que empiece la ventana**, es decir, en 10 segundos. Después, el libro de órdenes se
+   abre y el precio deja de servir. El bot no avisa si comprar cuesta más de 0,53.
+4. Anote qué habría hecho. Cuando la ventana vence, el bot trae el resultado oficial de OKX.
+
+**Antes de pensar en dinero real**, compruebe en la app de OKX, sin depositar:
+- si a su cuenta en Colombia le aparecen los «Eventos»;
+- si hay modo de práctica;
+- a qué precio se compra de verdad antes de cada ventana.
+
+OKX no está supervisada por la SFC, y estos contratos podrían considerarse juego (Coljuegos bloqueó Polymarket). Operar
+con dinero real requiere su decisión expresa y específica.
 
 ### Reversión nocturna en divisas para practicar en cuenta DEMO (Estudios 25, 27 y 28)
 

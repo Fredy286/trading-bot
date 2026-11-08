@@ -113,6 +113,13 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   - **«Ethereum» real:** solo binaria de 15 min (87 %) y digital al próximo múltiplo de 5 min (84 %, compra hasta 30 s
     antes).
   - **Regla:** nunca estudiar ni recomendar activos OTC.
+- **Event contracts de OKX (Estudio 54, 2026-11-07): la mejor vía encontrada.**
+  - Contratos «Up or Down» de 5 min de ETH y BTC, liquidados con el índice de OKX (precio real).
+  - Comprando antes de la ventana a 0,52 con comisión, el equilibrio es 53,1 %.
+  - Con el aviso anticipado: ETH 55,9 % (25,5 por día) y BTC 56,5 % (11,5 por día); 13 de 14 meses con ganancia.
+  - Modelos congelados, modo `tbot okx vivo` (panel /okx) y registro `okx_eth`/`okx_btc` con el resultado oficial.
+    Confirmación: Estudio 55 (enero de 2027).
+  - Lección: un contrato que cobra cerca del 50 % (libro de órdenes) vale más que uno de pago fijo del 86 %.
 - **Más monedas = más señales (Estudio 51, 2026-11-07):** la receta del blitz funciona con ETH tan bien como con BTC
   (56,9 % con p ≥ 0,57) y da 4,5 veces más señales; casi nunca coinciden. Es la vía para tener más señales sin bajar el
   acierto, siempre que la plataforma tenga el contrato de esa moneda.

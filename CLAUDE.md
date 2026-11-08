@@ -277,6 +277,19 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    - **Estudio 53 (2026-11-07): blitz de Solana NO PASA** (p ≥ 0,57: 55,2 % [52,1 %], 2,6/día; todas 53,7 %). En IQ Option solo
      queda el blitz de BTC (dom 22:00 → vie). `study51.run` admite otra moneda (con sus valores por defecto es el 51). Cierres de otras monedas: `research/bolsas.py`
      (`data/raw/bolsas_usdt/<SÍMBOLO>/`; SOL/XRP/DOGE en descarga, sin OKX aún).
+   - **Estudio 54 (2026-11-07): event contracts de OKX «Up or Down 5min» PASAN (H54a ETH, H54b BTC).**
+     - Plataforma encontrada tras pedir el usuario «ETH a precio real y vencimiento corto» (docs/03, 2.3).
+     - Contrato: índice de OKX (OKX 25 %, Binance 25 %, Bybit 18,75 %, Coinbase 18,75 %, Bitget 12,5 %); partida al
+       empezar la ventana; liquidación = media de los 30 cierres de 1 s antes del vencimiento.
+     - Costo: se compra antes de la ventana a ~0,52 + comisión del tomador 0,045·P·(1−P) → equilibrio 53,1 %.
+     - Aviso anticipado (s 50): ETH 55,9 % [54,9 %], 25,5/día; BTC 56,5 % [55,1 %], 11,5/día; 13/14 meses.
+     - La etiqueta reconstruida coincidió 98–100 % con el resultado oficial de OKX. API pública sin cuenta: series,
+       libro, resultados (OKX guarda pocos días de contratos vencidos).
+     - **Estudio 55** (confirmación, 2026-10-26 → 2027-01-18) pre-registrado (1067c6f). Modelos congelados en
+       config/senal_okx5_{eth,btc}.json.
+     - Modo SIN dinero: `scripts/iniciar_okx.sh --eth --btc --telegram` (panel /okx). Registro diario `okx_eth`/`okx_btc`.
+     - Falta que el usuario compruebe en la app de OKX si le aparecen los «Eventos» desde Colombia y si hay práctica.
+       OKX no está supervisada por la SFC; podría verse como juego (Coljuegos).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
