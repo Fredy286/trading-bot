@@ -4449,6 +4449,10 @@ compradas es mayor que 0.
 
 **El Estudio 55 no cambia.** Sigue su propio pre-registro, que supone 0,52.
 
+**Nota operativa (2026-11-08, antes del inicio del estudio).** El horario de GitHub falló el primer día (ítem 57).
+Por eso el flujo pasó a funcionar en cadena: cada grabación lanza la siguiente, y un vigía cada hora la relanza si
+se corta. No cambia nada del análisis.
+
 **Consecuencia:**
 - **Si pasa:** las señales de OKX ganan al precio real, y el aviso de OKX queda como la vía para practicar. El dinero
   real sigue requiriendo la autorización expresa y específica del usuario.

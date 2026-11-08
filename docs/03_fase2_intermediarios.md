@@ -183,6 +183,14 @@ para leerlos, y el tipo de orden volvió a «Mercado».
      0,51–0,52, con 13–33 contratos. Dos segundos antes del inicio, todo pasaba a 0,84 (8 de 8).
    - **Minutos antes hay mucha más cantidad.** Para la ventana de las 05:25, a las 05:21 había ETH 0,51 × 20 y
      0,52 × 513, y BTC 0,51 × 120 y 0,52 × 514. Al acercarse el inicio, el creador de mercado la retira.
+   - **Primer día grabado por GitHub** (2026-11-08, de 13:10 a 18:50 UTC, 69 ventanas, foto de −10 s, sin un solo
+     error):
+     - **ETH:** 0,52/0,52 en 50 ventanas. De 15:10 a 16:35 UTC (10:10–11:35 Bogotá) todo estuvo a 0,90 durante
+       18 ventanas seguidas: no había nada que comprar. Después volvió a 0,52, pero con solo 3 contratos (≈ 1,6 USDT).
+     - **BTC:** algún lado > 0,53 en 9 de 69 ventanas, nunca los dos. «Al alza» solía tener 12–30 contratos a
+       ≤ 0,53, pero «A la baja» a menudo solo 0,3–3 entre las 15 y las 18 UTC.
+     - **Conclusión práctica:** a buen precio solo se pueden comprar montos muy pequeños, de unos pocos dólares por
+       aviso, y a veces nada.
    - **Dentro de la ventana el diferencial se abre.** Por ejemplo, 0,43/0,52 en BTC a los 11 s, y 0,38/0,48 en ETH.
    - **Primer caso de libro inclinado con una señal.** A las 23:59:50 (Bogotá) el modelo de BTC dijo «Al alza» con
      p = 0,56. El libro ya vendía «Al alza» a 0,55 y «A la baja» a 0,52, o sea, inclinado **igual** que el modelo. El

@@ -2,29 +2,54 @@ name: Libro de OKX (Estudio 56)
 
 # Graba el libro de órdenes de los event contracts de OKX de 5 min (ETH y BTC) 10, 7, 5 y 3 s antes de cada ventana:
 # el precio al que de verdad se puede comprar cada señal (docs/03, 2.3; pre-registro del Estudio 56 en docs/01).
-# OKX no publica la historia del libro, así que solo se puede medir grabándolo. Cada ejecución dura ~5 h 48 min y se
-# lanza cada 6 h; si una se atrasa, la siguiente espera su turno (concurrency). Los huecos (atrasos de GitHub) no
-# dependen del resultado de las ventanas. Solo API pública, sin cuenta; no envía órdenes.
+# OKX no publica la historia del libro, así que solo se puede medir grabándolo. Solo API pública, sin cuenta; no envía
+# órdenes. Los huecos no dependen del resultado de las ventanas.
+#
+# Funciona EN CADENA: cada grabación dura ~5 h 48 min y, al terminar, lanza la siguiente (workflow_dispatch). El
+# horario de GitHub no sirve para esto: el 2026-11-08 la ejecución de las 06:03 no ocurrió, la de las 12:03 empezó a
+# las 13:05 y la de las 18:03 a las 21:53 (registro de errores 57). El horario (cada hora) solo hace de VIGÍA: si no hay
+# ninguna grabación en curso ni en espera, relanza la cadena. Después del 2027-04-26 (fin del Estudio 56) no lanza más.
 
 on:
   schedule:
-    - cron: "3 */6 * * *"   # 00:03, 06:03, 12:03 y 18:03 UTC
+    - cron: "17 * * * *"   # vigía
   workflow_dispatch:
     inputs:
       horas:
         description: "Horas de grabación (máximo 5,8)"
         default: "5.8"
 
-concurrency:
-  group: libro-okx
+concurrency:  # una sola grabación a la vez (la siguiente espera); los vigías van aparte
+  group: libro-okx-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
+  vigia:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Relanzar la cadena si se cortó
+        run: |
+          if [ "$(date -u +%Y%m%d)" -gt 20270426 ]; then echo "El Estudio 56 terminó"; exit 0; fi
+          vivas=$(gh run list --workflow libro_okx.yml --event workflow_dispatch --limit 20 --json status \
+                  --jq '[.[] | select(.status != "completed")] | length')
+          if [ "$vivas" -gt 0 ]; then echo "La cadena sigue viva ($vivas en curso o en espera)"; exit 0; fi
+          echo "La cadena se cortó: se relanza"
+          gh workflow run libro_okx.yml --ref "${{ github.ref_name }}"
+
   grabar:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 358
     permissions:
       contents: write
+      actions: write
     env:
       PYTHONIOENCODING: utf-8
       PYTHONPATH: src
@@ -47,3 +72,14 @@ jobs:
             git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
             sleep $((i * 5))
           done
+      - name: Lanzar la siguiente grabación
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(date -u +%Y%m%d)" -gt 20270426 ]; then echo "El Estudio 56 terminó: no se lanza otra"; exit 0; fi
+          for i in 1 2 3 4 5; do
+            gh workflow run libro_okx.yml --ref "${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 10))
+          done
+          echo "No se pudo lanzar la siguiente; el vigía (cada hora) la relanzará"

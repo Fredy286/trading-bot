@@ -300,8 +300,11 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        diario y los modelos congelados no estaban afectados.
      - **Estudio 56 (pre-registro 8c90ebf, 2026-11-08): las señales al precio REAL del libro.**
        - Mide si el libro se inclina en contra de las señales (selección adversa).
-       - GitHub graba el libro de ETH y BTC 10/7/5/3 s antes de cada ventana: `.github/workflows/libro_okx.yml`, cada
-         6 h → `results/okx_libro/`.
+       - GitHub graba el libro de ETH y BTC 10/7/5/3 s antes de cada ventana: `.github/workflows/libro_okx.yml` →
+         `results/okx_libro/`. Funciona EN CADENA (cada grabación de ~5,8 h lanza la siguiente; un vigía cada hora la
+         relanza si se corta), porque el horario de GitHub falló el primer día (ítem 57).
+       - Primer día grabado (2026-11-08): ETH sin precio (0,90) 1,5 h seguidas y luego solo 3 contratos a 0,52; BTC
+         con un lado > 0,53 en 9 de 69 ventanas. A buen precio solo caben montos de pocos dólares.
        - Política: compra 1 contrato al precio de −10 s si cuesta ≤ 0,53.
        - Miradas: `tbot research study56 --mirada enero` desde el 2027-01-19 (α 0,01) y `--mirada abril` desde el
          2027-04-27 (α 0,04; la principal, potencia ~89 %).
