@@ -4366,3 +4366,91 @@ Código: `src/tradingbot/research/study54.py`, `tbot research study54`; pruebas 
 - si a su cuenta de OKX en Colombia le aparecen los «Eventos»;
 - si hay modo de práctica;
 - cuál es el precio real antes de cada ventana.
+
+**Comprobado (2026-11-07/08, docs/03, 2.3):**
+- los «Eventos» aparecen para su cuenta (exigen «Modo de futuros»);
+- la demo de OKX no sirve (libro vacío, otro índice);
+- antes de la ventana se compra a 0,51–0,52, con poca cantidad, y a veces un lado cuesta 0,55. De ahí el Estudio 56.
+
+## Estudio 56 — las señales de OKX al precio real del libro (pre-registro, 2026-11-08, ANTES de grabar el libro de las ventanas del estudio y de mirar resultados posteriores al 2026-10-25)
+
+**Origen.** La comprobación del 2026-11-07/08 (docs/03, 2.3) mostró tres cosas que el Estudio 55 no cuenta:
+- a 0,52 suele haber poca cantidad (unos 13 contratos 10 s antes de la ventana);
+- a veces el libro se inclina y un lado cuesta 0,55;
+- en el primer caso con señal, el libro se inclinó **igual** que el modelo.
+
+Si el creador de mercado usa la misma información que el modelo, las señales que se pueden comprar barato serían las
+peores (selección adversa). El Estudio 55 supone que todo se compra a 0,52. Este estudio mide la ganancia **al precio
+que de verdad ofrece el libro**. Como OKX no publica la historia del libro, hay que grabarlo en vivo.
+
+**Datos:**
+- **Libro:** el de la ventana siguiente de ETH y de BTC (5 min), 10, 7, 5 y 3 s antes de cada inicio. Lo graba
+  `.github/workflows/libro_okx.yml` (`python -m tradingbot.live.okx_libro`, cada 6 h) en `results/okx_libro/`.
+  - Solo cuentan las grabaciones de GitHub («fuente» = github).
+  - Si una ventana quedó grabada dos veces, cuenta la primera (por nombre de archivo) con la foto de −10 s sin error.
+- **Señales:** las del registro diario (`results/registro/okx_eth/`, `okx_btc/`). Son las de los modelos congelados
+  del Estudio 55 (ETHUSDT-okx5-2fffa5, BTCUSDT-okx5-da65c6), con su regla: p − 0,5312 ≥ 0,02.
+- **Resultado:** el del registro, es decir, el oficial de OKX o, si ya no está, el reconstruido.
+- **Ventanas:** del 2026-11-09 00:00 UTC en adelante. Se unen señal y libro por el nombre del contrato.
+- **Exclusiones:**
+  - señales sin foto válida de −10 s (huecos o atrasos de GitHub, errores de la API). La falta de foto no depende del
+    resultado. Se informan como cobertura;
+  - señales sin resultado.
+
+**Política (la del bot en vivo):**
+- en la foto de −10 s, que es cuando sale el aviso, se compra **1 contrato** del lado de la señal;
+- se recorre el libro: «Al alza» compra en las ventas; «A la baja» cuesta 1 − cada compra de «Al alza»;
+- solo se compra si ese contrato completo cuesta ≤ 0,53. Si no, la señal queda **bloqueada**;
+- ganancia por contrato = 1 si acierta − (P + 0,045 × P × (1 − P)), con P el precio medio pagado.
+
+**Hipótesis H56 (una sola, ETH y BTC juntos para tener potencia):** la ganancia media por contrato de las señales
+compradas es mayor que 0.
+
+**Dos miradas, cada una una sola vez, con α repartido (Bonferroni, total 0,05):**
+- **enero:** ventanas del 2026-11-09 al 2027-01-18, α = 0,01. Se evalúa desde el 2027-01-19.
+- **abril:** ventanas del 2026-11-09 al 2027-04-26, α = 0,04. Se evalúa desde el 2027-04-27, y solo si enero no pasó.
+
+**Criterios (todos, en cada mirada):**
+1. ≥ 500 operaciones compradas;
+2. p < α. La prueba es unilateral, con aproximación normal sobre la ganancia por contrato;
+3. límite inferior > 0. Es el cuantil α de la media en 10 000 remuestreos por semanas ISO, semilla 56.
+
+**Veredicto:**
+- **enero:** «PASA» si se cumplen los tres; si no, «sigue hasta abril», sin veredicto;
+- **abril:** «PASA», «NO PASA», o «SIN CONCLUSIÓN» si hay menos de 500 operaciones.
+
+**Informativo (sin veredicto), en cada mirada:**
+- cobertura;
+- fracción de señales bloqueadas por precio, por moneda;
+- precio medio pagado;
+- ganancia con el precio real frente a la que supone 0,52, en las mismas señales;
+- **selección adversa:** acierto de las compradas frente a las bloqueadas, con IC 95 % por semanas;
+- resultado por moneda y en el horario del usuario;
+- la misma política con las fotos de −7, −5 y −3 s (si el clic llega más tarde);
+- contratos disponibles a ≤ 0,53 (mediana y percentil 10).
+
+**Potencia (calculada antes de empezar).**
+- El registro del 2026-10-26 al 11-06 tuvo unas 26 señales por día (ETH 8,2, BTC 18,2).
+- Con 90 % de cobertura y 70 % compradas, salen ≈ 16,6 operaciones por día: ≈ 1 180 en enero y ≈ 2 800 en abril.
+- Con una desviación de 0,5 por contrato:
+
+| Ganancia media real por contrato | Potencia en enero | Potencia en abril |
+|---|---|---|
+| +0,028 (la del desarrollo) | 34 % | 89 % |
+| +0,015 | 10 % | 44 % |
+
+- Por eso la mirada principal es la de abril. Enero solo sirve para pasar antes si la ventaja es clara.
+
+**Código congelado en este mismo commit:**
+- `src/tradingbot/research/study56.py` (`tbot research study56 --mirada enero|abril`). Se niega a correr antes de
+  tiempo, dos veces o con días del registro sin grabar;
+- `src/tradingbot/live/okx_libro.py`;
+- `.github/workflows/libro_okx.yml`.
+
+**El Estudio 55 no cambia.** Sigue su propio pre-registro, que supone 0,52.
+
+**Consecuencia:**
+- **Si pasa:** las señales de OKX ganan al precio real, y el aviso de OKX queda como la vía para practicar. El dinero
+  real sigue requiriendo la autorización expresa y específica del usuario.
+- **Si no pasa:** la ventaja del Estudio 54 no sobrevive al libro real, aunque el Estudio 55 pase. Sin señal para
+  operar.

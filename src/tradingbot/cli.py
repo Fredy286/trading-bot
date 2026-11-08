@@ -485,6 +485,13 @@ def cmd_research_study49(a) -> int:
     return 0
 
 
+def cmd_research_study56(a) -> int:
+    from .research import study56
+
+    study56.run(a.mirada)
+    return 0
+
+
 def cmd_research_study48(a) -> int:
     from .research import study48
 
@@ -909,6 +916,11 @@ def cmd_okx(a) -> int:
     """Event contracts de OKX «Up or Down 5min» (Estudios 54 y 55): avisos para practicar SIN dinero."""
     from .live import anticipada, okx_eventos
 
+    if a.accion == "libro":  # copia local; el Estudio 56 usa solo lo que graba GitHub en results/okx_libro
+        from .live import okx_libro
+
+        okx_libro.grabar(a.horas, Path(a.runtime) / "libro", fuente="local")
+        return 0
     simbolos = [s for s, f in (("ETHUSDT", a.eth), ("BTCUSDT", a.btc)) if f] or ["ETHUSDT"]
     if a.accion == "entrenar":
         for s in simbolos:
@@ -1026,6 +1038,10 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study26)
     x = r.add_parser("study49", help="Estudio 49: confirmación del filtro de racha (solo después del 2027-01-19)")
     x.set_defaults(func=cmd_research_study49)
+    x = r.add_parser("study56", help="Estudio 56: señales de OKX al precio real del libro (enero: desde el "
+                                     "2027-01-19; abril: desde el 2027-04-27)")
+    x.add_argument("--mirada", choices=["enero", "abril"], required=True)
+    x.set_defaults(func=cmd_research_study56)
     x = r.add_parser("study48", help="Estudio 48: filtro de racha reciente del propio GBM de BTC 1 min")
     x.set_defaults(func=cmd_research_study48)
     x = r.add_parser("study33", help="Estudio 33: variables de reloj (cuarto de hora, financiación) en el GBM de BTC 1 min")
@@ -1201,7 +1217,10 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_blitz)
 
     x = sub.add_parser("okx", help="avisos para los event contracts de OKX de 5 min, SIN dinero (Estudios 54 y 55)")
-    x.add_argument("accion", choices=["entrenar", "vivo"])
+    x.add_argument("accion", choices=["entrenar", "vivo", "libro"],
+                   help="libro: graba el libro de órdenes antes de cada ventana (Estudio 56; en GitHub lo hace "
+                        ".github/workflows/libro_okx.yml)")
+    x.add_argument("--horas", type=float, default=1.0, help="con «libro»: cuántas horas grabar")
     x.add_argument("--eth", action="store_true", help="ETH (por defecto si no se elige ninguna)")
     x.add_argument("--btc", action="store_true", help="BTC")
     x.add_argument("--runtime", default="runtime/okx")

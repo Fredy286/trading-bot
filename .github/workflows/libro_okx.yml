@@ -1,0 +1,49 @@
+name: Libro de OKX (Estudio 56)
+
+# Graba el libro de órdenes de los event contracts de OKX de 5 min (ETH y BTC) 10, 7, 5 y 3 s antes de cada ventana:
+# el precio al que de verdad se puede comprar cada señal (docs/03, 2.3; pre-registro del Estudio 56 en docs/01).
+# OKX no publica la historia del libro, así que solo se puede medir grabándolo. Cada ejecución dura ~5 h 48 min y se
+# lanza cada 6 h; si una se atrasa, la siguiente espera su turno (concurrency). Los huecos (atrasos de GitHub) no
+# dependen del resultado de las ventanas. Solo API pública, sin cuenta; no envía órdenes.
+
+on:
+  schedule:
+    - cron: "3 */6 * * *"   # 00:03, 06:03, 12:03 y 18:03 UTC
+  workflow_dispatch:
+    inputs:
+      horas:
+        description: "Horas de grabación (máximo 5,8)"
+        default: "5.8"
+
+concurrency:
+  group: libro-okx
+  cancel-in-progress: false
+
+jobs:
+  grabar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 358
+    permissions:
+      contents: write
+    env:
+      PYTHONIOENCODING: utf-8
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Grabar el libro
+        run: python -m tradingbot.live.okx_libro --horas "${{ github.event.inputs.horas || '5.8' }}" --salida results/okx_libro --fuente github
+      - name: Guardar en la rama
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/okx_libro/ 2>/dev/null || exit 0
+          git commit -m "Libro de OKX $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]" || exit 0
+          for i in 1 2 3 4 5 6; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((i * 5))
+          done
