@@ -726,7 +726,10 @@ de IQ Option (0, 1, 1b) siguen, pero dependen de anotaciones de Fredy. Traders v
   - comprobar que la cadena sigue viva: `gh run list --workflow libro_okx.yml` debe mostrar siempre una grabación
     «in_progress»;
   - comprobar que los archivos de `results/okx_libro/` se siguen sin huecos grandes. Mirar solo el libro, nunca
-    unirlo con resultados (Estudio 56).
+    unirlo con resultados (Estudio 56);
+  - comprobar que el vigía (evento «schedule» de `libro_okx.yml`) corrió al menos una vez. El primero, de las 22:17
+    UTC, no apareció en 40 min: GitHub está saltándose horarios en este repositorio. La vigilancia de canales, que
+    debería correr cada hora, corrió a las 10:11, 17:00 y 21:05. La cadena no depende del vigía.
 - **Primer día grabado (13:10–18:50 UTC).**
   - ETH estuvo sin precio (0,90) de 15:10 a 16:35 UTC y luego tuvo solo 3 contratos a 0,52.
   - BTC tuvo un lado > 0,53 en 9 de 69 ventanas. Detalle en docs/03, 2.3.
