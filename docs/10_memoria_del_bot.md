@@ -120,6 +120,16 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   - Modelos congelados, modo `tbot okx vivo` (panel /okx) y registro `okx_eth`/`okx_btc` con el resultado oficial.
     Confirmación: Estudio 55 (enero de 2027).
   - Lección: un contrato que cobra cerca del 50 % (libro de órdenes) vale más que uno de pago fijo del 86 %.
+  - **Comprobado en la cuenta del usuario (2026-11-07/08, docs/03, 2.3):**
+    - aparecen los «Eventos» (exigen «Modo de futuros»);
+    - la demo de OKX no sirve (libro vacío, otro índice);
+    - a 0,52 solo hay ~13 contratos y OKX retira los precios 1–2 s antes de la ventana.
+  - **Riesgo abierto: selección adversa.** El libro a veces se inclina (un lado a 0,55). En el primer caso visto, se
+    inclinó **igual** que el modelo (BTC «Al alza» p = 0,56 con «Al alza» a 0,55), y el bot no avisó. Si el creador de
+    mercado usa la misma información, las señales baratas serían las peores. El Estudio 55 supone 0,52 siempre; la
+    respuesta solo sale grabando el libro en vivo.
+  - Error 56: el modo en vivo con ETH como moneda principal decidía con precios de BTC (corregido). Regla: en una prueba
+    en vivo, comprobar que el precio de cada moneda es de esa moneda.
 - **Más monedas = más señales (Estudio 51, 2026-11-07):** la receta del blitz funciona con ETH tan bien como con BTC
   (56,9 % con p ≥ 0,57) y da 4,5 veces más señales; casi nunca coinciden. Es la vía para tener más señales sin bajar el
   acierto, siempre que la plataforma tenga el contrato de esa moneda.

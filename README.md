@@ -248,7 +248,8 @@ El modelo congelado es `ETHUSDT-blitz3-compuesto-5d7319` (`tbot blitz entrenar -
 
 La mejor vía encontrada para tener **más señales sin bajar el acierto** (búsqueda del 2026-11-07, docs/03, 2.3).
 
-**El contrato:** OKX, una de las bolsas más grandes, tiene «Up or Down 5min» de ETH y de BTC.
+**El contrato:** OKX, una de las bolsas más grandes, tiene «Up or Down 5min» de ETH y de BTC. En su web en español está
+en **Trade → Eventos y opciones**, como «Precio de ETH en 5 min» y «Precio de BTC en 5 min».
 - **Ventanas:** empiezan cada 5 minutos (:00, :05…).
 - **Partida:** el índice de OKX al empezar la ventana. Ese índice es una mezcla de OKX, Binance, Bybit, Coinbase y
   Bitget.
@@ -277,16 +278,24 @@ scripts/iniciar_okx.sh --eth --btc --telegram
 ```
 
 1. Abre el panel http://127.0.0.1:8765/okx. Pulse **«Activar sonido»**.
-2. El aviso llega en el **segundo 50 del minuto anterior** a cada ventana (por ejemplo, a las 21:34:50 para la ventana
-   21:35–21:40). Dice qué comprar («Up» o «Down»), de qué moneda y a qué precio máximo.
-3. **Hay que comprar antes de que empiece la ventana**, es decir, en 10 segundos. Después, el libro de órdenes se
-   abre y el precio deja de servir. El bot no avisa si comprar cuesta más de 0,53.
-4. Anote qué habría hecho. Cuando la ventana vence, el bot trae el resultado oficial de OKX.
+2. Mientras espera, el panel dice qué pestaña dejar abierta en OKX. Las pestañas bajo el gráfico llevan la hora de
+   **cierre** de cada ventana: la pestaña «21:40» es la ventana 21:35–21:40.
+3. El aviso llega en el **segundo 50 del minuto anterior** a cada ventana (por ejemplo, a las 21:34:50 para la ventana
+   21:35–21:40). Dice qué comprar («Al alza» o «A la baja», como en la web de OKX), de qué moneda, en qué pestaña y a
+   qué precio máximo.
+4. **Hay que comprar antes del segundo 57**, es decir, en unos 7 segundos. Uno o dos segundos antes de que empiece la
+   ventana, OKX retira los precios, y dentro de la ventana el precio se dispara. El bot no avisa si comprar cuesta más
+   de 0,53.
+5. Anote qué habría hecho. Cuando la ventana vence, el bot trae el resultado oficial de OKX.
 
-**Antes de pensar en dinero real**, compruebe en la app de OKX, sin depositar:
-- si a su cuenta en Colombia le aparecen los «Eventos»;
-- si hay modo de práctica;
-- a qué precio se compra de verdad antes de cada ventana.
+**Comprobado en su cuenta (2026-11-07, solo mirando, sin tocar nada):**
+- los «Eventos» **sí aparecen** para su cuenta en Colombia;
+- para operar, OKX pide pasar la cuenta a **«Modo de futuros»**, que también habilita productos con apalancamiento.
+  Además hacen falta USDT;
+- la **demo** de OKX («Simulación de trading») muestra los eventos, pero nadie vende ahí (libro vacío) y usa otro
+  precio. **No sirve para practicar** estos contratos: la práctica es con el panel del bot;
+- antes de cada ventana se compra a **0,51–0,52**, pero en poca cantidad (unos 13 contratos a 0,52, ≈ 7 USDT). A veces
+  un lado cuesta 0,55; entonces el bot no avisa.
 
 OKX no está supervisada por la SFC, y estos contratos podrían considerarse juego (Coljuegos bloqueó Polymarket). Operar
 con dinero real requiere su decisión expresa y específica.

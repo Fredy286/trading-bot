@@ -346,8 +346,9 @@ class BlitzLoop(SignalLoop):
                  extra: list[dict] | None = None):
         super().__init__(bundle, runtime, feed=feed, secfeed=secfeed, sound=sound, log=log, pago=pago, umbral=umbral,
                          telegram=telegram)
-        self.venues = venues or UsdtCloses(self.feed.session)
-        self.assets = [{"symbol": bundle.get("symbol", "BTCUSDT"), "bundle": bundle, "feed": self.feed,
+        sym0 = str(bundle.get("symbol") or "BTCUSDT").upper()
+        self.venues = venues or UsdtCloses(self.feed.session, symbol=sym0)
+        self.assets = [{"symbol": sym0, "bundle": bundle, "feed": self.feed,
                         "sec": self.sec, "venues": self.venues}]
         for x in extra or []:  # otras monedas: {"symbol", "bundle"} y, en pruebas, sus propios feed/sec/venues
             sym = x["symbol"]

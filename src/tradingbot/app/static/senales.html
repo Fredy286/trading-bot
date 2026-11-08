@@ -77,7 +77,7 @@
     <div id="sub"></div>
     <div id="countdown"></div>
     <button id="clickbtn" disabled>YA HICE CLIC</button>
-    <div class="note">Atajo: barra espaciadora. Haz clic en tu plataforma demo <b>lo antes posible</b>; ideal, antes de
+    <div class="note" id="nota_clic">Atajo: barra espaciadora. Haz clic en tu plataforma demo <b>lo antes posible</b>; ideal, antes de
       que la cuenta regresiva llegue a 0 (cierre de la vela).</div>
     <div id="after">
       <label>Precio de entrada en tu plataforma <input id="f_entrada" inputmode="decimal"></label>
@@ -111,9 +111,11 @@ const BLITZ = OKX || location.pathname.startsWith("/blitz");
 const MODE = OKX ? {api: "/api/okx", ref: "OKX oficial", contrato: "BTC · sube o baja en la ventana de 5 min de OKX",
   titulo: "Event contracts de OKX · 5 minutos", pago: "88",
   banner: "EXPERIMENTAL — SIN DINERO REAL. Estudio 54: con el aviso anticipado, ETH acertó 55,9 % en desarrollo en los " +
-    "contratos «Up or Down 5min» de OKX (hace falta ~53,1 % comprando a 0,52 con comisión). Pendiente de confirmación " +
-    "con datos nuevos (Estudio 55, enero de 2027). Compra ANTES de que empiece la ventana (el aviso llega 10 s antes) y " +
-    "solo si el precio es ≤ 0,53; dentro de la ventana el precio se dispara. Aquí solo se anota: nunca dinero real " +
+    "contratos «Precio de ETH en 5 min» de OKX (Trade → Eventos y opciones; hace falta ~53,1 % comprando a 0,52 con " +
+    "comisión). Las pestañas bajo el gráfico de OKX muestran la hora de CIERRE de cada ventana. Pendiente de confirmación " +
+    "con datos nuevos (Estudio 55, enero de 2027). Compra antes del segundo 57 (el aviso llega en el 50; 1–2 s antes de " +
+    "la ventana OKX retira los precios) y solo si el precio es ≤ 0,53; a 0,52 suele haber solo ~13 contratos (~7 USDT). " +
+    "Aquí solo se anota: nunca dinero real " +
     "sin decidirlo tú expresamente.",
   nota: "Anota qué habrías comprado y a qué precio. El bot trae el resultado OFICIAL de OKX de cada ventana " +
     "(precio de partida y de liquidación) en cuanto vence."}
@@ -132,12 +134,17 @@ const MODE = OKX ? {api: "/api/okx", ref: "OKX oficial", contrato: "BTC · sube 
 if (BLITZ) {
   document.title = MODE.titulo; $("titulo").textContent = MODE.titulo; $("banner").textContent = MODE.banner;
   $("nota_diario").textContent = MODE.nota; $("f_pago").placeholder = MODE.pago;
-  $("th_ref1").textContent = "Promedio entrada → salida"; $("th_ref2").textContent = "Promedio";
+  $("th_ref1").textContent = OKX ? "OKX: partida → liquidación" : "Promedio entrada → salida";
+  $("th_ref2").textContent = OKX ? "OKX oficial" : "Promedio";
+  if (OKX) $("nota_clic").textContent = "Atajo: barra espaciadora. Pulsa en cuanto hayas anotado lo que comprarías: " +
+    "tiene que ser antes del segundo 57 (el aviso llega en el 50; 1–2 s antes de la ventana OKX retira los precios). " +
+    "Sin dinero real.";
 }
 // Pasados LATE_S segundos desde el aviso ya no hay ventaja medida: no se debe entrar. Modo de 1 min: 15 s
-// (Estudio 16). Blitz: 30 s, lo ideal antes de 15 s (nota de la demora del clic, 2026-11-03). OKX: 10 s, porque
-// la ventana empieza 10 s después del aviso y desde ahí el libro de órdenes se abre.
-const LATE_S = OKX ? 10 : BLITZ ? 30 : 15, IDEAL_S = OKX ? null : BLITZ ? 15 : null;
+// (Estudio 16). Blitz: 30 s, lo ideal antes de 15 s (nota de la demora del clic, 2026-11-03). OKX: 7 s, porque
+// la ventana empieza 10 s después del aviso y el creador de mercado retira sus precios 1–2 s antes (libro medido
+// el 2026-11-08, docs/03, 2.3).
+const LATE_S = OKX ? 7 : BLITZ ? 30 : 15, IDEAL_S = OKX ? null : BLITZ ? 15 : null;
 let lastAlert = null, clicked = new Set(), audio = null, offsetMs = 0, current = null;
 const fmtT = (iso) => iso ? new Date(iso).toLocaleTimeString("es-CO", {timeZone: "America/Bogota", hour12: false}) : "—";
 const pct = (x) => x == null ? "—" : (100 * x).toFixed(1) + " %";
@@ -197,9 +204,12 @@ function renderSignal(st) {
     big.className = late ? "none" : (u.lado > 0 ? "up" : "down");
     const slow = IDEAL_S && since > IDEAL_S && !late && !clicked.has(u.alert_id);
     const coin = BLITZ && u.activo ? (OKX ? "OKX " : "") + u.activo + " " : "";  // qué moneda abrir
+    // mismos nombres que la web de OKX en español; sus pestañas bajo el gráfico llevan la hora de CIERRE de la ventana
     if (OKX && u.lado != null && !$("sub").textContent) $("sub").textContent =
-      `Compra «${u.lado > 0 ? "Up" : "Down"}» de la ventana ${fmtT(u.ventana).slice(0, 5)}–${fmtT(u.vence).slice(0, 5)} ` +
-      `antes de las ${fmtT(u.ventana)} · precio ahora ${u.precio_compra ?? "—"} (máx. ${st.precio_max ?? 0.53}) · probabilidad ${pct(u.p)}`;
+      `Compra «${u.lado > 0 ? "Al alza" : "A la baja"}» en la pestaña «${fmtT(u.vence).slice(0, 5)}» ` +
+      `(ventana ${fmtT(u.ventana).slice(0, 5)}–${fmtT(u.vence).slice(0, 5)}) antes de las ` +
+      `${fmtT(new Date(new Date(u.ventana).getTime() - 3000))} · ` +
+      `precio ahora ${u.precio_compra ?? "—"} (máx. ${st.precio_max ?? 0.53}) · probabilidad ${pct(u.p)}`;
     big.textContent = late ? "TARDE — no entres en esta" : coin + (u.lado > 0 ? "↑ SUBE" : "↓ BAJA") + (slow ? " · aún vale" : "");
     if (late) $("clickbtn").disabled = true;
     const left = (new Date(u.cierre).getTime() - now) / 1000;
@@ -220,6 +230,11 @@ function renderSignal(st) {
       $("countdown").textContent = `próxima decisión en ${wait.toFixed(0)} s`;
     }
     $("sub").textContent = u.motivo || "";
+    if (OKX && u.estado === "fuera de turno" && u.proximo) {  // que la pestaña correcta ya esté abierta al sonar
+      const ini = Math.floor(new Date(u.proximo).getTime() / 60000) * 60000 + 60000, fin = ini + 300000;
+      $("sub").textContent = `Ten abierta en OKX (Trade → Eventos y opciones) la pestaña «${fmtT(new Date(fin)).slice(0, 5)}» ` +
+        `de cada moneda: es la ventana ${fmtT(new Date(ini)).slice(0, 5)}–${fmtT(new Date(fin)).slice(0, 5)}.`;
+    }
   }
 }
 function renderMetrics(r) {
@@ -262,9 +277,12 @@ async function poll() {
     $("status").textContent = `actualizado ${fmtT(st.actualizado)} · ${st.minutos} minutos · ${st.avisos} avisos` +
       (st.umbral ? ` · solo p ≥ ${st.umbral}` : "") + (st.cuarto_r ? ` · cuarto de hora` : "");
     if (BLITZ && st.activos && st.activos.length > 1 && !$("banner").dataset.eth) {
-      $("titulo").textContent = `Blitz de IQ Option · ${st.activos.join(" y ")} 3 minutos`;
-      $("banner").textContent = MODE.banner + " ETH (Estudio 51): 56,9 % con p ≥ 0,57 en desarrollo; " +
-        "el aviso dice qué moneda abrir. Usa «Ethereum Blitz» solo si tu IQ Option lo tiene (confirmación: Estudio 52).";
+      if (OKX) $("titulo").textContent = `Event contracts de OKX · ${st.activos.join(" y ")} · 5 minutos`;
+      else {
+        $("titulo").textContent = `Blitz de IQ Option · ${st.activos.join(" y ")} 3 minutos`;
+        $("banner").textContent = MODE.banner + " ETH (Estudio 51) solo como referencia: el blitz de ETH de IQ Option " +
+          "es OTC (precio propio, comprobado el 2026-11-07), así que NO sirve; para ETH usa el modo OKX.";
+      }
       $("banner").dataset.eth = "1";
     }
     renderSignal(st); renderMetrics(st.resumen);

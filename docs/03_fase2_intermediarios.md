@@ -130,7 +130,7 @@ Pedido del usuario después de comprobar que el blitz de ETH de IQ Option es OTC
 | Deriv | **No** (cripto solo con multiplicadores) | — | — | Extranjera | No sirve (sección 2.1) |
 | Polymarket («Up or Down» 5/15 min) | Sí | 5 y 15 min | ~50 % + comisión del tomador | **Bloqueada por Coljuegos** (2025) | No |
 | Kalshi, Robinhood (15 min) | Sí | 15 min | — | Solo EE. UU. | No |
-| **OKX «Event Contracts»** | **Sí: índice de OKX** (OKX 25 %, Binance 25 %, Bybit 18,75 %, Coinbase 18,75 %, Bitget 12,5 %) | **5 y 15 min** (BTC, ETH, SOL), ventanas fijas (:00, :05…); se compra antes de que empiece la ventana | Antes de la ventana se compra a 0,51–0,52 USDT y se cobra 1 USDT si se acierta. Comisión del tomador = 0,045 × P × (1 − P) (~0,011 a P = 0,52); sin comisión de liquidación desde el 2026-05-06 → **equilibrio ≈ 52,1–53,1 %** | OKX dice ofrecerlos en Latinoamérica; Colombia no se nombra. Sin SFC; podrían considerarse juego (Coljuegos) | **La mejor candidata. Estudio 54 PASA** (ETH 55,9 %, BTC 56,5 % a 5 min con aviso anticipado); confirmación: Estudio 55 |
+| **OKX «Event Contracts»** | **Sí: índice de OKX** (OKX 25 %, Binance 25 %, Bybit 18,75 %, Coinbase 18,75 %, Bitget 12,5 %) | **5 y 15 min** (BTC, ETH, SOL), ventanas fijas (:00, :05…); se compra antes de que empiece la ventana | Antes de la ventana se compra a 0,51–0,52 USDT y se cobra 1 USDT si se acierta. Comisión del tomador = 0,045 × P × (1 − P) (~0,011 a P = 0,52); sin comisión de liquidación desde el 2026-05-06 → **equilibrio ≈ 52,1–53,1 %** | **Aparecen para la cuenta del usuario en Colombia** (comprobado el 2026-11-07); exige «Modo de futuros». Sin SFC; podrían considerarse juego (Coljuegos) | **La mejor candidata. Estudio 54 PASA** (ETH 55,9 %, BTC 56,5 % a 5 min con aviso anticipado); confirmación: Estudio 55 |
 | Binance «Event Contracts» (abril de 2026) | Probablemente (precio de Binance) | Sin detalles públicos encontrados | — | — | Pendiente |
 
 **Datos de OKX verificados con su API pública (sin cuenta):**
@@ -140,11 +140,60 @@ Pedido del usuario después de comprobar que el blitz de ETH de IQ Option es OTC
 - libro de órdenes (`market/books`) y resultados oficiales (`floorStrike`, `settleValue`, `outcome`);
 - historia de 1 min del índice desde al menos 2024-09 (`history-index-candles`), y de 1 s en fechas recientes.
 
-**Lo que falta saber (lo comprueba el usuario en la app de OKX, sin depositar):**
-1. si a un residente en Colombia le aparece la categoría «Events» / «Eventos» y le deja operar;
-2. si hay modo de práctica para estos contratos.
+**Comprobado en la cuenta del usuario (2026-11-07, 23:39–23:46 Bogotá).** Se hizo en su navegador (Brave), con su
+sesión abierta y por pedido suyo. Solo se miró: no se compró nada ni se cambió ningún ajuste. Solo se abrieron menús
+para leerlos, y el tipo de orden volvió a «Mercado».
+1. **Los eventos aparecen.**
+   - Están en Trade → «Eventos y opciones», con las páginas «Precio de BTC en 5 min» y «Precio de ETH en 5 min».
+   - También hay SOL a 5 min y otros eventos (por ejemplo, el precio diario del oro).
+2. **Para operar hay que cambiar el modo de la cuenta.**
+   - La cuenta está en «Modo de spot». Los eventos solo están en «Modo de futuros», que además habilita perpetuos,
+     futuros con vencimiento y opciones con margen cruzado.
+   - No se cambió. También hacen falta USDT en la cuenta de trading (tenía 0).
+3. **La demo no sirve para estos contratos.** «Simulación de trading» (5 000 USDT ficticios) muestra los eventos, pero:
+   - su libro de órdenes estaba vacío (nadie vende);
+   - usa otro índice: la partida de ETH de la ventana 23:40–23:45 era 2 231,51 en la demo y 2 236,83 en la real;
+   - también pide cambiar el modo de la cuenta demo.
 
-Sin práctica gratuita, la única forma sin dinero es seguir las señales en papel con el resultado oficial de la API.
+   La práctica sin dinero sigue siendo el panel del bot con el resultado oficial de la API.
+4. **Las reglas son las mismas que se usaron en el Estudio 54.** La ficha «Info» dice:
+   - subyacente: índice de OKX;
+   - 1 USDT por contrato, con precios de 0,001 a 0,999;
+   - «Alza» si la liquidación ≥ la partida;
+   - liquidación = promedio por segundo del índice en la ventana final.
+
+   La partida que muestra la web es el `floorStrike` de la API: BTC 23:40–23:45, 75 911,3 en las dos; ETH, 2 236,83.
+5. **Nombres y horas de la web en español.**
+   - Los lados se llaman «Al alza» y «A la baja», y las horas están en hora de Bogotá.
+   - Las pestañas bajo el gráfico llevan la hora de **cierre** de cada ventana: la pestaña «23:50» es la ventana
+     23:45–23:50. Los avisos del bot usan esos mismos nombres.
+6. **Tipos de orden.**
+   - «Límite».
+   - «Mercado», que es el de fábrica. Trae «Slippage máx.» de 0,10 USDT, así que puede llenar hasta 0,10 más caro.
+   - «Límite avanzada»: Post Only, FOK e IOC.
+
+   Si algún día se usara dinero (solo con autorización expresa), la orden adecuada sería «Límite avanzada → IOC» a
+   ≤ 0,53. Llena al instante lo que haya a ese precio y cancela el resto, así que no queda una orden abierta dentro de
+   la ventana, donde solo se llenaría cuando el precio se mueve en contra.
+7. **Precio y cantidad antes de la ventana.** Se midió el 2026-11-08 en 6 ventanas de 04:40 a 05:05 UTC: dos en la web
+   y cuatro con la API pública (`market/books`), tres de ellas segundo a segundo.
+   - **ETH (4 ventanas por API):** los dos lados se vendían a 0,52, con 13,1 contratos (≈ 7 USDT), desde 15 s hasta
+     2 s antes del inicio. Un segundo antes, todo pasaba a 0,90. En la web, 3,5 min antes de la ventana de las 04:45,
+     había 0,51 × 20 y 0,52 × 513.
+   - **BTC:** a 0,51–0,52 había de 13 a 33 contratos. En 2 de las 4 ventanas un lado costaba 0,55 (libro inclinado).
+     Dos segundos antes del inicio, todo pasaba a 0,84.
+   - **Dentro de la ventana el diferencial se abre.** Por ejemplo, 0,43/0,52 en BTC a los 11 s, y 0,38/0,48 en ETH.
+   - **Primer caso de libro inclinado con una señal.** A las 23:59:50 (Bogotá) el modelo de BTC dijo «Al alza» con
+     p = 0,56. El libro ya vendía «Al alza» a 0,55 y «A la baja» a 0,52, o sea, inclinado **igual** que el modelo. El
+     bot no avisó porque 0,55 > 0,53.
+
+**Consecuencias.**
+- El supuesto de los Estudios 54 y 55 (comprar a 0,52 con comisión) vale para montos pequeños, de unos 7 USDT por aviso.
+- El bot ya no avisa si el lado de la señal cuesta más de 0,53.
+- Falta saber si el libro se inclina **en contra** de las señales del modelo. Si el creador de mercado ya descuenta la
+  misma información, el lado de la señal costaría más justo cuando el modelo acierta. Ese costo extra no lo cuenta el
+  Estudio 55, que supone 0,52 siempre.
+- Eso no se puede reconstruir hacia atrás, porque OKX no publica la historia del libro. Hay que grabarlo en vivo.
 
 Fuentes: [OKX — lanzamiento](https://www.zawya.com/en/press-release/companies-news/okx-launches-event-contracts-providing-a-simpler-way-to-trade-btc-and-eth-price-movements-y4nqgepu);
 [reglas de liquidación](https://www.okx.com/help/how-to-trade-event-contracts-and-settlement-logic);

@@ -3,8 +3,10 @@
 Cada ventana de 5 min empieza en un minuto múltiplo de 5 (hora UTC). En el segundo 50 del minuto anterior el modelo
 congelado decide con la receta del blitz: vela anterior de Binance, bloque parcial hasta el segundo 49 y compuesto de 3
 bolsas. Si la ganancia esperada con el precio de compra es suficiente, avisa con sonido y Telegram: qué comprar
-(«Up» o «Down»), de qué ventana y a qué precio máximo. **Hay que comprar antes de que empiece la ventana:** después, el
-diferencial del libro de órdenes se abre.
+(«Al alza» o «A la baja», los nombres de la web de OKX en español; en la API, «Up» y «Down»), en qué pestaña (la web
+rotula cada ventana con su hora de CIERRE) y a qué precio máximo. **Hay que comprar antes del segundo 57:** 1–2 s antes
+de que empiece la ventana el creador de mercado retira sus precios, y dentro de la ventana el diferencial se abre
+(comprobado en la web y con el libro de la API el 2026-11-07/08, docs/03, 2.3).
 
 - Antes de avisar mira el libro de órdenes de la ventana. Si comprar ese lado cuesta más de `PRECIO_MAX`, no avisa.
 - La referencia de cada aviso es el **resultado oficial de OKX** (API pública: `floorStrike`, `settleValue`,

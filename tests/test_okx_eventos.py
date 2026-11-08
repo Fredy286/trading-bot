@@ -107,10 +107,24 @@ def test_loop_decides_only_before_each_window_and_checks_the_price(tmp_path, bar
     assert d["vence"] == (ventana + pd.Timedelta(minutes=5)).isoformat()
     assert d["ev_accion"] == pytest.approx(d["p"] - ok.costo(0.51), abs=1e-4)
     texto = aviso_texto(d, "okx")
-    assert texto.startswith("🔔 OKX ETH 5 min: ↑ SUBE") and "Compra «Up»" in texto and "Sin dinero real" in texto
+    fin = (ventana + pd.Timedelta(minutes=5)).tz_convert("America/Bogota")
+    assert texto.startswith("🔔 OKX ETH 5 min: ↑ SUBE") and "Sin dinero real" in texto
+    assert f"Compra «Al alza» en la pestaña «{fin:%H:%M}»" in texto  # como la web de OKX en español
+    limite = (ventana - pd.Timedelta(seconds=3)).tz_convert("America/Bogota")  # OKX retira los precios 1–2 s antes
+    assert f"ANTES de las {limite:%H:%M:%S}" in texto
     caro = _loop(tmp_path / "caro", bars_g, _Eventos(ask=0.60), grid)
     x = caro.step((grid + pd.Timedelta(seconds=50.3)).to_pydatetime())
     assert x["estado"] == "sin señal" and "0.6" in x["motivo"]
+
+
+def test_main_coin_reads_its_own_prices(tmp_path):
+    """Regresión (registro de errores 56): con ETH como moneda principal, el bucle leía velas, segundos y bolsas de
+    BTC. Cada moneda debe leer sus propios datos."""
+    loop = ok.OkxLoop(_bundle(), tmp_path, sound=False, extra=[{"symbol": "BTCUSDT", "bundle": {**_bundle(),
+                                                                                                "symbol": "BTCUSDT"}}])
+    eth, btc = loop.by_symbol["ETHUSDT"], loop.by_symbol["BTCUSDT"]
+    assert (eth["feed"].symbol, eth["sec"].symbol, eth["venues"].symbol) == ("ETHUSDT",) * 3
+    assert (btc["feed"].symbol, btc["sec"].symbol, btc["venues"].symbol) == ("BTCUSDT",) * 3
 
 
 def test_reference_is_the_official_okx_result(tmp_path, bars):

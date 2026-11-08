@@ -53,6 +53,9 @@ REG_PATH = Path("config/senal_anticipada.json")
 DAILY_URL = "https://data.binance.vision/data/spot/daily/klines/{s}/{i}/{s}-{i}-{d}.zip"
 SOUND = "/usr/share/sounds/freedesktop/stereo/complete.oga"
 FIRE_AT_S = 50.25  # segundo de la vela en que se decide (hora de Binance), con margen de publicación
+# OKX: el creador de mercado retira sus precios 1–2 s antes de que empiece cada ventana (libro medido el 2026-11-08,
+# docs/03, 2.3); el aviso pide comprar como tarde 3 s antes del inicio, es decir, en el segundo 57
+OKX_MARGEN_S = 3
 
 
 # ----------------------------------------------------------------------------------------------- datos y entrenamiento
@@ -207,12 +210,14 @@ def aviso_texto(d: dict, modo: str | None = None) -> str:
     flecha = "↑ SUBE" if d["lado"] == 1 else "↓ BAJA"
     prob = f"{100 * d['p']:.1f}".replace(".", ",") + " %"
     if modo == "okx":
-        lado = "Up" if d["lado"] == 1 else "Down"
+        # mismos nombres que la web de OKX en español; sus pestañas bajo el gráfico llevan la hora de CIERRE
+        lado = "Al alza" if d["lado"] == 1 else "A la baja"
         ini = pd.Timestamp(d["ventana"]).tz_convert(BOGOTA)
         fin = (pd.Timestamp(d["ventana"]) + pd.Timedelta(minutes=5)).tz_convert(BOGOTA)
         cabeza = f"OKX {d.get('activo') or 'ETH'} 5 min"
-        regla = (f"Compra «{lado}» de la ventana {ini:%H:%M}–{fin:%H:%M} ANTES de las {ini:%H:%M:%S} "
-                 f"(precio ahora {d.get('precio_compra')}; no pagues más de 0,53).")
+        limite = ini - pd.Timedelta(seconds=OKX_MARGEN_S)  # OKX retira los precios 1–2 s antes del inicio
+        regla = (f"Compra «{lado}» en la pestaña «{fin:%H:%M}» (ventana {ini:%H:%M}–{fin:%H:%M}) ANTES de las "
+                 f"{limite:%H:%M:%S} (precio ahora {d.get('precio_compra')}; no pagues más de 0,53).")
         prob = f"{100 * d['p']:.1f}".replace(".", ",") + " %"
         return (f"🔔 {cabeza}: {'↑ SUBE' if d['lado'] == 1 else '↓ BAJA'}\n{regla}\nProbabilidad {prob} · aviso "
                 f"{hora} (Bogotá)\nSin dinero real: solo anótalo.")
@@ -237,8 +242,11 @@ class SignalLoop:
         self.telegram = telegram  # función(texto) que manda el aviso al celular, o None
         self.cuarto_r, self.pago, self.umbral = cuarto_r, pago, umbral
         self.dir.mkdir(parents=True, exist_ok=True)
-        self.feed = feed or BinancePollingFeed("BTCUSDT")
-        self.sec = secfeed or SecondsFeed(self.feed.session)
+        # los datos deben ser de la moneda del modelo: antes siempre se leía BTC, y el modo OKX con ETH como moneda
+        # principal decidía con precios de BTC (registro de errores 56)
+        sym = str(bundle.get("symbol") or "BTCUSDT").upper()
+        self.feed = feed or BinancePollingFeed(sym)
+        self.sec = secfeed or SecondsFeed(self.feed.session, symbol=sym)
         self.sound, self.log = sound, log
         self.extra_state: dict = {}  # datos propios de cada modo (el blitz los usa) que se añaden a state.json
         self.last: dict = {}

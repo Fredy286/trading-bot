@@ -288,8 +288,17 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - **Estudio 55** (confirmación, 2026-10-26 → 2027-01-18) pre-registrado (1067c6f). Modelos congelados en
        config/senal_okx5_{eth,btc}.json.
      - Modo SIN dinero: `scripts/iniciar_okx.sh --eth --btc --telegram` (panel /okx). Registro diario `okx_eth`/`okx_btc`.
-     - Falta que el usuario compruebe en la app de OKX si le aparecen los «Eventos» desde Colombia y si hay práctica.
-       OKX no está supervisada por la SFC; podría verse como juego (Coljuegos).
+     - **Comprobado en la cuenta del usuario (Brave, 2026-11-07, solo lectura; docs/03, 2.3):**
+       - los «Eventos» aparecen (Trade → Eventos y opciones; «Precio de ETH/BTC en 5 min»);
+       - para operar exige «Modo de futuros» (no se cambió) y USDT;
+       - la demo («Simulación de trading») tiene el libro vacío y otro índice: no sirve;
+       - antes de la ventana se compra a 0,51–0,52, pero solo ~13 contratos a 0,52; a veces un lado a 0,55;
+       - OKX retira los precios 1–2 s antes del inicio → el aviso pide comprar antes del segundo 57;
+       - la web dice «Al alza»/«A la baja», en hora de Bogotá; las pestañas llevan la hora de CIERRE de la ventana.
+     - **Error 56 (corregido):** el modo OKX en vivo con ETH como moneda principal decidía con precios de BTC. El registro
+       diario y los modelos congelados no estaban afectados.
+     - Falta saber si el libro se inclina en contra de las señales (selección adversa): solo se mide grabando el libro en
+       vivo. OKX no está supervisada por la SFC; podría verse como juego (Coljuegos).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
