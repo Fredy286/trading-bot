@@ -73,7 +73,8 @@ def inst_id(symbol: str, ventana: pd.Timestamp, dur: int = DUR) -> str:
 
 
 # ----------------------------------------------------------------------------------------------- entrenamiento
-def train_frozen_okx(symbol: str, log=print, registro: str = "Estudio 55") -> dict:
+def train_frozen_okx(symbol: str, log=print,
+                     registro: str = "Estudio 55 (pre-registro 1067c6f): modelo congelado de OKX 5 min para la confirmación y la práctica") -> dict:
     """Entrena UNA vez el modelo del Estudio 54 (5 min) con los 12 meses hasta el 2026-10-25."""
     out, reg = MODELOS[symbol]
     if out.exists():
