@@ -649,3 +649,68 @@ de que llegara el archivo del 18, se gastaba con datos incompletos. Arreglado: s
 - Encontré y arreglé un descuido: la prueba de enero del «filtro de racha» podía correr con un día de datos faltante.
   Ahora espera a tener todos los días.
 - No hubo estudio nuevo. El bot y las señales no cambiaron. Solo demo.
+
+## 2026-11-08 (autónoma)
+
+Tema del domingo: resumen semanal y repriorizar docs/10.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado (33 y 48).
+- GitHub Actions: las últimas 25 ejecuciones en verde (pruebas, registro diario, cola, vigilancia de canales y la
+  primera grabación del libro de OKX, 2026-11-08 05:29 UTC → `results/okx_libro/2026-11-08_0529.jsonl`).
+- Registro diario (conteos sellados, sin aciertos): BTC 672 señales en 12 días (p ≥ 0,60: 47), ETH 15 (p ≥ 0,60: 0),
+  nocturna 1 809 en 13 días (fuerte 687), blitz BTC 84 (p ≥ 0,57: 52), blitz ETH 470 (p ≥ 0,57: 176),
+  OKX ETH 98 y OKX BTC 218. El blitz llega hasta el 11-05 (Gate publica con retraso, normal).
+- Nocturna con 0 señales el viernes 6 (y el 30 de octubre, el 31 y el 1 de noviembre): no es un fallo. Deriv no
+  entrega velas de divisas tras el cierre del viernes ni en el fin de semana.
+- **Conteos de OKX distintos al desarrollo:** ETH 8,2 señales por día (en el Estudio 54, 25,5) y BTC 18,2 (en el 54,
+  11,5). Revisé el código del registro sin mirar aciertos: la regla de compra es la misma del Estudio 54 (comprar si
+  p ≥ ~0,551) y cada moneda usa sus propios precios. Parece efecto del mercado de estas dos semanas (en el blitz ya se
+  vio que los meses tranquilos dan muchas menos señales de ETH). Se anota para enero; no cambia nada ahora.
+- Canales (tabla descriptiva, sin veredicto antes del 2027-01-31): QuotexSignalfreee 182 señales verificadas, 50,5 %
+  en la primera entrada (límite inferior 43,3 %); gotraderssinaisfree 58, 48,3 %. Ninguno se distingue del azar.
+
+### Resumen de la semana (2026-11-02 → 2026-11-08)
+
+**Qué se aprendió**
+1. **OKX es la mejor vía encontrada hasta ahora (Estudio 54).** Sus contratos «sube o baja en 5 min» de ETH y BTC se
+   liquidan con un índice de precios reales y cuestan ~0,52 (equilibrio 53,1 %). Con el aviso anticipado, en el
+   pasado: ETH 55,9 % y BTC 56,5 %, 13 de 14 meses con ganancia. Se vio en la cuenta de Fredy (sin operar).
+2. **El riesgo nuevo es el precio de compra, no el acierto.** 10 s antes de la ventana solo hay ~13 contratos a 0,52
+   y, en BTC, a veces el libro ya está inclinado hacia el lado del modelo (0,55). Si quien vende sabe lo mismo que el
+   bot, las señales baratas serían las peores. GitHub graba el libro cada 6 h para medirlo (Estudio 56).
+3. **Más monedas dan más señales; revisar más seguido no** (Estudios 50 y 51). El blitz de ETH funciona en el pasado,
+   pero IQ Option solo tiene ETH «OTC» (precio propio): no aplica. Solana no pasa (53).
+4. **Filtro de racha (48):** parar cuando el modelo viene fallando sube el acierto por operación (~57 %), pero no la
+   ganancia total. Sirve para operar menos.
+5. **Literatura y traders verificados:** Binance marca el precio de BTC y las demás bolsas lo siguen en segundos;
+   copiar a quien va ganando sube el riesgo, no el acierto.
+6. **Errores corregidos:** 54 (una evaluación única podía correr con un día faltante) y 56 (el modo OKX en vivo con ETH
+   decidía con precios de BTC; el registro no estaba afectado).
+
+**Qué está en marcha (automático)**
+- Registro diario sellado: BTC, ETH, nocturna, blitz BTC y ETH, OKX ETH y BTC.
+- Grabación del libro de OKX cada 6 h (Estudio 56); vigilancia de canales cada hora; cola de estudios y esta rutina.
+
+**Próximas fechas**
+- 2027-01-19: evaluación única de las confirmaciones (Estudios 12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44, 46, 49,
+  52 y 55), primera mirada del Estudio 56 (α 0,01) y apertura del registro. Antes, comprobar que no falte ningún día.
+- 2027-01-31: veredicto de los canales (Estudio 32).
+- 2027-04-27: mirada principal del Estudio 56 (el libro real de OKX).
+
+**Repriorización de docs/10:** OKX sube arriba (idea 1c: decidir antes de que el libro se vacíe, cuando el libro
+grabado diga cuánto se inclina; con cuidado de no usar para elegir el momento el mismo libro del Estudio 56). Las ideas
+de IQ Option (0, 1, 1b) siguen, pero dependen de anotaciones de Fredy. Traders verificados y canales, después.
+
+**Estudio nuevo:** ninguno (domingo de resumen).
+
+**Pendientes con fecha**
+- 2026-11-09: comprobar que la grabación del libro de OKX corre sola cada 6 h (hoy solo hay la primera, lanzada a mano).
+- Sesión local con Fredy: anotar precios de entrada del blitz en la demo de IQ (ideas 1 y 1b) y canales no OTC.
+
+**Para Fredy**
+- Esta semana encontramos la mejor opción hasta ahora: los contratos de 5 minutos de OKX (ETH y BTC), con precio real.
+- En el pasado el bot habría acertado unas 56 de cada 100; hacen falta 53 para no perder.
+- Lo que falta saber es si se puede comprar barato justo cuando el bot avisa. GitHub lo está midiendo solo.
+- Nada se confirma hasta enero. No operes con dinero real: OKX no tiene demo útil, así que por ahora solo mirar.
+- Todo lo automático funciona. El bot y las señales no cambiaron hoy.
