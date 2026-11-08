@@ -175,13 +175,14 @@ para leerlos, y el tipo de orden volvió a «Mercado».
    Si algún día se usara dinero (solo con autorización expresa), la orden adecuada sería «Límite avanzada → IOC» a
    ≤ 0,53. Llena al instante lo que haya a ese precio y cancela el resto, así que no queda una orden abierta dentro de
    la ventana, donde solo se llenaría cuando el precio se mueve en contra.
-7. **Precio y cantidad antes de la ventana.** Se midió el 2026-11-08 en 6 ventanas de 04:40 a 05:05 UTC: dos en la web
-   y cuatro con la API pública (`market/books`), tres de ellas segundo a segundo.
-   - **ETH (4 ventanas por API):** los dos lados se vendían a 0,52, con 13,1 contratos (≈ 7 USDT), desde 15 s hasta
-     2 s antes del inicio. Un segundo antes, todo pasaba a 0,90. En la web, 3,5 min antes de la ventana de las 04:45,
-     había 0,51 × 20 y 0,52 × 513.
-   - **BTC:** a 0,51–0,52 había de 13 a 33 contratos. En 2 de las 4 ventanas un lado costaba 0,55 (libro inclinado).
-     Dos segundos antes del inicio, todo pasaba a 0,84.
+7. **Precio y cantidad antes de la ventana.** Se midió el 2026-11-08 en 10 ventanas de 04:40 a 05:30 UTC: dos en la
+   web y ocho segundo a segundo con la API pública (`market/books`), de 15 s antes a 10 s después del inicio.
+   - **ETH (8 ventanas por API):** los dos lados se vendían a 0,52, con 13,1 contratos (≈ 7 USDT), desde 15 s hasta
+     2 s antes del inicio. Un segundo antes, todo pasaba a 0,90 (7 de 7).
+   - **BTC (8 ventanas):** en 4, un lado costaba 0,55 (libro inclinado). En las otras 4, los dos lados estaban a
+     0,51–0,52, con 13–33 contratos. Dos segundos antes del inicio, todo pasaba a 0,84 (8 de 8).
+   - **Minutos antes hay mucha más cantidad.** Para la ventana de las 05:25, a las 05:21 había ETH 0,51 × 20 y
+     0,52 × 513, y BTC 0,51 × 120 y 0,52 × 514. Al acercarse el inicio, el creador de mercado la retira.
    - **Dentro de la ventana el diferencial se abre.** Por ejemplo, 0,43/0,52 en BTC a los 11 s, y 0,38/0,48 en ETH.
    - **Primer caso de libro inclinado con una señal.** A las 23:59:50 (Bogotá) el modelo de BTC dijo «Al alza» con
      p = 0,56. El libro ya vendía «Al alza» a 0,55 y «A la baja» a 0,52, o sea, inclinado **igual** que el modelo. El
@@ -194,6 +195,8 @@ para leerlos, y el tipo de orden volvió a «Mercado».
   misma información, el lado de la señal costaría más justo cuando el modelo acierta. Ese costo extra no lo cuenta el
   Estudio 55, que supone 0,52 siempre.
 - Eso no se puede reconstruir hacia atrás, porque OKX no publica la historia del libro. Hay que grabarlo en vivo.
+  Lo hace el **Estudio 56** (pre-registro 8c90ebf, docs/01): GitHub graba el libro antes de cada ventana
+  (`.github/workflows/libro_okx.yml`). Se evalúa en enero y en abril de 2027.
 
 Fuentes: [OKX — lanzamiento](https://www.zawya.com/en/press-release/companies-news/okx-launches-event-contracts-providing-a-simpler-way-to-trade-btc-and-eth-price-movements-y4nqgepu);
 [reglas de liquidación](https://www.okx.com/help/how-to-trade-event-contracts-and-settlement-logic);

@@ -294,8 +294,14 @@ scripts/iniciar_okx.sh --eth --btc --telegram
   Además hacen falta USDT;
 - la **demo** de OKX («Simulación de trading») muestra los eventos, pero nadie vende ahí (libro vacío) y usa otro
   precio. **No sirve para practicar** estos contratos: la práctica es con el panel del bot;
-- antes de cada ventana se compra a **0,51–0,52**, pero en poca cantidad (unos 13 contratos a 0,52, ≈ 7 USDT). A veces
-  un lado cuesta 0,55; entonces el bot no avisa.
+- antes de cada ventana se compra a **0,51–0,52**, pero en poca cantidad (unos 13 contratos a 0,52, ≈ 7 USDT). En
+  BTC, en 4 de 8 ventanas medidas un lado costaba 0,55; si la señal es de ese lado, el bot no avisa.
+
+**Precio real (Estudio 56):**
+- GitHub graba el libro de órdenes de OKX antes de cada ventana, cada 6 horas, sin que usted tenga que dejar nada
+  encendido.
+- En enero y en abril de 2027 se medirá si las señales ganan al precio que de verdad se puede comprar. Puede pasar que
+  el vendedor de OKX ya «sepa» lo mismo que el modelo y cobre más justo en las buenas.
 
 OKX no está supervisada por la SFC, y estos contratos podrían considerarse juego (Coljuegos bloqueó Polymarket). Operar
 con dinero real requiere su decisión expresa y específica.
