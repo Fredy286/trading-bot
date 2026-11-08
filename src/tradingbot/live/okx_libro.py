@@ -3,7 +3,8 @@
 Antes de cada ventana de 5 min guarda el libro del contrato de esa ventana 10, 7, 5 y 3 s antes de que empiece. El aviso
 del bot sale 10 s antes, y el usuario tiene hasta 3 s antes, porque 1–2 s antes OKX retira los precios (docs/03, 2.3).
 OKX no publica la historia del libro: solo se puede medir grabándolo en vivo. Lo corre
-`.github/workflows/libro_okx.yml` cada 6 horas, y cada ejecución deja su propio archivo en `results/okx_libro/`.
+`.github/workflows/libro_okx.yml` en cadena (cada grabación de ~5,8 h lanza la siguiente; un vigía cada hora la relanza si
+se corta), y cada ejecución deja su propio archivo en `results/okx_libro/`.
 
 Solo usa la API pública (sin cuenta), la biblioteca estándar y `requests`, para que el flujo de GitHub no tenga que
 instalar todo el paquete. No envía órdenes.

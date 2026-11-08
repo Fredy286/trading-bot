@@ -714,3 +714,21 @@ de IQ Option (0, 1, 1b) siguen, pero dependen de anotaciones de Fredy. Traders v
 - Lo que falta saber es si se puede comprar barato justo cuando el bot avisa. GitHub lo está midiendo solo.
 - Nada se confirma hasta enero. No operes con dinero real: OKX no tiene demo útil, así que por ahora solo mirar.
 - Todo lo automático funciona. El bot y las señales no cambiaron hoy.
+
+## 2026-11-08, tarde (sesión local, no es la rutina)
+
+- **El horario de GitHub falló con la grabación del libro (ítem 57).** La de las 06:03 no ocurrió, la de las 12:03
+  empezó a las 13:05 y la de las 18:03 a las 21:53. Ahora funciona **en cadena**:
+  - cada grabación de ~5 h 48 min lanza la siguiente al terminar;
+  - un vigía cada hora la relanza si se corta;
+  - probado: al cancelar una grabación, guardó lo grabado y lanzó la siguiente.
+- **Pendiente del 2026-11-09, actualizado:**
+  - comprobar que la cadena sigue viva: `gh run list --workflow libro_okx.yml` debe mostrar siempre una grabación
+    «in_progress»;
+  - comprobar que los archivos de `results/okx_libro/` se siguen sin huecos grandes. Mirar solo el libro, nunca
+    unirlo con resultados (Estudio 56).
+- **Primer día grabado (13:10–18:50 UTC).**
+  - ETH estuvo sin precio (0,90) de 15:10 a 16:35 UTC y luego tuvo solo 3 contratos a 0,52.
+  - BTC tuvo un lado > 0,53 en 9 de 69 ventanas. Detalle en docs/03, 2.3.
+- **Modo OKX en vivo:** usa ya la regla del Estudio 56 (1 contrato completo a ≤ 0,53) y dice cuántos contratos hay.
+

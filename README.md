@@ -298,7 +298,7 @@ scripts/iniciar_okx.sh --eth --btc --telegram
   BTC, en 4 de 8 ventanas medidas un lado costaba 0,55; si la señal es de ese lado, el bot no avisa.
 
 **Precio real (Estudio 56):**
-- GitHub graba el libro de órdenes de OKX antes de cada ventana, cada 6 horas, sin que usted tenga que dejar nada
+- GitHub graba el libro de órdenes de OKX antes de cada ventana, sin parar (cada grabación lanza la siguiente), sin que usted tenga que dejar nada
   encendido.
 - En enero y en abril de 2027 se medirá si las señales ganan al precio que de verdad se puede comprar. Puede pasar que
   el vendedor de OKX ya «sepa» lo mismo que el modelo y cobre más justo en las buenas.
