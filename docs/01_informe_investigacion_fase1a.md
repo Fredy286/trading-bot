@@ -4295,3 +4295,74 @@ horizonte es de 5 min, y a 5 min el aviso anticipado de BTC dio 54,70 % con el p
 
 Código: `src/tradingbot/research/study54.py`, `tbot research study54`; pruebas en `tests/test_study54.py`. Descarga del
 índice en `research/bolsas.py` (`okx_index_month`).
+
+### Resultado del Estudio 54 (2026-11-07; código e4bd5d9 y 9e09c96, aplicado mecánicamente): PASA (H54a y H54b)
+
+`results/estudio54/resultado.json`:
+- índice de OKX completo: 1 175 045 minutos por moneda, 2024-08 → 2026-10-26 00:04;
+- la etiqueta reconstruida coincidió con el resultado oficial de OKX en 93 de 93 contratos de ETH y en 90 de 92 de BTC
+  (validación del 2026-11-07 con contratos recientes).
+
+| Hipótesis | Operaciones (por día) | Acierto [lím. inf.] | Equilibrio | EV por acción [IC 97,5 %] | Rendimiento por operación | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|---|---|
+| H54a (ETH, 5 min) | 10 711 (25,5) | **55,86 %** [54,92 %] | 53,06 % | +0,027 [+0,017; +0,037] | +5,3 % | 13 de 14 | **pasa** |
+| H54b (BTC, 5 min) | 4 811 (11,5) | **56,50 %** [55,09 %] | 53,06 % | +0,034 [+0,018; +0,051] | +6,5 % | 13 de 14 | **pasa** |
+
+**Informativo:**
+- **horario del usuario (02–06 UTC):** ETH 3,7 por noche con 55,7 %; BTC 1,5 por noche con 57,4 %;
+- **contratos de 15 min:**
+  - ETH: 3 269 operaciones, 56,93 % [55,22 %], EV +0,038;
+  - BTC: 1 991 operaciones, 56,20 % [54,01 %], EV +0,031;
+- **con p ≥ 0,57:** ETH 3 310 operaciones con 57,3 %; BTC 858 con 58,5 %;
+- **comprando a 0,51 sin comisión (umbral más bajo):** ETH 30 523 operaciones con 54,6 %; BTC 18 166 con 54,3 %;
+- ventanas que suben: 49,8 % en las dos monedas.
+
+**Consecuencia (pre-registrada):**
+- confirmación con datos posteriores al 2026-10-25 (Estudio 55, abajo);
+- modo de aviso para seguir las señales sin dinero (`tbot okx vivo`, panel /okx);
+- registro diario en la nube con el resultado oficial de OKX.
+
+## Estudio 55 — confirmación de los event contracts de OKX con datos nuevos (pre-registro, 2026-11-07, ANTES de entrenar los modelos congelados y de calcular señales posteriores al 2026-10-25)
+
+**Modelos congelados (ETH y BTC):**
+- la receta del Estudio 54 a 5 min, entrenada una sola vez con los 12 meses que terminan el 2026-10-25;
+- el último 20 % (desde el inicio de su día) para calibrar, con 8 min de purga; semilla 2024;
+- `tbot okx entrenar --eth --btc`; el SHA-256 queda en `config/senal_okx5_eth.json` y `config/senal_okx5_btc.json`.
+
+**Datos:**
+- todas las ventanas de 5 min del 2026-10-26 al 2027-01-18;
+- resultado = el **oficial de OKX** (`outcome` de la API) cuando la API todavía lo guarda;
+- si ya no lo guarda (OKX conserva pocos días), la etiqueta reconstruida del Estudio 54 (97,8–100 % de coincidencia);
+- cada fila del registro dice su fuente (`results/registro/okx_eth/`, `okx_btc/`). Sellado hasta el 2027-01-19.
+
+**Costo (con las comisiones publicadas por OKX desde el 2026-05-06):**
+- compra a 0,52 más la comisión del tomador, 0,045 × 0,52 × 0,48 = 0,0112;
+- costo 0,5312 y **equilibrio 53,12 %**;
+- política: p − 0,5312 ≥ 0,02.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H55a:** ETH a 5 min;
+- **H55b:** BTC a 5 min.
+
+**Criterios (cada una, todos):**
+1. ≥ 300 operaciones. Si no se llega, se amplía con días seguidos ya registrados hasta el 2027-04-26.
+2. p < 0,025 frente a 53,12 % (binomial);
+3. Wilson 95 % > 53,12 %;
+4. intervalo del EV por acción (bootstrap por semanas ISO, 97,5 %) por encima de 0.
+
+**Informativo:**
+- solo filas con resultado oficial;
+- horario del usuario;
+- comprando a 0,51.
+
+**Evaluación:** una sola vez, después del 2027-01-19. Antes se comprueba que estén todos los días (ítem 54).
+
+**Consecuencia:**
+- **Si pasa:** el aviso de OKX queda como la vía recomendada para practicar. Operar con dinero real sigue requiriendo
+  la autorización expresa y específica del usuario.
+- **Si no pasa:** sin señal.
+
+**Lo que debe comprobar el usuario, sin depositar:**
+- si a su cuenta de OKX en Colombia le aparecen los «Eventos»;
+- si hay modo de práctica;
+- cuál es el precio real antes de cada ventana.
