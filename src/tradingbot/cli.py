@@ -492,6 +492,16 @@ def cmd_research_study56(a) -> int:
     return 0
 
 
+def cmd_research_study57(a) -> int:
+    from .research import study57
+
+    rep = study57.run()
+    for h, r in rep["hipotesis"].items():
+        print(f"{h}: D = {r['D']:+.5f}  p = {r['p_unilateral']:.4f}  p Holm = {r['p_holm']:.4f}  "
+              f"{'PASA' if r['pasa'] else 'no pasa'}")
+    return 0
+
+
 def cmd_research_study48(a) -> int:
     from .research import study48
 
@@ -1042,6 +1052,9 @@ def build_parser() -> argparse.ArgumentParser:
                                      "2027-01-19; abril: desde el 2027-04-27)")
     x.add_argument("--mirada", choices=["enero", "abril"], required=True)
     x.set_defaults(func=cmd_research_study56)
+    x = r.add_parser("study57", help="Estudio 57: huella de la manipulación del cierre de 5 min de Polymarket "
+                                     "en Binance y en el GBM de BTC 1 min")
+    x.set_defaults(func=cmd_research_study57)
     x = r.add_parser("study48", help="Estudio 48: filtro de racha reciente del propio GBM de BTC 1 min")
     x.set_defaults(func=cmd_research_study48)
     x = r.add_parser("study33", help="Estudio 33: variables de reloj (cuarto de hora, financiación) en el GBM de BTC 1 min")
