@@ -4458,3 +4458,74 @@ se corta. No cambia nada del análisis.
   real sigue requiriendo la autorización expresa y específica del usuario.
 - **Si no pasa:** la ventaja del Estudio 54 no sobrevive al libro real, aunque el Estudio 55 pase. Sin señal para
   operar.
+
+## Estudio 57 — ¿la manipulación del cierre de los contratos de 5 min de Polymarket dejó huella en Binance y en nuestro modelo de BTC? (pre-registro, 2026-11-09, ANTES de calcular nada con este diseño)
+
+**Origen (literatura del lunes, docs/09 del 2026-11-09):**
+- Dai, Jia y Yu (Stanford y Singapore Management University), «Settlement Manipulation in Prediction Markets»,
+  preprint de junio de 2026: https://arxiv.org/abs/2606.31675 . **No se pudo leer el texto** (arxiv.org no abre
+  desde este entorno); solo resúmenes de buscador y de prensa (https://cointelegraph.com/news/stanford-study-5-minute-bitcoin-prediction-markets-enable-settlement-manipulation ,
+  https://bitcoinmagazine.com/news/traders-took-8-2-million-from-polymarkets , tampoco leídas directamente).
+- Lo que dicen esos resúmenes: tras el lanzamiento del contrato «BTC Up or Down 5 min» de Polymarket (**2026-02-12**
+  según el artículo y Bitcoin Magazine; Cointelegraph dice julio de 2024, que parece un error), el flujo de órdenes
+  del contado en los **últimos 10 s antes de cada cierre de 5 min subió ~50 %** y el precio **se revirtió en los
+  10 s siguientes**; ~8,2 millones de USD en dos meses pasaron de minoristas a ~821 posibles manipuladores; el
+  efecto casi no aparece en los contratos de 15 min.
+- Por qué nos importa: nuestras entradas caen justo en el cambio de minuto. El GBM de BTC entra en la apertura de la
+  vela siguiente (Estudios 33 y 48) y el aviso H16b entra en el segundo 60 (clic +10 s). Si en las marcas de 5 min el
+  precio de entrada está empujado y luego se revierte, el acierto en esos minutos pudo empeorar desde febrero.
+  Además, la partida de los contratos de OKX (Estudios 54–56) se fija justo en una marca de 5 min.
+- No sé en qué bolsa empujaban (Polymarket liquida con un dato de Chainlink que agrega bolsas); por eso se mide en
+  Binance, que es el precio de nuestro modelo. Si allí no hay huella, la respuesta también sirve.
+
+**Datos:**
+- H57a y H57b: velas de 1 s del contado BTC/USDT de Binance (data.binance.vision, archivos mensuales 2025-09 →
+  2026-09, misma lectura que el Estudio 16). Nada posterior al 2026-10-25.
+- H57c: el GBM de BTC 1 min del Estudio 48 (base sin filtro; `study33._predict`, walk-forward trimestral, 12 meses,
+  `config/research.toml` solo leído), periodo de verificación 2025-09-01 → 2026-10-01, sus operaciones de política
+  base (EV estimado ≥ margen, pago 85 %, empate reembolsado, sin empates en el acierto).
+
+**Periodos:** ANTES = 2025-09-01 00:00 → 2026-02-12 00:00 UTC; DESPUÉS = 2026-02-12 00:00 → 2026-10-01 00:00 UTC.
+
+**Definiciones (por cada cambio de minuto t, en UTC):**
+- P(x) = último precio negociado antes de t + x s (cierre de la última vela de 1 s que abre como mucho en t + x − 1;
+  hueco máximo 5 s; si no, se descarta). Igual que `last_before` del Estudio 16.
+- **Marca de 5 min (M5):** minuto de t múltiplo de 5 (incluye los cuartos de hora). **Otras (O):** el resto.
+- **Cuota de flujo** = volumen de las velas de 1 s en [t − 10 s, t) / volumen en [t − 60 s, t) (solo si este > 0).
+- **Reversión** = −signo(ln P(0)/P(−10)) · signo(ln P(10)/P(0)), solo si los dos movimientos son ≠ 0 (vale +1 si el
+  precio vuelve, −1 si sigue).
+- Para H57c, la operación del GBM decidida en la vela i entra en la apertura de la vela i + 1: es M5 si ese instante
+  de entrada es múltiplo de 5 min.
+
+**Estadístico común (diferencia en diferencias):** D = (media M5 − media O)_DESPUÉS − (media M5 − media O)_ANTES.
+Intervalo y valor p por bootstrap de días UTC completos (remuestreo de días dentro de cada periodo; 2 000
+repeticiones; semilla 12345); p unilateral = (nº de D* en contra + 1) / 2 001.
+
+**Hipótesis (Holm sobre las 3, α = 0,05 unilateral):**
+- **H57a (flujo):** D de la cuota de flujo > 0 (más volumen en los últimos 10 s antes de las marcas de 5 min desde
+  febrero, comparado con los demás minutos y con antes).
+- **H57b (reversión):** D de la reversión > 0.
+- **H57c (nuestro modelo):** D del acierto del GBM < 0 (empeora en las entradas M5 desde febrero).
+
+**Criterios:** cada una pasa si su p ajustado por Holm < 0,05. Además, para H57c: ≥ 1 500 operaciones M5 en cada
+periodo (si no, «sin potencia», no pasa).
+
+**Potencia declarada (antes de calcular):** el GBM tuvo ~62 900 operaciones en la verificación (~160 por día). Con
+~20 % en M5, quedan ~5 000 M5 antes y ~7 000 después: el error típico de D es ~1 punto. Solo se detectaría un daño
+de ~2,5 puntos o más. H57a y H57b usan todos los minutos (~45 000 M5 por periodo) y tienen mucha más potencia.
+
+**Informativo (no decide):** los tres D con «cuartos de hora» frente a «otras M5»; la serie mes a mes de (M5 − O)
+de cada medida; un placebo con fecha falsa 2025-11-27 (mitad del periodo ANTES, comparando sus dos mitades); acierto y
+operaciones del GBM en M5 y O por periodo; EV por operación con pago 85 %.
+
+**Expectativa declarada:** H57a probable (el artículo lo reporta, aunque quizá en otras bolsas); H57b dudosa en
+Binance, la bolsa más profunda; H57c poco probable de detectar con esta potencia. Una trampa a vigilar: los cuartos de
+hora ya tenían más actividad antes (Kim y Hansen, Estudio 33); la diferencia en diferencias la descuenta, pero otros
+cambios del mercado en febrero de 2026 también caerían en D (no prueba causa).
+
+**Consecuencia:**
+- Si H57c pasa: pre-registrar como confirmación, con las señales registradas después del 2026-10-25 (evaluación única
+  tras el 2027-01-18), un filtro que salte las entradas M5 de BTC (H16b y blitz). No se toca ningún modelo congelado.
+- Si H57a o H57b pasan y H57c no: anotar en docs/03 (OKX) y docs/10 que la partida de OKX cae en un instante
+  empujado; sin cambios en el bot.
+- Si nada pasa: idea cerrada en docs/10.
