@@ -309,6 +309,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        - Miradas: `tbot research study56 --mirada enero` desde el 2027-01-19 (α 0,01) y `--mirada abril` desde el
          2027-04-27 (α 0,04; la principal, potencia ~89 %).
        - OKX no está supervisada por la SFC; podría verse como juego (Coljuegos).
+   - **Estudio 57 (2026-11-09, rutina):** ¿la manipulación del cierre de los contratos de 5 min de Polymarket (preprint de
+     Stanford/SMU, arXiv 2606.31675) dejó huella en Binance (flujo y reversión en ±10 s de las marcas de 5 min) y empeoró el
+     GBM de BTC al entrar en ellas? Pre-registro 8459934, código 01b8835; en la cola de GitHub.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.

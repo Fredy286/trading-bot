@@ -735,3 +735,50 @@ de IQ Option (0, 1, 1b) siguen, pero dependen de anotaciones de Fredy. Traders v
   - BTC tuvo un lado > 0,53 en 9 de 69 ventanas. Detalle en docs/03, 2.3.
 - **Modo OKX en vivo:** usa ya la regla del Estudio 56 (1 contrato completo a ≤ 0,53) y dice cuántos contratos hay.
 
+
+## 2026-11-09 (autónoma)
+
+Tema del lunes: literatura y microestructura.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes; cola vacía y lo hecho ya documentado (33 y 48).
+- **Libro de OKX en cadena: vivo.** Grabaciones continuas desde 2026-11-08 21:55 UTC (archivos `2026-11-08_2159` →
+  `2026-11-09_0345` → la de las 09:30, en curso), sin huecos entre ellas. El vigía («schedule») sí corrió (01:45 y
+  09:51 UTC) y no hizo nada porque la cadena seguía viva. Solo miré ventanas y horas, no el contenido del libro.
+- **Registro diario:** el de hoy (programado 06:40 UTC) aún no había corrido a las 12:30 UTC; ayer corrió 7 h tarde
+  (13:49). Es el retraso de horarios de GitHub ya conocido (ítems 46 y 57), no un fallo: el registro recupera los
+  días pendientes. Último archivo de BTC: 2026-11-07.
+
+**Búsquedas (arxiv.org y okx.com no abren desde la nube: solo resúmenes de buscador):**
+1. **Manipulación del cierre en Polymarket** (Dai, Jia y Yu, Stanford/SMU, junio de 2026,
+   https://arxiv.org/abs/2606.31675 ; prensa: https://cointelegraph.com/news/stanford-study-5-minute-bitcoin-prediction-markets-enable-settlement-manipulation ,
+   https://bitcoinmagazine.com/news/traders-took-8-2-million-from-polymarkets). Según los resúmenes:
+   - desde el contrato «BTC Up or Down 5 min» (2026-02-12), el flujo del contado en los últimos 10 s antes de cada
+     cierre subió ~50 % y el precio se revirtió en los 10 s siguientes;
+   - ~8,2 M USD en dos meses pasaron de minoristas a ~821 posibles manipuladores; a 15 min casi no pasa;
+   - proponen liquidar con un promedio: es lo que ya hace OKX (media de 30 s de un índice de 5 bolsas). Pero la
+     **partida** de OKX es un instante, justo en una marca de 5 min.
+2. **Efecto del cuarto de hora** (Kim y Hansen, https://arxiv.org/abs/2607.09426): ya estaba en docs/06 y se probó en
+   el Estudio 33 (no pasa). Dato nuevo de los resúmenes: dirección de los primeros 10 s acertada 56,6 %, pero solo
+   ~0,51 pb por operación antes de comisiones (https://cryptoslate.com/the-invisible-opening-bell-inside-cryptos-endless-trading-day/).
+   No sirve para nosotros.
+3. **Contratos de eventos de Binance (10 min):** no encontré reglas oficiales (solo una publicación de Binance Square).
+   Sigue «pendiente» en docs/03.
+
+**Estudio nuevo: Estudio 57** (pre-registro 8459934, código 01b8835; en la cola de GitHub). ¿La manipulación de
+Polymarket dejó huella en Binance y empeoró nuestro modelo de BTC justo en las marcas de 5 min? Diferencia en
+diferencias (marcas de 5 min frente a otros minutos, antes y después del 2026-02-12), datos 2025-09 → 2026-09:
+H57a flujo de los últimos 10 s, H57b reversión en ±10 s, H57c acierto del GBM al entrar en una marca de 5 min (Holm).
+Expectativa: H57a probable, H57b dudosa, H57c casi sin potencia (solo vería un daño ≥ 2,5 puntos).
+
+**Pendientes con fecha**
+- 2026-11-10: documentar el Estudio 57 (si GitHub lo corrió) y comprobar que el registro diario de hoy llegó.
+- Sesión local con Fredy: precios de entrada del blitz en la demo (ideas 1 y 1b) y canales no OTC.
+- 2027-01-19: confirmaciones únicas y apertura del registro; 2027-01-31: canales; 2027-04-27: Estudio 56 (abril).
+
+**Para Fredy**
+- Leí un estudio de Stanford: en los contratos de 5 minutos de Polymarket hay gente que mueve el precio en los últimos
+  segundos para ganar; los minoristas perdieron unos 8 millones de dólares en dos meses.
+- OKX se protege mejor (liquida con un promedio de 30 segundos), pero su precio de partida es un solo instante.
+- Lancé el Estudio 57 para medir si ese juego también afecta a nuestras señales de BTC en los minutos :00, :05, :10…
+- La grabación del libro de OKX sigue funcionando sola. Nada cambió en el bot. Solo demo.

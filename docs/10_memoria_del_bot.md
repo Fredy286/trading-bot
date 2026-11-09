@@ -142,6 +142,13 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 - **Copy trading (2026-11-03):** copiar a quien va ganando aumenta el riesgo heredado, no el acierto; las listas de
   cuentas «verificadas» ya están filtradas por supervivencia. No buscar ahí reglas; como mucho, piezas medibles con
   su historial completo.
+- **Literatura del 2026-11-09 (solo resúmenes; arxiv.org y okx.com no abren desde la nube):** un preprint de Stanford/SMU
+  (https://arxiv.org/abs/2606.31675) dice que el contrato de 5 min de BTC de Polymarket invita a empujar el precio del
+  contado en los últimos 10 s antes de cada cierre (+50 % de flujo, reversión en 10 s; ~8,2 M USD de minoristas a ~821
+  cuentas en dos meses) y que a 15 min casi no pasa. El remedio que proponen (liquidar con un promedio) es justo el de
+  OKX (media de 30 s de un índice de 5 bolsas), pero la **partida** de OKX es un solo instante en una marca de 5 min.
+  Lección: en contratos muy cortos, la contraparte puede ser alguien que mueve el precio de liquidación; preferir
+  contratos con liquidación promediada y desconfiar de los instantes exactos (Estudio 57 lo mide en Binance).
 - **El usuario:** opera solo en demo; tiene libres las noches desde las 21:00 de Bogotá; su plataforma (IQ Option)
   no tiene BTC a 1 min (sí binaria de 15 min con pago del 87 %).
 - **Semana 2026-11-02 → 11-08:** se encontró la mejor vía hasta ahora (OKX, Estudio 54) y se vio que más monedas dan
@@ -165,6 +172,7 @@ siguen, pero dependen de anotaciones del usuario. Los números de las ideas no c
 | 4 | Selector BTC + ETH con p ≥ 0,60 en el horario del usuario (21:00–01:00 Bogotá) | Más señales de alta confianza en sus horas | **Baja prioridad:** el modelo congelado de ETH (Estudio 35) dio 0 señales en sus primeros 5 días registrados (conteo, sin aciertos); además el usuario no tiene BTC/ETH a 1 min en su plataforma |
 | 4b | **Filtro de «racha reciente» del propio modelo** (acierto de sus últimas 500 operaciones o de los últimos 7 días ≥ equilibrio) | Tercera forma de «confianza»; la ventaja va por épocas (Estudios 20 y 41) | **Estudio 48 PASA** (2026-11-05): +2,3–2,5 puntos entre tomadas y saltadas en desarrollo, +3,9–4,5 en verificación; persistencia semanal 0,36–0,40. Pero la ganancia total casi no cambia (−6 % / +5 %): sirve para operar menos con la misma ganancia. Confirmación pre-registrada: **Estudio 49** (señales registradas de H16b, código listo, se niega a correr antes del 2027-01-19; potencia ~45 %). Nada que hacer hasta entonces |
 | 5 | Comparar precios de Deriv con HistData en los mismos minutos | Validar la fuente del registro nocturno | **Baja:** Deriv quedó descartado para operar; solo afecta a la medida científica |
+| 6 | **Manipulación del cierre de 5 min de Polymarket** (desde el 2026-02-12): ¿más flujo y reversión en Binance justo antes/después de las marcas de 5 min, y peor acierto de nuestro GBM al entrar en ellas? | Dai, Jia y Yu (2026, https://arxiv.org/abs/2606.31675, solo resúmenes): +50 % de flujo en los últimos 10 s y reversión en 10 s. Nuestras entradas caen en el cambio de minuto y la partida de OKX en una marca de 5 min | **Estudio 57** pre-registrado (8459934, 2026-11-09); en la cola de GitHub. Documentar el resultado al día siguiente |
 
 ### Ideas cerradas (no repetir)
 
