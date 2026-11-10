@@ -782,3 +782,34 @@ Expectativa: H57a probable, H57b dudosa, H57c casi sin potencia (solo vería un 
 - OKX se protege mejor (liquida con un promedio de 30 segundos), pero su precio de partida es un solo instante.
 - Lancé el Estudio 57 para medir si ese juego también afecta a nuestras señales de BTC en los minutos :00, :05, :10…
 - La grabación del libro de OKX sigue funcionando sola. Nada cambió en el bot. Solo demo.
+
+## 2026-11-10 (autónoma)
+
+Tema del martes: estrategias de otras personas con historial verificado. Según docs/10 (idea 2), en la nube ya no se
+puede avanzar ahí (las páginas de cuentas no abren y hace falta el CSV completo en sesión local), así que se tomó la
+idea pendiente con trabajo listo: el resultado del Estudio 57 (idea 6).
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes. Cola: el Estudio 57 corrió en GitHub (2026-11-09 12:36 UTC), sin documentar.
+- Registro diario: último archivo de BTC 2026-11-08 (el del 9 entrará cuando GitHub lance la ejecución atrasada, ítems
+  46 y 57). Libro de OKX: grabaciones seguidas (última iniciada 2026-11-10 02:45 UTC). Canales: captura de las 09:41 UTC.
+
+**Estudio 57 (documentado mecánicamente en docs/01):** H57a (más volumen en los 10 s antes de cada marca de 5 min desde
+febrero) **PASA** (D +0,037, p Holm 0,0015; placebo 10 veces menor); H57b (reversión) **PASA** pero es débil: sale sobre
+todo de que los demás minutos cambiaron; H57c (nuestro GBM empeora en M5 desde febrero) **NO PASA** (−0,9 pts, p 0,21).
+*Post hoc*: el GBM acierta menos en entradas M5 en los dos periodos (55,0 % frente a 56,2 %; 55,5 % frente a 57,7 %).
+
+**Estudio nuevo: Estudio 58** (pre-registro 6eb87ec; código y pruebas en el commit siguiente): confirmar esa brecha con
+las señales registradas de H16b (2026-10-26 → 2027-01-18), una sola vez, tras el 2027-01-19. Potencia baja (~25–40 %).
+
+**Pendientes con fecha**
+- 2026-11-11: comprobar que el registro del 9 y 10 de noviembre llegó.
+- Sesión local con Fredy: precios de entrada del blitz en la demo (ideas 1 y 1b); CSV de cuentas verificadas (idea 2).
+- 2027-01-19: confirmaciones únicas (incluido el 58) y apertura del registro; 2027-01-31: canales; 2027-04-27: Estudio 56.
+
+**Para Fredy**
+- El estudio de ayer confirmó algo curioso: desde febrero, en Binance se mueve mucho más dinero en los 10 segundos antes
+  de las horas :00, :05, :10… Encaja con el «juego» de los contratos de 5 minutos de Polymarket.
+- Nuestras señales de BTC no se dañaron por eso. Pero parece que aciertan un poco menos cuando la entrada cae en esos
+  minutos. Eso lo vi mirando los datos, así que no vale todavía: lo comprobaremos en enero con las señales nuevas.
+- Nada cambió en el bot. Solo demo.

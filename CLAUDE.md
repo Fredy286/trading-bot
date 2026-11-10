@@ -312,6 +312,9 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    - **Estudio 57 (2026-11-09, rutina):** ¿la manipulación del cierre de los contratos de 5 min de Polymarket (preprint de
      Stanford/SMU, arXiv 2606.31675) dejó huella en Binance (flujo y reversión en ±10 s de las marcas de 5 min) y empeoró el
      GBM de BTC al entrar en ellas? Pre-registro 8459934, código 01b8835; en la cola de GitHub.
+   - **Estudio 57 (2026-11-10): H57a/H57b PASAN, H57c no.** Desde febrero de 2026, más volumen en Binance en los 10 s antes
+     de cada marca de 5 min; nuestro GBM no empeoró por eso. *Post hoc*: acierta menos al entrar en :00/:05… (−1–2 pts).
+     **Estudio 58** pre-registrado (confirmación con señales registradas de H16b, una vez tras el 2027-01-19; `tbot research study58`).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
