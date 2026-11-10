@@ -4529,3 +4529,91 @@ cambios del mercado en febrero de 2026 también caerían en D (no prueba causa).
 - Si H57a o H57b pasan y H57c no: anotar en docs/03 (OKX) y docs/10 que la partida de OKX cae en un instante
   empujado; sin cambios en el bot.
 - Si nada pasa: idea cerrada en docs/10.
+
+### Resultado del Estudio 57 (2026-11-10; ejecutado en GitHub Actions el 2026-11-09 12:36 UTC, código 01b8835, `results/estudio57/resultado.json`; aplicado mecánicamente): H57a y H57b PASAN, H57c NO PASA
+
+D = (M5 − otras)_DESPUÉS − (M5 − otras)_ANTES; bootstrap de días (164 antes, 231 después); Holm sobre las 3.
+
+| Hipótesis | M5 − otras, antes | M5 − otras, después | D [IC 95 %] | p (Holm) | Veredicto |
+|---|---|---|---|---|---|
+| H57a cuota de flujo en los últimos 10 s | +0,0041 | +0,0409 | **+0,0369** [+0,032; +0,042] | 0,0015 | **PASA** |
+| H57b reversión en ±10 s | +0,0090 | +0,0497 | **+0,0407** [+0,025; +0,057] | 0,0015 | **PASA** |
+| H57c acierto del GBM al entrar en M5 | −1,16 pts | −2,10 pts | −0,94 pts [−3,1; +1,2] | 0,21 | NO PASA (potencia mínima cumplida: 6 465 y 5 032 M5 sin empate) |
+
+**Informativo:**
+- Flujo, mes a mes (M5 − otras): +0,001 a +0,006 de septiembre de 2025 a enero de 2026; **+0,025 en febrero, +0,070 en
+  marzo**, +0,04–0,06 de abril a julio, y baja a +0,008/+0,021 en agosto y septiembre. Placebo (2025-11-27):
+  D = +0,0035 (diez veces menor). Cuartos de hora frente a otras M5: +0,011 (el salto es de todas las marcas de 5 min,
+  no solo de los cuartos).
+- Reversión: la serie mensual salta también en febrero (+0,069) y se mantiene hasta julio. **Ojo:** la media en M5
+  después es −0,003 (casi neutra), no una reversión clara; D sale positivo sobre todo porque los **demás** minutos se
+  volvieron más «de continuación» (−0,018 → −0,053). Placebo: D = −0,027 (signo contrario).
+- GBM de BTC 1 min, operaciones y EV (pago 85 %):
+
+  | Periodo | M5: ops / acierto / EV | Otras: ops / acierto / EV |
+  |---|---|---|
+  | Antes | 7 014 / 54,99 % / +0,016 | 28 252 / 56,15 % / +0,035 |
+  | Después | 5 598 / 55,54 % / +0,025 | 22 503 / 57,65 % / +0,059 |
+
+  Placebo de H57c: D = −3,3 pts (p 0,008): en la primera mitad del periodo ANTES no había diferencia (57,0 % frente a
+  56,9 %), y en la segunda (2025-11-27 → 2026-02-12) M5 51,7 % frente a 55,0 %. Cuartos frente a otras M5: −3,2 pts
+  (p 0,054).
+
+**Lectura honesta:**
+- En Binance sí hay huella desde febrero de 2026: más volumen en los 10 s antes de cada marca de 5 min, justo cuando
+  dicen los resúmenes del artículo, y se va apagando desde agosto. No prueba que sea manipulación (otros cambios del
+  mercado de febrero también caerían en D), pero la fecha y la forma encajan.
+- La «reversión» es más débil de lo que parece: lo que cambió es sobre todo el resto de los minutos.
+- Nuestro modelo **no** empeoró en M5 *por* febrero (H57c no pasa). Pero, mirando los números (esto es *post hoc*), el
+  GBM acierta **menos en las entradas M5 en los dos periodos** (−1,2 y −2,1 pts; EV por operación más o menos la
+  mitad). El placebo muestra que esa brecha no es pareja: aparece desde finales de noviembre de 2025. Es una hipótesis
+  nueva, no un hallazgo: solo se puede probar con datos nuevos (Estudio 58).
+- Consecuencia pre-registrada (H57a/H57b pasan, H57c no): anotarlo en docs/03 (OKX) y docs/10; sin cambios en el bot.
+
+## Estudio 58 — confirmación: ¿las señales de BTC que entran en una marca de 5 min aciertan menos? (pre-registro, 2026-11-10, ANTES de mirar ningún acierto posterior al 2026-10-25)
+
+**Origen:** observación *post hoc* del Estudio 57 (sección anterior). El GBM base de BTC 1 min acertó menos cuando su
+entrada caía en un minuto múltiplo de 5 («M5»: :00, :05, :10…) en los dos periodos medidos: 54,99 % frente a 56,15 %
+(2025-09 → 2026-02-11) y 55,54 % frente a 57,65 % (2026-02-12 → 2026-09-30); EV por operación más o menos la mitad.
+Mecanismo posible: desde febrero de 2026 hay más volumen justo antes de esas marcas (H57a), lo que añade ruido al
+precio de entrada. Como se vio mirando los datos, solo puede probarse con datos nuevos y una sola vez.
+
+**Datos:** las señales registradas cada día por la nube del modelo congelado `BTCUSDT-anticipada-k50-L10-35b764`
+(H16b: aviso en el segundo 50 de la vela `vela`, clic a +10 s, juicio con Binance), `results/registro/btc/*.jsonl`
+con `vela` de 2026-10-26 00:00 a 2027-01-18 23:59 UTC; resultado «gana», «pierde» o «empate» (las que no tengan
+resultado se excluyen). Es otro modelo que el del Estudio 57 (el GBM base); eso se declara como debilidad.
+
+**Definición:** la entrada de la señal de la vela t ocurre en t + 60 s (segundo 50 + 10 s), es decir, en la apertura
+del minuto siguiente. **M5** si (minuto de t + 1) es múltiplo de 5; **O** el resto. Acierto sin empates.
+
+**Hipótesis única (α = 0,05 unilateral):** **H58:** acierto(O) − acierto(M5) > 0.
+
+**Estadístico:** D = acierto(O) − acierto(M5). Valor p por bootstrap de días UTC completos (10 000 remuestreos,
+semilla 12345): p = (nº de D* ≤ 0 + 1) / 10 001; IC 95 % por percentiles.
+
+**Criterios (todos):**
+1. p < 0,05;
+2. EV por operación de «solo O» > EV de todas las señales (pago 85 %, empate reembolsado);
+3. ≥ 500 señales M5 sin empate. Si no se llega, se amplía la ventana con días seguidos ya registrados, de 7 en 7, hasta
+   el 2027-04-26; entonces se evalúa con lo que haya y, si sigue sin llegar, queda «sin datos suficientes».
+
+**Informativo (no decide):** lo mismo con p ≥ 0,60; cuartos de hora frente a las demás M5; ganancia total
+(EV × operaciones) de todas frente a solo O; serie semanal de D.
+
+**Potencia declarada:** con ~65 señales por día (conteo de `tbot registro resumen`, sin aciertos) y ~20 % en M5, en
+84 días habría ~1 100 M5 y ~4 400 O. El error típico de D es ~1,7 puntos: una diferencia real de 1,6–2,1 puntos (la
+vista en desarrollo) se detectaría solo con probabilidad ~25–40 %. Un «no pasa» será «no confirmado», no «refutado».
+
+**Por qué no otras señales:** el blitz registra ~8 señales por día (no llega a 500 M5); las de OKX empiezan todas en
+una marca de 5 min por diseño (no hay grupo de comparación); ETH (Estudio 35) casi no da señales.
+
+**Expectativa:** dudosa (potencia baja; observación *post hoc*; en la primera mitad del periodo ANTES la brecha no
+existía; otro modelo).
+
+**Consecuencia:**
+- Si pasa: el modo de práctica podría marcar «entrada en :00/:05…: mejor no operar» como aviso informativo, con un
+  cambio documentado y sin tocar el modelo congelado.
+- Si no pasa: idea cerrada como «no confirmada» en docs/10.
+
+**Evaluación:** una sola vez, después del 2027-01-19 (sello del registro), con `tbot research study58`, que se niega a
+correr antes y si falta el archivo de algún día de la ventana (igual que el Estudio 49).

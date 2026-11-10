@@ -133,6 +133,13 @@ Pedido del usuario después de comprobar que el blitz de ETH de IQ Option es OTC
 | **OKX «Event Contracts»** | **Sí: índice de OKX** (OKX 25 %, Binance 25 %, Bybit 18,75 %, Coinbase 18,75 %, Bitget 12,5 %) | **5 y 15 min** (BTC, ETH, SOL), ventanas fijas (:00, :05…); se compra antes de que empiece la ventana | Antes de la ventana se compra a 0,51–0,52 USDT y se cobra 1 USDT si se acierta. Comisión del tomador = 0,045 × P × (1 − P) (~0,011 a P = 0,52); sin comisión de liquidación desde el 2026-05-06 → **equilibrio ≈ 52,1–53,1 %** | **Aparecen para la cuenta del usuario en Colombia** (comprobado el 2026-11-07); exige «Modo de futuros». Sin SFC; podrían considerarse juego (Coljuegos) | **La mejor candidata. Estudio 54 PASA** (ETH 55,9 %, BTC 56,5 % a 5 min con aviso anticipado); confirmación: Estudio 55 |
 | Binance «Event Contracts» (abril de 2026) | Probablemente (precio de Binance) | Sin detalles públicos encontrados | — | — | Pendiente |
 
+**Nota del 2026-11-10 (Estudio 57, docs/01):** en el contado BTC/USDT de Binance, desde febrero de 2026 hay más volumen
+en los 10 s anteriores a cada marca de 5 min (:00, :05, :10…) que en los demás minutos (+0,037 de cuota, muy
+significativo; se va apagando desde agosto). La **partida** de los contratos de OKX se fija en un solo instante justo
+en esas marcas, así que puede caer en un precio empujado. La liquidación (media de 30 s de un índice de 5 bolsas) está
+mejor protegida. No cambia nada del bot: las señales de OKX ya se midieron con esa misma partida (Estudio 54) y se
+confirman con datos nuevos (Estudios 55 y 56).
+
 **Datos de OKX verificados con su API pública (sin cuenta):**
 - series `ETH-UPDOWN-5MIN`, `BTC-UPDOWN-5MIN`, `SOL-UPDOWN-5MIN` y las de 15 min;
 - partida = índice al comenzar la ventana; liquidación = media de los 30 cierres de 1 s antes del vencimiento (comprobado
