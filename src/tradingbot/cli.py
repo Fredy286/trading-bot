@@ -485,6 +485,13 @@ def cmd_research_study49(a) -> int:
     return 0
 
 
+def cmd_research_study58(a) -> int:
+    from .research import study58
+
+    study58.run()
+    return 0
+
+
 def cmd_research_study56(a) -> int:
     from .research import study56
 
@@ -1048,6 +1055,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study26)
     x = r.add_parser("study49", help="Estudio 49: confirmación del filtro de racha (solo después del 2027-01-19)")
     x.set_defaults(func=cmd_research_study49)
+    x = r.add_parser("study58", help="Estudio 58: entradas M5 de las señales de BTC (solo después del 2027-01-19)")
+    x.set_defaults(func=cmd_research_study58)
     x = r.add_parser("study56", help="Estudio 56: señales de OKX al precio real del libro (enero: desde el "
                                      "2027-01-19; abril: desde el 2027-04-27)")
     x.add_argument("--mirada", choices=["enero", "abril"], required=True)
