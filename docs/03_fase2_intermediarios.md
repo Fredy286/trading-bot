@@ -198,6 +198,13 @@ para leerlos, y el tipo de orden volvió a «Mercado».
        ≤ 0,53, pero «A la baja» a menudo solo 0,3–3 entre las 15 y las 18 UTC.
      - **Conclusión práctica:** a buen precio solo se pueden comprar montos muy pequeños, de unos pocos dólares por
        aviso, y a veces nada.
+   - **Dentro de la ventana** (libro grabado el 2026-11-11, `results/okx_dentro/`, 2 505 fotos):
+     - casi nunca hay precios útiles en ETH, SOL ni en los contratos de 15 min;
+     - en **BTC a 5 min, al segundo 60**, el diferencial es ≤ 0,10 en el 77 % de las ventanas (mediana 0,05);
+     - en el 54 % de las ventanas hay un favorito a 0,60–0,90 con unos 10 contratos;
+     - en los segundos 150, 240 y 285 el libro vuelve a abrirse.
+
+     Base del Estudio 62.
    - **Dentro de la ventana el diferencial se abre.** Por ejemplo, 0,43/0,52 en BTC a los 11 s, y 0,38/0,48 en ETH.
    - **Primer caso de libro inclinado con una señal.** A las 23:59:50 (Bogotá) el modelo de BTC dijo «Al alza» con
      p = 0,56. El libro ya vendía «Al alza» a 0,55 y «A la baja» a 0,52, o sea, inclinado **igual** que el modelo. El

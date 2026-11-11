@@ -315,6 +315,21 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
    - **Estudio 57 (2026-11-10): H57a/H57b PASAN, H57c no.** Desde febrero de 2026, más volumen en Binance en los 10 s antes
      de cada marca de 5 min; nuestro GBM no empeoró por eso. *Post hoc*: acierta menos al entrar en :00/:05… (−1–2 pts).
      **Estudio 58** pre-registrado (confirmación con señales registradas de H16b, una vez tras el 2027-01-19; `tbot research study58`).
+   - **Búsqueda del 2026-11-10/11 (pedido: «busca más estrategias»; pre-registros 4760414 y ac1cabf):**
+     - **Estudio 59 (Polymarket como espejo): NO PASA.** Al abrir cada ventana de 5 min, Polymarket ya cobraba 0,555 por
+       el lado de nuestras señales, que acertaban 56,8 % (ganancia +0,014, p 0,10; correlación 0,71). Aviso fuerte de
+       selección adversa: la ventaja solo existe frente a quien cotiza sin mirar lo mismo (lo decide el Estudio 56).
+       Conjunto kachoio (CC0) en data/raw/polymarket_5m/.
+     - **Estudio 60 (OKX 15 min, ETH y BTC):** modelos congelados ETHUSDT-okx15-6a2d32 y BTCUSDT-okx15-765c4c;
+       registro `okx15_eth`/`okx15_btc` desde el 2026-10-26 (ETH 7,8/día, BTC 11,4/día). Dos miradas: enero (α 0,01) y
+       abril (α 0,04). `tbot okx entrenar --dur 15`; `tbot research study60 --mirada …`.
+     - **Estudio 61 (Solana en OKX, 5 y 15 min): desarrollo.** Índice SOL-USDT de OKX descargado (27 meses).
+     - **Libro DENTRO de la ventana** (`live/okx_libro_dentro.py`, en la misma cadena de GitHub, `results/okx_dentro/`,
+       desde el 2026-11-11): casi nunca hay precios útiles, salvo **BTC 5 min al segundo 60** (diferencial ≤ 0,10 en
+       77 % de las ventanas; favorito a 0,60–0,90 con ~10 contratos en 54 %).
+     - **Estudio 62 (pre-registro ac1cabf): el favorito dentro de la ventana** (BTC 5 min, segundo 60; sesgo visto en
+       Polymarket, *post hoc*). Ventanas del 2026-11-12 al 12-11; evaluación única desde el 2026-12-13
+       (`tbot research study62`). Sería operable a mano: un minuto de margen.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.

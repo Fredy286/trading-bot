@@ -166,8 +166,10 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     mercado suele dejar 0,52/0,48 fijos, y eso es lo que el Estudio 56 tiene que confirmar.
 - **Sesgo del favorito dentro de la ventana (exploración *post hoc* del Estudio 59):** en Polymarket, el lado que va
   ganando gana +3 a +11 puntos más de lo que dice su precio, más cerca del final.
-  - En OKX, dentro de la ventana casi no hay libro (primera foto: 0,97/0,03).
-  - Se graba desde el 2026-11-11 (`results/okx_dentro/`) para decidir en una semana.
+  - En OKX, dentro de la ventana casi no hay libro, salvo BTC 5 min al segundo 60 (diferencial ≤ 0,10 en 77 % de las
+    ventanas; favorito a 0,60–0,90 con ~10 contratos en 54 %; libro del 2026-11-11, sin resultados).
+  - **Estudio 62** (pre-registro ac1cabf): comprar ese favorito al segundo 60. Ventanas del 2026-11-12 al 12-11;
+    se evalúa una vez desde el 2026-12-13. Si pasa, sería la primera señal operable con un minuto de margen.
 - **Más contratos de OKX (2026-11-10):**
   - **15 min, ETH y BTC (Estudio 60):** modelos congelados y registro diario (`okx15_eth`, `okx15_btc`). Confirmación en
     enero (α 0,01) y abril (α 0,04).
