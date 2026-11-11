@@ -506,6 +506,13 @@ def cmd_research_study61(a) -> int:
     return 0
 
 
+def cmd_research_study62(a) -> int:
+    from .research import study62
+
+    study62.run()
+    return 0
+
+
 def cmd_research_study59(a) -> int:
     from .research import study59
 
@@ -1088,6 +1095,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study60)
     x = r.add_parser("study61", help="Estudio 61: Solana en los contratos de OKX, 5 y 15 min (desarrollo)")
     x.set_defaults(func=cmd_research_study61)
+    x = r.add_parser("study62", help="Estudio 62: el favorito dentro de la ventana en OKX (BTC 5 min; desde el "
+                                     "2026-12-13)")
+    x.set_defaults(func=cmd_research_study62)
     x = r.add_parser("study59", help="Estudio 59: ¿Polymarket ya cobraba la información del modelo? (5 min, BTC y ETH)")
     x.set_defaults(func=cmd_research_study59)
     x = r.add_parser("study56", help="Estudio 56: señales de OKX al precio real del libro (enero: desde el "

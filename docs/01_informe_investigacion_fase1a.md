@@ -4788,3 +4788,57 @@ los altos, baratos. Datos de BTC y ETH, marzo–mayo de 2026, libros con diferen
 - **Primera foto real (2026-11-11 03:07 UTC):** a mitad de la ventana, BTC 0,97/0,03 y ETH 0,99/0,48. Dentro de la
   ventana casi nadie cotiza en OKX. Si sigue así, la idea no sirve allí. Se decide con una semana de datos y, si hay
   libro, con un pre-registro propio.
+
+## Estudio 62 — el favorito dentro de la ventana en OKX: comprar al que va ganando al minuto 1 (BTC, 5 min) (pre-registro, 2026-11-11, ANTES de unir ningún libro de dentro de la ventana con su resultado)
+
+**Por qué.** Hay dos indicios, ninguno confirmado:
+- **Polymarket** (nota exploratoria del Estudio 59, *post hoc*): dentro de la ventana, el lado que va ganando gana más
+  de lo que dice su precio (+3 a +5 puntos al minuto 1 con precios de 0,70–0,90). Varios bots públicos lo explotan.
+- **OKX** (libro grabado el 2026-11-11, solo libro, sin resultados): dentro de la ventana casi nunca hay precios
+  útiles, salvo en **BTC a 5 min al segundo 60**:
+  - diferencial ≤ 0,10 en 108 de 140 ventanas;
+  - en 76 de 140 había un favorito a 0,60–0,90, con unos 10 contratos;
+  - en los segundos 150, 240 y 285, y en ETH, SOL y 15 min, casi nunca.
+
+Sería una operación con un minuto de margen y no 7 segundos, mucho más fácil a mano.
+
+**Datos:**
+- **Fotos:** las de `results/okx_dentro/` grabadas por GitHub («fuente» = github), contrato `BTC-UPDOWN-5MIN`, foto
+  del segundo 60. Ventanas del **2026-11-12 00:00 al 2026-12-11 23:55 UTC** (30 días). Si una ventana tiene dos
+  fotos, cuenta la primera por nombre de archivo.
+- **Resultado:** el oficial de OKX (`outcome`) que el mismo grabador guarda en `*_resultados.jsonl`. Las ventanas sin
+  resultado se excluyen y se cuentan.
+- **No cuentan** las fotos del 2026-11-11, cuyo libro ya se miró.
+
+**Regla (fijada aquí):**
+1. En la foto del segundo 60, el diferencial de «Al alza» (mejor venta − mejor compra) es ≤ 0,10.
+2. **Favorito:** «Al alza» si el precio medio es ≥ 0,5; si no, «A la baja», que cuesta 1 − cada compra de «Al alza».
+3. Se compra **1 contrato** del favorito, recorriendo el libro, solo si su mejor precio está entre 0,60 y 0,90 y el
+   contrato completo cuesta ≤ 0,90.
+4. Ganancia = 1 si el favorito gana − precio − comisión del tomador 0,045 × precio × (1 − precio).
+
+**Hipótesis H62 (α = 0,05):** la ganancia media por contrato es mayor que 0.
+
+**Criterios (todos):**
+1. ≥ 300 operaciones;
+2. p < 0,05, unilateral, con aproximación normal;
+3. el cuantil 5 % de la media en 10 000 remuestreos por días UTC (semilla 62) es mayor que 0.
+
+Con menos de 300 operaciones: «SIN CONCLUSIÓN».
+
+**Informativo:**
+- por tramo de precio (0,60–0,70, 0,70–0,80, 0,80–0,90);
+- la misma regla al precio medio (sin pagar el diferencial);
+- calibración de OKX: frecuencia de «Al alza» frente al precio medio, en cada segundo grabado, con diferencial ≤ 0,10;
+- horario del usuario (02–06 UTC);
+- cobertura (ventanas con foto del segundo 60 frente a 8 640).
+
+**Potencia:** con ~70 operaciones por día habrá ≈ 2 100 en 30 días. Una ganancia real de +0,02 por contrato
+(desviación ~0,43) se detectaría con probabilidad ~70 %; una de +0,03, con ~95 %.
+
+**Evaluación:** una sola vez, desde el 2026-12-13, con `tbot research study62`. Se niega a correr antes y dos veces.
+
+**Consecuencia:**
+- **Si pasa:** se pre-registra una confirmación con datos nuevos y se diseña un aviso de práctica al minuto 1, siempre
+  sin dinero real sin autorización expresa.
+- **Si no pasa:** el sesgo del favorito no sirve en OKX.
