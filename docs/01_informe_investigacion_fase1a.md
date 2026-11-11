@@ -4771,3 +4771,20 @@ más bajo (53,12 %) y el precio es el índice de OKX.
   la ventana. Es un aviso fuerte de selección adversa: la ventaja solo existe frente a quien cotiza sin mirar lo mismo.
   - En OKX el creador de mercado suele dejar 0,52/0,48 fijos (docs/03, 2.3), lo que sería favorable.
   - Pero si se inclina justo cuando el modelo tiene razón, la ventaja desaparece. Lo decidirá el Estudio 56.
+
+**Nota exploratoria del Estudio 59 (2026-11-10, *post hoc*, no decide nada).** Dentro de la ventana, el lado que va
+ganando en Polymarket gana más veces de lo que dice su precio. Es el sesgo del favorito: los precios bajos están caros y
+los altos, baratos. Datos de BTC y ETH, marzo–mayo de 2026, libros con diferencial ≤ 0,05:
+
+| Segundo de la ventana | Precio medio ~0,65 | ~0,75 | ~0,85 |
+|---|---|---|---|
+| 60 | gana 65,7 % (+0,9) | 78,0 % (+3,4) | 88,6 % (+4,6) |
+| 240 | 68,8 % (+3,6) | 79,0 % (+3,7) | 87,8 % (+2,4) |
+| 285 (15 s antes del final) | 76,0 % (+10,7) | 83,7 % (+8,6) | 91,7 % (+6,0) |
+
+- Es lo que explotan varios bots públicos («comprar al que va ganando al final»).
+- Para OKX haría falta su libro dentro de la ventana, que OKX no publica. Desde el 2026-11-11 lo graba
+  `live/okx_libro_dentro.py`, en el mismo flujo de GitHub y aparte del Estudio 56.
+- **Primera foto real (2026-11-11 03:07 UTC):** a mitad de la ventana, BTC 0,97/0,03 y ETH 0,99/0,48. Dentro de la
+  ventana casi nadie cotiza en OKX. Si sigue así, la idea no sirve allí. Se decide con una semana de datos y, si hay
+  libro, con un pre-registro propio.

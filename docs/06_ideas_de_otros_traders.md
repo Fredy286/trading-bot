@@ -167,6 +167,22 @@ nada:
 | Bieganowski y Ślepaczuk, *Explainable Patterns in Cryptocurrency Microstructure* (arXiv 2602.00776, 2026). Libro de órdenes y operaciones de futuros de Binance cada segundo, 2022–2025 | El desequilibrio del flujo de órdenes y el diferencial explican el rendimiento de corto plazo de forma parecida en BTC, LTC, ETC y otras | Apoya usar el desequilibrio comprador/vendedor de las velas de 1 s (`s_tib`, ya en el Estudio 50). El libro de órdenes completo no está en los archivos públicos que usamos |
 | Descubrimiento de precio entre futuros de CME y contado de Binance (arXiv 2506.08718, 2025) | Los futuros de CME van ~0,05 s por delante del contado de Binance | Demasiado rápido para una operación manual |
 
+## 3e. Bots públicos de los contratos de 5 min de Polymarket (2026-11-10)
+
+Búsqueda pedida por el usuario («busca más estrategias»). Ninguno publica resultados verificados; se desarmó qué
+explota cada uno:
+
+| Bot (GitHub) | Qué hace | Qué medimos |
+|---|---|---|
+| AllAboutAI-YT/polymarket_bot_beginner; jmazzini/5m-poly-bot | Compra el lado que va ganando en los últimos segundos | En Polymarket (marzo–mayo de 2026) el favorito gana más de lo que dice su precio: +6 a +11 puntos con 15 s por delante (*post hoc*, docs/01, nota del Estudio 59). En OKX, dentro de la ventana casi no hay libro (0,97/0,03): se está midiendo |
+| Novals83/5min-btc-polymarket | Entra con ~2 min por delante si BTC ya se movió 70–100 USD | Es el mismo sesgo del favorito, más temprano (+3 a +4 puntos a los 150–240 s en Polymarket) |
+| dearolaf/Polymarket-BTC-5Minutes-Trading-Bot; Josh-Alot/polymarket_5min_bot | Velas y libro de Coinbase o Binance para adivinar la dirección antes de la ventana | Es lo que hace nuestro modelo. **Estudio 59:** al abrir la ventana, Polymarket ya cobraba casi toda esa información (0,555 por un lado que acierta 56,8 %) |
+| AI-Degen-69/polymarket-btc-updown-bot | Kelly para el tamaño de apuesta | No cambia la ganancia esperada; ya está en docs/08 (P5) |
+
+**Lección:** en un mercado con muchos bots, la información de los últimos segundos ya está en el precio al empezar
+la ventana. La ventaja solo existe frente a quien cotiza sin mirarla, o en sesgos de comportamiento como el del
+favorito, que necesitan alguien dispuesto a vender en la ventana.
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:

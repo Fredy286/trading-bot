@@ -44,8 +44,21 @@ from .blitz import CORTO, BlitzLoop
 
 DUR = 5
 SERIES = {"ETHUSDT": "ETH-UPDOWN-5MIN", "BTCUSDT": "BTC-UPDOWN-5MIN"}
+SERIES15 = {"ETHUSDT": "ETH-UPDOWN-15MIN", "BTCUSDT": "BTC-UPDOWN-15MIN"}  # Estudio 60
 MODELOS = {"ETHUSDT": (Path("config/modelos/ETHUSDT_okx5.pkl"), Path("config/senal_okx5_eth.json")),
            "BTCUSDT": (Path("config/modelos/BTCUSDT_okx5.pkl"), Path("config/senal_okx5_btc.json"))}
+MODELOS15 = {"ETHUSDT": (Path("config/modelos/ETHUSDT_okx15.pkl"), Path("config/senal_okx15_eth.json")),
+             "BTCUSDT": (Path("config/modelos/BTCUSDT_okx15.pkl"), Path("config/senal_okx15_btc.json"))}
+REGISTRO = {5: "Estudio 55 (pre-registro 1067c6f): modelo congelado de OKX 5 min para la confirmación y la práctica",
+            15: "Estudio 60 (pre-registro 4760414): modelo congelado de OKX 15 min para la confirmación"}
+
+
+def serie(symbol: str, dur: int = 5) -> str:
+    return (SERIES if dur == 5 else SERIES15)[symbol]
+
+
+def modelos(dur: int = 5) -> dict:
+    return MODELOS if dur == 5 else MODELOS15
 PRECIO_REF = 0.52   # compra antes de la ventana (Estudio 54)
 PRECIO_MAX = 0.53   # por encima, no se avisa
 K_TOMADOR = 0.045   # comisión del tomador por acción = K × P × (1 − P) (OKX, desde el 2026-05-06)
@@ -71,14 +84,14 @@ def margen_equivalente(precio: float = PRECIO_REF, ev_accion: float = 0.02) -> f
 def inst_id(symbol: str, ventana: pd.Timestamp, dur: int = DUR) -> str:
     """Nombre del contrato en OKX: la fecha y las horas van en UTC+8 (p. ej., ETH-UPDOWN-5MIN-261108-0650-0655)."""
     hk = pd.Timestamp(ventana).tz_convert("UTC").tz_localize(None) + pd.Timedelta(hours=8)
-    return f"{SERIES[symbol]}-{hk:%y%m%d}-{hk:%H%M}-{hk + pd.Timedelta(minutes=dur):%H%M}"
+    return f"{serie(symbol, dur)}-{hk:%y%m%d}-{hk:%H%M}-{hk + pd.Timedelta(minutes=dur):%H%M}"
 
 
 # ----------------------------------------------------------------------------------------------- entrenamiento
-def train_frozen_okx(symbol: str, log=print,
-                     registro: str = "Estudio 55 (pre-registro 1067c6f): modelo congelado de OKX 5 min para la confirmación y la práctica") -> dict:
-    """Entrena UNA vez el modelo del Estudio 54 (5 min) con los 12 meses hasta el 2026-10-25."""
-    out, reg = MODELOS[symbol]
+def train_frozen_okx(symbol: str, log=print, registro: str | None = None, dur: int = DUR) -> dict:
+    """Entrena UNA vez el modelo del Estudio 54 (5 o 15 min) con los 12 meses hasta el 2026-10-25."""
+    registro = registro or REGISTRO[dur]
+    out, reg = modelos(dur)[symbol]
     if out.exists():
         raise FileExistsError(f"{out} ya existe: el modelo se entrena una sola vez (pre-registro).")
     bars_all, tab_all, cl = s54.inputs(symbol)
@@ -100,23 +113,23 @@ def train_frozen_okx(symbol: str, log=print,
         sec = pd.concat([cur, nxt]).sort_index()
         sec = sec[~sec.index.duplicated(keep="last")]
         if len(rows) and not sec.empty:
-            y[rows] = s54.settle_labels(idx[rows], DUR, ix, bars["c"], sec.index, sec.to_numpy(float))
-    known = (idx + pd.Timedelta(minutes=DUR + 3)) <= TRAIN_END
+            y[rows] = s54.settle_labels(idx[rows], dur, ix, bars["c"], sec.index, sec.to_numpy(float))
+    known = (idx + pd.Timedelta(minutes=dur + 3)) <= TRAIN_END
     ok = (idx >= TRAIN_START) & known & X.notna().all(axis=1).to_numpy() & ~np.isnan(y)
     rows = np.flatnonzero(ok)
     cut = idx[rows[int(len(rows) * (1 - CALIB_FRAC))]].floor("D")
-    fit = ok & (idx < cut - pd.Timedelta(minutes=DUR + 3))
+    fit = ok & (idx < cut - pd.Timedelta(minutes=dur + 3))
     cal = ok & (idx >= cut)
     model, (pc,) = fit_predict_proba("gbm", X[fit], (y[fit] == 1).astype(int), [X[cal]], seed=2024,
                                      max_rows=400_000, features=list(X.columns))
     calib = Calibrator().fit(pc, (y[cal] == 1).astype(int))
     bundle = {"model": model, "calibrator": calib, "features": list(X.columns), "k": K, "latencia": LAT,
-              "duracion_min": DUR, "q": 0.0, "train_start": str(TRAIN_START), "train_end": str(TRAIN_END),
+              "duracion_min": dur, "q": 0.0, "train_start": str(TRAIN_START), "train_end": str(TRAIN_END),
               "calib_desde": str(cut), "n_ajuste": int(fit.sum()), "n_calibracion": int(cal.sum()),
               "payout": pago_equivalente(), "ev_margin": margen_equivalente(), "precio_ref": PRECIO_REF,
-              "symbol": symbol, "serie": SERIES[symbol],
+              "symbol": symbol, "serie": serie(symbol, dur),
               "precio": f"índice de OKX {s54.SIMBOLOS[symbol]['indice']} (resultado oficial del contrato)",
-              "model_id": f"{symbol}-okx5-{uuid.uuid4().hex[:6]}"}
+              "model_id": f"{symbol}-okx{dur}-{uuid.uuid4().hex[:6]}"}
     out.parent.mkdir(parents=True, exist_ok=True)
     with open(out, "wb") as fh:
         pickle.dump(bundle, fh)

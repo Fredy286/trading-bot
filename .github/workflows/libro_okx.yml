@@ -60,13 +60,22 @@ jobs:
           python-version: "3.11"
       - run: pip install requests
       - name: Grabar el libro
-        run: python -m tradingbot.live.okx_libro --horas "${{ github.event.inputs.horas || '5.8' }}" --salida results/okx_libro --fuente github
+        run: |
+          H="${{ github.event.inputs.horas || '5.8' }}"
+          # Aparte y en paralelo: el libro DENTRO de cada ventana (okx_libro_dentro.py, desde el 2026-11-11). Si falla,
+          # no toca la grabación del Estudio 56.
+          python -m tradingbot.live.okx_libro_dentro --horas "$H" --salida results/okx_dentro --fuente github > dentro.log 2>&1 &
+          DENTRO=$!
+          python -m tradingbot.live.okx_libro --horas "$H" --salida results/okx_libro --fuente github
+          wait $DENTRO || echo "La grabación dentro de la ventana falló (no afecta al Estudio 56)"
+          tail -3 dentro.log || true
       - name: Guardar en la rama
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add results/okx_libro/ 2>/dev/null || exit 0
+          git add results/okx_libro/ 2>/dev/null || true
+          git add results/okx_dentro/ 2>/dev/null || true
           git commit -m "Libro de OKX $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]" || exit 0
           for i in 1 2 3 4 5 6; do
             git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break

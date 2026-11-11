@@ -492,6 +492,20 @@ def cmd_research_study58(a) -> int:
     return 0
 
 
+def cmd_research_study60(a) -> int:
+    from .research import study60
+
+    study60.run(a.mirada)
+    return 0
+
+
+def cmd_research_study61(a) -> int:
+    from .research import study61
+
+    study61.run()
+    return 0
+
+
 def cmd_research_study59(a) -> int:
     from .research import study59
 
@@ -949,13 +963,17 @@ def cmd_okx(a) -> int:
     if a.accion == "entrenar":
         for s in simbolos:
             try:
-                meta = okx_eventos.train_frozen_okx(s)
+                meta = okx_eventos.train_frozen_okx(s, dur=a.dur)
             except FileExistsError as exc:
                 print(exc)
                 continue
             print(json.dumps({k: meta[k] for k in ("model_id", "model_sha256", "n_ajuste", "n_calibracion")},
                              ensure_ascii=False))
         return 0
+    if a.dur != 5:
+        print("El modo de práctica solo existe para los contratos de 5 min; los de 15 min están en confirmación "
+              "(Estudio 60).")
+        return 2
     bundles = []
     for s in simbolos:
         try:
@@ -1064,6 +1082,12 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study49)
     x = r.add_parser("study58", help="Estudio 58: entradas M5 de las señales de BTC (solo después del 2027-01-19)")
     x.set_defaults(func=cmd_research_study58)
+    x = r.add_parser("study60", help="Estudio 60: confirmación de OKX 15 min (enero: desde el 2027-01-19; abril: "
+                                     "desde el 2027-04-27)")
+    x.add_argument("--mirada", choices=["enero", "abril"], required=True)
+    x.set_defaults(func=cmd_research_study60)
+    x = r.add_parser("study61", help="Estudio 61: Solana en los contratos de OKX, 5 y 15 min (desarrollo)")
+    x.set_defaults(func=cmd_research_study61)
     x = r.add_parser("study59", help="Estudio 59: ¿Polymarket ya cobraba la información del modelo? (5 min, BTC y ETH)")
     x.set_defaults(func=cmd_research_study59)
     x = r.add_parser("study56", help="Estudio 56: señales de OKX al precio real del libro (enero: desde el "
@@ -1252,6 +1276,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="libro: graba el libro de órdenes antes de cada ventana (Estudio 56; en GitHub lo hace "
                         ".github/workflows/libro_okx.yml)")
     x.add_argument("--horas", type=float, default=1.0, help="con «libro»: cuántas horas grabar")
+    x.add_argument("--dur", type=int, choices=[5, 15], default=5,
+                   help="duración del contrato en minutos (15: modelos del Estudio 60, solo «entrenar»)")
     x.add_argument("--eth", action="store_true", help="ETH (por defecto si no se elige ninguna)")
     x.add_argument("--btc", action="store_true", help="BTC")
     x.add_argument("--runtime", default="runtime/okx")
