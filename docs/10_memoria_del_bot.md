@@ -173,7 +173,7 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 - **Más contratos de OKX (2026-11-10):**
   - **15 min, ETH y BTC (Estudio 60):** modelos congelados y registro diario (`okx15_eth`, `okx15_btc`). Confirmación en
     enero (α 0,01) y abril (α 0,04).
-  - **Solana (Estudio 61):** desarrollo con la receta del 54.
+  - **Solana (Estudio 61): NO PASA** (5 min 54,3 % [52,3 %]; 15 min 53,1 %). Cerrada, como en IQ Option.
 
 - **Literatura de microestructura, 2.ª pasada (2026-11-11, solo resúmenes):** el desequilibrio del flujo de órdenes a
   1 s predice el retorno de muy corto plazo (Bieganowski y Ślepaczuk, https://arxiv.org/abs/2602.00776), pero eso ya
@@ -210,5 +210,6 @@ siguen, pero dependen de anotaciones del usuario. Los números de las ideas no c
 | Confirmación de ETH con umbral | Pre-registrada y con modelo congelado (Estudio 35); se evalúa tras el 2027-01-18 |
 | Estrategias de «ChatGPT» elegidas por su prueba sobre el pasado | Estudio 45: no destacan después |
 | Blitz de Solana (receta del 42) | Estudio 53: NO PASA (2026-11-07) |
+| Solana en los contratos de OKX (5 y 15 min) | Estudio 61: NO PASA (2026-11-11) |
 | Blitz de ETH en IQ Option | Allí solo hay ETH/USD (OTC), precio propio de la plataforma; el Estudio 51 pasa con el precio real pero no aplica |
 | Blitz «continuo» (decidir cada 10 s en vez de una vez por minuto) | Estudio 50: NO PASA (2026-11-07). Queda solo la idea de una 2.ª decisión en el segundo 40, para datos nuevos |

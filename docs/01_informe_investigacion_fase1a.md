@@ -4842,3 +4842,18 @@ Con menos de 300 operaciones: «SIN CONCLUSIÓN».
 - **Si pasa:** se pre-registra una confirmación con datos nuevos y se diseña un aviso de práctica al minuto 1, siempre
   sin dinero real sin autorización expresa.
 - **Si no pasa:** el sesgo del favorito no sirve en OKX.
+
+### Resultado del Estudio 61 (2026-11-11, aplicado mecánicamente): Solana NO PASA en OKX
+
+| Hipótesis | Operaciones | Acierto [Wilson 95 %] | p | EV por acción [IC 97,5 %] | Meses con EV > 0 | Veredicto |
+|---|---|---|---|---|---|---|
+| H61a, 5 min | 2 366 (5,6/día) | 54,27 % [52,26 %] | 0,137 | +0,011 [−0,017; +0,039] | 67 % | **NO PASA** (p, Wilson, IC) |
+| H61b, 15 min | 1 021 (2,4/día) | 53,09 % [50,02 %] | 0,52 | −0,000 [−0,031; +0,035] | 45 % | **NO PASA** |
+
+**Informativo:**
+- horario del usuario: 5 min, 57,6 % en 271 señales; 15 min, 55,0 % en 160. Es *post hoc*;
+- con umbrales altos casi no hay señales (p ≥ 0,57: 157; p ≥ 0,60: 23);
+- el 36 % de las señales de SOL caen en una ventana con señal de ETH o BTC.
+
+**Consecuencia:** Solana queda cerrada también en OKX, como en el blitz de IQ Option (Estudio 53). No se hace
+confirmación.

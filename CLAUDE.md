@@ -323,7 +323,7 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - **Estudio 60 (OKX 15 min, ETH y BTC):** modelos congelados ETHUSDT-okx15-6a2d32 y BTCUSDT-okx15-765c4c;
        registro `okx15_eth`/`okx15_btc` desde el 2026-10-26 (ETH 7,8/día, BTC 11,4/día). Dos miradas: enero (α 0,01) y
        abril (α 0,04). `tbot okx entrenar --dur 15`; `tbot research study60 --mirada …`.
-     - **Estudio 61 (Solana en OKX, 5 y 15 min): desarrollo.** Índice SOL-USDT de OKX descargado (27 meses).
+     - **Estudio 61 (Solana en OKX): NO PASA.** 5 min: 54,27 % [52,26 %], EV +0,011 (p 0,14); 15 min: 53,09 %. Cerrada.
      - **Libro DENTRO de la ventana** (`live/okx_libro_dentro.py`, en la misma cadena de GitHub, `results/okx_dentro/`,
        desde el 2026-11-11): casi nunca hay precios útiles, salvo **BTC 5 min al segundo 60** (diferencial ≤ 0,10 en
        77 % de las ventanas; favorito a 0,60–0,90 con ~10 contratos en 54 %).
