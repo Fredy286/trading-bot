@@ -173,6 +173,12 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     enero (α 0,01) y abril (α 0,04).
   - **Solana (Estudio 61):** desarrollo con la receta del 54.
 
+- **Literatura de microestructura, 2.ª pasada (2026-11-11, solo resúmenes):** el desequilibrio del flujo de órdenes a
+  1 s predice el retorno de muy corto plazo (Bieganowski y Ślepaczuk, https://arxiv.org/abs/2602.00776), pero eso ya
+  lo usamos (Estudio 15, aviso anticipado) y el flujo de minutos anteriores no sirvió (Estudio 3). No volver a buscar
+  «order flow imbalance» para el modelo de 1 min: lo único nuevo serían variables del libro, sin historial público
+  del contado de Binance.
+
 ## Ideas pendientes (prioridad de arriba abajo; repriorizado el 2026-11-08)
 
 Repriorización del 2026-11-08: OKX (Estudios 54–56) pasa a ser la vía principal, porque liquida con precio real, cobra

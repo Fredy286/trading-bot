@@ -813,3 +813,53 @@ las señales registradas de H16b (2026-10-26 → 2027-01-18), una sola vez, tras
 - Nuestras señales de BTC no se dañaron por eso. Pero parece que aciertan un poco menos cuando la entrada cae en esos
   minutos. Eso lo vi mirando los datos, así que no vale todavía: lo comprobaremos en enero con las señales nuevas.
 - Nada cambió en el bot. Solo demo.
+
+## 2026-11-11 (autónoma)
+
+Tema del miércoles: mejorar el modelo de BTC 1 min (aviso en el segundo 50) o el de ETH.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes. Cola vacía; todo lo hecho ya está documentado (Estudio 57 incluido).
+- Registro diario: llegaron el 9 y el 10 de noviembre en los 9 registros (conteos con `tbot registro resumen`, sin
+  aciertos; p. ej. okx_btc 347 señales en 16 días, okx15_btc 182, okx15_eth 124).
+- Libro de OKX: grabaciones seguidas (última iniciada 2026-11-11 01:45 UTC, guardada a las 07:29). La carpeta
+  `results/okx_dentro/` aún no existe: es lo esperado, porque la grabación de las 01:45 empezó antes de que se añadiera
+  el grabador «dentro de la ventana» (commit 095d635, 03:12 UTC). La grabación en curso (desde ~07:30 UTC) es la
+  primera con ese grabador; se guarda hacia las 13:15 UTC.
+- Estudio 61 (Solana en OKX): el código existe, pero falta el índice de SOL (se descarga en la sesión local). No se puso
+  en la cola: el comando fallaría sin esos datos.
+
+**Búsquedas (solo resúmenes del buscador; no abrí los textos completos):**
+1. Bieganowski y Ślepaczuk, «Explainable Patterns in Cryptocurrency Microstructure» (https://arxiv.org/abs/2602.00776):
+   libros y operaciones de perpetuos de Binance a 1 s (2022 → 2025-10); el desequilibrio del flujo de órdenes predice
+   el retorno de muy corto plazo de forma casi monótona y estable entre monedas. **Nada nuevo para nosotros:** la
+   presión de compra/venta dentro del minuto ya es la pieza del Estudio 15 (velas de 1 s) y del aviso anticipado; el
+   flujo de órdenes de minutos anteriores ya falló (Estudio 3). Lo único distinto serían variables del libro, y
+   Binance no publica el historial del libro del contado.
+2. Informe de Delphic Alpha (https://delphicalpha.substack.com/p/crypto-orderflow-alpha-report-feb, no revisado por
+   pares): las señales de flujo se apagan más lento que las del libro y los costos mandan. Coincide con lo nuestro.
+3. Documento de trabajo con 8,7 M de operaciones agregadas de Binance a velas de 1 min
+   (https://vankyle00.github.io/trading-models/docs/models/03-order-flow-imbalance-btc.html): parece un resultado
+   negativo, no lo pude confirmar.
+4. Análisis de los mercados de 5 y 15 min de BTC en Polymarket (https://viktoriatsybko.substack.com/p/polymarket-predicts-btc-direction):
+   el acierto sigue al precio del mercado y, tras comisiones, es difícil ganar. Coincide con el Estudio 59.
+
+**Estudio nuevo: ninguno.** No encontré una idea realmente distinta para el modelo de BTC/ETH 1 min. Lo aprendido
+(docs/10) dice que las variables nuevas mejoran el log-loss pero no la política, y las palancas que funcionan
+(confianza, precio de liquidación, más monedas) ya están en estudios abiertos (21, 48/49, 54–56, 60, 61). La idea
+pendiente de mayor prioridad (1c, decidir antes en OKX) debe esperar al libro grabado, y las 0(a), 1 y 1b dependen de
+anotaciones del usuario o ya están hechas (el modelo del blitz ya usa variables del precio compuesto: `c_r1`, `c_r3`,
+`c_disp`). No forcé un estudio.
+
+**Pendientes con fecha**
+- 2026-11-12: comprobar que `results/okx_dentro/` llegó con la grabación de las ~07:30 UTC del 11; si no, revisar el
+  registro del flujo (`dentro.log`).
+- Sesión local con Fredy: índice de SOL de OKX y ejecución del Estudio 61; precios de entrada del blitz (ideas 1 y 1b).
+- 2027-01-19: confirmaciones únicas y apertura del registro; 2027-01-31: canales; 2027-04-27: Estudio 56 (abril).
+
+**Para Fredy**
+- Hoy revisé artículos nuevos sobre cómo se mueve el precio de BTC segundo a segundo. Dicen lo mismo que ya
+  encontramos: la presión de compra o venta de los últimos segundos ayuda un poco, y los costos se comen casi todo.
+- No encontré una mejora nueva que valga la pena probar, así que hoy no lancé ningún estudio (mejor eso que inventar).
+- Todo lo automático sigue funcionando: el registro diario llegó hasta el 10 de noviembre y el libro de OKX se graba.
+- Nada cambió en el bot. Solo demo.
