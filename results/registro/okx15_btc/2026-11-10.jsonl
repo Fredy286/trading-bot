@@ -1,0 +1,2 @@
+{"ventana": "2026-11-10T03:30:00+00:00", "instrumento": "BTC-UPDOWN-15MIN-261110-1130-1145", "lado": "Up", "p": 0.5551, "ev_accion": 0.0239, "horario_usuario": true, "resultado": "pierde", "fuente": "oficial", "partida": 74661.9, "liquidacion": 74425.652, "modelo": "BTCUSDT-okx15-765c4c"}
+{"ventana": "2026-11-10T22:15:00+00:00", "instrumento": "BTC-UPDOWN-15MIN-261111-0615-0630", "lado": "Down", "p": 0.5553, "ev_accion": 0.0241, "horario_usuario": false, "resultado": "gana", "fuente": "oficial", "partida": 73927.7, "liquidacion": 73672.933, "modelo": "BTCUSDT-okx15-765c4c"}
