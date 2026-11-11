@@ -492,6 +492,13 @@ def cmd_research_study58(a) -> int:
     return 0
 
 
+def cmd_research_study59(a) -> int:
+    from .research import study59
+
+    study59.run()
+    return 0
+
+
 def cmd_research_study56(a) -> int:
     from .research import study56
 
@@ -1057,6 +1064,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study49)
     x = r.add_parser("study58", help="Estudio 58: entradas M5 de las señales de BTC (solo después del 2027-01-19)")
     x.set_defaults(func=cmd_research_study58)
+    x = r.add_parser("study59", help="Estudio 59: ¿Polymarket ya cobraba la información del modelo? (5 min, BTC y ETH)")
+    x.set_defaults(func=cmd_research_study59)
     x = r.add_parser("study56", help="Estudio 56: señales de OKX al precio real del libro (enero: desde el "
                                      "2027-01-19; abril: desde el 2027-04-27)")
     x.add_argument("--mirada", choices=["enero", "abril"], required=True)

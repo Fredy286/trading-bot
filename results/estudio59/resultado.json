@@ -1,0 +1,77 @@
+{
+  "ventanas_unidas": 25468,
+  "principal": {
+    "operaciones": 2141,
+    "acierto": 0.5684259691732835,
+    "precio_medio": 0.5545305931807567,
+    "ganancia_media": 0.013895375992526847,
+    "p_modelo_media": 0.5658251685623904,
+    "p_valor": 0.09721295336243763,
+    "limite_inferior_5": -0.004699540259066521,
+    "criterios": {
+      "min_500": true,
+      "p_menor_005": false,
+      "limite_mayor_0": false
+    }
+  },
+  "pasa": false,
+  "correlacion_rangos_p_vs_mercado": {
+    "todas": 0.46728870008584167,
+    "senales": 0.7114466982208402
+  },
+  "logistica": {
+    "coef_mercado": 1.0414038225753535,
+    "coef_modelo": 0.2626795448244206,
+    "ic95_coef_modelo": [
+      0.0412343507732215,
+      0.49784410431354964
+    ]
+  },
+  "mas_tarde": {
+    "+10s": {
+      "operaciones": 2142,
+      "acierto": 0.5681605975723623,
+      "precio_medio": 0.5308823529411765,
+      "ganancia_media": 0.03727824463118581,
+      "p_modelo_media": 0.5658199548625659
+    },
+    "+30s": {
+      "operaciones": 2142,
+      "acierto": 0.5681605975723623,
+      "precio_medio": 0.5305415499533147,
+      "ganancia_media": 0.03761904761904763,
+      "p_modelo_media": 0.5658199548625659
+    },
+    "+60s": {
+      "operaciones": 2142,
+      "acierto": 0.5681605975723623,
+      "precio_medio": 0.5390989729225023,
+      "ganancia_media": 0.029061624649859945,
+      "p_modelo_media": 0.5658199548625659
+    }
+  },
+  "por_moneda": {
+    "BTCUSDT": {
+      "operaciones": 572,
+      "acierto": 0.5437062937062938,
+      "precio_medio": 0.5391608391608391,
+      "ganancia_media": 0.00454545454545454,
+      "p_modelo_media": 0.5624480508083665
+    },
+    "ETHUSDT": {
+      "operaciones": 1569,
+      "acierto": 0.5774378585086042,
+      "precio_medio": 0.560133843212237,
+      "ganancia_media": 0.017304015296367103,
+      "p_modelo_media": 0.5670563421476689
+    }
+  },
+  "coincidencia_polymarket_okx": 0.9511936547824721,
+  "estudio": "Estudio 59 — ¿Polymarket ya cobraba la información del modelo? (pre-registro 4760414)",
+  "precio_de_referencia": "primer tick entre el inicio y 5 s después (el conjunto no trae ticks previos)",
+  "periodo": [
+    "2026-03-24 22:10:00+00:00",
+    "2026-05-18 10:30:00+00:00"
+  ],
+  "git_sha": "4760414ab4548e6968dd9e6460323fdeba262a10"
+}

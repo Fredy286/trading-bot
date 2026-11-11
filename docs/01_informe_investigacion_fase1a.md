@@ -4747,3 +4747,27 @@ más bajo (53,12 %) y el precio es el índice de OKX.
 **Consecuencia:**
 - **si pasa:** se pre-registra una confirmación con datos posteriores al 2026-10-25 (modelos congelados y registro);
 - **si no pasa:** Solana queda cerrada también en OKX.
+
+### Resultado del Estudio 59 (2026-11-10, aplicado mecánicamente)
+
+- **Datos:**
+  - 25 468 ventanas unidas, del 2026-03-24 al 2026-05-18;
+  - el conjunto no trae precios antes del inicio. Según la regla del pre-registro, el precio de referencia es el
+    primer tick al empezar la ventana, segundo 0.
+- **H59 NO PASA:**
+  - 2 141 señales; acierto con el resultado de Polymarket 56,8 %;
+  - **precio medio pagado por el lado de la señal: 0,5545**;
+  - ganancia +0,014 por acción, p = 0,097, límite inferior del 5 % −0,005;
+  - por moneda: BTC 572 señales, 54,4 % a 0,539 (+0,005); ETH 1 569, 57,7 % a 0,560 (+0,017).
+- **Informativo:**
+  - correlación de rangos entre la p del modelo y el precio del mercado: 0,47 en todas las ventanas y **0,71 en las
+    señales**;
+  - regresión logística: coeficiente del mercado 1,04 (precio bien calibrado). El del modelo es 0,26 [0,04; 0,50]:
+    aporta algo, pero poco, una vez conocido el precio;
+  - comprando 10 o 30 s después del inicio, el mismo lado costaba 0,531 (ganancia +0,037), y a los 60 s, 0,539
+    (+0,029). El precio del segundo 0 sale inflado y se desinfla en segundos. Es *post hoc*;
+  - el resultado de Polymarket (Chainlink) coincide con la etiqueta de OKX en el 95,1 % de las ventanas.
+- **Lectura (la fijada de antemano):** un mercado competido ya cobraba casi toda la información del modelo al empezar
+  la ventana. Es un aviso fuerte de selección adversa: la ventaja solo existe frente a quien cotiza sin mirar lo mismo.
+  - En OKX el creador de mercado suele dejar 0,52/0,48 fijos (docs/03, 2.3), lo que sería favorable.
+  - Pero si se inclina justo cuando el modelo tiene razón, la ventaja desaparece. Lo decidirá el Estudio 56.
