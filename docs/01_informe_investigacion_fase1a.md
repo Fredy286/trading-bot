@@ -4617,3 +4617,133 @@ existía; otro modelo).
 
 **Evaluación:** una sola vez, después del 2027-01-19 (sello del registro), con `tbot research study58`, que se niega a
 correr antes y si falta el archivo de algún día de la ventana (igual que el Estudio 49).
+
+## Estudio 59 — ¿el mercado ya sabía lo que sabe nuestro modelo? Polymarket 5 min, BTC y ETH, marzo–mayo de 2026 (pre-registro, 2026-11-10, ANTES de descargar los datos de Polymarket)
+
+**Pedido del usuario (2026-11-10):** «busca más estrategias a ver qué más encontramos».
+
+**Por qué.** El mayor riesgo de los contratos de OKX es la selección adversa (Estudio 56): si quien pone los precios ya
+usa la misma información que el modelo, el lado de la señal costaría más justo cuando el modelo acierta. El Estudio 56
+lo medirá con el libro de OKX en enero y en abril. Hay una forma de adelantarse con datos que ya existen:
+- Polymarket tiene el mismo contrato («BTC/ETH Up or Down 5 min»), con muchos más participantes y bots.
+- Un conjunto público (kachoio, `polymarket-5-minute-crypto-up-down-markets`, licencia CC0) trae su libro segundo a
+  segundo: BTC del 2026-03-24 al 2026-05-18 y ETH del 2026-04-05 al 2026-05-18.
+- Para esas mismas ventanas ya tenemos las predicciones fuera de muestra del Estudio 54
+  (`results/estudio54/predicciones.parquet`, 5 min). Nunca se unieron con Polymarket.
+
+**Datos:**
+- `btc_markets/ticks` y `eth_markets/ticks` del conjunto, en `data/raw/polymarket_5m/` (no versionado). Por mercado:
+  `market_start`, `outcome` (Up/Down; las filas sin resultado se excluyen); por segundo: mejor compra y venta de
+  «Up» (`bu`, `au`) y de «Down» (`bd`, `ad`).
+- Predicción: la del Estudio 54 para la ventana que empieza en `market_start` (decisión en el segundo 50 del minuto
+  anterior, la misma regla del Estudio 55: p − 0,5312 ≥ 0,02).
+- **Precio de referencia:**
+  - si el conjunto trae ticks antes de `market_start` en al menos el 80 % de los mercados, el último tick entre 10 y
+    3 s antes del inicio (lo que tendría el usuario);
+  - si no, el primer tick entre el inicio y 5 s después. Eso favorece al mercado, que ya vio 10 s más que el modelo.
+- Se excluyen las ventanas sin tick en ese tramo o sin venta en el lado de la señal.
+
+**Hipótesis H59 (ETH y BTC juntos, α = 0,05):** comprando el lado de la señal a la venta de Polymarket en el precio de
+referencia, la ganancia media por acción (1 si acierta − precio pagado, sin comisión) es mayor que 0.
+
+**Criterios (todos):**
+1. ≥ 500 señales con precio;
+2. p < 0,05, unilateral, con aproximación normal;
+3. el cuantil 5 % de la media en 10 000 remuestreos por días UTC (semilla 59) es mayor que 0.
+
+**Informativo:**
+- correlación de rangos entre la p del modelo y el precio medio de «Up» en el mercado, en todas las ventanas y en las
+  señales;
+- precio medio pagado frente al acierto de las señales;
+- regresión logística del resultado con el precio del mercado y la p del modelo (coeficiente del modelo, IC por días);
+- la misma ganancia comprando 10, 30 y 60 s después del inicio;
+- por moneda;
+- coincidencia entre el resultado de Polymarket (Chainlink) y la etiqueta de OKX del Estudio 54.
+
+**Interpretación fijada de antemano:**
+- **Si pasa:** un mercado mucho más competido no tenía en cuenta la información del modelo al empezar la ventana. Es una
+  buena señal para OKX, cuyo creador de mercado casi siempre cotiza 0,52/0,48. No reemplaza al Estudio 56.
+- **Si no pasa,** pero el acierto sigue siendo ~56 %: el mercado ya cobraba esa información. Aviso fuerte de selección
+  adversa también para OKX.
+
+**Evaluación:** una vez (datos ya cerrados), con `tbot research study59`.
+
+## Estudio 60 — confirmación de los contratos de 15 min de OKX, ETH y BTC (pre-registro, 2026-11-10, ANTES de entrenar los modelos congelados de 15 min y de calcular ninguna señal de 15 min posterior al 2026-10-25)
+
+**Por qué.** Son más señales con la misma ventaja. En el desarrollo del Estudio 54 se calcularon también, como
+información, los contratos de 15 min:
+- ETH: 56,9 % [55,2 %], 7,8 señales por día;
+- BTC: 56,2 % [54,0 %], 4,7 por día;
+- en los dos casos frente a un equilibrio de 53,1 %.
+
+OKX los tiene (`ETH-UPDOWN-15MIN` y `BTC-UPDOWN-15MIN`; lista de series del 2026-11-10). Sus ventanas empiezan en :00,
+:15, :30 y :45, y la liquidación es la media de los 60 cierres de 1 s antes del vencimiento.
+
+**Modelos congelados (ETH y BTC):**
+- la receta del Estudio 54 a 15 min: decisión en el segundo 50 del minuto anterior a cada ventana;
+- entrenada una sola vez con los 12 meses que terminan el 2026-10-25;
+- el último 20 % para calibrar, purga de 18 min, semilla 2024;
+- `tbot okx entrenar --dur 15 --eth --btc`. El SHA-256 queda en `config/senal_okx15_eth.json` y `_btc.json`.
+
+**Datos:**
+- todas las ventanas de 15 min desde el 2026-10-26;
+- resultado oficial de OKX cuando la API lo guarda. Si no, la etiqueta reconstruida (media de 60 s), igual que en el
+  Estudio 55;
+- registro diario en `results/registro/okx15_eth/` y `okx15_btc/`, sellado hasta el 2027-01-19 como los demás.
+
+**Costo y política:** 0,52 + comisión del tomador = 0,5312. Se opera si p − 0,5312 ≥ 0,02.
+
+**Hipótesis H60 (ETH y BTC juntos, para tener potencia):** el acierto de las señales es mayor que 53,12 %. Es lo mismo
+que pedir ganancia media por acción mayor que 0.
+
+**Dos miradas, cada una una sola vez (Bonferroni, total 0,05):**
+- **enero:** ventanas del 2026-10-26 al 2027-01-18, α = 0,01, desde el 2027-01-19;
+- **abril:** ventanas hasta el 2027-04-26, α = 0,04, desde el 2027-04-27, y solo si enero no pasó.
+
+**Criterios (todos, en cada mirada):**
+1. ≥ 300 señales con resultado;
+2. p < α, unilateral (binomial frente a 53,12 %);
+3. el cuantil α de la ganancia media por acción en 10 000 remuestreos por semanas ISO (semilla 60) es mayor que 0.
+
+Antes de calcular se comprueba que estén todos los días del registro (ítem 54).
+
+**Informativo:** por moneda; horario del usuario; solo filas con resultado oficial; con p ≥ 0,58.
+
+**Potencia:**
+- unas 12,5 señales por día en desarrollo: ≈ 1 060 en enero y ≈ 2 290 en abril;
+- con el acierto del desarrollo (~56,6 %, ganancia +0,035), la potencia es ~48 % en enero y ~95 % en abril.
+
+**Consecuencia:**
+- **si pasa:** los avisos de 15 min se suman al modo de práctica, siempre sin dinero real sin autorización expresa;
+- **si no pasa:** sin señal a 15 min.
+
+## Estudio 61 — Solana en los contratos de OKX, 5 y 15 min: desarrollo (pre-registro, 2026-11-10, ANTES de descargar el índice de SOL de OKX y de calcular nada de SOL con el índice)
+
+**Por qué.** Más señales. OKX tiene `SOL-UPDOWN-5MIN` y `SOL-UPDOWN-15MIN`. En el blitz de IQ Option, Solana no pasó
+(Estudio 53: 55,2 % con p ≥ 0,57, límite inferior 52,1 %, frente a un equilibrio de 53,76 %). En OKX el equilibrio es
+más bajo (53,12 %) y el precio es el índice de OKX.
+
+**Receta:** la del Estudio 54, sin cambios, con los datos de SOL:
+- velas de 1 min y de 1 s de Binance SOLUSDT (`data/raw/estudio3/SOLUSDT`, `data/processed/estudio26/SOLUSDT/`);
+- cierres de Bybit y OKX (`data/raw/bolsas_usdt/SOLUSDT/`);
+- índice `SOL-USDT` de OKX de 1 min (API pública `history-index-candles`, 2024-08 → 2026-10);
+- mes a mes del 2025-09 al 2026-10-25, 12 meses de entrenamiento, 20 % de calibración.
+
+**Costo y política:** 0,5312 (precio 0,52 + comisión del tomador); se opera si p − 0,5312 ≥ 0,02.
+
+**Hipótesis (Bonferroni α = 0,025):**
+- **H61a:** SOL a 5 min;
+- **H61b:** SOL a 15 min.
+
+**Criterios (cada una, todos, los del Estudio 54):**
+1. ≥ 300 operaciones;
+2. p < 0,025 (binomial frente a 53,12 %);
+3. Wilson 95 % > 53,12 %;
+4. IC 97,5 % del EV por acción (bootstrap por semanas ISO) por encima de 0;
+5. EV > 0 en ≥ 60 % de los meses.
+
+**Informativo:** horario del usuario; umbrales 0,55, 0,57 y 0,60; coincidencia con las señales de ETH y BTC.
+
+**Consecuencia:**
+- **si pasa:** se pre-registra una confirmación con datos posteriores al 2026-10-25 (modelos congelados y registro);
+- **si no pasa:** Solana queda cerrada también en OKX.
