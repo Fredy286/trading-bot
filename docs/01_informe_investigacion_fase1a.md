@@ -5095,3 +5095,50 @@ propias.
 - Horario del usuario: de 1,9 a 7,3 por día (58,1 % → 56,0 %).
 
 **Consecuencia (la fijada):** se pre-registran sus confirmaciones con piezas congeladas (Estudios 68 y 69).
+
+## Estudios 68 y 69 — confirmación del gran bot del blitz de BTC y del gran bot de OKX 15 min (pre-registro, 2026-11-12, ANTES de entrenar los modelos congelados de 1 min de SOL, XRP y DOGE, de ajustar los metamodelos congelados y de calcular ninguna opinión posterior al 2026-10-25)
+
+**Piezas congeladas comunes:** las de los Estudios 55, 60 y 64:
+- OKX 5 min ETH y BTC;
+- OKX 15 min ETH y BTC;
+- BTC 1 min (H16b);
+- blitz BTC, ETH y SOL a 3 min.
+
+**Nuevas, que se entrenan una sola vez:**
+- **ETH 1 min:** el modelo congelado del Estudio 35 (ETHUSDT-anticipada-k50-L10-02b1e4).
+- **SOL, XRP y DOGE a 1 min:** la receta del Estudio 35, con los 12 meses que terminan el 2026-10-25 y las velas del
+  Estudio 26 (`tbot senal entrenar --moneda SOLUSDT|XRPUSDT|DOGEUSDT`). Sus SHA-256 quedan en
+  `config/senal_anticipada_<moneda>.json`.
+- **Metamodelos:** el del Estudio 66 (blitz, 8 opiniones) y el del 67 (OKX 15 min, 8 opiniones). Se ajustan **una
+  vez** con todas sus filas de desarrollo (2025-09-01 → 2026-10-25) y quedan en `config/gran_bot_blitz.json` y
+  `config/gran_bot_okx15.json`.
+
+**Registro diario (sellado hasta el 2027-01-19), desde el 2026-10-26:**
+- `results/registro/granblitz/`: cada vela donde opera el gran bot del blitz o la base, con las opiniones, la p de
+  cada uno, el q y el resultado. El resultado es el compuesto de 3 bolsas a 3 min, como en el Estudio 44.
+- `results/registro/gran15/`: todas las ventanas de 15 min de ETH y BTC, con el resultado oficial de OKX o, si no
+  está, el reconstruido (media de 60 s).
+
+**Reglas de operar:**
+- **blitz:** la del Estudio 44 (EV con pago 0,86 y el q del modelo congelado ≥ 0,02). Gana +0,86, pierde −1 y el
+  empate da 0;
+- **OKX 15 min:** p − 0,5312 ≥ 0,02.
+
+**Hipótesis (cada una sobre su contrato; para OKX, ETH y BTC juntos):**
+- **H68:** el gran bot del blitz gana y mejora a p42 sola;
+- **H69:** el gran bot de 15 min gana y mejora a la opinión propia de 15 min.
+
+**Criterios (cada una, todos, como el Estudio 64):**
+1. el cuantil α de la ganancia total del gran bot (10 000 remuestreos por semanas ISO) es mayor que 0;
+2. el cuantil α de ΔG frente a la base (remuestreos pareados) es mayor que 0;
+3. ≥ 300 operaciones del gran bot.
+
+**Dos miradas, cada una una sola vez:**
+- **enero:** ventanas del 2026-10-26 al 2027-01-18, α = 0,01, desde el 2027-01-19;
+- **abril:** hasta el 2027-04-26, α = 0,04, solo si enero no pasó.
+
+Semillas 68 y 69. Antes se comprueba que estén todos los días.
+
+**Consecuencia:**
+- **si pasan:** el modo de práctica del blitz (IQ Option, solo demo) y el de OKX 15 min usan su gran bot;
+- **si no:** se quedan las opiniones propias.
