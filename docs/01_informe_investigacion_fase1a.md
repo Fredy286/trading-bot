@@ -5142,3 +5142,12 @@ Semillas 68 y 69. Antes se comprueba que estén todos los días.
 **Consecuencia:**
 - **si pasan:** el modo de práctica del blitz (IQ Option, solo demo) y el de OKX 15 min usan su gran bot;
 - **si no:** se quedan las opiniones propias.
+
+**Enmienda al Estudio 68 (2026-11-12, antes de calcular ninguna opinión posterior al 2026-10-25).** La receta del
+Estudio 35 mide «sube o baja» con el tic de BTC (0,01). Con XRP y DOGE eso convierte casi todo en empate. Los modelos
+quedaron con 30 399 y 24 filas de ajuste (registro de errores 58).
+- Se borraron sin usarlos y se reentrenaron **una sola vez** con el tic de cada moneda (XRP 0,0001; DOGE 0,00001). Es
+  la etiqueta del Estudio 26, de donde salen las opiniones que aprendió el metamodelo.
+- SOL y ETH no cambian: su tic es 0,01, la misma etiqueta.
+- El metamodelo del blitz se volvió a congelar con los mismos coeficientes y la cita de los modelos correctos.
+

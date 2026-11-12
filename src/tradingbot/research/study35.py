@@ -68,3 +68,54 @@ def train_frozen_eth(root3: Path = Path("data/raw/estudio3"), work: Path = WORK,
     Path(reg).write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     log(f"Modelo {bundle['model_id']}: ajuste={fit.sum():,} calibración={cal.sum():,} q={q:.4f} sha256={sha[:12]}…")
     return meta
+
+
+def train_frozen_1min(symbol: str, root3: Path = Path("data/raw/estudio3"), log=print) -> dict:
+    """La misma receta de `train_frozen_eth` para otra moneda del Estudio 26 (SOL, XRP, DOGE): modelos congelados de
+    1 min que son opiniones del gran bot del blitz (Estudio 68, pre-registro 238985c)."""
+    work = Path("data/processed/estudio26") / symbol
+    out = Path(f"config/modelos/{symbol}_senal_anticipada_k50.pkl")
+    reg = Path(f"config/senal_anticipada_{symbol[:-4].lower()}.json")
+    if out.exists():
+        raise FileExistsError(f"{out} ya existe: el modelo se entrena una sola vez (pre-registro).")
+    m1 = pd.concat([pd.read_parquet(f) for f in sorted((work / "1m").glob("*.parquet"))])
+    spot = pd.concat([load(root3, symbol, "spot"), m1])
+    spot = spot[~spot.index.duplicated(keep="last")].sort_index()
+    bars = spot_bars(spot)
+    bars = bars[(bars.index >= TRAIN_START - pd.Timedelta(days=3)) & (bars.index < TRAIN_END)]
+    prev = compute_features(bars).shift(1)
+    tab = pd.read_parquet(work / "tabla.parquet").reindex(bars.index)
+    X = pd.concat([prev[FEATURES], partial_features(tab, bars["o"], np.exp(prev["lvol60"]), K)], axis=1)
+    # Etiqueta con el tic de precio de la moneda, como en el Estudio 26 (con el de BTC, 0,01, casi todo XRP y DOGE salía
+    # empate: registro de errores 58). Para SOL y ETH el tic es 0,01 y la etiqueta es la misma de `label`.
+    from .study26 import COINS
+    from .study26 import label as label_tic
+
+    tick = COINS[symbol]
+    y = label_tic(tab[f"Q{K + LAT}"].to_numpy(), tab[f"Q{K + LAT + 60}"].to_numpy(), tick)
+    known = (bars.index + pd.Timedelta(minutes=3)) <= TRAIN_END
+    ok = (bars.index >= TRAIN_START) & known & X.notna().all(axis=1).to_numpy() & ~np.isnan(y)
+    rows = np.flatnonzero(ok)
+    cut = bars.index[rows[int(len(rows) * (1 - CALIB_FRAC))]].floor("D")
+    fit = ok & (bars.index < cut - pd.Timedelta(minutes=3)) & (y != 0)
+    cal = ok & (bars.index >= cut) & (y != 0)
+    model, (pc,) = fit_predict_proba("gbm", X[fit], (y[fit] == 1).astype(int), [X[cal]], seed=2024,
+                                     features=list(X.columns))
+    calib = Calibrator().fit(pc, (y[cal] == 1).astype(int))
+    q = float(np.mean(y[ok & (bars.index >= cut)] == 0))
+    bundle = {"model": model, "calibrator": calib, "features": list(X.columns), "k": K, "latencia": LAT, "q": q,
+              "train_start": str(TRAIN_START), "train_end": str(TRAIN_END), "calib_desde": str(cut),
+              "n_ajuste": int(fit.sum()), "n_calibracion": int(cal.sum()), "payout": 0.85, "ev_margin": 0.02,
+              "umbral": 0.60, "symbol": symbol, "tic": tick,
+              "model_id": f"{symbol}-anticipada-k{K}-L{LAT}-{uuid.uuid4().hex[:6]}"}
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with open(out, "wb") as fh:
+        pickle.dump(bundle, fh)
+    sha = hashlib.sha256(out.read_bytes()).hexdigest()
+    meta = {k: v for k, v in bundle.items() if k not in ("model", "calibrator")}
+    meta.update({"model_file": str(out), "model_sha256": sha, "git_sha": git_sha(), "creado": utcnow().isoformat(),
+                 "registro": f"Estudio 68 (pre-registro 238985c): modelo congelado de 1 min de {symbol}, opinión del "
+                             "gran bot del blitz"})
+    reg.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    log(f"Modelo {bundle['model_id']}: ajuste={fit.sum():,} calibración={cal.sum():,} q={q:.4f} sha256={sha[:12]}…")
+    return meta

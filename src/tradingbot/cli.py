@@ -909,7 +909,12 @@ def cmd_senal(a) -> int:
 
     if a.accion == "entrenar":
         try:
-            meta = anticipada.train_frozen()
+            if a.moneda and a.moneda != "BTCUSDT":  # opiniones de 1 min del gran bot del blitz (Estudio 68)
+                from .research import study35
+
+                meta = study35.train_frozen_1min(a.moneda)
+            else:
+                meta = anticipada.train_frozen()
         except (FileExistsError, FileNotFoundError) as exc:
             print(exc)
             return 2
@@ -1320,6 +1325,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     x = sub.add_parser("senal", help="señales anticipadas en el segundo 50 para cuenta DEMO (Estudio 16)")
     x.add_argument("accion", choices=["entrenar", "vivo"])
+    x.add_argument("--moneda", default=None, choices=["SOLUSDT", "XRPUSDT", "DOGEUSDT"],
+                   help="solo con «entrenar»: modelo congelado de 1 min de otra moneda (opinión del gran bot, Estudio 68)")
     x.add_argument("--runtime", default="runtime/senales")
     x.add_argument("--iteraciones", type=int, default=0, help="0 = sin límite")
     x.add_argument("--sin-sonido", action="store_true")

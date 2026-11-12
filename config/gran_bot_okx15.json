@@ -1,0 +1,91 @@
+{
+  "coeficientes": {
+    "ETHUSDT": {
+      "constante": 0.000890240506813242,
+      "propia15": 0.17138005205382065,
+      "otra15": 0.4565297779798622,
+      "propia5": 0.5431498867474056,
+      "otra5": 0.040157882202572735,
+      "p20": -0.03151536400908153,
+      "p42": -0.04788790193176263,
+      "p51": 0.32270097204506026,
+      "p53": 0.42456587149680225
+    },
+    "BTCUSDT": {
+      "constante": 0.00011336283189142027,
+      "propia15": 0.6481489620454967,
+      "otra15": 0.107531789025108,
+      "propia5": 0.20974708722354418,
+      "otra5": 0.43825906272152976,
+      "p20": 0.14336761499247364,
+      "p42": 0.015039151392983684,
+      "p51": -0.05436884080923576,
+      "p53": 0.4764351081735222
+    }
+  },
+  "opiniones": [
+    "propia15",
+    "otra15",
+    "propia5",
+    "otra5",
+    "p20",
+    "p42",
+    "p51",
+    "p53"
+  ],
+  "filas_ajuste": {
+    "ETHUSDT": 40292,
+    "BTCUSDT": 40292
+  },
+  "periodo_ajuste": [
+    "2025-09-01",
+    "2026-10-25"
+  ],
+  "bases": {
+    "okx15_ETHUSDT": {
+      "model_id": "ETHUSDT-okx15-6a2d32",
+      "model_sha256": "10a147889d5ba7a3890492bcf15bf8cbbd314967a7023a3b1aa79b4fec06c40c",
+      "archivo": "config/modelos/ETHUSDT_okx15.pkl"
+    },
+    "okx15_BTCUSDT": {
+      "model_id": "BTCUSDT-okx15-765c4c",
+      "model_sha256": "12e85e77cba86011c5bba2515780d573b0be945397b4f97baaf830ce0b71daaa",
+      "archivo": "config/modelos/BTCUSDT_okx15.pkl"
+    },
+    "okx5_ETHUSDT": {
+      "model_id": "ETHUSDT-okx5-2fffa5",
+      "model_sha256": "7695cf9ed2d4b69142ba22202c225f4bda3454eb66052b47a1bbce2abd4058e9",
+      "archivo": "config/modelos/ETHUSDT_okx5.pkl"
+    },
+    "okx5_BTCUSDT": {
+      "model_id": "BTCUSDT-okx5-da65c6",
+      "model_sha256": "1711914a3d941b35763e3bb675a14d500df9be0e35a8aa1c09911d71b172675c",
+      "archivo": "config/modelos/BTCUSDT_okx5.pkl"
+    },
+    "p20": {
+      "model_id": "BTCUSDT-anticipada-k50-L10-35b764",
+      "model_sha256": "5ebfa4852f6857843a702596d5b82be2312a75700371e4aabebf5344a53d6157",
+      "archivo": "config/modelos/BTCUSDT_senal_anticipada_k50.pkl"
+    },
+    "p42": {
+      "model_id": "BTCUSDT-blitz3-compuesto-0f8694",
+      "model_sha256": "3eb8d05b0bfffde4acd3b589ecdedc87c85eb9dbe680fd883812a15a2ec76014",
+      "archivo": "config/modelos/BTCUSDT_blitz3_compuesto.pkl"
+    },
+    "p51": {
+      "model_id": "ETHUSDT-blitz3-compuesto-5d7319",
+      "model_sha256": "679cfa67af4a5d837421ad3fd7b29e0c32f7442311ea382d75475f5fc01971f7",
+      "archivo": "config/modelos/ETHUSDT_blitz3_compuesto.pkl"
+    },
+    "p53": {
+      "model_id": "SOLUSDT-blitz3-compuesto-675060",
+      "model_sha256": "9d5818d572582f3c92d9565b860f6286c8d132115948db18fa4cd0593bf98fdc",
+      "archivo": "config/modelos/SOLUSDT_blitz3_compuesto.pkl"
+    }
+  },
+  "costo": 0.531232,
+  "margen": 0.02,
+  "git_sha": "238985ce8b5d62383d072edc4f46001da1a32ba4",
+  "creado": "2026-11-12T00:19:57.911447+00:00",
+  "registro": "Estudios 68 y 69 (pre-registro 238985c): metamodelo congelado, ajustado una vez con todo su desarrollo"
+}

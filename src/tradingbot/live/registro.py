@@ -424,6 +424,12 @@ def run_day(day: str, root: Path = ROOT, log=print) -> dict:
 
     if gran_bot.CONFIG.exists() and all(mp.exists() for mp, _ in gran_bot.bases().values()):  # Estudio 64
         tareas.append(("gran5", gran_bot.gran5_day))
+    todas = {**gran_bot.bases(), **gran_bot.bases_extra()}
+    if all(mp.exists() for mp, _ in todas.values()):  # Estudios 68 y 69
+        if gran_bot.CONFIG_15.exists():
+            tareas.append(("gran15", gran_bot.gran15_day))
+        if gran_bot.CONFIG_BLITZ.exists():
+            tareas.append(("granblitz", gran_bot.granblitz_day))
     for name, fn in tareas:
         path = Path(root) / name / f"{day}.jsonl"
         if path.exists():
