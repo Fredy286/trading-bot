@@ -524,6 +524,13 @@ def cmd_gran(a) -> int:
     return 0
 
 
+def cmd_research_study65(a) -> int:
+    from .research import study65
+
+    study65.run()
+    return 0
+
+
 def cmd_research_study64(a) -> int:
     from .research import study64
 
@@ -1127,6 +1134,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study60)
     x = r.add_parser("study61", help="Estudio 61: Solana en los contratos de OKX, 5 y 15 min (desarrollo)")
     x.set_defaults(func=cmd_research_study61)
+    x = r.add_parser("study65", help="Estudio 65: gran bot ampliado a 10 opiniones (desarrollo)")
+    x.set_defaults(func=cmd_research_study65)
     x = r.add_parser("study64", help="Estudio 64: confirmación del gran bot (enero: desde el 2027-01-19; abril: "
                                      "desde el 2027-04-27)")
     x.add_argument("--mirada", choices=["enero", "abril"], required=True)

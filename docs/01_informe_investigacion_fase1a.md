@@ -5009,3 +5009,16 @@ de Binance:
 - **si pasa:** se pre-registra aparte su confirmación (Estudio 66), con modelos congelados de 1 min para SOL, XRP y
   DOGE entrenados una vez con datos hasta el 2026-10-25. El Estudio 64 sigue igual;
 - **si no pasa:** el gran bot se queda con 6 opiniones.
+
+### Resultado del Estudio 65 (2026-11-12, aplicado mecánicamente): NO PASA
+
+| | Operaciones por día | Acierto | Ganancia total |
+|---|---|---|---|
+| Gran bot de 6 opiniones | 73,3 | 55,94 % | +740,8 |
+| Gran bot de 10 opiniones | 81,0 | 55,97 % | +827,8 |
+
+- **H65 NO PASA:** ΔG = +87,0. El cuantil 5 % es −8,0, y el 6,7 % de los remuestreos quedan ≤ 0. La log-loss casi
+  no cambia (−0,000008).
+- **Por moneda (informativo):** ETH +82,7 (49,4 por día con 56,15 %, frente a 45,5 con 55,91 %); BTC +4,3.
+- **Consecuencia (la fijada):** el gran bot se queda con 6 opiniones. Que ETH mejore con las opiniones de 1 min de
+  otras monedas es solo una pista, para un estudio nuevo con datos nuevos.
