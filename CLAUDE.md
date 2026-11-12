@@ -330,6 +330,20 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - **Estudio 62 (pre-registro ac1cabf): el favorito dentro de la ventana** (BTC 5 min, segundo 60; sesgo visto en
        Polymarket, *post hoc*). Ventanas del 2026-11-12 al 12-11; evaluación única desde el 2026-12-13
        (`tbot research study62`). Sería operable a mano: un minuto de margen.
+   - **EL GRAN BOT (2026-11-11/12, pedido: «juntar todo en un gran bot y mejorar aunque sea poquito»):**
+     - Metamodelo logístico mes a mes que combina las opiniones fuera de muestra de nuestros modelos (todas hasta el
+       segundo 49). Código: research/study63.py, apilado.py, study66/67.py; live/gran_bot.py.
+     - **Estudio 63 (OKX 5 min, 6 opiniones): PASA el desarrollo.** De 40 a 73 señales por día (ETH + BTC) con el mismo
+       acierto (55,9 % frente a 56,1 %); ganancia total +71 %; log-loss mejor.
+     - **Estudio 65 (10 opiniones): NO PASA** (+87, lím. −8). Se queda con 6.
+     - **Estudio 66 (blitz de BTC de IQ Option, 8 opiniones): PASA.** De 36 a 77 por día, 55,3 % igual; ganancia ×2,1.
+     - **Estudio 67 (OKX 15 min, 8 opiniones): PASA.** De 14 a 50 por día, 56,9 % → 55,8 %; ganancia ×2,6.
+     - **Confirmaciones pre-registradas:** Estudios 64 (bda4760), 68 y 69 (238985c). Las piezas están congeladas
+       (`config/gran_bot_okx5.json`, `gran_bot_blitz.json`, `gran_bot_okx15.json`, más los modelos SOL blitz y SOL, XRP
+       y DOGE a 1 min). Registros diarios `gran5`, `gran15` y `granblitz` (sellados). Miradas en enero (α 0,01) y abril
+       (α 0,04).
+     - Error 58: la receta del 35 llevada a XRP y DOGE usaba el tic de BTC; se corrigió antes de usarlos.
+     - Pendiente: modo de práctica con el gran bot (falta juntar los seis u ocho modelos en el bucle en vivo).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.

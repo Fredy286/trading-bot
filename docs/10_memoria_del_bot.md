@@ -181,6 +181,18 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   «order flow imbalance» para el modelo de 1 min: lo único nuevo serían variables del libro, sin historial público
   del contado de Binance.
 
+- **El gran bot (Estudios 63–69, 2026-11-11/12): combinar opiniones SÍ sirve.**
+  - Lo que no lograron 30 herramientas de terceros lo logró juntar nuestros propios modelos. Un metamodelo simple
+    (regresión logística mes a mes) con las opiniones de BTC, ETH y SOL a 1, 3, 5 y 15 min casi duplica las señales con
+    el mismo acierto:
+    - OKX 5 min: de 40 a 73 por día;
+    - blitz: de 36 a 77;
+    - OKX 15 min: de 14 a 50.
+  - Más opiniones no siempre suman: con XRP y DOGE a 1 min (10 opiniones) no pasa.
+  - Confirmaciones en enero y abril (Estudios 64, 68 y 69).
+  - Lección: la información de otras monedas y otros plazos ya está en nuestros modelos. Sumar opiniones propias es
+    más útil que buscar herramientas nuevas.
+
 ## Ideas pendientes (prioridad de arriba abajo; repriorizado el 2026-11-08)
 
 Repriorización del 2026-11-08: OKX (Estudios 54–56) pasa a ser la vía principal, porque liquida con precio real, cobra
