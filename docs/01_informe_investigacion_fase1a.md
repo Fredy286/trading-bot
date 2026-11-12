@@ -5066,3 +5066,32 @@ Son estudios distintos con contratos distintos, así que no se corrige entre ell
 
 **Consecuencia:** si pasan, se pre-registra su confirmación con piezas congeladas. Si no, se quedan las opiniones
 propias.
+
+### Resultados de los Estudios 66 y 67 (2026-11-12, aplicados mecánicamente): los dos PASAN el desarrollo
+
+**Estudio 66, blitz de BTC de IQ Option (3 min, pago 86 %):**
+
+| | Operaciones por día | Acierto sin empates | EV por operación | Ganancia total |
+|---|---|---|---|---|
+| Base (p42) | 36,0 | 55,34 % | +0,029 | +378,4 |
+| **Gran bot del blitz** | **77,0** | **55,33 %** | +0,029 | **+802,1** |
+
+- ΔG +423,7, cuantil 5 % +149,9 (p del bootstrap 0,006): **H66 PASA**.
+- Log-loss sin empates: 0,69269 → 0,69238.
+- Horario del usuario: de 4,4 a 10,2 por día (56,7 % → 56,3 %).
+- Coeficientes de 2026-10: propia 0,40, ETH 1 min 0,32, BTC 1 min 0,25, ETH 3 min 0,21, SOL 3 min 0,19, XRP 1 min
+  0,13; SOL y DOGE a 1 min ≈ 0.
+
+**Estudio 67, OKX 15 min (ETH y BTC):**
+
+| | Operaciones por día | Acierto | EV por operación | Ganancia total |
+|---|---|---|---|---|
+| Base (propia de 15 min) | 13,9 | 56,89 % | +0,038 | +187,7 |
+| **Gran bot de 15 min** | **50,5** | **55,79 %** | +0,027 | **+484,1** |
+
+- ΔG +296,4, cuantil 5 % +159,3: **H67 PASA**.
+- Log-loss: 0,69169 → 0,69156.
+- Por moneda: ETH de 8,7 a 25,6 por día y BTC de 5,2 a 25,0.
+- Horario del usuario: de 1,9 a 7,3 por día (58,1 % → 56,0 %).
+
+**Consecuencia (la fijada):** se pre-registran sus confirmaciones con piezas congeladas (Estudios 68 y 69).
