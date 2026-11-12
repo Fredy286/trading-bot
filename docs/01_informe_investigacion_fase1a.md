@@ -4982,3 +4982,30 @@ Antes de calcular se comprueba que estén todos los días (ítem 54).
 - **si pasa:** el modo de práctica usa el gran bot en lugar de la opinión propia, siempre sin dinero real sin
   autorización expresa;
 - **si no pasa:** se queda la opinión propia.
+
+## Estudio 65 — gran bot ampliado: cuatro opiniones más (ETH, SOL, XRP y DOGE a 1 min) (pre-registro, 2026-11-12, ANTES de combinar estas opiniones)
+
+**Por qué.** El Estudio 63 mostró que sumar opiniones de otras monedas casi duplica las señales sin bajar el acierto.
+El Estudio 26 dejó predicciones fuera de muestra, mes a mes, del 2025-09 al 2026-10-25, para cuatro monedas más con
+la receta H16b. Se calculan con información hasta el segundo 49 de la vela de decisión y predicen la vela siguiente
+de Binance:
+- `data/processed/estudio26/ETHUSDT/predicciones.parquet`;
+- y lo mismo para SOLUSDT, XRPUSDT y DOGEUSDT.
+
+**Diseño:** el mismo del Estudio 63 (metamodelo logístico por moneda, mes a mes solo con el pasado, meses de prueba
+2025-11 → 2026-10-25, misma regla de operar), con 10 opiniones: las 6 del 63 más `e26_eth`, `e26_sol`, `e26_xrp` y
+`e26_doge`.
+- **Comparación:** contra el gran bot de 6 opiniones, recalculado en las mismas filas (las que tienen las 10).
+
+**Hipótesis H65 (ETH y BTC juntos, α = 0,05):** la ganancia total del gran bot de 10 opiniones supera a la del de 6.
+
+**Criterios (todos):**
+1. el cuantil 5 % de ΔG en 10 000 remuestreos pareados por semanas ISO (semilla 65) es mayor que 0;
+2. ≥ 300 operaciones.
+
+**Informativo:** Δ log-loss; por moneda; coeficientes; comparación con la base.
+
+**Consecuencia:**
+- **si pasa:** se pre-registra aparte su confirmación (Estudio 66), con modelos congelados de 1 min para SOL, XRP y
+  DOGE entrenados una vez con datos hasta el 2026-10-25. El Estudio 64 sigue igual;
+- **si no pasa:** el gran bot se queda con 6 opiniones.
