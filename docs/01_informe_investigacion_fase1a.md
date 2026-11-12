@@ -5022,3 +5022,47 @@ de Binance:
 - **Por moneda (informativo):** ETH +82,7 (49,4 por día con 56,15 %, frente a 45,5 con 55,91 %); BTC +4,3.
 - **Consecuencia (la fijada):** el gran bot se queda con 6 opiniones. Que ETH mejore con las opiniones de 1 min de
   otras monedas es solo una pista, para un estudio nuevo con datos nuevos.
+
+## Estudios 66 y 67 — el gran bot en otros contratos: blitz de BTC de IQ Option y OKX a 15 min (pre-registro, 2026-11-12, ANTES de combinar estas opiniones)
+
+Misma idea y mismo método que el Estudio 63:
+- metamodelo logístico mes a mes, solo con el pasado, desde el 2025-09-01 hasta 10 min antes del mes de prueba;
+- meses de prueba 2025-11 → 2026-10-25;
+- logits recortados a [0,01; 0,99];
+- las opiniones son predicciones fuera de muestra ya guardadas, calculadas con información hasta el segundo 49 de la
+  vela de decisión.
+
+**Estudio 66 — blitz de BTC de IQ Option (3 min, pago 86 %).**
+- **Filas:** todas las velas (decisión en el segundo 50).
+- **Ocho opiniones:**
+  - p42 (propia, Estudio 42);
+  - p51 y p53 (ETH y SOL a 3 min);
+  - p20 (BTC 1 min);
+  - e26_eth, e26_sol, e26_xrp y e26_doge (1 min, Estudio 26).
+- **Etiqueta:** la del Estudio 42 (compuesto de 3 bolsas, 3 min). El metamodelo se ajusta sin los empates.
+- **Regla de operar:** la del Estudio 42 (EV con pago 0,86 y reembolso del empate, con el q de cada fila, ≥ 0,02).
+  Gana +0,86, pierde −1 y el empate da 0.
+- **Base:** p42 sola.
+- **H66 (α = 0,05):** la ganancia total del gran bot del blitz supera a la de la base.
+
+**Estudio 67 — OKX a 15 min (ETH y BTC).**
+- **Filas:** los minutos de decisión de 15 min.
+- **Ocho opiniones:**
+  - la propia de 15 min y la de la otra moneda a 15 min (Estudio 54);
+  - la propia de 5 min y la de la otra moneda a 5 min (la ventana de 5 min empieza a la misma hora);
+  - p20, p42, p51 y p53.
+- **Etiqueta:** la del Estudio 54 a 15 min.
+- **Regla de operar:** p − 0,5312 ≥ 0,02.
+- **Base:** la propia de 15 min.
+- **H67 (ETH y BTC juntos, α = 0,05):** la ganancia total del gran bot de 15 min supera a la de la base.
+
+**Criterios (cada uno, todos):**
+1. el cuantil 5 % de ΔG en 10 000 remuestreos pareados por semanas ISO (semillas 66 y 67) es mayor que 0;
+2. ≥ 300 operaciones del gran bot.
+
+Son estudios distintos con contratos distintos, así que no se corrige entre ellos.
+
+**Informativo:** acierto y señales por día; Δ log-loss; coeficientes; horario del usuario.
+
+**Consecuencia:** si pasan, se pre-registra su confirmación con piezas congeladas. Si no, se quedan las opiniones
+propias.
