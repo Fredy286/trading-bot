@@ -4933,3 +4933,52 @@ Meses de prueba 2025-11 → 2026-10-25; ETH y BTC juntos; misma regla de operar 
   - Para BTC, la propia (0,4–0,9), BTC a 3 min y SOL a 3 min.
 
 **Consecuencia (la fijada):** se pre-registra la confirmación con el metamodelo congelado (Estudio 64).
+
+## Estudio 64 — confirmación del gran bot con datos nuevos (pre-registro, 2026-11-11, ANTES de entrenar el modelo congelado de SOL, de ajustar el metamodelo congelado y de calcular ninguna opinión posterior al 2026-10-25)
+
+**Piezas congeladas:**
+- **opiniones**: los modelos congelados que ya existen:
+  - OKX 5 min ETHUSDT-okx5-2fffa5 y BTCUSDT-okx5-da65c6 (opinión propia y de la otra moneda);
+  - BTC 1 min BTCUSDT-anticipada-k50-L10-35b764;
+  - blitz BTC BTCUSDT-blitz3-compuesto-0f8694;
+  - blitz ETH ETHUSDT-blitz3-compuesto-5d7319.
+- **SOL a 3 min:** como no tiene modelo congelado, se entrena **una sola vez** con la receta de los Estudios 51 y 53 y
+  los 12 meses que terminan el 2026-10-25 (`tbot blitz entrenar --sol`). El SHA-256 queda en
+  `config/senal_blitz_sol.json`.
+- **Metamodelo:** la regresión logística del Estudio 63, por moneda, ajustada **una vez** con todas las filas de
+  desarrollo (2025-09-01 → 2026-10-25). Los coeficientes quedan en `config/gran_bot_okx5.json`.
+
+**Datos:**
+- todas las ventanas de 5 min de ETH y BTC desde el 2026-10-26;
+- las seis opiniones de cada minuto de decisión las calcula el registro diario con los modelos congelados, en
+  `results/registro/gran5/`, sellado hasta el 2027-01-19;
+- resultado: el oficial de OKX cuando se tiene (registro y `results/okx_dentro/`); si no, el reconstruido del
+  Estudio 54.
+
+**Regla de operar (las dos versiones):** p − 0,5312 ≥ 0,02. Gana +0,4688 y pierde −0,5312.
+- **gran bot:** la probabilidad del metamodelo congelado;
+- **base:** la opinión propia congelada.
+
+**Hipótesis H64 (ETH y BTC juntos):** el gran bot gana y mejora a la base.
+
+**Criterios (todos, en cada mirada):**
+1. ganancia total del gran bot > 0: su cuantil α en 10 000 remuestreos por semanas ISO (semilla 64) es mayor que 0;
+2. ΔG = ganancia del gran bot − la de la base > 0: su cuantil α en remuestreos pareados por semanas es mayor que 0;
+3. ≥ 300 operaciones del gran bot.
+
+**Dos miradas, cada una una sola vez (Bonferroni, total 0,05):**
+- **enero:** ventanas del 2026-10-26 al 2027-01-18, α = 0,01, desde el 2027-01-19;
+- **abril:** hasta el 2027-04-26, α = 0,04, desde el 2027-04-27, y solo si enero no pasó.
+
+Antes de calcular se comprueba que estén todos los días (ítem 54).
+
+**Informativo:** por moneda; con p ≥ 0,57; horario del usuario; solo filas con resultado oficial.
+
+**Potencia** (escalando el desarrollo: ΔG ≈ +26 por mes, desviación ≈ 73 en 12 meses):
+- enero: ΔG ≈ +72 ± 35, potencia ~40 %;
+- abril: ΔG ≈ +154 ± 52, potencia ~90 %. La mirada principal es la de abril.
+
+**Consecuencia:**
+- **si pasa:** el modo de práctica usa el gran bot en lugar de la opinión propia, siempre sin dinero real sin
+  autorización expresa;
+- **si no pasa:** se queda la opinión propia.
