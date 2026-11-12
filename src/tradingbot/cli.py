@@ -506,6 +506,13 @@ def cmd_research_study61(a) -> int:
     return 0
 
 
+def cmd_research_study63(a) -> int:
+    from .research import study63
+
+    study63.run()
+    return 0
+
+
 def cmd_research_study62(a) -> int:
     from .research import study62
 
@@ -1095,6 +1102,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study60)
     x = r.add_parser("study61", help="Estudio 61: Solana en los contratos de OKX, 5 y 15 min (desarrollo)")
     x.set_defaults(func=cmd_research_study61)
+    x = r.add_parser("study63", help="Estudio 63: el «gran bot» (metamodelo de seis modelos propios, OKX 5 min)")
+    x.set_defaults(func=cmd_research_study63)
     x = r.add_parser("study62", help="Estudio 62: el favorito dentro de la ventana en OKX (BTC 5 min; desde el "
                                      "2026-12-13)")
     x.set_defaults(func=cmd_research_study62)

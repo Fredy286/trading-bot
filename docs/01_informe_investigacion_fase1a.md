@@ -4909,3 +4909,27 @@ tanto acertar más como tener más señales.
 - **si pasa:** se pre-registra una confirmación con el metamodelo congelado (ajustado con todo el desarrollo) sobre
   datos posteriores al 2026-10-25. Para eso el registro diario tendrá que guardar las seis opiniones de cada ventana;
 - **si no pasa:** el bot sigue con la opinión propia y la idea queda anotada en docs/10.
+
+### Resultado del Estudio 63 (2026-11-11, aplicado mecánicamente): el gran bot PASA el desarrollo
+
+Meses de prueba 2025-11 → 2026-10-25; ETH y BTC juntos; misma regla de operar (p − 0,5312 ≥ 0,02).
+
+| | Operaciones (por día) | Acierto | EV por operación | Ganancia total |
+|---|---|---|---|---|
+| Base (opinión propia) | 14 348 (40,0) | 56,13 % | +0,030 | +431,9 |
+| **Gran bot** | **26 330 (73,3)** | **55,94 %** | +0,028 | **+740,7** |
+
+- **H63 PASA:** ΔG = +308,8. El cuantil 5 % del bootstrap por semanas es +189,0, y ninguno de los 10 000 remuestreos
+  queda ≤ 0. El gran bot tiene ≥ 300 operaciones.
+- **Log-loss:** 0,69197 → 0,69161 (Δ −0,00035, IC 95 % [−0,00057; −0,00014]). Las probabilidades mejoran de verdad.
+- **Por moneda:**
+  - ETH: de 27,1 a 45,5 señales por día (55,96 % → 55,90 %), ΔG +177,8;
+  - BTC: de 12,9 a 27,9 por día (56,49 % → 55,99 %), ΔG +131,0.
+- **Horario del usuario:** de 5,5 a 10,3 señales por día (56,1 % → 56,2 %).
+- **Umbrales del gran bot:** con p ≥ 0,57, 31,6 por día con 57,0 % (EV +0,039); con p ≥ 0,60, 6,6 por día con 56,9 %.
+- **«Acuerdo»** (la base solo cuando la otra moneda apunta igual): 33,5 por día con 56,3 %.
+- **Coeficientes:** todas las opiniones pesan a favor, y los pesos cambian de mes a mes.
+  - Para ETH pesan más ETH a 3 min (0,5–0,8), SOL a 3 min (0,3–0,6), la opinión propia y BTC.
+  - Para BTC, la propia (0,4–0,9), BTC a 3 min y SOL a 3 min.
+
+**Consecuencia (la fijada):** se pre-registra la confirmación con el metamodelo congelado (Estudio 64).
