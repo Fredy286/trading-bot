@@ -863,3 +863,48 @@ anotaciones del usuario o ya están hechas (el modelo del blitz ya usa variables
 - No encontré una mejora nueva que valga la pena probar, así que hoy no lancé ningún estudio (mejor eso que inventar).
 - Todo lo automático sigue funcionando: el registro diario llegó hasta el 10 de noviembre y el libro de OKX se graba.
 - Nada cambió en el bot. Solo demo.
+
+## 2026-11-12 (autónoma)
+
+Tema del jueves: mejorar la reversión nocturna en divisas (21–24 UTC) o buscar mecanismos parecidos de liquidez.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes. Cola vacía; todo lo hecho está documentado.
+- `results/okx_dentro/` sí llegó (grabaciones del 2026-11-11 13:18 y 19:06 y del 2026-11-12 00:54, con sus
+  resultados). Pendiente del día anterior cerrado.
+- Registro diario: llega hasta el 2026-11-10 (conteos, sin aciertos). La corrida de hoy aún no empieza: GitHub lanza
+  este horario con 1–2 h de retraso (corridas del 9, 10 y 11 a las 16:48, 15:12 y 14:41 UTC; ítem 46). No es un fallo.
+
+**Búsquedas (solo resúmenes del buscador; las páginas de CME y del Banco de Canadá no abren desde la nube):**
+1. BidFX (https://financefeeds.com/bidfx-research-finds-liquidity-gap-in-fx-markets-between-4-pm-and-6-pm-est/):
+   entre las 16:00 y las 18:00 de Nueva York se hace menos del 0,6 % del volumen diario de divisas.
+2. CME, «When FX futures pause» (https://www.cmegroup.com/articles/2026/when-fx-futures-pause.html): en el cambio de
+   día el diferencial pasa de fracciones de pip a varios pips; minutos después se normaliza y el precio parece
+   «rebotar». Advierte que ese rebote puede ser efecto de la cotización y no un movimiento real.
+3. Krohn, Mueller y Whelan, «Foreign Exchange Fixings and Returns Around the Clock»
+   (https://topcat.aeaweb.org/conference/2020/preliminary/paper/2dedYfDH; versión del Banco de Canadá
+   https://www.bankofcanada.ca/?p=223052): reversiones prolongadas alrededor de las fijaciones; las 17:00 de NY es la
+   hora de diferencial máximo y volumen mínimo. Explotable solo si los costos lo permiten.
+4. Baltussen, Da y Soebhag (https://www3.nd.edu/~zda/EOD.pdf): reversión de fin de día en acciones de EE. UU. por
+   presión de precio. Es otro mercado.
+
+**Lectura:** encaja con el Estudio 34 (la reversión vive en los minutos de diferencial 3–60 veces lo normal). Una parte
+podría ser el diferencial que se abre y se cierra, aunque usemos precio medio. Eso ya se sabía en espíritu; la regla de
+docs/10 sigue: no mejorar la reversión hasta encontrar una plataforma real que la pague a esas horas.
+
+**Estudio nuevo: ninguno.** Medir ese efecto haría falta con ticks de HistData, que no llegan a la nube, y aunque saliera
+bien no cambiaría nada mientras no haya dónde operarla. No forcé un estudio.
+
+**Pendientes con fecha**
+- 2026-11-13: comprobar que el registro del 11 de noviembre llegó.
+- Sesión local con Fredy: precios de entrada del blitz (ideas 1 y 1b); índice de SOL ya no hace falta (Estudio 61 cerrado).
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones únicas y apertura del registro; 2027-01-31: canales; 2027-04-27:
+  Estudio 56 (abril).
+
+**Para Fredy**
+- Hoy busqué por qué funciona la «reversión nocturna» de divisas. Los estudios dicen que a las 4–5 p. m. de Bogotá
+  casi nadie opera divisas y la diferencia entre compra y venta se abre mucho.
+- Parte de lo que vemos puede ser solo esa diferencia que se abre y se cierra, no un movimiento que un bróker te pague.
+- Por eso no tiene sentido mejorarla hasta encontrar una plataforma seria que deje operar a esa hora. Hoy no lancé
+  ningún estudio.
+- Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo.

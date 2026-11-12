@@ -21,6 +21,12 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 - **La reversión nocturna vive en el diferencial abierto (Estudio 34):** se replica en 2024–25 (56,2 %; 5 min 59,6 %),
   pero el acierto sale de los minutos con diferencial 3–60 veces lo normal (60–66 %); con diferencial normal, 53–54 %.
   Antes de mejorarla, comprobar que una plataforma real pague ese movimiento.
+  **Literatura (2026-11-12, solo resúmenes del buscador):** las 17:00 de Nueva York (21 UTC en verano, 22 UTC en
+  invierno) es la hora de diferencial más alto y volumen más bajo del día (BidFX: < 0,6 % del volumen entre 16:00 y
+  18:00 de NY); CME advierte que el diferencial se abre y, minutos después, el precio «vuelve» al normalizarse. Es
+  decir, parte de nuestra reversión puede ser **efecto de la cotización** (el diferencial que se abre y se cierra), no
+  un movimiento que un bróker pague. Refuerza la regla: no mejorarla hasta tener una plataforma real que liquide con
+  precio medio a esas horas (ninguna encontrada; Deriv las bloquea).
 - **Las ventajas viven en el precio de cada fuente (Estudios 34, 36 y 37):**
   - BTC: las señales calificadas con Coinbase aciertan 52,2 % (Binance 57,6 %);
   - divisas de noche: la reversión existe en Deriv (56,4 %; 5 min 60,7 %) y en HistData, pero con señales distintas
