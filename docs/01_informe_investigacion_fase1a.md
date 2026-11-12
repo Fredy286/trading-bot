@@ -4857,3 +4857,55 @@ Con menos de 300 operaciones: «SIN CONCLUSIÓN».
 
 **Consecuencia:** Solana queda cerrada también en OKX, como en el blitz de IQ Option (Estudio 53). No se hace
 confirmación.
+
+## Estudio 63 — el «gran bot»: combinar las opiniones de todos nuestros modelos para los contratos de 5 min de OKX (pre-registro, 2026-11-11, ANTES de combinar ninguna predicción)
+
+**Pedido del usuario (2026-11-11):** «juntar todo en un gran bot de predicción… combinarlos y mejorar aún más el nuestro,
+así sea muy poquito».
+
+**Idea.** Seis modelos nuestros ya tienen predicciones fuera de muestra, mes a mes, del 2025-09 al 2026-10-25. Todas
+se calcularon con información hasta el segundo 49 de la misma vela de decisión. Ninguna mira el futuro. Son seis
+«opiniones» distintas sobre el mismo momento:
+
+| Opinión | Fuente | Qué predice |
+|---|---|---|
+| propia | Estudio 54, 5 min | el contrato de OKX de esa moneda |
+| la otra moneda | Estudio 54, 5 min | el contrato de OKX de ETH si se juzga BTC, y al revés |
+| BTC 1 min | Estudio 20 (H16b) | la vela siguiente de Binance |
+| BTC 3 min | Estudio 42 | el compuesto de 3 bolsas, 3 min |
+| ETH 3 min | Estudio 51 | lo mismo con ETH |
+| SOL 3 min | Estudio 53 | lo mismo con SOL |
+
+Un **metamodelo** (regresión logística con constante, sin penalización, una por moneda) aprende cuánto pesa cada
+opinión. Usa los logits recortados a [0,01; 0,99].
+
+**Cómo se entrena, sin mirar el futuro:**
+- mes a mes;
+- para el mes de prueba M, solo con las filas desde el 2025-09-01 hasta 10 min antes de que empiece M;
+- meses de prueba: 2025-11 → 2026-10-25 (12 meses);
+- filas: los minutos de decisión de las ventanas de 5 min, con las seis opiniones y la etiqueta del Estudio 54.
+
+**Comparación (mismas filas, misma regla de operar: p − 0,5312 ≥ 0,02; gana +0,4688, pierde −0,5312):**
+- **base:** la opinión propia sola, que es lo que hoy usa el bot;
+- **gran bot:** la probabilidad del metamodelo.
+
+**Hipótesis H63 (ETH y BTC juntos, α = 0,05):** la ganancia total del gran bot supera a la de la base. Así cuenta
+tanto acertar más como tener más señales.
+
+**Criterios (todos):**
+1. el cuantil 5 % de ΔG (ganancia total del gran bot − la de la base), con 10 000 remuestreos pareados por semanas
+   ISO (semilla 63), es mayor que 0;
+2. el gran bot tiene ≥ 300 operaciones.
+
+**Informativo:**
+- diferencia de log-loss con su IC;
+- por moneda: ΔG, acierto y señales por día;
+- coeficientes del metamodelo por mes (estabilidad);
+- «acuerdo»: la base solo cuando la otra moneda apunta igual, sin ajustar nada;
+- el gran bot con p ≥ 0,57 y 0,60;
+- horario del usuario.
+
+**Consecuencia:**
+- **si pasa:** se pre-registra una confirmación con el metamodelo congelado (ajustado con todo el desarrollo) sobre
+  datos posteriores al 2026-10-25. Para eso el registro diario tendrá que guardar las seis opiniones de cada ventana;
+- **si no pasa:** el bot sigue con la opinión propia y la idea queda anotada en docs/10.
