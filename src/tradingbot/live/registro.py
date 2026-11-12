@@ -420,6 +420,10 @@ def run_day(day: str, root: Path = ROOT, log=print) -> dict:
                                   ("okx15_btc", "BTCUSDT", okx15_btc_day, OKX_MODELOS15)):
         if mods[sym][0].exists():  # solo después de congelar su modelo (Estudios 55 y 60)
             tareas.append((nombre, fn))
+    from . import gran_bot
+
+    if gran_bot.CONFIG.exists() and all(mp.exists() for mp, _ in gran_bot.bases().values()):  # Estudio 64
+        tareas.append(("gran5", gran_bot.gran5_day))
     for name, fn in tareas:
         path = Path(root) / name / f"{day}.jsonl"
         if path.exists():

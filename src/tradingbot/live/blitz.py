@@ -54,13 +54,18 @@ MODEL_PATH = Path("config/modelos/BTCUSDT_blitz3_compuesto.pkl")
 REG_PATH = Path("config/senal_blitz.json")
 ETH_MODEL_PATH = Path("config/modelos/ETHUSDT_blitz3_compuesto.pkl")  # Estudios 51 y 52
 ETH_REG_PATH = Path("config/senal_blitz_eth.json")
-MODELOS = {"BTCUSDT": (MODEL_PATH, REG_PATH), "ETHUSDT": (ETH_MODEL_PATH, ETH_REG_PATH)}
-CORTO = {"BTCUSDT": "BTC", "ETHUSDT": "ETH"}
+SOL_MODEL_PATH = Path("config/modelos/SOLUSDT_blitz3_compuesto.pkl")  # Estudio 64: opinión del gran bot
+SOL_REG_PATH = Path("config/senal_blitz_sol.json")
+MODELOS = {"BTCUSDT": (MODEL_PATH, REG_PATH), "ETHUSDT": (ETH_MODEL_PATH, ETH_REG_PATH),
+           "SOLUSDT": (SOL_MODEL_PATH, SOL_REG_PATH)}
+CORTO = {"BTCUSDT": "BTC", "ETHUSDT": "ETH", "SOLUSDT": "SOL"}
 NOMBRES = {  # nombre del par en cada bolsa
     "BTCUSDT": {"binance": "BTCUSDT", "bybit": "BTCUSDT", "okx": "BTC-USDT", "gate": "BTC_USDT", "kucoin": "BTC-USDT",
                 "bitget": "BTCUSDT"},
     "ETHUSDT": {"binance": "ETHUSDT", "bybit": "ETHUSDT", "okx": "ETH-USDT", "gate": "ETH_USDT", "kucoin": "ETH-USDT",
                 "bitget": "ETHUSDT"},
+    "SOLUSDT": {"binance": "SOLUSDT", "bybit": "SOLUSDT", "okx": "SOL-USDT", "gate": "SOL_USDT", "kucoin": "SOL-USDT",
+                "bitget": "SOLUSDT"},
 }
 HIST_MIN = 70  # cierres que necesitan las variables del compuesto (media de 60 min + 4 + margen)
 VENUES = ("bybit", "okx")  # Binance llega por el feed de 1 min de siempre
@@ -70,7 +75,7 @@ VENUES = ("bybit", "okx")  # Binance llega por el feed de 1 min de siempre
 def train_frozen_blitz(root3: Path = Path("data/raw/estudio3"), daily_cache: Path = Path("data/processed/senal/diario"),
                        out: Path | None = None, reg: Path | None = None, log=print, symbol: str = "BTCUSDT") -> dict:
     """Entrena UNA vez el modelo del blitz con los 12 meses hasta el 2026-10-25: BTC (Estudio 42, confirmación en el
-    44) o ETH (Estudio 51, confirmación en el 52), con la misma receta."""
+    44), ETH (Estudio 51, confirmación en el 52) o SOL (opinión del gran bot, Estudio 64), con la misma receta."""
     out, reg = Path(out or MODELOS[symbol][0]), Path(reg or MODELOS[symbol][1])
     if out.exists():
         raise FileExistsError(f"{out} ya existe: el modelo se entrena una sola vez (pre-registro).")
@@ -87,6 +92,14 @@ def train_frozen_blitz(root3: Path = Path("data/raw/estudio3"), daily_cache: Pat
         tab_all = pd.read_parquet(study51.TAB)
         cl = {v: x for v, x in study51.closes("2025-10", "2026-10").items() if v in ("binance", "bybit", "okx")}
         registro = "Estudio 52 (pre-registro ad3ce59): modelo congelado del blitz de ETH para la confirmación y la demo"
+    elif symbol == "SOLUSDT":
+        from ..research import study51, study53
+
+        spot = study51.minute_bars(root3, symbol="SOLUSDT", m1=study53.M1)
+        tab_all = pd.read_parquet(study53.TAB)
+        cl = {v: x for v, x in study51.closes("2025-10", "2026-10", symbol="SOLUSDT").items()
+              if v in ("binance", "bybit", "okx")}
+        registro = "Estudio 64 (pre-registro bda4760): modelo congelado del blitz de SOL, opinión del gran bot"
     else:
         raise ValueError(f"Moneda sin datos para el blitz: {symbol}")
     spot = spot[~spot.index.duplicated(keep="last")].sort_index()

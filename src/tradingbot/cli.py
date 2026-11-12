@@ -506,6 +506,31 @@ def cmd_research_study61(a) -> int:
     return 0
 
 
+def cmd_gran(a) -> int:
+    """El gran bot (Estudios 63 y 64): congelar el metamodelo una vez o calcular un día de opiniones."""
+    from .live import gran_bot
+
+    if a.accion == "congelar":
+        try:
+            gran_bot.congelar()
+        except FileExistsError as exc:
+            print(exc)
+            return 2
+        return 0
+    filas = gran_bot.gran5_day(a.dia)
+    n = sum(f["senal_gran"] for f in filas)
+    print(f"{a.dia}: {len(filas)} ventanas con las seis opiniones; señales del gran bot: {n}; de la base: "
+          f"{sum(f['senal_base'] for f in filas)} (resultados sellados: no se muestran)")
+    return 0
+
+
+def cmd_research_study64(a) -> int:
+    from .research import study64
+
+    study64.run(a.mirada)
+    return 0
+
+
 def cmd_research_study63(a) -> int:
     from .research import study63
 
@@ -921,7 +946,7 @@ def cmd_blitz(a) -> int:
 
     if a.accion == "entrenar":
         try:
-            meta = blitz.train_frozen_blitz(symbol="ETHUSDT" if a.eth else "BTCUSDT")
+            meta = blitz.train_frozen_blitz(symbol="SOLUSDT" if a.sol else "ETHUSDT" if a.eth else "BTCUSDT")
         except (FileExistsError, FileNotFoundError) as exc:
             print(exc)
             return 2
@@ -1102,6 +1127,10 @@ def build_parser() -> argparse.ArgumentParser:
     x.set_defaults(func=cmd_research_study60)
     x = r.add_parser("study61", help="Estudio 61: Solana en los contratos de OKX, 5 y 15 min (desarrollo)")
     x.set_defaults(func=cmd_research_study61)
+    x = r.add_parser("study64", help="Estudio 64: confirmación del gran bot (enero: desde el 2027-01-19; abril: "
+                                     "desde el 2027-04-27)")
+    x.add_argument("--mirada", choices=["enero", "abril"], required=True)
+    x.set_defaults(func=cmd_research_study64)
     x = r.add_parser("study63", help="Estudio 63: el «gran bot» (metamodelo de seis modelos propios, OKX 5 min)")
     x.set_defaults(func=cmd_research_study63)
     x = r.add_parser("study62", help="Estudio 62: el favorito dentro de la ventana en OKX (BTC 5 min; desde el "
@@ -1288,6 +1317,8 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--eth", action="store_true",
                    help="vigilar también ETH (Estudio 51). NO sirve en IQ Option: su blitz de ETH es «ETH/USD (OTC)», "
                         "con precio propio (2026-11-07). Con «entrenar», entrena el modelo de ETH")
+    x.add_argument("--sol", action="store_true",
+                   help="solo con «entrenar»: el modelo congelado de SOL (opinión del gran bot, Estudio 64)")
     x.set_defaults(func=cmd_blitz)
 
     x = sub.add_parser("okx", help="avisos para los event contracts de OKX de 5 min, SIN dinero (Estudios 54 y 55)")
@@ -1306,6 +1337,11 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--precio-max", type=float, default=0.53, help="no avisar si comprar cuesta más (USDT por acción)")
     x.add_argument("--telegram", action="store_true", help="mandar también cada aviso al Telegram del .env")
     x.set_defaults(func=cmd_okx)
+
+    x = sub.add_parser("gran", help="el gran bot (Estudios 63 y 64): congelar el metamodelo o calcular un día")
+    x.add_argument("accion", choices=["congelar", "dia"])
+    x.add_argument("--dia", default=None, help="con «dia»: AAAA-MM-DD (UTC)")
+    x.set_defaults(func=cmd_gran)
 
     x = sub.add_parser("telegram", help="Telegram de los avisos de práctica")
     x.add_argument("accion", choices=["probar"], help="probar: manda UN mensaje de prueba al chat del .env")
