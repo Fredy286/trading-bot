@@ -183,6 +183,24 @@ explota cada uno:
 la ventana. La ventaja solo existe frente a quien cotiza sin mirarla, o en sesgos de comportamiento como el del
 favorito, que necesitan alguien dispuesto a vender en la ventana.
 
+## 3f. Los resultados publicados por la familia «Gavin» (GavinVIPResults, 2026-11-13)
+
+El canal público GavinVIPResults (vigilado desde el 2026-10-28) publica cada hora la lista de sus operaciones con
+«WIN», «WIN¹», «WIN²» o «LOSS». Contando **sus propias listas** del 2026-10-28 al 2026-11-13 (5 138 operaciones, todas
+en activos OTC: no se pueden comprobar con un precio real):
+
+| Resultado según el canal | Operaciones | Proporción |
+|---|---|---|
+| Gana en la 1.ª entrada | 2 562 | 49,9 % |
+| Gana en la 2.ª (gale 1) | 1 278 | 24,9 % |
+| Gana en la 3.ª (gale 2) | 621 | 12,1 % |
+| Pierde las tres | 677 | 13,2 % |
+
+Su «tasa de acierto» publicada (69–74 % en los resúmenes diarios, 86,8 % con gales) es **exactamente lo que da una
+moneda al aire**: con 50 % por intento, ganar en alguno de tres intentos es 87,5 %. Ni siquiera con sus propias cifras
+la primera entrada supera el azar, y con pago 85 % y martingala la ganancia esperada es negativa (docs/05). Descriptivo,
+con las cifras del propio canal (puede haber operaciones repetidas entre listas); no cambia el veredicto del Estudio 32.
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:

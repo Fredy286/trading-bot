@@ -908,3 +908,48 @@ bien no cambiaría nada mientras no haya dónde operarla. No forcé un estudio.
 - Por eso no tiene sentido mejorarla hasta encontrar una plataforma seria que deje operar a esa hora. Hoy no lancé
   ningún estudio.
 - Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo.
+
+## 2026-11-13 (autónoma)
+
+Tema del viernes: canales de señales.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado.
+- Registro diario: llega hasta el 2026-11-11 (17 días desde el 2026-10-26; conteos, sin aciertos). Pendiente de ayer cerrado.
+- Vigilancia de canales: corre (capturas del 2026-11-13). Unidos y gotraderssinaisfree siguen sin señales (solo
+  publicidad). Auditoría con precios (Estudio 32) hasta el 2026-11-11. El horario «cada hora» de GitHub en realidad
+  dispara cada 2–6 h (ítem 46); como se guardan todos los mensajes nuevos, no se pierde nada.
+
+**Tabla descriptiva `tbot canales tabla` (sin veredicto antes del 2027-01-31):**
+
+| Canal | Señales | Verificadas | Acierto 1.ª entrada | Límite inf. 95 % | p frente al azar |
+|---|---|---|---|---|---|
+| QuotexSignalfreee | 363 | 274 | 49,6 % | 43,8 % | 0,57 |
+| gotraderssinaisfree | 63 | 58 | 48,3 % | 35,9 % | 0,65 |
+
+Lectura: el 56,4 % de QuotexSignalfreee de hace una semana (94 señales) se diluyó hasta 49,6 % con 274: lo típico del
+azar con muestras pequeñas.
+
+**Los resultados que publica el propio canal GavinVIPResults** (docs/06, 3f): de sus listas horarias, 5 138
+operaciones (todas OTC), 49,9 % ganan en la primera entrada; su 86,8 % sale de contar como acierto las victorias tras
+1 o 2 «gales». Con una moneda al aire eso da 87,5 %. Es decir: con sus propias cifras no hay nada más que azar.
+
+**Búsqueda de canales nuevos:** sin resultado útil. t.me sigue bloqueado desde la nube (el proxy rechaza la conexión).
+Dos búsquedas web solo devolvieron el canal vfxAlert_binarysignals, ya descartado el 2026-11-06 por ser de Pocket
+Option OTC (https://t.me/s/vfxAlert_binarysignals?before=845), y foros de denuncias de estafas
+(https://www.forexpeacearmy.com/community/threads/iq-option-signals-investments-telegram-groups-scamms.55660/latest).
+No se añadió ningún canal.
+
+**Estudio nuevo:** ninguno (no había material que lo justificara).
+
+**Pendientes con fecha**
+- Sesión local con Fredy: canales con listas NO OTC fechadas (t.me abre desde su PC); precios de entrada del blitz.
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones únicas y apertura del registro; 2027-01-31: canales;
+  2027-04-27: Estudio 56 (abril).
+
+**Para Fredy**
+- El canal de señales que hace una semana parecía acertar 56 de cada 100, ahora con más señales acierta 49,6: azar.
+- Conté los resultados que publica el propio canal «Gavin»: de 5 138 operaciones, la primera entrada gana 49,9 %.
+  Su «87 % de acierto» es solo repetir la apuesta hasta 2 veces tras perder: lo mismo que lanzar una moneda.
+- Además todas sus señales son OTC (precio inventado por el bróker). No sirven.
+- No encontré canales nuevos (Telegram no abre desde la nube). Nada cambió en el bot. Solo demo.
