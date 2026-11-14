@@ -953,3 +953,42 @@ No se añadió ningún canal.
   Su «87 % de acierto» es solo repetir la apuesta hasta 2 veces tras perder: lo mismo que lanzar una moneda.
 - Además todas sus señales son OTC (precio inventado por el bróker). No sirven.
 - No encontré canales nuevos (Telegram no abre desde la nube). Nada cambió en el bot. Solo demo.
+
+## 2026-11-14 (autónoma)
+
+Tema del sábado: robustez y calidad.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado.
+- Flujos de GitHub (API de Actions, ~12:15 UTC): todos los últimos en verde (registro diario, cola, vigilancia de
+  canales, libro de OKX, integración de la rutina de ayer y pruebas).
+- Libro de OKX dentro de la ventana (Estudio 62): la cadena graba sin cortes cada ~5,8 h desde el 2026-11-11. En BTC
+  5 min, segundo 60: 906 fotos (≈ 288 por día, lo esperado), tomadas 0,5–2,2 s después del segundo objetivo; solo
+  las 2 ventanas más recientes sin resultado oficial (aún no vencían). No se calculó ningún acierto.
+- Revisado `research/study62.py`: lado «A la baja» bien calculado (1 − precio de compra de «Al alza»), ventanas en
+  UTC (el nombre del contrato va en hora de Hong Kong, coincide), evaluación única protegida. Sin fallos.
+
+**Fallo hallado y corregido (ítem 59):** el registro del blitz (BTC y ETH) llevaba 8 días sin grabar el 2026-11-06
+(17 días frente a 18 de los demás). Causa: Gate nunca publicó su archivo de ese día y el registro lo exigía, aunque
+Gate solo sirve para el resultado con el precio IQ reconstruido (H44c). Ahora espera 5 días y, si Gate no aparece,
+graba el día con ese resultado vacío; las señales y el resultado pre-registrado (3 bolsas) no cambian. En enero, las
+confirmaciones que exigen todos los días se habrían negado a correr. Nota de procedimiento en docs/01 (Estudios 44
+y 52), sin tocar criterios. La próxima corrida del registro diario grabará el 2026-11-06.
+
+**Otro arreglo (pruebas):** `test_blitz_eth_is_in_the_daily_registry` no simulaba las tareas de OKX ni del gran bot y
+descargaba de Binance de verdad; desde la nube se quedaba colgada varios minutos. Ahora está aislada de la red.
+
+**Estudio nuevo:** ninguno (sábado de revisión).
+
+**Pendientes con fecha**
+- 2026-11-15: comprobar que `results/registro/blitz/2026-11-06.jsonl` y `blitz_eth/2026-11-06.jsonl` existen.
+- 2026-11-15 (domingo): resumen semanal.
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones únicas y apertura del registro (contar los días sin Gate);
+  2027-01-31: canales; 2027-04-27: Estudio 56 (abril).
+
+**Para Fredy**
+- Hoy revisé que todo lo automático funcione: sí, todo en verde.
+- Encontré un descuido: una de las 4 bolsas que usa IQ Option para su precio (Gate) no publicó sus datos del 6 de
+  noviembre, y el bot se quedaba esperando ese día para siempre. Ya no: ahora espera 5 días y sigue.
+- Las señales y la medida principal no cambian; solo falta, ese día, el resultado con el precio de IQ Option.
+- No hubo estudio nuevo. El bot no cambió. Solo demo.

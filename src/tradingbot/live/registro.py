@@ -167,6 +167,27 @@ def _maybe(fn, *args) -> pd.Series:
         return pd.Series(dtype=float, index=pd.DatetimeIndex([], tz="UTC"))
 
 
+GATE_ESPERA_DIAS = 5  # Gate publica con 1–2 días de retraso; pasado esto, se da el archivo por perdido (ítem 59)
+
+
+def gate_or_missing(day: pd.Timestamp, cache: Path, symbol: str = "BTCUSDT", now: pd.Timestamp | None = None,
+                    log=print) -> pd.Series:
+    """Cierres de Gate del día; si Gate sigue sin publicarlo `GATE_ESPERA_DIAS` días después, serie vacía.
+
+    Solo afecta a `resultado_iq` (H44c / H52), que queda en None ese día. Las señales y el resultado pre-registrado
+    (3 bolsas: Binance, Bybit y OKX) no usan Gate. Antes, un archivo que Gate nunca publicó bloqueaba el día para
+    siempre (2026-11-06)."""
+    try:
+        return gate_closes(day, cache, symbol)
+    except FileNotFoundError:
+        now = pd.Timestamp(now if now is not None else utcnow())
+        now = now.tz_localize("UTC") if now.tzinfo is None else now
+        if now < day + pd.Timedelta(days=1 + GATE_ESPERA_DIAS):
+            raise
+        log(f"Gate no publicó el {day:%Y-%m-%d} ({symbol}) tras {GATE_ESPERA_DIAS} días: resultado_iq vacío ese día")
+        return pd.Series(dtype=float, index=pd.DatetimeIndex([], tz="UTC"))
+
+
 def blitz_day(day: str, cache: Path = CACHE, symbol: str = "BTCUSDT") -> list[dict]:
     """Blitz de IQ Option (aviso en el segundo 50, 3 min, pago 86 %) con el modelo congelado de cada moneda: BTC
     (Estudio 44) o ETH (Estudio 52). Señales del día y su resultado con el promedio de 3 bolsas (el pre-registrado) y
@@ -200,7 +221,7 @@ def blitz_day(day: str, cache: Path = CACHE, symbol: str = "BTCUSDT") -> list[di
     by = pd.concat([bybit_closes(d0 - pd.Timedelta(days=1), ven_cache, symbol), bybit_closes(d0, ven_cache, symbol),
                     _maybe(bybit_closes, d1, ven_cache, symbol)])
     ok = okx_closes(d0 - pd.Timedelta(hours=2), d1 + pd.Timedelta(minutes=5), symbol)
-    ga = pd.concat([gate_closes(d0, ven_cache, symbol), _maybe(gate_closes, d1, ven_cache, symbol)])
+    ga = pd.concat([gate_or_missing(d0, ven_cache, symbol), _maybe(gate_closes, d1, ven_cache, symbol)])
     bn = bars["c"]
     comp = composite({"binance": bn, "bybit": by[~by.index.duplicated()], "okx": ok})
     X = pd.concat([prev[FEATURES], partial_features(tab, bars["o"], vol, b["k"]), comp_features(comp, bn, vol, bars.index)],

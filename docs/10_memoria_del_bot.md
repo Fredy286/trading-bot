@@ -72,6 +72,9 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   - unidades de tiempo de pandas (microsegundos).
   - estudio y modo en vivo deben usar la MISMA función para juzgar gana/pierde/empate (ítem 51: con precios
     promediados, una regla de redondeo copiada cambiaba el empate).
+  - una fuente secundaria no debe bloquear para siempre lo que no depende de ella (ítem 59: Gate no publicó el
+    2026-11-06 y el registro del blitz se quedó 8 días esperando; ahora espera 5 días y graba sin `resultado_iq`).
+    En la revisión de los sábados, comparar el número de días de cada carpeta de `results/registro/`.
 - **Deriv, desarmado (2026-10-30, consultas `proposal` y `contracts_for` a las 03:55 UTC):**
   - el pago de «sube/baja» a 15 min en divisas **depende del movimiento reciente**: tras una caída, «sube» paga
     menos (NZDJPY −3,7 pb en 15 min: CALL 51,4 %, PUT 100,1 %; AUDCAD −3,4 pb: CALL 75,1 %, PUT 81,8 %). Su modelo de

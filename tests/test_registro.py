@@ -4,6 +4,7 @@ import json
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from tradingbot.live import registro
 
@@ -65,10 +66,28 @@ def test_blitz_summary_is_sealed_and_counts_its_groups(tmp_path):
 
 def test_blitz_eth_is_in_the_daily_registry_and_summary(tmp_path, monkeypatch):
     calls = []
-    for name in ("btc_day", "eth_day", "night_day", "blitz_day", "blitz_eth_day"):
+    for name in ("btc_day", "eth_day", "night_day", "blitz_day", "blitz_eth_day", "okx_eth_day", "okx_btc_day",
+                 "okx15_eth_day", "okx15_btc_day"):
         monkeypatch.setattr(registro, name, (lambda n: (lambda day: calls.append((n, day)) or []))(name))
+    from tradingbot.live import gran_bot  # sin red: las tareas del gran bot también se simulan
+
+    for name in ("gran5_day", "gran15_day", "granblitz_day"):
+        monkeypatch.setattr(gran_bot, name, (lambda n: (lambda day: calls.append((n, day)) or []))(name))
     out = registro.run_day("2026-11-01", root=tmp_path, log=lambda *_: None)
     assert out["blitz_eth"] == 0 and ("blitz_eth_day", "2026-11-01") in calls
     assert (tmp_path / "blitz_eth" / "2026-11-01.jsonl").exists()
     r = registro.resumen(tmp_path, now=pd.Timestamp("2026-11-07", tz="UTC"))
     assert r["blitz_eth"]["dias"] == 1 and r["sellado_hasta"] == "2027-01-19"
+
+
+def test_gate_missing_day_waits_then_gives_up(tmp_path, monkeypatch):
+    """Ítem 59: un archivo de Gate que nunca se publica no debe bloquear el día del blitz para siempre."""
+    def no_file(day, cache, symbol="BTCUSDT"):
+        raise FileNotFoundError(f"Gate aún no publica el {day:%Y-%m-%d}")
+
+    monkeypatch.setattr(registro, "gate_closes", no_file)
+    day = pd.Timestamp("2026-11-06", tz="UTC")
+    with pytest.raises(FileNotFoundError):  # dentro de la espera normal de Gate: sigue pendiente
+        registro.gate_or_missing(day, tmp_path, now=pd.Timestamp("2026-11-09", tz="UTC"), log=lambda *_: None)
+    s = registro.gate_or_missing(day, tmp_path, now=pd.Timestamp("2026-11-13", tz="UTC"), log=lambda *_: None)
+    assert s.empty and str(s.index.tz) == "UTC"

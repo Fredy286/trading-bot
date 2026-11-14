@@ -246,7 +246,8 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
          (EV +0,029, 12 de 13 meses); en el horario del usuario, 56,8 % (*post hoc*).
        - **Estudio 47:** 275 velas leídas de 6 capturas: IQ Option ≈ Binance 0,336 + Bybit 0,071 + OKX 0,223 + Gate 0,370
          (error 1,5 USD). Con ese precio el blitz acierta 55,32 % (pasa); octubre 56,3 %. Gate: archivos diarios de
-         download.gatedata.org. Enmienda al Estudio 44: H44c (mismo juicio con ese precio).
+         download.gatedata.org. Enmienda al Estudio 44: H44c (mismo juicio con ese precio). Si Gate no publica un
+         día en 5 días, el registro lo graba sin `resultado_iq` (pasó el 2026-11-06; ítem 59).
        - Modelo congelado `BTCUSDT-blitz3-compuesto-0f8694` (config/senal_blitz.json). Confirmación: Estudio 44,
          después del 2027-01-18.
        - **Registro diario del blitz en la nube** (`registro.blitz_day`, desde el 2026-10-26; sellado): Binance y Bybit desde

@@ -3657,6 +3657,13 @@ política de H44a juzgada con el precio IQ reconstruido (los mismos pesos, fijos
   estricta, no una prueba más que pueda salir bien por azar.
 - Gate se descarga de sus archivos diarios públicos.
 
+**Nota de procedimiento a los Estudios 44 (H44c) y 52 (2026-11-14, sin mirar ningún acierto; no cambia criterios):**
+Gate no publicó su archivo diario del 2026-11-06 (BTC ni ETH) y el registro diario dejaba ese día pendiente sin fin
+(registro de errores, ítem 59). Desde hoy, si Gate sigue sin un día 5 días después, el día se registra igual y
+`resultado_iq` queda vacío solo ese día. H44c (y su equivalente de ETH) se evalúa con los minutos que tengan precio
+IQ reconstruido, como ya hacía `iq_price` (solo minutos con las 4 bolsas); H44a y el Estudio 52 (3 bolsas) no cambian.
+Al evaluar en enero, informar cuántos días quedaron sin Gate.
+
 ## Nota del blitz: ¿cuánto puede tardar el clic? (2026-11-03, informativa, solo datos de desarrollo; regla fijada ANTES de calcular)
 
 **Pregunta:** el panel del blitz marca «TARDE» a los 15 s del aviso, un límite que viene del modelo de 1 min
