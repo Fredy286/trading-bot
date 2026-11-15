@@ -218,6 +218,9 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     abierto, y el panel `/blitz` ya no avisa fuera de él («IQ cerrado — no operes OTC»).
   - Lección: antes de recomendar una plataforma, medir la ventaja solo en las horas en que esa plataforma está
     abierta con precio real.
+  - **Confirmado con datos nuevos (2026-11-15):** H5b del Estudio 5 (BTC 1 min, solo sábados y domingos, 2 500
+    alertas del 4 al 25 de octubre) APRUEBA: 58,16 % [56,22 %], EV +0,064. Es la primera confirmación del efecto de
+    fin de semana; el Estudio 70 lo pone a prueba en OKX con datos posteriores.
 
 ## Ideas pendientes (prioridad de arriba abajo; repriorizado el 2026-11-15)
 

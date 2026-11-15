@@ -98,8 +98,8 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        Entre semana 53,2 %; fin de semana 58,4 % (descriptivo). Con pago 80 % a +10 s, EV +0,009.
        Consecuencia: señales manuales experimentales SOLO en demo (falta construir ese modo y verificar
        el precio, el empate y el pago del intermediario).
-     - H5b: 2 286 de 2 500 al 2026-10-24; se completaría con el fin de semana del 25 de octubre
-       (lanzar con `end` = 2026-10-26).
+     - **H5b APRUEBA (2026-11-15, run 43763624113):** solo fin de semana, 58,16 % [56,22 %], EV +0,064, p = 0,00002
+       (muestra de 2 500 hasta el 2026-10-25).
    - **Estudio 6 «zonas»:** pre-registrado (bc97dc0), código congelado (37fdd3f) y ejecutado: **SIN SEÑAL**.
      En BTC las zonas no mejoran el log-loss y bajan el EV (55,61 % → 55,19 %). En EUR/USD empeoran.
    - **Estudio 7 (Kronos, análogos, Kalman, ETH como mejoras del GBM de BTC 1 min):** SIN SEÑAL (2026-10-25).
@@ -355,7 +355,7 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        blitz salían de horas con IQ cerrado (fin de semana: solo OTC). Se juzgan también en horario abierto
        (`config/horario_iq_blitz.json`, prudente: dom 22:00 → vie 17:00 Bogotá; Fredy puede confirmarlo antes del
        2027-01-12). El panel /blitz ya no avisa fuera de horario.
-     - **H5b del Estudio 5:** lanzada en GitHub (run 43763624113, `end` = 2026-10-26).
+     - **H5b del Estudio 5: APRUEBA** (58,16 %, EV +0,064; run 43763624113). El fin de semana es más fuerte.
      - Video «Conecta Claude a TradingView» (MCP): sin valor para predecir (docs/06 y docs/07).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca

@@ -755,6 +755,39 @@ hora. Antes, la prueba en demo debe comprobar que el precio del intermediario si
 el empate se reembolsa y que el pago es ≥ 85 % (con 80 % el EV a +10 s es casi nulo). H5b
 (2 286 de 2 500) se evalúa en cuanto se complete. Nunca dinero real sin autorización expresa.
 
+**Resultado de H5b (run 43763624113 de GitHub Actions, 2026-11-15, datos 2026-10-04 → 2026-10-25, aplicado
+mecánicamente; `results/estudio5/verdict.json`, estado «final»):**
+
+| | Valor |
+|---|---|
+| Muestra fija | 2 500 alertas sin empate de sábado y domingo UTC (7 días de fin de semana, 2026-10-04 → 2026-10-25), más 478 empates |
+| Aciertos | 1 454 = **58,16 %** [IC 95 %: 56,22 %; 60,08 %] |
+| Umbral p* | 54,05 % (pago 85 %, empate reembolsado) |
+| EV por unidad apostada | **+0,064** |
+| p unilateral | 0,00002 (< 0,025) |
+| **Veredicto** | **H5b APRUEBA** |
+
+- Sábado 57,7 % (721/1 250); domingo 58,6 % (733/1 250).
+- La reproducción repitió H5a exactamente (1 964 de 3 500).
+- Como estaba pre-registrado («del mismo libro»), H5a y H5b comparten las alertas de fin de semana del 4 al 19 de
+  octubre: no son pruebas independientes.
+
+**Sensibilidad (informativa, no decide):**
+
+| Entrada tras el cierre | +2 s | +5 s | +10 s | +20 s |
+|---|---|---|---|---|
+| Acierto | 59,3 % | 58,8 % | 58,2 % | 57,6 % |
+| EV con pago 85 % | +0,083 | +0,075 | +0,064 | +0,055 |
+| EV con pago 80 % | +0,058 | +0,050 | +0,039 | +0,031 |
+
+**Consecuencia:**
+- H5a ya había aprobado (señales experimentales en demo a cualquier hora). H5b confirma, con datos que nadie había
+  visto, que el fin de semana es más fuerte: 58,2 % frente a 56,1 % en todas las horas.
+- Es independiente del Estudio 70, cuyos datos empiezan el 2026-10-26.
+- Recordatorio de los Estudios 37 y 38: esta ventaja es del último precio de Binance y no vale para plataformas que
+  liquidan con otro precio.
+- Nunca dinero real sin autorización expresa y específica.
+
 ## Estudio 6 — zonas de precio (pre-registro, 2026-10-24, ANTES de calcular ninguna variable de zona)
 
 **Origen:** análisis del PDF «El secreto del trading profesional» (docs/05). La única idea del PDF con
