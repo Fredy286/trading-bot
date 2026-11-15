@@ -221,6 +221,7 @@ function renderSignal(st) {
   } else {
     current = null; $("clickbtn").disabled = true; big.className = "none";
     big.textContent = u.estado === "error" ? "Error de datos (reintentando)" :
+      u.estado === "cerrado" ? "IQ cerrado — no operes OTC" :
       u.estado === "sin datos" ? "Sin datos suficientes este minuto" :
       u.estado === "fuera de turno" ? (OKX ? "Esperando la próxima ventana de 5 min" : "Esperando el turno del vencimiento") : "Sin señal — esperando el segundo 50";
     if (u.estado === "fuera de turno" && u.proximo) {

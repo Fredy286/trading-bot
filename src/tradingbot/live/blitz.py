@@ -46,6 +46,7 @@ from ..research.study42 import closes as hist_closes
 from ..research.study47 import WEIGHTS as IQ_WEIGHTS
 from ..research.study47 import iq_price
 from ..timeutil import utcnow
+from . import horario_iq
 from .anticipada import CALIB_FRAC, K, LAT, TRAIN_END, TRAIN_START, SecondsFeed, SignalLoop, download_daily
 from .feeds import BinancePollingFeed
 
@@ -356,9 +357,12 @@ class BlitzLoop(SignalLoop):
 
     def __init__(self, bundle: dict, runtime: Path, feed=None, secfeed=None, venues=None, sound: bool = True,
                  log=print, pago: float | None = None, umbral: float | None = None, record: bool = True, telegram=None,
-                 extra: list[dict] | None = None):
+                 extra: list[dict] | None = None, horario: dict | None = None):
         super().__init__(bundle, runtime, feed=feed, secfeed=secfeed, sound=sound, log=log, pago=pago, umbral=umbral,
                          telegram=telegram)
+        # Horario del blitz con precio real en IQ Option (enmienda 2026-11-15 a los Estudios 44, 46 y 68): fuera de él
+        # no se avisa. None = sin horario (modo OKX y pruebas); `tbot blitz vivo` pasa config/horario_iq_blitz.json.
+        self.horario = horario
         sym0 = str(bundle.get("symbol") or "BTCUSDT").upper()
         self.venues = venues or UsdtCloses(self.feed.session, symbol=sym0)
         self.assets = [{"symbol": sym0, "bundle": bundle, "feed": self.feed,
@@ -406,6 +410,8 @@ class BlitzLoop(SignalLoop):
         if len(self.assets) > 1:
             d["otras"] = [{"activo": x["activo"], "estado": x["estado"], "lado": x.get("lado"), "p": x.get("p")}
                           for x in decisions if x is not d]
+        if self.horario is not None and not horario_iq.abierto(minute_open, self.horario):
+            d.update({"estado": "cerrado", "motivo": horario_iq.MOTIVO, "senal_modelo": d["estado"] == "señal"})
         if d["estado"] == "señal":
             self.n_signals += 1
             d["alert_id"] = uuid.uuid4().hex[:12]

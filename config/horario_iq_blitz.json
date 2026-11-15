@@ -1,0 +1,8 @@
+{
+  "zona": "UTC",
+  "abre": {"dia": 0, "hora": "03:00"},
+  "cierra": {"dia": 4, "hora": "22:00"},
+  "pausas": [],
+  "confirmado_por_usuario": false,
+  "nota": "Horario prudente de la enmienda a los Estudios 44, 46 y 68 (docs/01, 2026-11-15): lunes 03:00 UTC (domingo 22:00 de Bogotá) a viernes 22:00 UTC (17:00 de Bogotá). Si Fredy lo comprueba en IQ Option antes del 2027-01-12, se actualiza con commit fechado; después de esa fecha queda congelado. dia: 0 = lunes … 6 = domingo."
+}

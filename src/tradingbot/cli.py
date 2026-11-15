@@ -552,6 +552,29 @@ def cmd_research_study64(a) -> int:
     return 0
 
 
+def cmd_research_study70(a) -> int:
+    from .research import study70
+
+    if a.desarrollo:
+        rep = study70.desarrollo()
+        print(json.dumps({k: rep[k] for k in ("extra", "principal", "regla_actual", "regla_nueva")}, indent=2,
+                         ensure_ascii=False, default=float))
+        return 0
+    study70.run(a.mirada)
+    return 0
+
+
+def cmd_research_study71(a) -> int:
+    from .research import study71
+
+    if a.desarrollo:
+        rep = study71.desarrollo()
+        print(json.dumps({k: rep[k] for k in ("operaciones", "principal")}, indent=2, ensure_ascii=False, default=float))
+        return 0
+    study71.run(a.mirada)
+    return 0
+
+
 def cmd_research_study63(a) -> int:
     from .research import study63
 
@@ -1007,9 +1030,16 @@ def cmd_blitz(a) -> int:
           f"({', '.join([bundle['model_id']] + [x['bundle']['model_id'] for x in extra])}). "
           f"Panel: http://127.0.0.1:8765/blitz — Ctrl+C para detener. SOLO CUENTA DEMO.")
     try:
+        from .live import horario_iq
+
+        horario = horario_iq.cargar()
+        if not horario.get("confirmado_por_usuario"):
+            print("Horario de IQ Option: prudente (domingo 22:00 → viernes 17:00 de Bogotá). Fuera de él el panel dice "
+                  "«IQ cerrado: no operar OTC». Si lo compruebas en la plataforma, se actualiza "
+                  "config/horario_iq_blitz.json.")
         blitz.BlitzLoop(bundle, Path(a.runtime), sound=not a.sin_sonido, pago=a.pago / 100 if a.pago else None,
                         umbral=a.umbral, telegram=_telegram_sender() if a.telegram else None,
-                        extra=extra).run(a.iteraciones)
+                        extra=extra, horario=horario).run(a.iteraciones)
     except KeyboardInterrupt:
         pass
     return 0
@@ -1163,6 +1193,14 @@ def build_parser() -> argparse.ArgumentParser:
                                      "desde el 2027-04-27)")
     x.add_argument("--mirada", choices=["enero", "abril"], required=True)
     x.set_defaults(func=cmd_research_study64)
+    for num, ayuda, fn in (("70", "margen 0 el fin de semana en el gran bot de OKX 5 min", cmd_research_study70),
+                           ("71", "apoyo del gran bot de 15 min al contrato de 5 min, entre semana", cmd_research_study71)):
+        x = r.add_parser(f"study{num}", help=f"Estudio {num}: {ayuda} (enero: desde el 2027-01-19; abril: desde el "
+                                              "2027-04-27; --desarrollo reproduce las cifras del pre-registro)")
+        g = x.add_mutually_exclusive_group(required=True)
+        g.add_argument("--mirada", choices=["enero", "abril"])
+        g.add_argument("--desarrollo", action="store_true")
+        x.set_defaults(func=fn)
     x = r.add_parser("study63", help="Estudio 63: el «gran bot» (metamodelo de seis modelos propios, OKX 5 min)")
     x.set_defaults(func=cmd_research_study63)
     x = r.add_parser("study62", help="Estudio 62: el favorito dentro de la ventana en OKX (BTC 5 min; desde el "

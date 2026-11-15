@@ -300,3 +300,37 @@ def test_closes_and_tickers_use_each_coin_name():
     assert eth["binance"][1](a, b)["symbol"] == "ETHUSDT" and eth["bybit"][1](a, b)["symbol"] == "ETHUSDT"
     assert blitz.tickers_for("ETHUSDT")["okx"][1] == {"instId": "ETH-USDT"}
     assert blitz.REQUESTS["okx"][1](a, b)["instId"] == "BTC-USDT"  # BTC sigue igual por defecto
+
+
+def test_loop_does_not_alert_when_iq_is_closed(tmp_path, bars):
+    """Enmienda 2026-11-15: fuera del horario del blitz con precio real, el panel dice «IQ cerrado» y no avisa."""
+    t = bars.index[-1] + pd.Timedelta(minutes=1)
+    now = (t + pd.Timedelta(seconds=50.3)).to_pydatetime()
+
+    class _Feed:
+        offset_s, session = 0.0, None
+
+        def get(self, now=None):
+            return bars, now
+
+        def server_now(self):
+            return now
+
+    class _Sec:
+        def get(self, start, now, limit=120):
+            return _sec(t)
+
+    class _V:
+        def recent(self, t1):
+            return _venues(bars, t1)
+
+    nunca = {"zona": "UTC", "abre": {"dia": 6, "hora": "23:59"}, "cierra": {"dia": 6, "hora": "23:59"}, "pausas": []}
+    btc = {**_bundle(0.70), "symbol": "BTCUSDT", "model_id": "B"}
+    loop = blitz.BlitzLoop(btc, tmp_path, feed=_Feed(), secfeed=_Sec(), venues=_V(), sound=False, record=False,
+                           horario=nunca)
+    d = loop.step(now)
+    assert d["estado"] == "cerrado" and d["senal_modelo"] and "OTC" in d["motivo"]
+    assert loop.n_signals == 0 and not (tmp_path / "senales.jsonl").exists()
+    abierto = blitz.BlitzLoop(btc, tmp_path / "b", feed=_Feed(), secfeed=_Sec(), venues=_V(), sound=False,
+                              record=False)  # sin horario (modo OKX y pruebas): avisa como siempre
+    assert abierto.step(now)["estado"] == "señal"
