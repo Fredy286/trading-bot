@@ -63,6 +63,10 @@ ajustarla.
 - **Alertas de TradingView → bot** (*webhook*): TradingView puede enviar un mensaje JSON a una dirección
   web cuando se cumple una condición. El proyecto no lo necesita hoy, porque el bot calcula sus propias
   señales, y exige un servidor accesible desde internet.
+- **Conectar Claude a TradingView Desktop con un MCP** (video del 2026-11-15): **descartado.** Funciona abriendo un
+  puerto de depuración (9222) y usando interfaces internas no oficiales; sus propios autores advierten que puede
+  violar los términos de TradingView y poner en riesgo la cuenta. No aporta datos nuevos al bot. Para ver las
+  señales en el gráfico basta el indicador de Pine del primer punto. Detalle en docs/06, sección 3.
 
 ## 5. Lo aprendido de las capturas de redes (2026-10-25)
 
