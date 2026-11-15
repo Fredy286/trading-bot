@@ -204,6 +204,21 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
 
 - **Semana 2026-11-09 → 11-15:** combinar opiniones propias (gran bot) es lo único nuevo que pasó en desarrollo; Polymarket mostró que un mercado con bots ya cobra la ventaja (Estudio 59); Solana se cerró (61). En el registro, todos los modos dan menos señales que en desarrollo (mercado tranquilo), y el gran bot sigue dando ×1,5 a ×4,7 más que su base. `tbot registro resumen` ya cuenta el gran bot (solo conteos; sus aciertos, en los Estudios 64, 68 y 69).
 
+- **El fin de semana manda (ronda de mejoras del 2026-11-15, desarrollo *post hoc*):**
+  - Nuestros modelos aciertan más los sábados y domingos UTC, y el gran bot está bien calibrado esos días (pendiente
+    1,11) pero exagera entre semana (0,68).
+  - En OKX 5 min, las operaciones que hoy se dejan pasar el fin de semana (margen entre 0 y 0,02) dan 55,18 % y +227
+    (12 de 12 meses); entre semana, la misma franja pierde (52,66 %). Se repite con BTC 1 min en 2024-07 → 2025-08
+    (55,62 % frente a 52,38 %). Confirmación: **Estudio 70** (margen 0 el fin de semana; enero y abril).
+  - **Estudio 71**, en secuencia detrás del 70: de lunes a viernes, cuando el gran bot de 15 min da señal, el de 5 min
+    del mismo lado puede operar sin margen (55,06 %, +81). La señal de 15 min caduca en 5–10 min.
+  - **Advertencia para IQ Option:** dos tercios de la ganancia de desarrollo del blitz salen de horas en que IQ tiene
+    cerrado el blitz con precio real (fin de semana: solo OTC). En horas abiertas, p42 da 54,5 % frente a un
+    equilibrio de 53,76 %: borde fino. Enmienda a los Estudios 44, 46 y 68: se juzgan también solo en horario
+    abierto, y el panel `/blitz` ya no avisa fuera de él («IQ cerrado — no operes OTC»).
+  - Lección: antes de recomendar una plataforma, medir la ventaja solo en las horas en que esa plataforma está
+    abierta con precio real.
+
 ## Ideas pendientes (prioridad de arriba abajo; repriorizado el 2026-11-15)
 
 Repriorización del 2026-11-15: sube arriba la idea 7 (modo de práctica del gran bot), porque es lo único que pasó en
@@ -216,6 +231,8 @@ siguen, pero dependen de anotaciones del usuario. Los números de las ideas no c
 
 | # | Idea | Por qué | Estado |
 |---|---|---|---|
+| 7b | **Horario real de IQ Option** (Paso 0 de la enmienda a los Estudios 44, 46 y 68) | El blitz se juzga también solo en horario abierto; hoy vale el prudente (domingo 22:00 → viernes 17:00 de Bogotá) en `config/horario_iq_blitz.json` | Pendiente del usuario, sin operar: anotar en IQ Option la hora de cierre del viernes y las pausas del blitz de Bitcoin, antes del 2027-01-12. Si no, queda el prudente |
+| 7c | **Estudios 70 y 71** (margen 0 el fin de semana; apoyo del gran bot de 15 min entre semana) | Ronda de mejoras del 2026-11-15 (pre-registro ebe2874); el registro `gran5`/`gran15` ya guarda todo | Nada que hacer hasta el 2027-01-19 (`tbot research study70 --mirada enero`, luego `study71`). Potencia: 70 ~35 % en enero y ~85 % en abril; 71 ~8 % y ~35 % |
 | 7 | **Modo de práctica del gran bot** (OKX 5 y 15 min, blitz): juntar en el bucle en vivo los 6–8 modelos congelados y los metamodelos (`config/gran_bot_*.json`) | Estudios 63, 66 y 67 pasan en desarrollo (casi el doble de señales con el mismo acierto); el registro diario ya los califica (`gran5`, `gran15`, `granblitz`) | Pendiente (sesión local; no cambia ningún parámetro: solo usa lo congelado). Conteos del registro (2026-10-26 → 11-13, sin aciertos): gran5 47,7/día (base 30,8; desarrollo 73/40), gran15 27,8/día (base 18,1; 50/14), granblitz 42,7/día (base 9,1; 77/36). Solo práctica hasta las confirmaciones (64, 68, 69; enero y abril) |
 | 1c | **OKX: decidir antes de que el libro se vacíe** (por ejemplo, 60 s antes de la ventana y no 10 s) | 10 s antes solo hay ~13 contratos a 0,52; minutos antes, cientos (docs/03, 2.3). Decidir antes daría más cantidad y quizá un libro todavía sin inclinar, a cambio de menos información para el modelo | Pendiente (2026-11-08). Es un estudio nuevo con su propio pre-registro. Conviene esperar a que el libro grabado (Estudio 56) diga cuánto se inclina y cuándo. **Ojo al preparar el pre-registro:** el libro que graba GitHub no puede mirarse para elegir el momento si luego se usa en el Estudio 56; usar solo lo grabado antes de una fecha fija o datos propios separados. Conteo del registro (2026-10-26 → 11-06, sin aciertos): ETH 98 señales (8,2/día, en desarrollo 25,5) y BTC 218 (18,2/día, en desarrollo 11,5); la regla del registro es la misma del Estudio 54 (p ≈ 0,551), así que la diferencia parece del mercado, no del código. **Ojo, probablemente débil (2026-11-08, sesión local):** el Estudio 50 mostró que la ventaja vive en los segundos 40–50 del minuto (58 %); a mitad del minuto, 51 %. Y la cantidad grande (cientos de contratos) está 3–4 min antes, mientras que 15 s antes ya solo hay ~13. Decidir tan pronto perdería casi toda la ventaja |
 | 0 | **Aprender con el precio de la plataforma**: entrenar y juzgar los modelos con el precio con que liquida IQ Option (promedio con pesos de bolsas en USDT, Estudio 47) | Estudios 34, 36–38, 41, 42 y 47 | **Estudio 42 PASA en desarrollo** (55,3 %, EV +0,029, 12 de 13 meses); con el precio reconstruido del Estudio 47, 55,3 % (octubre 56,3 %). Modelo congelado `BTCUSDT-blitz3-compuesto-0f8694`, modo de práctica (`scripts/iniciar_blitz.sh`). Confirmación: Estudios 44 (H44a–c) y 46, una vez, después del 2027-01-18. **Siguiente:** (a) variables del propio precio reconstruido (no del de Binance) en un estudio nuevo pre-registrado, sin tocar el modelo congelado; (b) **ETH en blitz: Estudio 51 PASA, pero NO aplica a IQ Option** (allí solo hay ETH/USD OTC, precio propio; 2026-11-07) (2026-11-07): p ≥ 0,57 → 31 señales/día con 56,9 % (4 bolsas 56,7 %), casi sin coincidir con BTC; modelo congelado `ETHUSDT-blitz3-compuesto-5d7319`, modo `scripts/iniciar_blitz.sh --eth`, registro `blitz_eth` en la nube; confirmación: Estudio 52 (enero de 2027). **Solana (Estudio 53, la otra cripto con blitz real en IQ): NO PASA** (p ≥ 0,57: 55,2 % [52,1 %], 2,6/día). En IQ Option solo queda el blitz de BTC |

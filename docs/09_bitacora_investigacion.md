@@ -1076,3 +1076,26 @@ probablemente débil. Las ideas de IQ Option (0, 1, 1b) y de traders verificados
 - Todo lo automático funciona y no falta ningún día. Estas semanas el mercado está tranquilo: hay menos señales.
 - Primera fecha importante: 13 de diciembre (Estudio 62). La grande: 19 de enero, cuando se abren los resultados.
 - Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-15 — sesión local (con Fredy)
+
+**Ronda de mejoras del gran bot (8 agentes, 16 ideas, 2 jueces).** Se eligieron tres. Sus cifras de desarrollo se
+recalcularon de forma independiente y coinciden:
+- **Estudio 70** (margen 0 el fin de semana en OKX 5 min) y **Estudio 71** (apoyo del gran bot de 15 min, entre
+  semana), pre-registrados en ebe2874 antes de abrir los registros sellados. Evaluadores en `research/study70.py` y
+  `study71.py` (1c12186).
+- **Enmienda de horario de IQ Option a los Estudios 44, 46 y 68**, con `live/horario_iq.py`. El panel del blitz ya no
+  avisa con IQ cerrado.
+- Descartadas con motivo (docs/10): recalibrar el metamodelo, re-ajustarlo cada mes, variables del precio de
+  liquidación, margen 0–0,01 antes del Estudio 56, y ETH o SOL en más contratos.
+
+**H5b del Estudio 5:** por fin se lanzó su evaluación única (GitHub, run 43763624113, `end` = 2026-10-26).
+
+**Video «Conecta Claude a TradingView»:** es un control remoto del gráfico (MCP por el puerto de depuración). No
+predice nada y sus autores advierten un riesgo con los términos de TradingView (docs/06 y 07).
+
+**Prompt de datos alternativos (pedido de Fredy):** se puso a investigar con agentes:
+- texto social sin cuenta, posicionamiento de la multitud, noticias y calendario;
+- literatura y lógicas de comunidades;
+- exploración *post hoc* con predicciones de desarrollo, diseño y crítica en dos lentes.
+

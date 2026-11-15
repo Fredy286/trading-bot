@@ -346,6 +346,17 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - Error 58: la receta del 35 llevada a XRP y DOGE usaba el tic de BTC; se corrigió antes de usarlos.
      - Pendiente: modo de práctica con el gran bot (falta juntar los seis u ocho modelos en el bucle en vivo).
      - `tbot registro resumen` cuenta también `gran5`, `gran15` y `granblitz` (solo conteos, nunca aciertos; 2026-11-15).
+   - **Ronda de mejoras del 2026-11-15 (sesión local; pre-registro ebe2874, código 1c12186):**
+     - **Estudio 70:** margen 0 los sábados y domingos UTC en el gran bot de OKX 5 min (desarrollo: las extra dan
+       55,18 %, +227, 12/12 meses; réplica con BTC 1 min en 2024-07 → 2025-08). `tbot research study70 --mirada …`.
+     - **Estudio 71:** de lunes a viernes, apoyo del gran bot de 15 min al de 5 min (55,06 %, +81). Solo se evalúa si
+       pasa el 70.
+     - **Enmienda a los Estudios 44, 46 y 68 (horario de IQ Option):** dos tercios de la ganancia de desarrollo del
+       blitz salían de horas con IQ cerrado (fin de semana: solo OTC). Se juzgan también en horario abierto
+       (`config/horario_iq_blitz.json`, prudente: dom 22:00 → vie 17:00 Bogotá; Fredy puede confirmarlo antes del
+       2027-01-12). El panel /blitz ya no avisa fuera de horario.
+     - **H5b del Estudio 5:** lanzada en GitHub (run 43763624113, `end` = 2026-10-26).
+     - Video «Conecta Claude a TradingView» (MCP): sin valor para predecir (docs/06 y docs/07).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
