@@ -16,7 +16,7 @@
   "entrada_s": 10.0,
   "inicio": "2026-10-04T00:00:00+00:00",
   "plazo_fin_excluido": "2026-12-14T00:00:00+00:00",
-  "datos_hasta_excluido": "2026-10-25T00:00:00+00:00",
+  "datos_hasta_excluido": "2026-10-26T00:00:00+00:00",
   "objetivo": {
     "H5a": 3500,
     "H5b": 2500
@@ -24,11 +24,11 @@
   "alfa": 0.025,
   "sin_empate_en_muestra": {
     "H5a": 3500,
-    "H5b": 2286
+    "H5b": 2500
   },
   "completa": {
     "H5a": true,
-    "H5b": false
+    "H5b": true
   },
   "excluidas": {
     "de_otro_modelo_o_metodo": 0,
@@ -36,7 +36,7 @@
     "fuera_del_periodo": 0,
     "vela_de_decision_repetida": 0
   },
-  "estado": "parcial",
+  "estado": "final",
   "hipotesis": {
     "H5a": {
       "n": 3500,
@@ -245,9 +245,154 @@
       ]
     },
     "H5b": {
-      "estado": "pendiente",
-      "sin_empate": 2286,
-      "objetivo": 2500
+      "n": 2500,
+      "aciertos": 1454,
+      "empates": 478,
+      "acierto": 0.5816,
+      "lo95": 0.5621520141132567,
+      "hi95": 0.6007975910055335,
+      "ev": 0.06376762928139491,
+      "p": 1.976060750927065e-05,
+      "umbral": 0.5405405405405405,
+      "estado": "aprueba",
+      "por_dia_utc": {
+        "2026-10-04": {
+          "n": 388,
+          "aciertos": 233
+        },
+        "2026-10-10": {
+          "n": 540,
+          "aciertos": 314
+        },
+        "2026-10-11": {
+          "n": 359,
+          "aciertos": 205
+        },
+        "2026-10-17": {
+          "n": 394,
+          "aciertos": 225
+        },
+        "2026-10-18": {
+          "n": 290,
+          "aciertos": 174
+        },
+        "2026-10-24": {
+          "n": 316,
+          "aciertos": 182
+        },
+        "2026-10-25": {
+          "n": 213,
+          "aciertos": 121
+        }
+      },
+      "por_dia_semana_utc": {
+        "5": {
+          "n": 1250,
+          "aciertos": 721
+        },
+        "6": {
+          "n": 1250,
+          "aciertos": 733
+        }
+      },
+      "sensibilidad": [
+        {
+          "entrada_s": 2,
+          "pago": 0.85,
+          "n": 2521,
+          "aciertos": 1496,
+          "empates": 457,
+          "sin_precio": 0,
+          "acierto": 0.5934153113843713,
+          "lo95": 0.5741127222141696,
+          "umbral": 0.5405405405405405,
+          "ev": 0.08280725319006041
+        },
+        {
+          "entrada_s": 2,
+          "pago": 0.8,
+          "n": 2521,
+          "aciertos": 1496,
+          "empates": 457,
+          "sin_precio": 0,
+          "acierto": 0.5934153113843713,
+          "lo95": 0.5741127222141696,
+          "umbral": 0.5555555555555556,
+          "ev": 0.057689724647414356
+        },
+        {
+          "entrada_s": 5,
+          "pago": 0.85,
+          "n": 2525,
+          "aciertos": 1485,
+          "empates": 453,
+          "sin_precio": 0,
+          "acierto": 0.5881188118811881,
+          "lo95": 0.5688016039465662,
+          "umbral": 0.5405405405405405,
+          "ev": 0.07463062458025521
+        },
+        {
+          "entrada_s": 5,
+          "pago": 0.8,
+          "n": 2525,
+          "aciertos": 1485,
+          "empates": 453,
+          "sin_precio": 0,
+          "acierto": 0.5881188118811881,
+          "lo95": 0.5688016039465662,
+          "umbral": 0.5555555555555556,
+          "ev": 0.04969778374748153
+        },
+        {
+          "entrada_s": 10,
+          "pago": 0.85,
+          "n": 2500,
+          "aciertos": 1454,
+          "empates": 478,
+          "sin_precio": 0,
+          "acierto": 0.5816,
+          "lo95": 0.5621520141132567,
+          "umbral": 0.5405405405405405,
+          "ev": 0.06376762928139687
+        },
+        {
+          "entrada_s": 10,
+          "pago": 0.8,
+          "n": 2500,
+          "aciertos": 1454,
+          "empates": 478,
+          "sin_precio": 0,
+          "acierto": 0.5816,
+          "lo95": 0.5621520141132567,
+          "umbral": 0.5555555555555556,
+          "ev": 0.03935527199462728
+        },
+        {
+          "entrada_s": 20,
+          "pago": 0.85,
+          "n": 2516,
+          "aciertos": 1449,
+          "empates": 462,
+          "sin_precio": 0,
+          "acierto": 0.5759141494435612,
+          "lo95": 0.5565017160430361,
+          "umbral": 0.5405405405405405,
+          "ev": 0.05528878441907316
+        },
+        {
+          "entrada_s": 20,
+          "pago": 0.8,
+          "n": 2516,
+          "aciertos": 1449,
+          "empates": 462,
+          "sin_precio": 0,
+          "acierto": 0.5759141494435612,
+          "lo95": 0.5565017160430361,
+          "umbral": 0.5555555555555556,
+          "ev": 0.03096037609133648
+        }
+      ]
     }
   },
   "conclusion": "Aprueba H5a: señales manuales experimentales en cuenta DEMO, a cualquier hora.",
