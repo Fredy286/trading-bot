@@ -992,3 +992,87 @@ descargaba de Binance de verdad; desde la nube se quedaba colgada varios minutos
   noviembre, y el bot se quedaba esperando ese día para siempre. Ya no: ahora espera 5 días y sigue.
 - Las señales y la medida principal no cambian; solo falta, ese día, el resultado con el precio de IQ Option.
 - No hubo estudio nuevo. El bot no cambió. Solo demo.
+
+## 2026-11-15 (autónoma)
+
+Tema del domingo: resumen semanal y repriorizar docs/10.
+
+**Comprobaciones:**
+- Sin ramas `claude/rutina-*` pendientes; cola de estudios vacía y todo lo hecho ya documentado (33, 48 y 57).
+- **Pendiente de ayer cerrado:** `results/registro/blitz/2026-11-06.jsonl` y `blitz_eth/2026-11-06.jsonl` ya existen.
+  Las 12 carpetas del registro tienen ahora los mismos 19 días (2026-10-26 → 11-13).
+- GitHub Actions (API, ~12:30 UTC): las últimas 25 ejecuciones en verde (libro de OKX en cadena, cola, vigilancia de
+  canales, registro diario del 14, integración de la rutina de ayer y pruebas). El registro diario de hoy aún no corre
+  (retraso conocido de los horarios de GitHub, ítems 46 y 57).
+- **Mejora pequeña:** `tbot registro resumen` no mostraba los registros del gran bot (`gran5`, `gran15`, `granblitz`).
+  Ahora muestra sus conteos (señales del gran bot y de la base, y en el horario del usuario), **nunca** sus aciertos,
+  ni siquiera después del sello: esos los calculan los Estudios 64, 68 y 69 con sus propias reglas. Prueba nueva en
+  `tests/test_registro.py`. Comprobación cruzada: la «base» del gran bot coincide con los registros sueltos (OKX 5 min
+  586 = 169 + 417; blitz 173 = 173).
+
+**Conteos del registro (19 días, sellados, sin aciertos):**
+
+| Registro | Señales | Por día | En desarrollo |
+|---|---|---|---|
+| BTC 1 min (H16b) | 1 294 (p ≥ 0,60: 152) | 68 | — |
+| Nocturna, actual / fuerte | 2 685 / 990 | 141 / 52 | — |
+| Blitz BTC (p ≥ 0,57) | 173 (102) | 9,1 | 36 (Estudio 66, base) |
+| Blitz ETH (p ≥ 0,57) | 909 (338) | 48 | 112 |
+| OKX 5 min ETH / BTC | 169 / 417 | 8,9 / 21,9 | 25,5 / 11,5 |
+| OKX 15 min ETH / BTC | 134 / 209 | 7,1 / 11,0 | 7,8 / 11,4 |
+| Gran bot OKX 5 min (base) | 906 (586) | 47,7 (30,8) | 73 (40) |
+| Gran bot OKX 15 min (base) | 528 (343) | 27,8 (18,1) | 50 (14) |
+| Gran bot blitz (base) | 811 (173) | 42,7 (9,1) | 77 (36) |
+
+Lectura (solo cantidades): el gran bot sigue dando bastantes más señales que su base (×1,5 a ×4,7), como en
+desarrollo, pero todos los registros dan menos señales que en desarrollo: estas semanas son tranquilas (ya se vio en
+octubre con el blitz). Nada de esto dice si aciertan; eso se sabrá en enero.
+
+### Resumen de la semana (2026-11-09 → 2026-11-15)
+
+**Qué se aprendió**
+1. **Juntar nuestros propios modelos sirve (Estudios 63–69, «el gran bot»).** Un combinador simple de las opiniones
+   de BTC, ETH y SOL a varios plazos casi duplicó las señales con el mismo acierto en el pasado (OKX 5 min 40 → 73 por
+   día; blitz 36 → 77; OKX 15 min 14 → 50). Con más monedas (XRP, DOGE) ya no mejora (Estudio 65). Lo que no lograron
+   30 herramientas de terceros lo logró sumar opiniones propias.
+2. **Un mercado lleno de bots ya cobra nuestra ventaja (Estudio 59).** En Polymarket, el lado de nuestras señales ya
+   costaba 0,555 y acertaba 56,8 %: casi no queda ganancia. En OKX la pregunta es la misma y la responde el libro
+   grabado (Estudio 56, abril).
+3. **La manipulación de las marcas de 5 min existe en Binance (Estudio 57)**, pero no dañó nuestro modelo; la pequeña
+   baja de acierto en :00/:05… se confirmará en enero (Estudio 58).
+4. **Solana no sirve en ningún contrato** (Estudios 53 y 61). OKX 15 min (ETH y BTC) queda en confirmación (Estudio 60).
+5. **Dentro de la ventana de OKX casi nunca hay precio**, salvo BTC 5 min al minuto 1 → Estudio 62 (el favorito).
+6. **Literatura de la semana:** el flujo de órdenes a 1 s ya lo usamos; la reversión nocturna puede ser en parte el
+   diferencial que se abre y se cierra (no algo que un bróker pague). **Canales:** QuotexSignalfreee bajó a 49,6 % con
+   más señales; las listas de «Gavin» dan 49,9 % en la 1.ª entrada (azar con gales).
+7. **Errores corregidos:** 58 (XRP y DOGE usaban el tic de BTC, antes de usarlos) y 59 (el registro del blitz se
+   quedaba esperando a Gate para siempre). Hoy, conteos del gran bot en el resumen.
+
+**Qué está en marcha (automático)**
+- Registro diario sellado: 12 registros (BTC, ETH, nocturna, blitz BTC y ETH, OKX 5 y 15 min de ETH y BTC, gran bot ×3).
+- Libro de OKX antes y dentro de la ventana (Estudios 56 y 62), en cadena; vigilancia de canales; cola y esta rutina.
+
+**Próximas fechas**
+- 2026-12-13: evaluación única del Estudio 62 (favorito de BTC 5 min al minuto 1).
+- 2027-01-19: confirmaciones únicas (12, 14, 15, 16, 19, 21, 29, 35, 40, 43, 44, 46, 49, 52, 55, 58, 60, 64, 68 y 69),
+  primeras miradas de 56 y 60 (α 0,01) y apertura del registro. Antes, comprobar que no falte ningún día.
+- 2027-01-31: veredicto de los canales (Estudio 32). 2027-04-27: miradas principales de 56, 60, 64, 68 y 69 (α 0,04).
+
+**Repriorización de docs/10:** sube arriba la idea 7 (modo de práctica del gran bot: ya hay modelos y registro, falta
+el bucle en vivo; es trabajo de sesión local, sin estudio nuevo). Sigue la 1c (OKX: decidir antes), marcada como
+probablemente débil. Las ideas de IQ Option (0, 1, 1b) y de traders verificados (2) dependen de la sesión local.
+
+**Estudio nuevo:** ninguno (domingo de resumen).
+
+**Pendientes con fecha**
+- 2026-11-16: comprobar que el registro diario del 14 de noviembre llegó a las 12 carpetas.
+- Sesión local con Fredy: modo de práctica del gran bot; precios de entrada del blitz (ideas 1 y 1b); canales no OTC.
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones. 2027-01-31: canales. 2027-04-27: miradas de abril.
+
+**Para Fredy**
+- Esta semana la mejor noticia fue el «gran bot»: juntar las opiniones de nuestros propios modelos casi duplicó las
+  señales en el pasado sin bajar el acierto.
+- La advertencia: en Polymarket, donde hay muchos bots, el precio ya se comía la ventaja. En OKX lo estamos midiendo.
+- Todo lo automático funciona y no falta ningún día. Estas semanas el mercado está tranquilo: hay menos señales.
+- Primera fecha importante: 13 de diciembre (Estudio 62). La grande: 19 de enero, cuando se abren los resultados.
+- Nada cambió en el bot. Solo demo; no operes con dinero real.

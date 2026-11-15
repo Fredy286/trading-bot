@@ -513,6 +513,16 @@ def resumen(root: Path = ROOT, abrir: bool = False, now: pd.Timestamp | None = N
                 item["acierto"] = round(float((dec["resultado"] == "gana").mean()), 4) if len(dec) else None
                 item["medidas"] = int(len(dec))
             out[name][lab] = item
+    # Gran bot (Estudios 64, 68 y 69): solo conteos. Sus aciertos los calculan los propios estudios (su campo
+    # `resultado` es la dirección ±1 o el resultado del compuesto, no «gana/pierde»).
+    for name in ("gran5", "gran15", "granblitz"):
+        df = _load(root, name)
+        out[name] = {"dias": len(list((Path(root) / name).glob("*.jsonl")))}
+        for lab, col in (("señal del gran bot", "senal_gran"), ("señal de la base", "senal_base")):
+            n = int(df[col].astype(bool).sum()) if col in df else 0
+            nu = (int((df[col].astype(bool) & df["horario_usuario"].astype(bool)).sum())
+                  if col in df and "horario_usuario" in df else 0)
+            out[name][lab] = {"senales": n, "horario del usuario": nu}
     if abrir and now < SELLO:
         with open(Path(root) / "aperturas_del_sello.log", "a", encoding="utf-8") as fh:
             fh.write(f"{now.isoformat()} se abrieron los aciertos antes del {SELLO:%Y-%m-%d}\n")

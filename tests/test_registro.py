@@ -91,3 +91,20 @@ def test_gate_missing_day_waits_then_gives_up(tmp_path, monkeypatch):
         registro.gate_or_missing(day, tmp_path, now=pd.Timestamp("2026-11-09", tz="UTC"), log=lambda *_: None)
     s = registro.gate_or_missing(day, tmp_path, now=pd.Timestamp("2026-11-13", tz="UTC"), log=lambda *_: None)
     assert s.empty and str(s.index.tz) == "UTC"
+
+
+def test_gran_bot_registries_show_only_counts(tmp_path):
+    """El resumen cuenta las señales del gran bot (Estudios 64, 68, 69) sin calcular aciertos, ni abierto."""
+    (tmp_path / "gran5").mkdir()
+    rows = [{"senal_gran": True, "senal_base": False, "horario_usuario": True, "resultado": 1},
+            {"senal_gran": True, "senal_base": True, "horario_usuario": False, "resultado": -1},
+            {"senal_gran": False, "senal_base": False, "horario_usuario": False, "resultado": None}]
+    (tmp_path / "gran5" / "2026-11-02.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    s = registro.resumen(tmp_path, now=pd.Timestamp("2026-11-04", tz="UTC"))
+    assert s["gran5"]["dias"] == 1
+    assert s["gran5"]["señal del gran bot"] == {"senales": 2, "horario del usuario": 1}
+    assert s["gran5"]["señal de la base"] == {"senales": 1, "horario del usuario": 0}
+    assert s["gran15"] == {"dias": 0, "señal del gran bot": {"senales": 0, "horario del usuario": 0},
+                           "señal de la base": {"senales": 0, "horario del usuario": 0}}
+    abierto = registro.resumen(tmp_path, now=pd.Timestamp("2027-02-01", tz="UTC"))
+    assert "acierto" not in abierto["gran5"]["señal del gran bot"]

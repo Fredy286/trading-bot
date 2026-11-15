@@ -345,6 +345,7 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        (α 0,04).
      - Error 58: la receta del 35 llevada a XRP y DOGE usaba el tic de BTC; se corrigió antes de usarlos.
      - Pendiente: modo de práctica con el gran bot (falta juntar los seis u ocho modelos en el bucle en vivo).
+     - `tbot registro resumen` cuenta también `gran5`, `gran15` y `granblitz` (solo conteos, nunca aciertos; 2026-11-15).
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
