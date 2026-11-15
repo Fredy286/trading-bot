@@ -5158,3 +5158,207 @@ quedaron con 30 399 y 24 filas de ajuste (registro de errores 58).
 - SOL y ETH no cambian: su tic es 0,01, la misma etiqueta.
 - El metamodelo del blitz se volvió a congelar con los mismos coeficientes y la cita de los modelos correctos.
 
+
+## Estudio 70 — margen 0 los sábados y domingos (UTC) en el gran bot de OKX 5 min (pre-registro, 2026-11-15, ANTES de abrir `results/registro/gran5/`, sellado hasta el 2027-01-19, y de calcular ningún acierto posterior al 2026-10-25)
+
+**Origen (desarrollo, *post hoc*).** Ronda de mejoras del 2026-11-15. Las cifras se recalcularon de forma
+independiente con las predicciones fuera de muestra del Estudio 63: metamodelo mes a mes, solo con el pasado;
+ventanas 2025-11-01 → 2026-10-25; `results/estudio63/predicciones.parquet`.
+- Regla actual (p_dir − 0,5312 ≥ 0,02): 73,3 señales/día, 55,94 %, ganancia +740,7.
+- El gran bot está bien calibrado el fin de semana y exagera entre semana. Pendiente de la logística de y sobre
+  logit p: 1,11 el fin de semana y 0,68 entre semana.
+- Operaciones «extra» del fin de semana (0 ≤ p_dir − 0,5312 < 0,02):
+  - 11 051 operaciones, **55,18 %** [Wilson 54,25; 56,11], **+227,4**;
+  - cuantil 5 % de 10 000 remuestreos por semanas ISO: +137,9 (1 %: +100,0);
+  - 12 de 12 meses positivos;
+  - ETH 55,9 % (+160,6); BTC 54,4 % (+66,8); sábado 55,6 %; domingo 54,8 %;
+  - horario del usuario (02:00–05:59 UTC): 1 827 con 57,1 %.
+- Control: la misma franja entre semana da 52,66 % (−110,4; 4 de 12 meses positivos).
+- Réplica con otro modelo y en otro año: BTC 1 min (H16b, pago 85 %), verificación 2024-07 → 2025-08. La misma
+  franja (0 ≤ EV < 0,02) el fin de semana: 9 468 operaciones, 55,62 % (equilibrio 54,05 %), +250,4, cuantil 5 %
+  +123,7, 11 de 14 meses. Entre semana: 52,38 % (−345,7).
+- Coincide con H5a del Estudio 5 (fin de semana 58,4 % frente a 53,2 % entre semana, descriptivo) y con su
+  hipótesis H5b, pre-registrada en octubre y todavía sin evaluar.
+- Con el metamodelo congelado aplicado a esas filas (en muestra, solo para contar): ~95 operaciones extra por día
+  de fin de semana.
+
+**Piezas congeladas (no cambian):**
+- el metamodelo `config/gran_bot_okx5.json` del Estudio 64 (commit e04e832; SHA-256 6a8035d247bbb592…);
+- sus seis opiniones: ETHUSDT-okx5-2fffa5, BTCUSDT-okx5-da65c6, BTCUSDT-anticipada-k50-L10-35b764,
+  BTCUSDT-blitz3-compuesto-0f8694, ETHUSDT-blitz3-compuesto-5d7319 y SOLUSDT-blitz3-compuesto-675060;
+- el costo 0,5312 (0,52 + comisión 0,045·0,52·0,48);
+- el registro diario `gran5` tal como está. Ya guarda TODAS las ventanas, con p_gran, p_base y el resultado oficial
+  o reconstruido, así que no se toca el código en vivo.
+
+**Definiciones (fijas):**
+- **fin de semana:** la ventana (campo `ventana`) empieza en sábado o domingo UTC, es decir, de viernes 19:00 a
+  domingo 18:59 de Bogotá (la definición de H5b);
+- **p_dir** = max(p_gran, 1 − p_gran); el lado es «Al alza» si p_gran ≥ 0,5;
+- **regla actual (H64):** operar si p_dir − 0,5312 ≥ 0,02;
+- **regla nueva:** el fin de semana, operar si p_dir − 0,5312 ≥ 0; de lunes a viernes, igual que hoy;
+- **operaciones extra:** ventanas de fin de semana con 0 ≤ p_dir − 0,5312 < 0,02. Cada una gana +0,4688 o pierde
+  −0,5312.
+
+**Hipótesis H70 (ETH y BTC juntos):** la ganancia total de las operaciones extra es mayor que 0. Equivale a que la
+regla nueva gane más que la actual.
+
+**Criterios (todos, en cada mirada):**
+1. el cuantil α de la suma, en 10 000 remuestreos de semanas ISO completas con reemplazo (semilla 70; la semana es
+   la del inicio de la ventana), es mayor que 0;
+2. hay ≥ 300 operaciones extra.
+
+**Datos:** `results/registro/gran5/` desde el 2026-10-26. Solo filas con resultado ±1, sin duplicados por moneda e
+instrumento, como en el Estudio 64. Antes de calcular se comprueba que no falte ningún día (ítem 54); si falta
+alguno, no se evalúa.
+
+**Dos miradas, cada una una sola vez (Bonferroni, total 0,05), como en el Estudio 64:**
+- **enero:** ventanas del 2026-10-26 al 2027-01-18 (12 fines de semana); se evalúa desde el 2027-01-19 con α = 0,01;
+- **abril:** ventanas hasta el 2027-04-26 (26 fines de semana); se evalúa desde el 2027-04-27 con α = 0,04, solo si
+  enero no pasó.
+
+**Informativo (no decide):**
+- acierto de las extra con IC de Wilson frente a 53,12 %;
+- por moneda, al alza y a la baja, sábado y domingo, y en el horario del usuario;
+- solo filas con resultado oficial;
+- la misma franja entre semana, como control (se espera ≤ 0);
+- pendiente de calibración por régimen;
+- cuando el Estudio 56 haga su mirada: las extra con el precio real del libro a −10 s, con costo
+  P + 0,045·P·(1 − P).
+
+**Potencia** (desarrollo: +4,4 por semana, desviación 7,7): enero ~35 % con el efecto completo y ~9 % con la
+mitad; abril ~85 % y ~38 %. La mirada principal es la de abril.
+
+**Riesgos que quedan escritos:**
+- el borde es fino: en desarrollo, comprando a 0,53 las extra ganaban +117 y a 0,54, +7;
+- el libro de ETH estuvo vacío 1,5 h el domingo 2026-11-08 (Estudio 56);
+- por regresión a la media, hay que esperar menos que en desarrollo.
+
+**Orden con el Estudio 71:** el 71 va detrás de este, en secuencia fija. El 70 no le cede α.
+
+**Consecuencia:**
+- **si pasan H70 y H64** (en la misma mirada o antes): el modo de práctica del gran bot de OKX 5 min usa margen 0
+  los sábados y domingos UTC. En las operaciones extra solo compra si el lado cuesta ≤ 0,52;
+- **si no pasa:** el margen sigue en 0,02 todos los días.
+Siempre sin dinero real; nunca dinero real sin autorización expresa y específica del usuario.
+
+## Estudio 71 — apoyo del gran bot de 15 min para el contrato de 5 min de OKX, de lunes a viernes (pre-registro, 2026-11-15, en el mismo commit que el Estudio 70, ANTES de abrir `results/registro/gran5/` y `results/registro/gran15/`, sellados hasta el 2027-01-19)
+
+**Origen (desarrollo, *post hoc*; cifras recalculadas de forma independiente).** Predicciones fuera de muestra de los
+Estudios 63 (5 min) y 67 (15 min; walk-forward regenerado, reproduce +484,1); ventanas 2025-11 → 2026-10-25. En
+las ventanas de 5 min que empiezan a la misma hora que una de 15 min (minutos 0, 15, 30 y 45):
+- de lunes a viernes, cuando el gran bot de 15 min da señal y el de 5 min apunta al mismo lado sin llegar al
+  margen (0 ≤ p_dir5 − 0,5312 < 0,02):
+  - 4 188 operaciones (unas 16 por día laborable), **55,06 %** [Wilson 53,55; 56,56], **+81,2**;
+  - cuantil 5 % por semanas ISO +14,6; cuantil 1 % −13,1;
+  - 10 de 12 meses positivos;
+- control: la misma franja sin ese apoyo da 51,17 % (−73,4; 2 de 12 meses positivos);
+- con la señal de 15 min de 5 y 10 min antes (2.ª y 3.ª ventana del bloque), el efecto se apaga (53,2 % y 52,0 %):
+  es información que caduca;
+- los dos gran bots nunca dieron señales opuestas en la misma ventana (0 casos);
+- en el horario del usuario no aporta (53,4 %);
+- comprando a 0,53: +39; a 0,54: −2.
+Varias decisiones de diseño se tomaron mirando estos datos: por eso la potencia y el orden se fijan con prudencia.
+
+**Piezas congeladas (no cambian):**
+- `config/gran_bot_okx5.json` (Estudio 64);
+- `config/gran_bot_okx15.json` (Estudio 69; commit 5063cfc; SHA-256 ee93275b43dd6786…);
+- sus opiniones congeladas: ETHUSDT-okx15-6a2d32, BTCUSDT-okx15-765c4c y las seis del Estudio 64;
+- costo 0,5312 y margen 0,02.
+No se tocan los registros ni el código en vivo.
+
+**Regla (congelada).** Se compra 1 contrato de 5 min cuando se cumple todo:
+1. la ventana de 5 min empieza de lunes a viernes UTC, en el minuto 0, 15, 30 o 45;
+2. el gran bot de 15 min de la misma moneda da señal en la ventana de 15 min que empieza a la misma hora:
+   max(p15, 1 − p15) − 0,5312 ≥ 0,02 (campo `senal_gran` del registro `gran15`);
+3. el gran bot de 5 min apunta al mismo lado: signo(p5 − 0,5) = signo(p15 − 0,5);
+4. el de 5 min solo no llegaba al margen: 0 ≤ max(p5, 1 − p5) − 0,5312 < 0,02.
+Gana +0,4688 o pierde −0,5312, con el resultado del contrato de 5 min (registro `gran5`).
+
+**Hipótesis H71 (ETH y BTC juntos):** la ganancia total de esas operaciones es mayor que 0. Es la mejora frente al
+gran bot de 5 min actual, que no las toma.
+
+**Criterios (todos):**
+1. el cuantil α de la suma, en 10 000 remuestreos de semanas ISO completas (semilla 71), es mayor que 0;
+2. hay ≥ 300 operaciones.
+
+**Orden y α (secuencia fija con el Estudio 70; no se reparte α).** En cada mirada, H71 solo se evalúa si H70 ya
+pasó, en esa mirada o en la de enero. Entonces usa el α de esa mirada:
+- **enero:** ventanas 2026-10-26 → 2027-01-18, desde el 2027-01-19, α = 0,01;
+- **abril:** ventanas hasta el 2027-04-26, desde el 2027-04-27, α = 0,04, solo si H71 no pasó en enero.
+Si H70 no pasa nunca, H71 queda «no evaluada».
+
+**Datos:** `results/registro/gran5/` y `results/registro/gran15/`, unidos por inicio de ventana (`ventana`) y
+moneda. Solo filas con resultado ±1 del contrato de 5 min. Antes de calcular se comprueba que no falte ningún día en
+ninguno de los dos registros.
+
+**Informativo:** la misma regla en la 2.ª y la 3.ª ventana del bloque (se espera ≈ 0); por moneda; horario del
+usuario; solo resultado oficial; con el precio real del libro (Estudio 56), cuando haya hecho su mirada; cuántas
+operaciones añade por día laborable.
+
+**Potencia** (desarrollo: +1,6 por semana, desviación ≈ 5,6): enero ~8 % con el efecto completo; abril ~35 %. Lo más
+probable en enero es «sin confirmar».
+
+**Consecuencia:**
+- **si pasan H71, H64 y H69:** el modo de práctica del gran bot de 5 min añade esta regla de lunes a viernes,
+  comprando solo a ≤ 0,52 (a 0,53 la ventaja casi desaparece). Siempre sin dinero real;
+- **si no pasa:** nada cambia.
+
+## Enmienda 2 al Estudio 44 y enmiendas a los Estudios 46 y 68: el blitz de BTC se juzga también solo en el horario en que IQ Option lo abre (pre-registro, 2026-11-15, ANTES de abrir `results/registro/blitz/` y `results/registro/granblitz/`, sellados hasta el 2027-01-19)
+
+**Motivo.** En IQ Option, el blitz de Bitcoin con precio real cierra el fin de semana y abre el domingo a las 22:00
+de Bogotá (lunes 03:00 UTC). El fin de semana solo hay versiones OTC, que nunca se estudian ni se recomiendan.
+H44a, H44c, H46 y H68 cuentan todas las velas, también las de horas en que la plataforma está cerrada.
+
+**Desarrollo (*post hoc*, cifras recalculadas de forma independiente).** Predicciones fuera de muestra de los Estudios
+42 y 66 (walk-forward regenerado, reproduce +802,1 y +378,4), 2025-11 → 2026-10-25, con cierre prudente el viernes
+22:00 UTC (17:00 de Bogotá):
+
+| | Horas abiertas | Horas cerradas |
+|---|---|---|
+| p42 (base) | ~31–33/día, 54,53 %, +113,9 | +264,5 |
+| Gran bot del blitz | ~70–73/día, 54,54 %, +256,8 (cuantil 5 % por semanas ≈ +34 a +36) | +545,3 |
+
+- Dos tercios de la ganancia de desarrollo vienen de horas en que IQ Option tiene cerrado el blitz con precio real.
+- ΔG gran bot − p42 en horas abiertas: +142,9 (cuantil 5 % −78,9; p ≈ 0,15). En todas las horas era +424.
+- El equilibrio del blitz es 53,76 %: en horas abiertas el borde es fino.
+
+**Paso 0 (antes del 2027-01-12; sesión con Fredy, sin operar):** anotar en IQ Option el horario del activo
+«Bitcoin» en Blitz, en hora de Bogotá: apertura del domingo, cierre del viernes y pausas diarias. Se congela en
+`config/horario_iq_blitz.json` con commit fechado. Si no se confirma antes del 2027-01-12, queda el horario prudente:
+lunes 03:00 UTC → viernes 22:00 UTC (domingo 22:00 → viernes 17:00 de Bogotá), sin pausas. Bogotá = UTC−5 todo el
+año. El horario es un dato de la plataforma, no un corte elegido mirando resultados.
+
+**Definición:** una vela de decisión t (campo `vela` de los registros) está «en horario abierto» si su contrato
+entero cae dentro del horario congelado: la compra, al cierre de t (t + 1 min), y el vencimiento 3 min después
+(t + 4 min).
+
+**Hipótesis nuevas.** Mismos modelos congelados (BTCUSDT-blitz3-compuesto-0f8694; `config/gran_bot_blitz.json`,
+SHA-256 43723c2b5f6a1986…), reglas de operar, datos, criterios, semillas y miradas que la hipótesis original. Solo
+cambian las velas que cuentan:
+- **H44a-ab:** H44a con las velas en horario abierto: ≥ 300 operaciones; p binomial unilateral < 0,025 frente a
+  53,76 %; Wilson 95 % > 53,76 %. Una sola evaluación, después del 2027-01-18;
+- **H44c-ab:** lo mismo con el precio IQ reconstruido (H44c);
+- **H44b-ab:** H44b (decisión de 02:00 a 05:59 UTC) en horario abierto. Si no llega a 300 operaciones, se espera como
+  en H44b, con un máximo de 6 meses;
+- **H46-ab:** H46 (p ≥ 0,57) en horario abierto, con sus mismos criterios;
+- **H68-ab:** los tres criterios de H68 con las velas en horario abierto (ganancia del gran bot del blitz > 0 y ΔG
+  frente a p42 > 0 en el cuantil α de 10 000 remuestreos pareados por semanas ISO, semilla 68; ≥ 300 operaciones).
+  Miradas de enero (α = 0,01) y abril (α = 0,04, solo si enero no pasó), como H68.
+
+**Regla de decisión (intersección-unión; no se reparte α).** Cada consecuencia práctica para IQ Option exige que
+pasen la hipótesis original **y** su versión «-ab», cada una con su α:
+- seguir practicando el blitz en la demo: H44a, H44c, H44a-ab y H44c-ab;
+- avisos en el horario del usuario: además, H44b y H44b-ab;
+- filtro p ≥ 0,57: H46 y H46-ab;
+- usar el gran bot del blitz en lugar de p42: H68 y H68-ab.
+Las hipótesis originales se informan igual, como medida científica.
+
+**Informativo:** las mismas cifras en horas cerradas; por día de la semana; el viernes de 17:00 a 22:00 de Bogotá,
+aparte; la primera hora del lunes.
+
+**Potencia** (escalando el desarrollo): H44a-ab ~10 %; H44b-ab ~27 % a los 6 meses; H46-ab ~20 %; H68-ab ~3 % en
+enero y ~16 % en abril. Lo más probable es «sin confirmar en horario abierto», y eso es justo lo que hay que saber
+antes de recomendar IQ Option.
+
+**Consecuencia inmediata (no depende de ningún resultado):** el panel `/blitz` deja de avisar fuera del horario
+congelado y muestra «IQ cerrado: no operar OTC». Nunca dinero real sin autorización expresa y específica.
