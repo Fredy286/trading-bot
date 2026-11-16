@@ -1099,3 +1099,37 @@ predice nada y sus autores advierten un riesgo con los términos de TradingView 
 - literatura y lógicas de comunidades;
 - exploración *post hoc* con predicciones de desarrollo, diseño y crítica en dos lentes.
 
+
+## 2026-11-16 (autónoma)
+
+**Tema del día (lunes):** literatura y microestructura.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. El registro
+diario del 14 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo conteos; 20 días cada una). La
+corrida de hoy del registro aún no había empezado a las 12:15 UTC (GitHub la lanza tarde, como siempre, ítem 46).
+
+**Búsquedas (solo resúmenes del buscador; concretumgroup.com, karlwhelan.com e ifo.de no abren desde la nube):**
+- Fin de semana y horas en BTC: «Monday Asia Open Effect» (Zarattini, Pagani y Barbon, SSRN 2025) — tendencia de
+  horas al abrir Asia el lunes; en contra, Kaiser (Finance Research Letters 2024): la estacionalidad de BTC no es
+  robusta. Fuentes en docs/06, 3g.
+- Sesgo del favorito en mercados de predicción: Kalshi (Bürgi, Deng y Whelan, CESifo WP 12122; > 300 000 contratos):
+  los baratos ganan menos de lo que cuestan, los precios mejoran cerca del cierre y los *makers* ganan más que los
+  *takers*. Sobre contratos de cripto de 5 min solo hay un blog sin método verificable.
+- Combinar modelos (*stacking*) en cripto: nada nuevo frente al gran bot (Barnwal et al. 2019, arXiv 1902.07855, con
+  validación *walk-forward* purgada, como la nuestra).
+
+**Estudio nuevo:** ninguno. El efecto de Asia sería elegir una franja horaria mirando el pasado (ya falló con la
+«catalogación») y el sesgo del favorito ya lo cubre el Estudio 62. Idea nueva 1d en docs/10 (OKX como *maker*), sin
+estudio por falta de datos del libro completo.
+
+**Pendientes con fecha**
+- 2026-11-17: comprobar que el registro del 15 de noviembre llegó a las 12 carpetas.
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones y apertura del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy tocaba leer estudios de otros. Dos ideas interesantes, ninguna para probar hoy.
+- Unos investigadores ven que BTC sigue tendencias al abrir Asia el lunes, pero otros dicen que esos «días mágicos» no
+  se sostienen en el tiempo. No lo vamos a perseguir.
+- En Kalshi (un mercado de apuestas de EE. UU.) el favorito gana más de lo que dice su precio: eso apoya la prueba del
+  13 de diciembre (Estudio 62).
+- Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.

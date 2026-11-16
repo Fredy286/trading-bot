@@ -202,6 +202,26 @@ moneda al aire**: con 50 % por intento, ganar en alguno de tres intentos es 87,5
 la primera entrada supera el azar, y con pago 85 % y martingala la ganancia esperada es negativa (docs/05). Descriptivo,
 con las cifras del propio canal (puede haber operaciones repetidas entre listas); no cambia el veredicto del Estudio 32.
 
+## 3g. Literatura del 2026-11-16: fin de semana, apertura de Asia y sesgo del favorito (solo resúmenes)
+
+Las páginas no abren desde la nube (concretumgroup.com, karlwhelan.com, ifo.de dan «host no permitido»); todo sale de
+los resúmenes del buscador, sin cifras de rentabilidad verificadas.
+
+- **«Monday Asia Open Effect»** (Zarattini, Pagani y Barbon, *Catching Crypto Trends*, SSRN 2025, rev. oct. 2025): una
+  cartera de modelos de tendencia de alta frecuencia en BTC gana más al abrir Asia el lunes; lo atribuyen a liquidez y
+  posiciones nuevas que marcan movimientos de varias horas, más fuerte desde mediados de 2020. En contra: Kaiser (Finance
+  Research Letters 64, 2024) dice que el «efecto lunes» de BTC no persiste después de 2015 y que la estacionalidad en
+  cripto no es robusta. **Lectura:** es tendencia de horas, no de 1 min; no se convierte en estudio (sería buscar una
+  franja horaria a posteriori, lo que ya falló con la «catalogación»). Nuestro efecto de fin de semana (H5b confirmada)
+  es otro: se mide en datos nuevos y no depende de una hora concreta.
+- **Sesgo del favorito en Kalshi** (Bürgi, Deng y Whelan, *Makers and Takers*, CESifo WP 12122 / CEPR DP20631, 2025–26;
+  más de 300 000 contratos): los contratos baratos ganan menos de lo que dice su precio (sesgo favorito–longshot); los
+  precios mejoran cerca del cierre; los que ponen órdenes en el libro (*makers*) ganan más que los que las toman
+  (*takers*); rendimiento medio de −20 % a −22 %. Un blog sin método verificable dice que el sesgo es más fuerte en los
+  contratos de 5 min de cripto. **Lectura:** apoya la lógica del Estudio 62 (comprar al favorito dentro de la ventana de
+  OKX), ya pre-registrado; no se cambia nada. Y recuerda que en OKX compramos como *taker*: la parte que gana en esos
+  mercados es la que deja órdenes esperando (anotado como idea 1d en docs/10, sin estudio).
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:
@@ -254,3 +274,8 @@ BIAS).
 - Momentum: Moskowitz, Ooi y Pedersen, *Time Series Momentum*: https://papers.ssrn.com/abstract=2089463 ;
   RSI sobrecomprado (practicante): https://sentimentrader.com/blog/overbought-on-every-time-frame
 - MCP de TradingView (README con sus advertencias sobre términos de uso y riesgo de la cuenta): https://github.com/tradesdontlie/tradingview-mcp
+- Literatura del 2026-11-16: Concretum (SSRN): https://concretumgroup.com/seasonality-in-bitcoin-intraday-trend-trading/ ;
+  Kaiser 2024: https://ideas.repec.org/a/eee/finlet/v64y2024ics1544612324004598.html ;
+  Kalshi: https://www.ifo.de/DocDL/cesifo1_wp12122.pdf ; https://econpapers.repec.org/RePEc:cpr:ceprdp:20631 ;
+  https://www.ucd.ie/economics/t4media/WP2025_19.pdf ; blog de contratos de 5 min (sin verificar):
+  https://oddsreference.pages.dev/predictions/research/kalshi-crypto-binary-options
