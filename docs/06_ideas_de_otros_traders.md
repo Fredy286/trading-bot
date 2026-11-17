@@ -222,6 +222,27 @@ los resúmenes del buscador, sin cifras de rentabilidad verificadas.
   OKX), ya pre-registrado; no se cambia nada. Y recuerda que en OKX compramos como *taker*: la parte que gana en esos
   mercados es la que deja órdenes esperando (anotado como idea 1d en docs/10, sin estudio).
 
+## 3h. Hyperliquid: el único historial de traders verificado al 100 % (2026-11-17, solo resúmenes)
+
+En Hyperliquid (bolsa de futuros perpetuos en su propia cadena) cada orden y cada cuenta son públicas: es el único
+sitio donde el «historial verificado» no depende de una captura ni de un bróker. Las páginas y la API
+(api.hyperliquid.xyz, stats-data.hyperliquid.xyz, htx.com, hyprswarm.pages.dev) **no abren desde la nube**; todo sale de
+los resúmenes del buscador, sin poder comprobar cifras.
+
+- **La mayoría pierde:** de 1 000 cuentas, 166 con ganancia (16,6 %, The Coin Republic, 2025-06); otro informe con datos
+  de Hyperdash da 14 %; otro, 75 % pierde (HTX).
+- **Acierto alto ≠ ganancia:** según HyprSwarm, las carteras más grandes aciertan menos del 40 % y son las que más ganan;
+  una cuenta con 28 % de acierto ganó 4,48 M USD en 50 operaciones; la de «64,75 % de acierto» es de alta frecuencia (por
+  su estilo, probablemente un creador de mercado que cobra el diferencial, no alguien que adivina la dirección).
+- **Las listas engañan:** Protos (2025) cuenta cifras de ganancias mal leídas de las tablas de clasificación que se
+  difundieron en redes; ordenar por acierto saca arriba a cuentas de poca ganancia.
+
+**Lectura:** confirma las secciones 3b y 3c con datos que nadie puede maquillar: quien acierta ≥ 60 % de forma estable
+suele ganar poco por operación o cobrar el diferencial (lo que hace el *maker*, idea 1d de docs/10), no predecir mejor.
+No hay estudio: no tenemos acceso a la API desde la nube, y «seguir a las ballenas» es copiar, lo que ya se descartó.
+Queda como idea 2b de baja prioridad (docs/10): solo si GitHub Actions llega a la API, medir si las posiciones de las
+cuentas grandes anticipan el minuto siguiente de BTC, con pre-registro y datos hasta el 2026-10-25.
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:
@@ -279,3 +300,8 @@ BIAS).
   Kalshi: https://www.ifo.de/DocDL/cesifo1_wp12122.pdf ; https://econpapers.repec.org/RePEc:cpr:ceprdp:20631 ;
   https://www.ucd.ie/economics/t4media/WP2025_19.pdf ; blog de contratos de 5 min (sin verificar):
   https://oddsreference.pages.dev/predictions/research/kalshi-crypto-binary-options
+- Hyperliquid (2026-11-17, solo resúmenes): https://www.thecoinrepublic.com/2025/06/16/hyperliquid-crypto-only-166-of-1000-traders-profitable-whats-going-on/ ;
+  https://hyprswarm.pages.dev/blog/why-biggest-wallets-worst-win-rate/ ;
+  https://www.htx.com/news/data-75-of-traders-on-hyperliquid-are-losing-money-what-are-R2h1lIXH/ ;
+  https://beincrypto.com/hyperliquid-traders-profitability ;
+  https://protos.com/hyperliquid-leaderboards-confuse-traders-as-hype-hits-all-time-high

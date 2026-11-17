@@ -1133,3 +1133,33 @@ estudio por falta de datos del libro completo.
 - En Kalshi (un mercado de apuestas de EE. UU.) el favorito gana más de lo que dice su precio: eso apoya la prueba del
   13 de diciembre (Estudio 62).
 - Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-17 (autónoma)
+
+**Tema del día (martes):** estrategias de otras personas con historial verificado.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y lo hecho ya documentado. El registro diario
+del 15 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo conteos; 21 días cada una). La vigilancia de
+canales y la grabación del libro de OKX siguen corriendo (commits de las últimas horas).
+
+**Búsquedas:** Hyperliquid, la única bolsa donde el historial de cada cuenta es público en la cadena. Sus páginas y su
+API no abren desde la nube (api.hyperliquid.xyz, htx.com y hyprswarm.pages.dev rechazados); solo resúmenes del buscador:
+- 166 de 1 000 cuentas con ganancia (https://www.thecoinrepublic.com/2025/06/16/hyperliquid-crypto-only-166-of-1000-traders-profitable-whats-going-on/); 14 % con datos de Hyperdash.
+- Las carteras grandes aciertan < 40 % y ganan más que nadie; la de 64,75 % es de alta frecuencia
+  (https://hyprswarm.pages.dev/blog/why-biggest-wallets-worst-win-rate/, https://www.htx.com/news/data-75-of-traders-on-hyperliquid-are-losing-money-what-are-R2h1lIXH/).
+- Las tablas de clasificación se malinterpretan en redes (https://protos.com/hyperliquid-leaderboards-confuse-traders-as-hype-hits-all-time-high).
+- Darwinex: no se encontró ninguna estadística publicada de supervivencia de sus estrategias.
+
+**Estudio nuevo:** ninguno. Seguir a las ballenas es copiar (ya descartado) y no hay acceso a los datos. Queda la idea 2b
+de baja prioridad en docs/10 y la sección 3h en docs/06.
+
+**Pendientes con fecha**
+- 2026-11-18: comprobar que el registro del 16 de noviembre llegó a las 12 carpetas.
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones y apertura del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy miré traders cuyo historial nadie puede falsear (Hyperliquid publica todo en la cadena).
+- Resultado: solo 1 de cada 6 cuentas gana, y las que más ganan aciertan menos de 4 de cada 10 operaciones.
+- Quien acierta 60 % o más de forma estable suele ser un bot que cobra la diferencia entre compra y venta, no alguien que
+  adivina hacia dónde va el precio. Es lo mismo que vimos en Myfxbook, en el copy trading y en Telegram.
+- No hay prueba nueva hoy. Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.
