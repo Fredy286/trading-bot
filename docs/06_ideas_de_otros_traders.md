@@ -243,6 +243,23 @@ No hay estudio: no tenemos acceso a la API desde la nube, y «seguir a las balle
 Queda como idea 2b de baja prioridad (docs/10): solo si GitHub Actions llega a la API, medir si las posiciones de las
 cuentas grandes anticipan el minuto siguiente de BTC, con pre-registro y datos hasta el 2026-10-25.
 
+## 3i. El «efecto del cuarto de hora» en futuros cripto (2026-11-18, solo resúmenes)
+
+- **Fuente:** Kim y Hansen (UNC), *The Quarter-Hour Effect: Periodic Algorithmic Trading and Return Predictability in
+  Cryptocurrency Futures*, arXiv 2607.09426 (julio de 2026; https://ideas.repec.org/p/arx/papers/2607.09426.html).
+  arxiv.org, alphaxiv.org y cryptoslate.com no abren desde la nube: solo resúmenes del buscador; autoría y cifras sin
+  verificar en el texto.
+- **Qué dice:** la actividad se dispara en los **primeros 10 s** de cada cuarto de hora (sobre todo en la hora en punto)
+  y casi desaparece en el bloque siguiente; bajan las operaciones de tamaño «redondo» (bots programados). Con datos
+  previos a la marca predicen la dirección de esos 10 s (AUC ~0,60), pero la mejor regla gana en promedio **0,51 pb por
+  operación antes de comisiones** (según la reseña de cryptoslate).
+- **Lectura para nosotros:** encaja con el Estudio 57 (más volumen en Binance en torno a las marcas de 5 min) y con la
+  observación *post hoc* de que nuestro GBM acierta 1–2 puntos menos al entrar en :00/:05… Lo que se puede predecir dura
+  10 s y ya pasó cuando entra un clic humano (+10 s); 0,51 pb no paga ni la comisión de Binance Futures (4–10 pb).
+  **Sin estudio nuevo:** las variables de «reloj» ya fallaron (Estudio 33) y la brecha en las marcas se confirma con el
+  Estudio 58 (enero de 2027). Si el 58 la confirma, la mejora natural es **no avisar en las entradas de :00/:15/:30/:45**,
+  pre-registrada aparte con datos nuevos.
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:
@@ -305,3 +322,6 @@ BIAS).
   https://www.htx.com/news/data-75-of-traders-on-hyperliquid-are-losing-money-what-are-R2h1lIXH/ ;
   https://beincrypto.com/hyperliquid-traders-profitability ;
   https://protos.com/hyperliquid-leaderboards-confuse-traders-as-hype-hits-all-time-high
+- Efecto del cuarto de hora (2026-11-18, solo resúmenes): https://ideas.repec.org/p/arx/papers/2607.09426.html ;
+  https://www.emergentmind.com/papers/2607.09426 ; https://cryptoslate.com/the-invisible-opening-bell-inside-cryptos-endless-trading-day/ ;
+  líder futuros/contado (resumen de CCN sobre Easley, O'Hara, Yang y Zhang 2024): https://www.ccn.com/analysis/technology/perpetuals-account-majority-crypto-market-behavior/

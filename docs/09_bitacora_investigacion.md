@@ -1163,3 +1163,40 @@ de baja prioridad en docs/10 y la sección 3h en docs/06.
 - Quien acierta 60 % o más de forma estable suele ser un bot que cobra la diferencia entre compra y venta, no alguien que
   adivina hacia dónde va el precio. Es lo mismo que vimos en Myfxbook, en el copy trading y en Telegram.
 - No hay prueba nueva hoy. Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-18 (autónoma)
+
+**Tema del día (miércoles):** mejorar el modelo de BTC 1 min (o el de ETH).
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y lo hecho ya documentado. El registro diario
+del 16 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo conteos; 22 días cada una). La vigilancia de
+canales y la grabación del libro de OKX siguen corriendo (commits de las últimas horas).
+
+**Búsquedas (solo resúmenes del buscador; arxiv.org, alphaxiv.org y cryptoslate.com no abren desde la nube):**
+- «Efecto del cuarto de hora» en futuros cripto (Kim y Hansen, arXiv 2607.09426,
+  https://ideas.repec.org/p/arx/papers/2607.09426.html): los bots programados concentran la actividad en los primeros
+  10 s de cada cuarto de hora; esa dirección se predice algo (AUC ~0,60), pero la mejor regla gana ~0,51 pb por
+  operación antes de comisiones. Detalle en docs/06, 3i.
+- Futuros perpetuos frente al contado: los perpetuos llevan la mayor parte del volumen y de la formación del precio de
+  BTC, pero el retraso publicado es de minutos, no de segundos (resumen de CCN sobre Easley, O'Hara, Yang y Zhang 2024,
+  https://www.ccn.com/analysis/technology/perpetuals-account-majority-crypto-market-behavior/). Nada nuevo frente al
+  Estudio 3 (el perpetuo a 1 min no mejoró el modelo).
+- Variables de tamaño de operación en los últimos segundos: no se encontró ningún estudio concreto; con las velas de
+  1 s ya usamos volumen, número de operaciones y presión compradora de los últimos 10 s (Estudio 15).
+
+**Estudio nuevo:** ninguno. El efecto del cuarto de hora dura 10 s y ya pasó cuando llega un clic humano; las variables
+de reloj fallaron (Estudio 33) y la brecha en las marcas de 5 min se confirma con el Estudio 58 en enero. Si se
+confirma, la mejora natural sería «no avisar en las entradas de :00/:15/:30/:45», pre-registrada aparte con datos nuevos
+(anotado en docs/10, idea 6).
+
+**Pendientes con fecha**
+- 2026-11-19: comprobar que el registro del 17 de noviembre llegó a las 12 carpetas.
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones y apertura del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy tocaba buscar mejoras para el modelo de BTC de 1 minuto. No encontré ninguna que valga una prueba nueva.
+- Un estudio de julio dice que muchos bots compran o venden justo en los primeros 10 segundos de cada cuarto de hora
+  (:00, :15, :30, :45). Eso explica por qué nuestro modelo acierta un poco menos cuando la entrada cae en esas marcas.
+- Ese movimiento es demasiado corto para un clic humano y casi no deja ganancia. Si en enero se confirma, el bot
+  dejará de avisar en esas marcas.
+- Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.

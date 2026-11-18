@@ -215,6 +215,11 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   diferencial), no de adivinar la dirección. No buscar más «traders que aciertan 60 %»: la respuesta ya es la misma en
   Myfxbook, copy trading, Telegram y en la cadena.
 
+- **Efecto del cuarto de hora (2026-11-18, solo resúmenes; docs/06, 3i):** en futuros cripto, los bots programados
+  mueven el precio en los primeros 10 s de cada cuarto de hora (Kim y Hansen, arXiv 2607.09426); se puede predecir algo
+  (AUC ~0,60) pero gana ~0,5 pb antes de comisiones. Para nosotros solo importa como **zona a evitar**: el clic humano
+  llega tarde. Queda esperando el Estudio 58 (enero); no volver a probar variables de reloj.
+
 - **El fin de semana manda (ronda de mejoras del 2026-11-15, desarrollo *post hoc*):**
   - Nuestros modelos aciertan más los sábados y domingos UTC, y el gran bot está bien calibrado esos días (pendiente
     1,11) pero exagera entre semana (0,68).
@@ -259,7 +264,7 @@ siguen, pero dependen de anotaciones del usuario. Los números de las ideas no c
 | 4 | Selector BTC + ETH con p ≥ 0,60 en el horario del usuario (21:00–01:00 Bogotá) | Más señales de alta confianza en sus horas | **Baja prioridad:** el modelo congelado de ETH (Estudio 35) dio 0 señales en sus primeros 5 días registrados (conteo, sin aciertos); además el usuario no tiene BTC/ETH a 1 min en su plataforma |
 | 4b | **Filtro de «racha reciente» del propio modelo** (acierto de sus últimas 500 operaciones o de los últimos 7 días ≥ equilibrio) | Tercera forma de «confianza»; la ventaja va por épocas (Estudios 20 y 41) | **Estudio 48 PASA** (2026-11-05): +2,3–2,5 puntos entre tomadas y saltadas en desarrollo, +3,9–4,5 en verificación; persistencia semanal 0,36–0,40. Pero la ganancia total casi no cambia (−6 % / +5 %): sirve para operar menos con la misma ganancia. Confirmación pre-registrada: **Estudio 49** (señales registradas de H16b, código listo, se niega a correr antes del 2027-01-19; potencia ~45 %). Nada que hacer hasta entonces |
 | 5 | Comparar precios de Deriv con HistData en los mismos minutos | Validar la fuente del registro nocturno | **Baja:** Deriv quedó descartado para operar; solo afecta a la medida científica |
-| 6 | **Manipulación del cierre de 5 min de Polymarket** (desde el 2026-02-12) | Dai, Jia y Yu (2026, https://arxiv.org/abs/2606.31675, solo resúmenes) | **Estudio 57 (2026-11-10): H57a y H57b PASAN, H57c no.** En Binance, desde febrero de 2026, más volumen en los 10 s antes de cada marca de 5 min (+0,037 de cuota; se apaga desde agosto); la «reversión» sale sobre todo de que los demás minutos cambiaron. El GBM no empeoró en M5 *por* febrero, pero (*post hoc*) acierta menos en las entradas M5 en los dos periodos (−1,2 y −2,1 pts). **Estudio 58** pre-registrado: confirmar esa brecha con las señales registradas de H16b (2026-10-26 → 2027-01-18), una vez, tras el 2027-01-19; potencia ~25–40 %. Nada que hacer hasta entonces |
+| 6 | **Manipulación del cierre de 5 min de Polymarket** (desde el 2026-02-12) | Dai, Jia y Yu (2026, https://arxiv.org/abs/2606.31675, solo resúmenes) | **Estudio 57 (2026-11-10): H57a y H57b PASAN, H57c no.** En Binance, desde febrero de 2026, más volumen en los 10 s antes de cada marca de 5 min (+0,037 de cuota; se apaga desde agosto); la «reversión» sale sobre todo de que los demás minutos cambiaron. El GBM no empeoró en M5 *por* febrero, pero (*post hoc*) acierta menos en las entradas M5 en los dos periodos (−1,2 y −2,1 pts). **Estudio 58** pre-registrado: confirmar esa brecha con las señales registradas de H16b (2026-10-26 → 2027-01-18), una vez, tras el 2027-01-19; potencia ~25–40 %. Nada que hacer hasta entonces. 2026-11-18: el «efecto del cuarto de hora» (arXiv 2607.09426, docs/06, 3i) apoya la misma lectura; si el 58 confirma, pre-registrar «no avisar en :00/:15/:30/:45» con datos nuevos |
 
 ### Ideas cerradas (no repetir)
 
