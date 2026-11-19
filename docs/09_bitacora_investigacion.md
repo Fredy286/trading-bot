@@ -1200,3 +1200,33 @@ confirma, la mejora natural sería «no avisar en las entradas de :00/:15/:30/:4
 - Ese movimiento es demasiado corto para un clic humano y casi no deja ganancia. Si en enero se confirma, el bot
   dejará de avisar en esas marcas.
 - Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-19 (autónoma)
+
+**Tema del día (jueves):** reversión nocturna en divisas o mecanismos parecidos de liquidez.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y lo hecho ya documentado. El registro diario
+del 17 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo conteos; 23 días cada una). La vigilancia de
+canales (2026-11-19 03:17 UTC) y la grabación del libro de OKX (09:06 UTC) siguen corriendo.
+
+**Búsquedas (solo resúmenes del buscador; mdpi.com no abre desde la nube):** como la reversión de divisas no se mejora
+hasta tener dónde operarla (docs/10), busqué su equivalente en cripto: las horas de financiación de los perpetuos.
+- AFA (https://afajof.org/management/viewp.php?n=169764; resumen en https://business.cornell.edu/centers/?p=5984):
+  volumen y diferencial en U dentro del ciclo de 8 h, más altos en las horas de financiación, por operadores informados.
+- MDPI 2026 (https://www.mdpi.com/2227-7072/14/5/103): máximo del diferencial ~2 h después de la financiación.
+- Quantpedia (https://quantpedia.com/strategies/intraday-seasonality-in-bitcoin): BTC sube más a las 22–23 UTC; deriva
+  de horas, sin uso en una vela de 1 min.
+
+**Estudio nuevo:** ninguno. El diferencial cripto se abre por información, no por falta de liquidez (no hay razón para
+una reversión), y la distancia a la financiación ya falló como variable en el Estudio 33. Anotado en docs/06 (3j) y docs/10.
+
+**Pendientes con fecha**
+- 2026-11-20: comprobar que el registro del 18 de noviembre llegó a las 12 carpetas.
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones y apertura del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy tocaba la estrategia nocturna de divisas. Sigue sin plataforma que la pague, así que busqué algo parecido en cripto.
+- En cripto, cada 8 horas (7:00 p. m., 3:00 a. m. y 11:00 a. m. de Bogotá) se cobra la «financiación» de los futuros y el
+  precio se vuelve más caro de operar. Pero eso pasa porque entra gente bien informada, no porque falte gente, así que no
+  esperamos un rebote aprovechable. Ya lo habíamos probado en octubre (Estudio 33) sin mejora.
+- No hay prueba nueva hoy. Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.

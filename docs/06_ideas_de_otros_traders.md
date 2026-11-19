@@ -260,6 +260,23 @@ cuentas grandes anticipan el minuto siguiente de BTC, con pre-registro y datos h
   Estudio 58 (enero de 2027). Si el 58 la confirma, la mejora natural es **no avisar en las entradas de :00/:15/:30/:45**,
   pre-registrada aparte con datos nuevos.
 
+## 3j. Horas de financiación de los perpetuos: el «17:00 de Nueva York» de las cripto (2026-11-19, solo resúmenes)
+
+Búsqueda del jueves (mecanismos de liquidez parecidos a la reversión nocturna de divisas). Solo resúmenes del buscador;
+mdpi.com no abre desde la nube.
+- «Perpetual Futures Contracts and Cryptocurrency Market Quality» (afajof.org, datos de libro 2017–2023; resumen del
+  Cornell): alrededor de cada liquidación de la financiación (00:00, 08:00 y 16:00 UTC en Binance) suben el volumen
+  al contado y el diferencial, en forma de U dentro del ciclo de 8 h; lo explican por más operadores informados, no
+  por presión de precio que luego se devuelva.
+- Un artículo de MDPI de 2026 (26 bolsas, 812 símbolos, nov-2025 → ene-2026) ve el máximo del diferencial unas 2 h
+  después de esas horas. Es un resultado de diferencial, no de reversión.
+- Quantpedia (Padyšák y Vojtko) ve rendimientos horarios de BTC mayores a las 22–23 UTC: es una deriva de horas, no
+  algo medible en una vela de 1 min.
+
+**Lectura:** a diferencia de las 17:00 de NY en divisas, aquí el diferencial se abre por información, no por falta de
+liquidez; no hay motivo para esperar una reversión. Y la distancia a la financiación ya se probó como variable en el
+Estudio 33 (no mejoró la política). **Sin estudio nuevo.**
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:
@@ -325,3 +342,6 @@ BIAS).
 - Efecto del cuarto de hora (2026-11-18, solo resúmenes): https://ideas.repec.org/p/arx/papers/2607.09426.html ;
   https://www.emergentmind.com/papers/2607.09426 ; https://cryptoslate.com/the-invisible-opening-bell-inside-cryptos-endless-trading-day/ ;
   líder futuros/contado (resumen de CCN sobre Easley, O'Hara, Yang y Zhang 2024): https://www.ccn.com/analysis/technology/perpetuals-account-majority-crypto-market-behavior/
+- Horas de financiación (2026-11-19, solo resúmenes): https://afajof.org/management/viewp.php?n=169764 ;
+  https://business.cornell.edu/centers/?p=5984 ; https://www.mdpi.com/2227-7072/14/5/103 (no abre desde la nube) ;
+  https://quantpedia.com/strategies/intraday-seasonality-in-bitcoin ; https://ledger.pitt.edu/ojs/ledger/article/view/213

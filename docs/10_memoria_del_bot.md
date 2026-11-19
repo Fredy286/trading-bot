@@ -27,6 +27,9 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   decir, parte de nuestra reversión puede ser **efecto de la cotización** (el diferencial que se abre y se cierra), no
   un movimiento que un bróker pague. Refuerza la regla: no mejorarla hasta tener una plataforma real que liquide con
   precio medio a esas horas (ninguna encontrada; Deriv las bloquea).
+  **2026-11-19:** en cripto, el equivalente (horas de financiación 00/08/16 UTC) abre el diferencial por operadores
+  informados, no por falta de liquidez; no promete reversión y ya se probó como variable (Estudio 33). No repetir
+  (docs/06, 3j).
 - **Las ventajas viven en el precio de cada fuente (Estudios 34, 36 y 37):**
   - BTC: las señales calificadas con Coinbase aciertan 52,2 % (Binance 57,6 %);
   - divisas de noche: la reversión existe en Deriv (56,4 %; 5 min 60,7 %) y en HistData, pero con señales distintas
