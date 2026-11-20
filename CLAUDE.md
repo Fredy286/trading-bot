@@ -212,7 +212,10 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
      - La tarea local `investigacion-diaria-trading-bot` quedó PAUSADA (la reemplaza la rutina en la nube).
      - **Vigilancia 24/7 de canales** (`.github/workflows/vigilancia_canales.yml`, cada hora): guarda los mensajes nuevos
        de `config/canales_vigilados.txt` en `results/canales/`; el registro diario los audita con Deriv
-       (`tbot canales auditar`, Estudio 32 → `results/auditoria_canales/`; veredicto único el 2027-01-31).
+       (`tbot canales auditar`, Estudio 32 → `results/auditoria_canales/`; veredicto único el 2027-01-31). **Enmienda 2
+       (2026-11-20, error 60):** se descartan señales publicadas después de su hora (antes se pasaban al día siguiente)
+       y se leen formatos en varias líneas; reauditoría completa; la lectura original queda en
+       `results/auditoria_canales_lectura_original/`.
      - **Integración:** la rutina sube a `claude/rutina-AAAA-MM-DD`; `.github/workflows/integrar_rutina.yml` la reaplica
        sobre la rama principal si pasan las pruebas. El 2026-10-29 la primera rutina recibió 403 al hacer push
        (falta permiso de escritura de la app de Claude en GitHub); en un reintento sí subió: su estudio de «reloj» quedó como **Estudio 33** (aea2c8b), en la cola.

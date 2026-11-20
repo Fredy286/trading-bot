@@ -1230,3 +1230,48 @@ una reversión), y la distancia a la financiación ya falló como variable en el
   precio se vuelve más caro de operar. Pero eso pasa porque entra gente bien informada, no porque falte gente, así que no
   esperamos un rebote aprovechable. Ya lo habíamos probado en octubre (Estudio 33) sin mejora.
 - No hay prueba nueva hoy. Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-20 (autónoma)
+
+**Tema del día (viernes):** canales de señales.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y lo hecho ya documentado. El registro diario
+del 18 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo conteos; 24 días cada una). La vigilancia de
+canales (2026-11-20 11:25 UTC) y la grabación del libro de OKX (08:19 UTC) siguen corriendo.
+
+**Búsqueda de canales nuevos:** sin resultado. t.me sigue sin abrir desde la nube (curl sin respuesta). Dos búsquedas
+web solo devolvieron listas de advertencias y reseñas de afiliados, sin canales con señales no OTC fechadas
+(p. ej. https://brokerlistings.com/scams/signals-telegram, https://plisio.net/es/crypto/best-crypto-signals). No se
+añadió ningún canal.
+
+**Hallazgo (error 60), revisando a mano las capturas, sin precios:**
+- Las 485 señales auditadas de QuotexSignalfreee se publicaron **después** de su hora (todas, entrada a más de 12 h de
+  la publicación): la regla «primera vez que llega esa hora» las pasaba al día siguiente. La tabla de ese canal
+  (49,6 % el 13 de noviembre; 46,5 % hoy con 376) no medía nada real.
+- El canal publica dos clases de mensajes con la misma plantilla: 626 en una línea, todos tardíos, y 635 en varias
+  líneas, todos 1–3 min **antes** de la entrada. Solo se leían los tardíos.
+- Tampoco se leían los formatos en varias líneas de los canales «Gavin» (PocketSignalsM1, PocketOptionSignalsM5) ni el
+  «5Minute Expiration» de quotexsignals2814.
+
+**Corrección (sin estudio nuevo):** Enmienda 2 del Estudio 32 (fb9a625, antes de cruzar con precios las señales que
+añade) y su código con pruebas (514a7b9):
+- se descartan las señales tardías;
+- se leen los mensajes en varias líneas y el vencimiento escrito;
+- se reaudita todo desde el 2026-10-29.
+Con las reglas nuevas, sin precios, quedan verificables: QuotexSignalfreee 576, PocketSignalsM1 414,
+PocketOptionSignalsM5 111, quotexsignals2814 98, gotraderssinaisfree 59 y Unidos 5, casi todas publicadas 1–5 min antes
+de la entrada. La lectura original queda en `results/auditoria_canales_lectura_original/`. Deriv no abre desde la
+nube: la reauditoría la hace el registro diario de GitHub (2026-11-21, 06:40 UTC).
+
+**Pendientes con fecha**
+- 2026-11-21: comprobar que la reauditoría corrió (`results/auditoria_canales/dias_auditados_enmienda2.txt`, carpetas de
+  los 6 canales) y que el registro del 19 de noviembre llegó a las 12 carpetas.
+- 2026-11-27 (viernes): primera tabla descriptiva con la lectura enmendada (sin veredicto).
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones y apertura del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Encontré un error en la revisión de canales de señales: contaba señales que el canal publicó DESPUÉS de la hora de
+  entrada, y las pasaba al día siguiente. Por eso esa tabla no servía.
+- Además, el programa no entendía los mensajes escritos en varias líneas, que son justo las señales que sí llegan a tiempo.
+- Ya está corregido: desde mañana se revisan unas 1 200 señales de 6 canales, publicadas 1 a 5 minutos antes de entrar.
+- El veredicto sigue siendo el 31 de enero. Nada cambió en el bot. Solo demo; no operes con dinero real.
