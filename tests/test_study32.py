@@ -13,7 +13,8 @@ def test_parse_semicolon_list_and_otc_and_timezone():
     assert [(x["par"], x["dir"], x["venc_min"]) for x in s] == [("EURAUD", -1, 1), ("EURJPY", 1, 1)]
     assert s[0]["entrada_utc"] == "2026-10-23T13:08:00+00:00"
     assert parse_signals(txt + "\nM1;EURUSD-OTC;10:50;PUT", pub, -3) == []  # mensaje con «OTC»: fuera
-    assert parse_signals("M5 EUR/USD 09:00 CALL", pub, -3)[0]["entrada_utc"] == "2026-10-24T12:00:00+00:00"  # ya pasó → mañana
+    assert parse_signals("M5 EUR/USD 12:00 CALL", pub, -3)[0]["entrada_utc"] == "2026-10-23T15:00:00+00:00"
+    assert parse_signals("M5 EUR/USD 09:00 CALL", pub, -3) == []  # ya pasó: tardía (enmienda 2), no se pasa a mañana
     assert parse_signals("EURUSD 10:00 CALL", pub, -3) == []  # sin vencimiento
     assert parse_signals("M5 EURUSD 10:00 CALL", pub, None) == []  # sin zona horaria
 
@@ -77,3 +78,43 @@ def test_capture_keeps_long_lists():
     from tradingbot.data.telegram_publico import MAX_TEXT
 
     assert MAX_TEXT >= 4096
+
+
+def test_enmienda2_late_signal_is_dropped_not_moved_to_next_day():
+    pub = pd.Timestamp("2026-10-29T14:49:08+00:00")  # 11:49 en UTC−3, la hora anunciada (11:48) ya pasó
+    txt = "Quotex Signals  💳 Pair: EUR/AUD 🔥 Timeframe: M1 ⏳ Time: UTC -3 11:48:00 📊 Signal: 🟢 BUY"
+    assert parse_signals(txt, pub, -3) == []
+    # dentro de 12 h sigue valiendo (la lista de la mañana para la tarde)
+    assert len(parse_signals("M5 EURUSD 20:00 CALL", pub, -3)) == 1
+
+
+def test_enmienda2_multiline_message_is_one_signal():
+    pub = pd.Timestamp("2026-11-10T07:03:06+00:00")
+    txt = ("Quotex Signals\n\n💳 Pair: EUR/JPY\n🔥 Timeframe: M1\n⏳ Time: UTC -3 04:05:00\n🎯 Confidence: 90.9%\n"
+           "🔄 Martingale: 3\n📊 Signal: 🟢 BUY\n\n🚀 Want safer signals?")
+    s = parse_signals(txt, pub, -3)
+    assert [(x["par"], x["dir"], x["venc_min"], x["entrada_utc"], x["lectura"]) for x in s] == [
+        ("EURJPY", 1, 1, "2026-11-10T07:05:00+00:00", "mensaje")]
+    gavin = "🛰 GAVIN — POCKETOPTION [M1] \n\n💷 GBPUSD\n💎 M1\n⌚️ 05:25:00\n🔽 Put\n\n⚡ Powered by: @GavinBinary"
+    s = parse_signals(gavin, pd.Timestamp("2026-11-19T08:23:00+00:00"), -3)
+    assert [(x["par"], x["dir"], x["entrada_utc"]) for x in s] == [("GBPUSD", -1, "2026-11-19T08:25:00+00:00")]
+    assert parse_signals(gavin.replace("GBPUSD", "GBPUSD-OTC"), pd.Timestamp("2026-11-19T08:23:00+00:00"), -3) == []
+
+
+def test_enmienda2_written_expiry_and_results_excluded():
+    pub = pd.Timestamp("2026-11-19T10:33:00+00:00")  # 07:33 en UTC−3
+    txt = ("⏰ 5Minute Expiration UTC-3\n\n📊 USD/JPY 07:35 »CALL 🟩\n\n⏰ TIME TO 07:40\n\n"
+           "1st GALE → TIME TO 07:45\n\n2nd GALE → TIME TO 07:50")
+    s = parse_signals(txt, pub, -3)
+    assert [(x["par"], x["dir"], x["venc_min"], x["lectura"]) for x in s] == [("USDJPY", 1, 5, "linea_venc")]
+    rep = "📊 SESSION REPORT\n🎯 Accuracy: 100.00%\n✅ 06:25 — 🇬🇧 GBP/AUD 🇦🇺 — Sell\n💎 M5"
+    assert parse_signals(rep, pd.Timestamp("2026-11-10T06:09:58+00:00"), 6) == []  # 12:09 local: tardía
+    res = "WIN ✅\n💷 GBPUSD\n💎 M1\n⌚️ 05:25:00\n🔽 Put"  # resultado con el formato en varias líneas: fuera
+    assert parse_signals(res, pd.Timestamp("2026-11-19T08:23:00+00:00"), -3) == []
+    assert len(parse_signals(res.replace("WIN ✅", "Señal"), pd.Timestamp("2026-11-19T08:23:00+00:00"), -3)) == 1
+
+
+def test_original_line_reading_unchanged():
+    pub = pd.Timestamp("2026-10-23T12:40:04+00:00")
+    s = parse_signals("M1;EURAUD;10:08;PUT\nM1;EURJPY;10:37;CALL", pub, -3)
+    assert {x["lectura"] for x in s} == {"linea"}

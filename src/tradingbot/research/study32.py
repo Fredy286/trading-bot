@@ -25,10 +25,14 @@ DERIV_FX = ("AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "EURAUD", "EURCAD"
 _PAIR = re.compile(r"\b([A-Z]{3})\s*/?\s*([A-Z]{3})\b")
 _TIME = re.compile(r"(?<!\d)([01]?\d|2[0-3])[:h]([0-5]\d)(?!\d)")
 _TF = re.compile(r"\bM(1|5|15)\b", re.I)
+_TF_TXT = re.compile(r"(?<!\d)(1|5|15)\s*-?\s*MIN(?:UTE|UTO)?S?\b", re.I)  # enmienda 2: «5Minute», «15 min»
+_RESULT = re.compile(r"\b(WIN|WINS|LOSS|LOSSES|RESULT|RESULTS|REPORT|ACCURACY)\b|✅|❌", re.I)
+MAX_LAG = pd.Timedelta(hours=12)  # enmienda 2: sin fecha, una entrada a más de 12 h de la publicación es tardía
 _UP = re.compile(r"\b(CALL|BUY|COMPRA|UP)\b|🟩|⬆|🔼", re.I)
 _DOWN = re.compile(r"\b(PUT|SELL|VENDA|VENTA|DOWN)\b|🟥|⬇|🔽", re.I)
 _DATE = re.compile(r"(?<![\d/])(0?[1-9]|[12]\d|3[01])/(0?[1-9]|1[0-2])(?:/(\d{4}|\d{2}))?(?![\d/])")
 START, EVAL_END = "2026-10-29", "2027-01-26"
+DONE_FILE = "dias_auditados_enmienda2.txt"  # enmienda 2: todo se audita otra vez desde el inicio
 
 
 def _list_date(text: str, pub_local: pd.Timestamp) -> pd.Timestamp | None:
@@ -50,14 +54,28 @@ def _list_date(text: str, pub_local: pd.Timestamp) -> pd.Timestamp | None:
     return d
 
 
-def parse_signals(text: str, published: pd.Timestamp, tz_h: float | None) -> list[dict]:
-    """Señales verificables de un mensaje según las reglas del pre-registro (con la enmienda 1)."""
-    if tz_h is None or "OTC" in text.upper():  # regla: se excluyen los mensajes que digan «OTC»
-        return []
-    post_tf = _TF.search(text)
-    off = pd.Timedelta(hours=tz_h)
-    pub_local = published.tz_convert(None) + off
-    day = _list_date(text, pub_local)
+def _entry(hm: pd.Timedelta, day: pd.Timestamp | None, pub_local: pd.Timestamp) -> pd.Timestamp | None:
+    """Hora local de entrada, o None si no es verificable (ya pasó en una lista fechada, o tardía; enmienda 2)."""
+    if day is not None:  # lista fechada: esa fecha; si la hora ya pasó al publicarla, no es verificable
+        local = day + hm
+        return local if local > pub_local else None
+    local = pub_local.normalize() + hm
+    if local <= pub_local:
+        local += pd.Timedelta(days=1)  # primera vez que llega esa hora DESPUÉS de la publicación
+    return local if local - pub_local <= MAX_LAG else None
+
+
+def _tf_original(text: str):
+    m = _TF.search(text)
+    return int(m.group(1)) if m else None
+
+
+def _tf(text: str):
+    m = _TF.search(text) or _TF_TXT.search(text)
+    return int(m.group(1)) if m else None
+
+
+def _lines(text: str, pub_local: pd.Timestamp, day, post_tf, tf_fn) -> list[dict]:
     out = []
     for ln in text.splitlines():
         pm = [m for m in _PAIR.finditer(ln.upper()) if m.group(1) + m.group(2) in DERIV_FX]
@@ -65,21 +83,46 @@ def parse_signals(text: str, published: pd.Timestamp, tz_h: float | None) -> lis
         up, down = bool(_UP.search(ln)), bool(_DOWN.search(ln))
         if not pm or not tm or up == down:
             continue
-        tf = _TF.search(ln) or post_tf
+        tf = tf_fn(ln) or post_tf
         if not tf:
             continue
-        hm = pd.Timedelta(hours=int(tm.group(1)), minutes=int(tm.group(2)))
-        if day is not None:  # lista fechada: esa fecha; si la hora ya pasó al publicarla, no es verificable
-            local = day + hm
-            if local <= pub_local:
-                continue
-        else:
-            local = pub_local.normalize() + hm
-            if local <= pub_local:
-                local += pd.Timedelta(days=1)  # primera vez que llega esa hora DESPUÉS de la publicación
-        out.append({"par": pm[0].group(1) + pm[0].group(2), "dir": 1 if up else -1, "venc_min": int(tf.group(1)),
-                    "entrada_utc": (local - off).tz_localize("UTC").isoformat(), "linea": ln.strip()[:120]})
+        local = _entry(pd.Timedelta(hours=int(tm.group(1)), minutes=int(tm.group(2))), day, pub_local)
+        if local is None:
+            continue
+        out.append({"par": pm[0].group(1) + pm[0].group(2), "dir": 1 if up else -1, "venc_min": tf,
+                    "local": local, "linea": ln.strip()[:120]})
     return out
+
+
+def parse_signals(text: str, published: pd.Timestamp, tz_h: float | None) -> list[dict]:
+    """Señales verificables de un mensaje según las reglas del pre-registro (con las enmiendas 1 y 2)."""
+    if tz_h is None or "OTC" in text.upper():  # regla: se excluyen los mensajes que digan «OTC»
+        return []
+    off = pd.Timedelta(hours=tz_h)
+    pub_local = published.tz_convert(None) + off
+    day = _list_date(text, pub_local)
+    found = _lines(text, pub_local, day, _tf_original(text), _tf_original)
+    lectura = "linea"
+    if not found:
+        # enmienda 2 (solo si la lectura original no da nada): vencimiento escrito y lectura por mensaje
+        found = _lines(text, pub_local, day, _tf(text), _tf)
+        lectura = "linea_venc"
+        if not found and not _RESULT.search(text):
+            up_txt = text.upper()
+            pairs = {m.group(1) + m.group(2) for m in _PAIR.finditer(up_txt) if m.group(1) + m.group(2) in DERIV_FX}
+            times = {(int(m.group(1)), int(m.group(2))) for m in _TIME.finditer(text)}
+            up, down = bool(_UP.search(text)), bool(_DOWN.search(text))
+            tf = _tf(text)
+            if len(pairs) == 1 and len(times) == 1 and up != down and tf:
+                h, mi = times.pop()
+                local = _entry(pd.Timedelta(hours=h, minutes=mi), day, pub_local)
+                if local is not None:
+                    found = [{"par": pairs.pop(), "dir": 1 if up else -1, "venc_min": tf, "local": local,
+                              "linea": " ".join(text.split())[:120]}]
+                    lectura = "mensaje"
+    return [{"par": f["par"], "dir": f["dir"], "venc_min": f["venc_min"],
+             "entrada_utc": (f["local"] - off).tz_localize("UTC").isoformat(), "linea": f["linea"],
+             "lectura": lectura} for f in found]
 
 
 def judge(sig: dict, candles: pd.Series, opens: pd.Series) -> str | None:
@@ -122,6 +165,8 @@ def audit_day(day: str, feed=None, root: Path = ROOT, out: Path = OUT, lista: Pa
                                          "count": 1000, "start": a, "end": min(a + 960 * 60, int(d1.timestamp()) + 1800)})
                             parts.extend(r.get("candles", []))
                         c = pd.DataFrame(parts).drop_duplicates("epoch") if parts else pd.DataFrame()
+                        if len(c):  # Deriv devuelve velas recientes si el rango está fuera de su historial (ítem 48)
+                            c = c[(c["epoch"] >= int(d0.timestamp())) & (c["epoch"] <= int(d1.timestamp()) + 1800)]
                         cache[s["par"]] = ((c.set_index("epoch")["close"].astype(float), c.set_index("epoch")["open"].astype(float))
                                            if len(c) else (pd.Series(dtype=float), pd.Series(dtype=float)))
                     closes, opens = cache[s["par"]]
@@ -139,17 +184,17 @@ def audit_day(day: str, feed=None, root: Path = ROOT, out: Path = OUT, lista: Pa
 
 def audit_pending(out: Path = OUT, log=print) -> None:
     """Audita los días completos (desde el inicio) que aún no tengan marca de hecho."""
-    done_f = Path(out) / "dias_auditados.txt"
+    done_f = Path(out) / DONE_FILE
     done = set(done_f.read_text(encoding="utf-8").split()) if done_f.exists() else set()
     last = (pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
     for d in pd.date_range(START, last, freq="D"):
         day = d.strftime("%Y-%m-%d")
         if day in done:
             continue
-        audit_day(day, log=log)
+        audit_day(day, out=out, log=log)
         done.add(day)
-    Path(out).mkdir(parents=True, exist_ok=True)
-    done_f.write_text("\n".join(sorted(done)) + "\n", encoding="utf-8")
+        Path(out).mkdir(parents=True, exist_ok=True)  # se guarda tras cada día: un corte no pierde lo hecho
+        done_f.write_text("\n".join(sorted(done)) + "\n", encoding="utf-8")
 
 
 def table(out: Path = OUT, until: str | None = None) -> dict:
