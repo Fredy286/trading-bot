@@ -2765,6 +2765,34 @@ dependen del resultado de ninguna señal:
    capturados se quedan como están.
 Hipótesis, criterios, fechas y expectativa no cambian.
 
+**Enmienda 2 (2026-11-20, rutina autónoma; ANTES de cruzar con precios ninguna de las señales que esta enmienda
+añade).** Al revisar a mano las capturas (sin precios) aparecieron dos fallos de lectura que no dependen del resultado
+de ninguna señal (registro de errores 60):
+1. **Señales tardías movidas al día siguiente.** QuotexSignalfreee publica dos clases de mensaje con la misma
+   plantilla: en varias líneas, 635 mensajes publicados **antes** de su hora (1–3 min); en una sola línea, 626
+   publicados **después** de su hora (sin gemelo previo con el mismo par y hora). La lectura por líneas solo leía los de
+   una línea y, como su hora ya había pasado, la regla «primera vez que llega esa hora» los llevaba al **día siguiente**,
+   que el canal nunca anunció. Las 485 señales de ese canal auditadas hasta el 2026-11-18 son todas de esa clase (entrada
+   más de 12 h después de la publicación). **Nueva regla:** sin fecha en el mensaje, si la entrada queda más de 12 h
+   después de la publicación, la señal **se descarta** (tardía).
+   *Transparencia:* ya se había visto la tabla descriptiva agregada de esas 485 (46,5 % con 376 verificadas; 49,6 % con
+   274 el 2026-11-13). La regla nueva depende solo de la hora de publicación y de la hora anunciada, no del resultado.
+2. **Formatos no leídos.** Las señales con el par, la hora y la dirección en líneas distintas (QuotexSignalfreee en
+   varias líneas; «GAVIN — POCKETOPTION [M1]» y «POCKET OPTION [M5]» de PocketSignalsM1 y PocketOptionSignalsM5) y las
+   que anuncian el vencimiento como «5Minute Expiration» (quotexsignals2814) no se leían: unas 1 270 señales no OTC
+   publicadas desde el 2026-10-29, nunca cruzadas con precios. **Nuevas reglas, solo para los mensajes de los que la
+   lectura por líneas no saca ninguna señal:**
+   - **vencimiento escrito**: además de M1/M5/M15, «N min», «N minute(s)» o «N-minute», con N = 1, 5 o 15;
+   - **lectura por mensaje**: si el mensaje (sin «OTC») no tiene palabras de resultado (WIN, LOSS, ✅, ❌, RESULT,
+     REPORT, ACCURACY) y contiene exactamente un par de Deriv, exactamente una hora HH:MM distinta, una sola dirección y
+     un vencimiento, es **una** señal; la fecha y la regla de tardías son las mismas.
+   La lectura por líneas no cambia para los mensajes que ya daban señales (salvo la regla de tardías).
+3. **Reauditoría:** todos los días desde el 2026-10-29 se auditan otra vez con estas reglas (nuevo archivo de días
+   hechos). Los archivos con la lectura original pasan a `results/auditoria_canales_lectura_original/` (solo
+   informativos). Se descartan las velas de Deriv fuera del día pedido (registro de errores 48).
+4. **Evaluación del 2027-01-31:** hipótesis, umbrales, Holm, fechas y expectativa **no cambian**; se aplican a la
+   lectura enmendada. Como información, se dará también la tabla con la lectura original.
+
 ## Estudio 33 — variables de «reloj» (cuarto de hora y hora de financiación) en el modelo de BTC 1 min (pre-registro, 2026-10-29, ANTES de calcularlas)
 
 *Renumerado de 32 a 33 el mismo día, antes de ejecutar nada: el número 32 ya lo usaba la auditoría prospectiva de canales.*
