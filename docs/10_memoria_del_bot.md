@@ -242,6 +242,15 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     fin de semana; el Estudio 70 lo pone a prueba en OKX con datos posteriores.
 - **Auditar canales exige mirar «entrada − publicación» (2026-11-20, error 60):** una señal publicada después de su hora no es una señal; la regla heredada la pasaba al día siguiente y toda la tabla de QuotexSignalfreee medía eso. Antes de fiarse de cualquier tabla de canales, comprobar que las señales se publican minutos ANTES de la entrada y que el lector entiende el formato del mensaje (varias líneas, vencimiento escrito).
 
+- **Datos alternativos (prompt del usuario, 2026-11-15 → 11-21; docs/11):**
+  - Redes, posicionamiento de la multitud y noticias NO predicen la dirección a 1–15 min. Siguen al precio y, a lo
+    sumo, anuncian volatilidad. Probadas: ~410 variantes de posicionamiento, 89 de noticias, 52 hallazgos de
+    literatura y 23 lógicas de comunidades.
+  - Lo útil salió de desarmar creencias populares: «la tendencia es tu amiga» funciona al revés a 5–15 min, y en la
+    apertura de Nueva York el modelo pierde la ventaja. De ahí salen dos vetos (Estudio 72).
+  - Lección: el sentimiento de la multitud ya está en el precio. Sirve más preguntar «¿cuándo se equivoca NUESTRO
+    modelo?» que «¿qué piensa la gente?».
+
 ## Ideas pendientes (prioridad de arriba abajo; repriorizado el 2026-11-15)
 
 Repriorización del 2026-11-15: sube arriba la idea 7 (modo de práctica del gran bot), porque es lo único que pasó en
@@ -255,6 +264,7 @@ siguen, pero dependen de anotaciones del usuario. Los números de las ideas no c
 | # | Idea | Por qué | Estado |
 |---|---|---|---|
 | 7b | **Horario real de IQ Option** (Paso 0 de la enmienda a los Estudios 44, 46 y 68) | El blitz se juzga también solo en horario abierto; hoy vale el prudente (domingo 22:00 → viernes 17:00 de Bogotá) en `config/horario_iq_blitz.json` | Pendiente del usuario, sin operar: anotar en IQ Option la hora de cierre del viernes y las pausas del blitz de Bitcoin, antes del 2027-01-12. Si no, queda el prudente |
+| 7d | **Estudio 72: capa de vetos** (D1 no seguir la tendencia de 60 min; D2 no operar en la apertura de Nueva York) | Investigación del prompt de datos alternativos (docs/11). Desarrollo: en el blitz con p42 en horas abiertas de IQ, 54,5 % → 55,9 % y +114 → +247; en el gran bot de OKX 15 min, +484 → +543 | Pre-registro defc48c, código 33e3833. Miradas: enero (α 0,01), abril y julio (α 0,02); `tbot research study72 --mirada …`. Potencia baja en enero (~5 %); nada que hacer hasta entonces |
 | 7c | **Estudios 70 y 71** (margen 0 el fin de semana; apoyo del gran bot de 15 min entre semana) | Ronda de mejoras del 2026-11-15 (pre-registro ebe2874); el registro `gran5`/`gran15` ya guarda todo | Nada que hacer hasta el 2027-01-19 (`tbot research study70 --mirada enero`, luego `study71`). Potencia: 70 ~35 % en enero y ~85 % en abril; 71 ~8 % y ~35 % |
 | 7 | **Modo de práctica del gran bot** (OKX 5 y 15 min, blitz): juntar en el bucle en vivo los 6–8 modelos congelados y los metamodelos (`config/gran_bot_*.json`) | Estudios 63, 66 y 67 pasan en desarrollo (casi el doble de señales con el mismo acierto); el registro diario ya los califica (`gran5`, `gran15`, `granblitz`) | Pendiente (sesión local; no cambia ningún parámetro: solo usa lo congelado). Conteos del registro (2026-10-26 → 11-13, sin aciertos): gran5 47,7/día (base 30,8; desarrollo 73/40), gran15 27,8/día (base 18,1; 50/14), granblitz 42,7/día (base 9,1; 77/36). Solo práctica hasta las confirmaciones (64, 68, 69; enero y abril) |
 | 1c | **OKX: decidir antes de que el libro se vacíe** (por ejemplo, 60 s antes de la ventana y no 10 s) | 10 s antes solo hay ~13 contratos a 0,52; minutos antes, cientos (docs/03, 2.3). Decidir antes daría más cantidad y quizá un libro todavía sin inclinar, a cambio de menos información para el modelo | Pendiente (2026-11-08). Es un estudio nuevo con su propio pre-registro. Conviene esperar a que el libro grabado (Estudio 56) diga cuánto se inclina y cuándo. **Ojo al preparar el pre-registro:** el libro que graba GitHub no puede mirarse para elegir el momento si luego se usa en el Estudio 56; usar solo lo grabado antes de una fecha fija o datos propios separados. Conteo del registro (2026-10-26 → 11-06, sin aciertos): ETH 98 señales (8,2/día, en desarrollo 25,5) y BTC 218 (18,2/día, en desarrollo 11,5); la regla del registro es la misma del Estudio 54 (p ≈ 0,551), así que la diferencia parece del mercado, no del código. **Ojo, probablemente débil (2026-11-08, sesión local):** el Estudio 50 mostró que la ventaja vive en los segundos 40–50 del minuto (58 %); a mitad del minuto, 51 %. Y la cantidad grande (cientos de contratos) está 3–4 min antes, mientras que 15 s antes ya solo hay ~13. Decidir tan pronto perdería casi toda la ventaja |
@@ -274,6 +284,9 @@ siguen, pero dependen de anotaciones del usuario. Los números de las ideas no c
 
 | Idea | Cierre |
 |---|---|
+| Sentimiento de redes, foros y titulares (velocidad, polaridad, divergencia narrativa-precio) | docs/11 (2026-11-21): sin señal; las noticias van detrás del precio. Sin fuente de texto viable en vivo sin cuenta |
+| Posicionamiento de la multitud: ratio largo/corto, interés abierto, liquidaciones (P7) | docs/11: AUC 0,500; las liquidaciones copian el pasado. «Giro brusco» = volatilidad (misma ganancia con menos operaciones) |
+| Calendario macro como veto (IPC, empleo, FOMC) | docs/11: toca < 1 % de las operaciones; solo como aviso en el panel |
 | Variables de «reloj» (:00/:15/:30/:45, financiación) en el GBM de BTC | Estudio 33: NO PASA (log-loss sí, política no). 2026-10-31 |
 | Reversión en Deriv (cualquier horario) | Deriv bloquea divisas < 5 h de 21:00 a 23:59 UTC y cobra la reversión en el pago (Estudios 39–40, ítem 49) |
 | Réplica de la reversión nocturna + filtro de diferencial normal | Estudio 34: se replica, pero vive en el diferencial abierto (60–66 %); con diferencial normal 53 % |

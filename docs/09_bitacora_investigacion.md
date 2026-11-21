@@ -1315,3 +1315,15 @@ del 19 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo cont
 - El domingo 16 de noviembre GitHub perdió 8 horas de grabación de OKX por una falla de sus máquinas. No afecta a
   las conclusiones; solo hay un poco menos de datos.
 - Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-21 — sesión local (con Fredy): cierre del prompt de datos alternativos
+
+- La investigación con agentes se cortó dos veces al apagarse el PC; se perdió lo descargado en el scratchpad, pero
+  no los resultados de 7 de 8 agentes. La exploración de Reddit no se terminó: no hay fuente de texto utilizable en
+  vivo.
+- Informe: **docs/11_datos_alternativos.md**. Redes, posicionamiento y noticias: SIN SEÑAL; P7 cerrada (docs/08).
+- Las dos pistas defensivas se recalcularon con código propio (D1 no es «poca confianza»: z −4,1 dentro de la
+  confianza) → **Estudio 72**, pre-registrado (defc48c) con su evaluador (33e3833).
+- Repaso de la nube del 16 al 21 de noviembre: la rutina no abrió estudios nuevos. Hubo una enmienda 2 del Estudio
+  32 (error 60) y un hueco de 8 h en el libro de OKX el 16-nov (máquina perdida de GitHub). El registro está completo.
+

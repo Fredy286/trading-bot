@@ -360,6 +360,11 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        2027-01-12). El panel /blitz ya no avisa fuera de horario.
      - **H5b del Estudio 5: APRUEBA** (58,16 %, EV +0,064; run 43763624113). El fin de semana es más fuerte.
      - Video «Conecta Claude a TradingView» (MCP): sin valor para predecir (docs/06 y docs/07).
+   - **Datos alternativos (prompt del usuario, 2026-11-15 → 11-21; docs/11):** redes, posicionamiento de la multitud
+     y noticias: **SIN SEÑAL** a 1–15 min (siguen al precio; ninguna fuente de texto sirve en vivo sin cuenta). De las
+     creencias de las comunidades, «la tendencia es tu amiga» funciona al revés → **Estudio 72** (pre-registro
+     defc48c, código 33e3833): vetos D1 (no seguir la tendencia de 60 min) y D2 (no operar en la apertura de NY). En el
+     blitz en horas abiertas de IQ, 54,5 % → 55,9 % (desarrollo). Miradas enero/abril/julio de 2027.
    - **docs/06_ideas_de_otros_traders.md:** catálogo vivo de ideas de terceros probadas, errores típicos,
      estudios sobre traders de redes y lista de señales de estafa. El usuario NO quiere comprar nada: busca
      piezas para pulir el modelo propio. Añadir ahí cada idea nueva.
