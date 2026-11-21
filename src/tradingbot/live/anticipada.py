@@ -148,22 +148,58 @@ def load_bundle(path: Path = MODEL_PATH, reg: Path = REG_PATH) -> dict:
 
 
 # ----------------------------------------------------------------------------------------------- decisión
+def apertura(sec: pd.DataFrame) -> float:
+    """Apertura de la vela de 1 min en curso a partir de sus velas de 1 s: la de la primera vela de 1 s CON
+    operaciones. Binance publica también los segundos sin operaciones, con apertura = cierre anterior; la vela de 1 min
+    abre con la primera operación, y con esa apertura se entrenaron los modelos y calcula el registro (registro de
+    errores 61: antes se tomaba la primera vela de 1 s, aunque estuviera vacía)."""
+    if "n" in sec:
+        con = sec.loc[sec["n"] > 0, "o"]
+        if len(con):
+            return float(con.iloc[0])
+    return float(sec["o"].iloc[0])  # sin operaciones hasta el segundo k: la mejor aproximación disponible
+
+
+def previas_binance(bars: pd.DataFrame, minute_open: pd.Timestamp) -> tuple[pd.DataFrame | None, str | None]:
+    """Variables de la vela `minute_open` que solo usan velas de 1 min CERRADAS: se pueden calcular antes del segundo
+    50 (el gran bot las prepara en el segundo 35)."""
+    if bars.index[-1] != minute_open - pd.Timedelta(minutes=1):
+        return None, "falta la vela de 1 min anterior"
+    prev = compute_features(bars).iloc[[-1]]
+    prev.index = pd.DatetimeIndex([minute_open])
+    return prev, None
+
+
+def con_segundos(prev: pd.DataFrame, sec: pd.DataFrame, minute_open: pd.Timestamp, k: int,
+                 extra: pd.DataFrame | None = None) -> tuple[pd.DataFrame | None, str | None]:
+    """Completa `prev` con el bloque parcial de las velas de 1 s hasta el segundo k − 1 (y `extra`, si hay)."""
+    sec = sec[(sec.index >= minute_open) & (sec.index < minute_open + pd.Timedelta(seconds=k))]
+    if sec.empty:
+        return None, "sin velas de 1 s de la vela en curso"
+    tab = minute_table(sec, pd.DatetimeIndex([minute_open]))
+    part = partial_features(tab, pd.Series(apertura(sec), index=[minute_open]), np.exp(prev["lvol60"]), k)
+    return pd.concat([prev[FEATURES], part] + ([extra] if extra is not None else []), axis=1), None
+
+
+def features_binance(bars: pd.DataFrame, sec: pd.DataFrame, minute_open: pd.Timestamp,
+                     k: int) -> tuple[pd.DataFrame | None, str | None]:
+    """Variables de la vela `minute_open` en el segundo k con solo Binance (receta H16b): vela anterior y velas de 1 s
+    hasta el segundo k − 1. Devuelve (una fila con todas las variables, None) o (None, motivo)."""
+    prev, motivo = previas_binance(bars, minute_open)
+    if prev is None:
+        return None, motivo
+    return con_segundos(prev, sec, minute_open, k)
+
+
 def decide(bundle: dict, bars: pd.DataFrame, sec: pd.DataFrame, minute_open: pd.Timestamp,
            payout: float | None = None, umbral: float | None = None) -> dict:
     """Decisión en el segundo k de la vela `minute_open`. `bars`: velas de 1 min CERRADAS (hasta la anterior);
     `sec`: velas de 1 s CERRADAS de la vela en curso (columnas o, h, l, c, v, tb, n). `payout`: pago real de la
     plataforma (por defecto, el del modelo). `umbral`: probabilidad mínima de la dirección (Estudio 21)."""
-    if bars.index[-1] != minute_open - pd.Timedelta(minutes=1):
-        return {"estado": "sin datos", "motivo": "falta la vela de 1 min anterior"}
-    sec = sec[(sec.index >= minute_open) & (sec.index < minute_open + pd.Timedelta(seconds=bundle["k"]))]
-    if sec.empty:
-        return {"estado": "sin datos", "motivo": "sin velas de 1 s de la vela en curso"}
-    prev = compute_features(bars).iloc[[-1]]
-    prev.index = pd.DatetimeIndex([minute_open])
-    tab = minute_table(sec, pd.DatetimeIndex([minute_open]))
-    part = partial_features(tab, pd.Series(sec["o"].iloc[0], index=[minute_open]),
-                            np.exp(prev["lvol60"]), bundle["k"])
-    X = pd.concat([prev[FEATURES], part], axis=1)[bundle["features"]]
+    X, motivo = features_binance(bars, sec, minute_open, bundle["k"])
+    if X is None:
+        return {"estado": "sin datos", "motivo": motivo}
+    X = X[bundle["features"]]
     if X.isna().any(axis=1).iloc[0]:
         return {"estado": "sin datos", "motivo": "variables incompletas (faltan segundos o historia)"}
     p_up = float(bundle["calibrator"].transform(bundle["model"].predict_proba(X.to_numpy())[:, 1])[0])
@@ -213,8 +249,10 @@ def aviso_texto(d: dict, modo: str | None = None) -> str:
         # mismos nombres que la web de OKX en español; sus pestañas bajo el gráfico llevan la hora de CIERRE
         lado = "Al alza" if d["lado"] == 1 else "A la baja"
         ini = pd.Timestamp(d["ventana"]).tz_convert(BOGOTA)
-        fin = (pd.Timestamp(d["ventana"]) + pd.Timedelta(minutes=5)).tz_convert(BOGOTA)
-        cabeza = f"OKX {d.get('activo') or 'ETH'} 5 min"
+        dur = (round((pd.Timestamp(d["vence"]) - pd.Timestamp(d["ventana"])).total_seconds() / 60)
+               if d.get("vence") else 5)  # 5 o 15 min
+        fin = (pd.Timestamp(d["ventana"]) + pd.Timedelta(minutes=dur)).tz_convert(BOGOTA)
+        cabeza = f"{'Gran bot · ' if d.get('gran') else ''}OKX {d.get('activo') or 'ETH'} {dur} min"
         limite = ini - pd.Timedelta(seconds=OKX_MARGEN_S)  # OKX retira los precios 1–2 s antes del inicio
         precio, disp = d.get("precio_compra"), d.get("disponible")
         cuanto = (f"; a ≤ 0,53 hay {disp:g} contratos, unos {disp * precio:.1f} USDT".replace(".", ",")
@@ -225,7 +263,7 @@ def aviso_texto(d: dict, modo: str | None = None) -> str:
         return (f"🔔 {cabeza}: {'↑ SUBE' if d['lado'] == 1 else '↓ BAJA'}\n{regla}\nProbabilidad {prob} · aviso "
                 f"{hora} (Bogotá)\nSin dinero real: solo anótalo.")
     if modo == "blitz":
-        cabeza = f"{d.get('activo') or 'BTC'} blitz 3 min"
+        cabeza = f"{'Gran bot · ' if d.get('gran') else ''}{d.get('activo') or 'BTC'} blitz 3 min"
         regla = "Haz clic ya: lo ideal, antes de 15 s; hasta 30 s aún vale."
     else:
         cabeza, regla = "BTC 1 min", "Haz clic antes del cierre de la vela; pasados 15 s, no entres."

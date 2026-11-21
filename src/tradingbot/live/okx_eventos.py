@@ -170,9 +170,9 @@ class OkxEventos:
 
         return precio_un_contrato(self.libro(inst), "Up" if lado == 1 else "Down", cantidad, tope)
 
-    def resultado(self, symbol: str, inst: str, after_ms: int | None = None) -> dict | None:
-        """Resultado oficial de un contrato vencido (o None si aún no está)."""
-        params = {"seriesId": SERIES[symbol], "state": "expired"}
+    def resultado(self, symbol: str, inst: str, after_ms: int | None = None, dur: int = DUR) -> dict | None:
+        """Resultado oficial de un contrato vencido de 5 o 15 min (o None si aún no está)."""
+        params = {"seriesId": serie(symbol, dur), "state": "expired"}
         if after_ms:
             params["after"] = after_ms
         for x in self._get("/api/v5/public/event-contract/markets", **params).get("data") or []:
@@ -203,11 +203,14 @@ class OkxLoop(BlitzLoop):
                                  "precio": "índice de OKX (resultado oficial del contrato)"})
 
     def _decide(self, a: dict, now: datetime, minute_open: pd.Timestamp) -> dict:
-        d = super()._decide(a, now, minute_open)
+        return self._libro(a, super()._decide(a, now, minute_open), minute_open)
+
+    def _libro(self, a: dict, d: dict, minute_open: pd.Timestamp) -> dict:
+        """Antes de avisar, el precio real del libro de la ventana (el gran bot usa lo mismo)."""
         if d["estado"] != "señal":
             return d
         ventana = minute_open + pd.Timedelta(minutes=1)
-        inst = inst_id(a["symbol"], ventana)
+        inst = inst_id(a["symbol"], ventana, self.dur)
         try:
             precio, disponible = self.eventos.precio_compra(inst, d["lado"], tope=self.precio_max)
         except (requests.RequestException, ValueError, KeyError, IndexError):
@@ -245,7 +248,7 @@ class OkxLoop(BlitzLoop):
             if pd.Timestamp(now) < vence + pd.Timedelta(seconds=20):
                 continue
             try:
-                r = self.eventos.resultado(a["symbol"], a["instrumento"])
+                r = self.eventos.resultado(a["symbol"], a["instrumento"], dur=self.dur)
             except (requests.RequestException, ValueError, KeyError):
                 r = None
             if r is None:

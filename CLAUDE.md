@@ -347,7 +347,10 @@ Fase 2 y bajo condiciones estrictas, ejecutar automáticamente.
        y DOGE a 1 min). Registros diarios `gran5`, `gran15` y `granblitz` (sellados). Miradas en enero (α 0,01) y abril
        (α 0,04).
      - Error 58: la receta del 35 llevada a XRP y DOGE usaba el tic de BTC; se corrigió antes de usarlos.
-     - Pendiente: modo de práctica con el gran bot (falta juntar los seis u ocho modelos en el bucle en vivo).
+     - **Modo de práctica del gran bot (2026-11-21):** `live/gran_vivo.py`, `scripts/iniciar_gran.sh blitz|okx5|okx15` → paneles
+       `/gran-blitz`, `/gran-okx5`, `/gran-okx15` (`tbot blitz vivo --gran`, `tbot okx vivo --gran [--dur 15]`). Opiniones en vivo
+       idénticas al registro con datos reales del 2026-11-19; prepara en el segundo 35 y decide en ~0,4 s. Error 61 corregido:
+       los modos en vivo tomaban la apertura de la primera vela de 1 s aunque estuviera vacía (ahora `anticipada.apertura`).
      - `tbot registro resumen` cuenta también `gran5`, `gran15` y `granblitz` (solo conteos, nunca aciertos; 2026-11-15).
    - **Ronda de mejoras del 2026-11-15 (sesión local; pre-registro ebe2874, código 1c12186):**
      - **Estudio 70:** margen 0 los sábados y domingos UTC en el gran bot de OKX 5 min (desarrollo: las extra dan

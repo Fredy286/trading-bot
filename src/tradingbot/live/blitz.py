@@ -46,7 +46,7 @@ from ..research.study42 import closes as hist_closes
 from ..research.study47 import WEIGHTS as IQ_WEIGHTS
 from ..research.study47 import iq_price
 from ..timeutil import utcnow
-from . import horario_iq
+from . import anticipada, horario_iq
 from .anticipada import CALIB_FRAC, K, LAT, TRAIN_END, TRAIN_START, SecondsFeed, SignalLoop, download_daily
 from .feeds import BinancePollingFeed
 
@@ -143,28 +143,45 @@ def train_frozen_blitz(root3: Path = Path("data/raw/estudio3"), daily_cache: Pat
 
 
 # ----------------------------------------------------------------------------------------------- decisión
+def previas_blitz(bars: pd.DataFrame, venues: dict[str, pd.Series], minute_open: pd.Timestamp):
+    """La parte de las variables del Estudio 42 que solo usa velas de 1 min CERRADAS (Binance y el compuesto de Binance,
+    Bybit y OKX): se puede calcular antes del segundo 50. Devuelve (prev, variables del compuesto, None, compuesto de
+    la vela anterior) o (None, None, motivo, None)."""
+    t1 = minute_open - pd.Timedelta(minutes=1)
+    if bars.index[-1] != t1:
+        return None, None, "falta la vela de 1 min anterior de Binance", None
+    falta = [v for v in VENUES if venues.get(v) is None or venues[v].empty or venues[v].index[-1] != t1]
+    if falta:
+        return None, None, f"falta el cierre anterior de {', '.join(falta)}", None
+    prev = compute_features(bars).iloc[[-1]]
+    prev.index = pd.DatetimeIndex([minute_open])
+    vol = np.exp(prev["lvol60"])
+    hist = pd.date_range(minute_open - pd.Timedelta(minutes=HIST_MIN), minute_open, freq="min")
+    comp = composite({"binance": bars["c"], **{v: venues[v] for v in VENUES}})
+    cf = comp_features(comp, bars["c"], pd.Series(float(vol.iloc[0]), index=hist), hist).iloc[[-1]]
+    return prev, cf, None, float(comp.loc[t1])
+
+
+def features_blitz(bars: pd.DataFrame, sec: pd.DataFrame, venues: dict[str, pd.Series], minute_open: pd.Timestamp,
+                   k: int) -> tuple[pd.DataFrame | None, str | None, float | None]:
+    """Variables de la vela `minute_open` en el segundo k (receta del Estudio 42): vela anterior de Binance, velas de
+    1 s hasta el segundo k − 1 y el compuesto de Binance, Bybit y OKX. Devuelve (una fila con todas las variables,
+    None, compuesto de la vela anterior) o (None, motivo, None)."""
+    prev, cf, motivo, comp_t1 = previas_blitz(bars, venues, minute_open)
+    if prev is None:
+        return None, motivo, None
+    X, motivo = anticipada.con_segundos(prev, sec, minute_open, k, extra=cf)
+    return X, motivo, (comp_t1 if X is not None else None)
+
+
 def decide_blitz(bundle: dict, bars: pd.DataFrame, sec: pd.DataFrame, venues: dict[str, pd.Series],
                  minute_open: pd.Timestamp, payout: float | None = None, umbral: float | None = None) -> dict:
     """Decisión en el segundo k de la vela `minute_open`. `bars`: velas de 1 min de Binance CERRADAS; `sec`: velas de
     1 s CERRADAS de la vela en curso; `venues`: cierres de 1 min de Bybit y OKX hasta la vela anterior."""
-    t1 = minute_open - pd.Timedelta(minutes=1)
-    if bars.index[-1] != t1:
-        return {"estado": "sin datos", "motivo": "falta la vela de 1 min anterior de Binance"}
-    falta = [v for v in VENUES if venues.get(v) is None or venues[v].empty or venues[v].index[-1] != t1]
-    if falta:
-        return {"estado": "sin datos", "motivo": f"falta el cierre anterior de {', '.join(falta)}"}
-    sec = sec[(sec.index >= minute_open) & (sec.index < minute_open + pd.Timedelta(seconds=bundle["k"]))]
-    if sec.empty:
-        return {"estado": "sin datos", "motivo": "sin velas de 1 s de la vela en curso"}
-    prev = compute_features(bars).iloc[[-1]]
-    prev.index = pd.DatetimeIndex([minute_open])
-    vol = np.exp(prev["lvol60"])
-    tab = minute_table(sec, pd.DatetimeIndex([minute_open]))
-    part = partial_features(tab, pd.Series(sec["o"].iloc[0], index=[minute_open]), vol, bundle["k"])
-    hist = pd.date_range(minute_open - pd.Timedelta(minutes=HIST_MIN), minute_open, freq="min")
-    comp = composite({"binance": bars["c"], **{v: venues[v] for v in VENUES}})
-    cf = comp_features(comp, bars["c"], pd.Series(float(vol.iloc[0]), index=hist), hist).iloc[[-1]]
-    X = pd.concat([prev[FEATURES], part, cf], axis=1)[bundle["features"]]
+    X, motivo, comp_t1 = features_blitz(bars, sec, venues, minute_open, bundle["k"])
+    if X is None:
+        return {"estado": "sin datos", "motivo": motivo}
+    X = X[bundle["features"]]
     if X.isna().any(axis=1).iloc[0]:
         return {"estado": "sin datos", "motivo": "variables incompletas (faltan segundos o historia)"}
     p_up = float(bundle["calibrator"].transform(bundle["model"].predict_proba(X.to_numpy())[:, 1])[0])
@@ -173,8 +190,7 @@ def decide_blitz(bundle: dict, bars: pd.DataFrame, sec: pd.DataFrame, venues: di
     b = bundle["payout"] if payout is None else payout
     ev = float(BinaryContract(b, "refund").ev(np.array([p_dir]), np.array([bundle["q"]]))[0])
     fires = ev >= bundle["ev_margin"] and (umbral is None or p_dir >= umbral)
-    return {"estado": "señal" if fires else "sin señal", "lado": side, "p": p_dir, "ev": ev,
-            "compuesto": float(comp.loc[t1])}
+    return {"estado": "señal" if fires else "sin señal", "lado": side, "p": p_dir, "ev": ev, "compuesto": comp_t1}
 
 
 def _resultado(o: float, e: float, lado: int) -> int:

@@ -1022,6 +1022,8 @@ def cmd_blitz(a) -> int:
                       f" · {x['n']} operaciones")
         print("El promedio con menor error es el que más se parece al precio de IQ Option.")
         return 0
+    if a.gran:
+        return _gran_blitz(a)
     try:
         bundle = anticipada.load_bundle(blitz.MODEL_PATH, blitz.REG_PATH)
     except FileNotFoundError:
@@ -1057,6 +1059,46 @@ def cmd_blitz(a) -> int:
     return 0
 
 
+def _gran_blitz(a) -> int:
+    """El gran bot del blitz de BTC (8 modelos congelados; Estudios 66 y 68) para practicar en cuenta DEMO."""
+    from .live import gran_vivo, horario_iq
+
+    if a.eth:
+        print("El gran bot del blitz es solo de BTC (el blitz de ETH de IQ Option es OTC); ETH ya es una de sus opiniones.")
+        return 2
+    runtime = Path("runtime/gran_blitz" if a.runtime == "runtime/blitz" else a.runtime)
+    horario = horario_iq.cargar()
+    print("Gran bot del blitz de BTC (8 modelos congelados, Estudios 66 y 68): aviso en el segundo 50 de cada vela, solo "
+          "con IQ Option abierto (domingo 22:00 → viernes 17:00 de Bogotá). Panel: http://127.0.0.1:8765/gran-blitz — "
+          "Ctrl+C para detener. SOLO CUENTA DEMO.")
+    try:
+        gran_vivo.GranBlitzLoop(runtime, sound=not a.sin_sonido, pago=a.pago / 100 if a.pago else None, umbral=a.umbral,
+                                telegram=_telegram_sender() if a.telegram else None, horario=horario).run(a.iteraciones)
+    except KeyboardInterrupt:
+        pass
+    return 0
+
+
+def _gran_okx(a) -> int:
+    """El gran bot de los contratos de OKX de 5 o 15 min (Estudios 63/64 y 67/69), ETH y BTC, SIN dinero."""
+    from .live import gran_vivo
+
+    monedas = [s for s, f in (("ETHUSDT", a.eth), ("BTCUSDT", a.btc)) if f] or ["ETHUSDT", "BTCUSDT"]
+    runtime = Path(f"runtime/gran_okx{a.dur}" if a.runtime == "runtime/okx" else a.runtime)
+    n = len(gran_vivo.PRODUCTOS[f"okx{a.dur}"]["claves"])
+    print(f"Gran bot de OKX {a.dur} min de {' y '.join(s[:3] for s in monedas)} ({n} modelos congelados, "
+          f"{gran_vivo.PRODUCTOS[f'okx{a.dur}']['estudios']}): aviso en el segundo 50 antes de cada ventana; compra solo "
+          f"si cuesta ≤ {a.precio_max}. Panel: http://127.0.0.1:8765/gran-okx{a.dur} — Ctrl+C para detener. "
+          "SIN DINERO REAL: solo anotar.")
+    try:
+        gran_vivo.GranOkxLoop(runtime, dur=a.dur, monedas=tuple(monedas), sound=not a.sin_sonido, umbral=a.umbral,
+                              telegram=_telegram_sender() if a.telegram else None,
+                              precio_max=a.precio_max).run(a.iteraciones)
+    except KeyboardInterrupt:
+        pass
+    return 0
+
+
 def cmd_okx(a) -> int:
     """Event contracts de OKX «Up or Down 5min» (Estudios 54 y 55): avisos para practicar SIN dinero."""
     from .live import anticipada, okx_eventos
@@ -1077,9 +1119,11 @@ def cmd_okx(a) -> int:
             print(json.dumps({k: meta[k] for k in ("model_id", "model_sha256", "n_ajuste", "n_calibracion")},
                              ensure_ascii=False))
         return 0
+    if a.gran:
+        return _gran_okx(a)
     if a.dur != 5:
-        print("El modo de práctica solo existe para los contratos de 5 min; los de 15 min están en confirmación "
-              "(Estudio 60).")
+        print("El modo de práctica con un solo modelo solo existe para los contratos de 5 min (los de 15 min están en "
+              "confirmación, Estudio 60). Para 15 min está el gran bot: tbot okx vivo --gran --dur 15")
         return 2
     bundles = []
     for s in simbolos:
@@ -1409,6 +1453,8 @@ def build_parser() -> argparse.ArgumentParser:
                         "con precio propio (2026-11-07). Con «entrenar», entrena el modelo de ETH")
     x.add_argument("--sol", action="store_true",
                    help="solo con «entrenar»: el modelo congelado de SOL (opinión del gran bot, Estudio 64)")
+    x.add_argument("--gran", action="store_true",
+                   help="con «vivo»: el gran bot (8 modelos congelados, Estudios 66 y 68); panel /gran-blitz")
     x.set_defaults(func=cmd_blitz)
 
     x = sub.add_parser("okx", help="avisos para los event contracts de OKX de 5 min, SIN dinero (Estudios 54 y 55)")
@@ -1417,7 +1463,10 @@ def build_parser() -> argparse.ArgumentParser:
                         ".github/workflows/libro_okx.yml)")
     x.add_argument("--horas", type=float, default=1.0, help="con «libro»: cuántas horas grabar")
     x.add_argument("--dur", type=int, choices=[5, 15], default=5,
-                   help="duración del contrato en minutos (15: modelos del Estudio 60, solo «entrenar»)")
+                   help="duración del contrato en minutos (15: modelos del Estudio 60; en vivo, solo con --gran)")
+    x.add_argument("--gran", action="store_true",
+                   help="con «vivo»: el gran bot (6 u 8 modelos congelados, Estudios 63/64 y 67/69), ETH y BTC; "
+                        "panel /gran-okx5 o /gran-okx15")
     x.add_argument("--eth", action="store_true", help="ETH (por defecto si no se elige ninguna)")
     x.add_argument("--btc", action="store_true", help="BTC")
     x.add_argument("--runtime", default="runtime/okx")

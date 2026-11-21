@@ -175,3 +175,18 @@ def test_real_payout_changes_the_expected_gain(bars):
     d85 = anticipada.decide(_bundle(0.56), bars, _sec(t), t)
     d87 = anticipada.decide(_bundle(0.56), bars, _sec(t), t, payout=0.87)
     assert d87["ev"] > d85["ev"]
+
+
+def test_open_is_the_first_traded_second_not_an_empty_one():
+    """Registro de errores 61: Binance publica los segundos sin operaciones con apertura = cierre anterior; la vela de
+    1 min abre con la primera operación, que es la apertura con que se entrenaron los modelos."""
+    from tradingbot.live.anticipada import apertura
+
+    idx = pd.date_range("2026-11-21 23:44", periods=4, freq="s", tz="UTC")
+    sec = pd.DataFrame({"o": [73.20, 73.20, 73.21, 73.22], "c": [73.20, 73.21, 73.22, 73.22],
+                        "n": [0.0, 3.0, 5.0, 1.0]}, index=idx)
+    assert apertura(sec) == 73.20  # el segundo 1 abrió a 73,20 (con operaciones)
+    sec.loc[idx[1], "o"] = 73.21
+    assert apertura(sec) == 73.21
+    assert apertura(sec.assign(n=0.0)) == 73.20  # sin operaciones hasta el segundo k: la primera vela
+    assert apertura(sec.drop(columns="n")) == 73.20  # datos sin número de operaciones: como antes

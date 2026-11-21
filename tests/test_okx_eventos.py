@@ -64,7 +64,7 @@ class _Eventos(ok.OkxEventos):
     def libro(self, inst, niveles=5):
         return {"a": [[self.ask, self.cant], [0.6, 50.0]], "b": [[self.bid, self.cant], [0.4, 50.0]]}
 
-    def resultado(self, symbol, inst, after_ms=None):
+    def resultado(self, symbol, inst, after_ms=None, dur=5):
         return {"outcome": self.outcome, "partida": 100.0, "liquidacion": 101.0}
 
 

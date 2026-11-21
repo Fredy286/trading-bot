@@ -306,6 +306,36 @@ scripts/iniciar_okx.sh --eth --btc --telegram
 OKX no está supervisada por la SFC, y estos contratos podrían considerarse juego (Coljuegos bloqueó Polymarket). Operar
 con dinero real requiere su decisión expresa y específica.
 
+### El gran bot: junta los modelos para dar más avisos (Estudios 63, 66 y 67)
+
+El «gran bot» combina las opiniones de 6 a 8 modelos congelados (de BTC, ETH, SOL, XRP y DOGE) con una fórmula que
+también quedó congelada. En desarrollo dio unas dos veces más avisos que el modelo solo, con casi el mismo acierto:
+
+| Producto | Avisos por día (modelo solo → gran bot) | Acierto (modelo solo → gran bot) | Hace falta | Confirmación |
+|---|---|---|---|---|
+| Blitz de BTC de IQ Option (3 min) | 36 → 77 | 55,3 % → 55,3 % | 53,8 % | Estudio 68 |
+| OKX 5 min, ETH y BTC | 40 → 73 | 56,1 % → 55,9 % | 53,1 % | Estudio 64 |
+| OKX 15 min, ETH y BTC | 14 → 50 | 56,9 % → 55,8 % | 53,1 % | Estudio 69 |
+
+Los avisos por día del blitz cuentan también las horas en que IQ Option está cerrado (fin de semana): con IQ abierto
+son menos.
+
+```bash
+scripts/iniciar_gran.sh blitz      # IQ Option, cuenta DEMO → http://127.0.0.1:8765/gran-blitz
+scripts/iniciar_gran.sh okx5       # OKX 5 min, solo anotar → http://127.0.0.1:8765/gran-okx5
+scripts/iniciar_gran.sh okx15      # OKX 15 min, solo anotar → http://127.0.0.1:8765/gran-okx15
+```
+
+- Añada `--telegram` para recibir también los avisos en el celular.
+- El panel funciona igual que en los modos blitz y OKX: sonido, botón «ya hice clic» (barra espaciadora) y diario.
+- El blitz solo avisa con IQ Option abierto (domingo 22:00 → viernes 17:00 de Bogotá).
+- En OKX, el panel nombra la pestaña por su hora de cierre, como en los contratos de 5 min. En los de 15 min eso aún
+  no se ha comprobado en la web de OKX.
+- Para que el aviso llegue a tiempo, el bot prepara en el segundo 35 lo que no cambia; en el segundo 50 solo baja los
+  últimos segundos y decide en menos de medio segundo.
+- Se comprobó con datos reales del 19 de noviembre: calcula exactamente lo mismo que el registro diario.
+- **Falta la confirmación con datos nuevos** (enero y abril de 2027). Solo práctica: nunca dinero real.
+
 ### Reversión nocturna en divisas para practicar en cuenta DEMO (Estudios 25, 27 y 28)
 
 ```bash

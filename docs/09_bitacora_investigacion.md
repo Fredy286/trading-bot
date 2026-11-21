@@ -1327,3 +1327,29 @@ del 19 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo cont
 - Repaso de la nube del 16 al 21 de noviembre: la rutina no abrió estudios nuevos. Hubo una enmienda 2 del Estudio
   32 (error 60) y un hueco de 8 h en el libro de OKX el 16-nov (máquina perdida de GitHub). El registro está completo.
 
+
+## 2026-11-21 (noche) — sesión local (con Fredy): modo de práctica del gran bot (idea 7)
+
+- **Hecho:** `live/gran_vivo.py` junta en vivo los modelos congelados con sus metamodelos congelados (no se ajusta
+  nada): blitz de BTC de IQ Option (8 opiniones, Estudios 66/68), OKX 5 min (6, Estudios 63/64) y OKX 15 min (8,
+  Estudios 67/69), ETH y BTC. Mismo panel, sonido, Telegram, clic y diario que los modos blitz y OKX:
+  `scripts/iniciar_gran.sh blitz|okx5|okx15` → `/gran-blitz`, `/gran-okx5`, `/gran-okx15`. El modo OKX ya sirve para
+  contratos de 15 min (instrumento, resultado oficial y texto del aviso según la duración).
+- **Paridad con datos reales (2026-11-19):** con las mismas entradas, las 12 opiniones en vivo salen IDÉNTICAS a
+  `gran_bot.opiniones_dia` en 408 minutos, y la probabilidad final coincide con lo que guardó la nube en `gran5`
+  (576 filas) y `gran15` (192) con diferencia ≤ 0,000005 (redondeo). Solo se leyeron probabilidades; ningún resultado.
+- **Error 61 (corregido):** los modos en vivo tomaban como apertura de la vela la primera vela de 1 s, aunque
+  estuviera vacía (Binance publica los segundos sin operaciones con apertura = cierre anterior). Pasa en el 11 % de
+  los minutos de BTC y hasta el 62 % de DOGE. Con las velas de 1 s de la API, antes de corregir las opiniones de ETH,
+  SOL, XRP y DOGE se desviaban hasta 0,019; ningún aviso cambió en 200 minutos. Corregido con `anticipada.apertura`
+  (primera vela de 1 s con operaciones). El registro sellado no estaba afectado.
+- **Velocidad:** con 5 monedas, la decisión tardaba 2–4 s. Ahora un hilo prepara en el segundo 35 lo que solo depende
+  de velas cerradas (`Opinador.preparar`) y en el segundo 50 solo se bajan los segundos del minuto: 0,4 s en vivo.
+- Pruebas nuevas: `tests/test_gran_vivo.py` (reglas = registro, opiniones en vivo = camino del registro con datos
+  sintéticos, preparación, bucles, panel).
+
+**Para Fredy**
+- Ya puedes practicar con el gran bot: `scripts/iniciar_gran.sh blitz` (IQ Option, cuenta demo, de domingo 22:00 a
+  viernes 17:00) o `scripts/iniciar_gran.sh okx5` / `okx15` (solo anotar). Da más avisos que los modos de un solo
+  modelo; en desarrollo, con casi el mismo acierto.
+- Sigue sin confirmar con datos nuevos (enero y abril de 2027). Solo práctica; nunca dinero real.

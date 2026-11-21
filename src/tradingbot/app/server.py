@@ -12,6 +12,7 @@ Rutas:
   GET  /blitz          el mismo panel, para el blitz de BTC de IQ Option (3 min, Estudio 42)
   GET  /api/blitz/state, POST /api/blitz/clic, POST /api/blitz/registro  → igual que /api/senal/*
   GET  /okx, /api/okx/*  → lo mismo para los event contracts de OKX (Estudios 54 y 55)
+  GET  /gran-blitz, /gran-okx5, /gran-okx15 y sus /api/<modo>/*  → el gran bot de práctica (live/gran_vivo.py)
   GET  /nocturna       panel de la reversión nocturna en divisas (cuenta demo, Estudios 25/27/28)
   GET  /api/nocturna/state  estado del bucle nocturno, diario y resumen
   POST /api/nocturna/clic   {"alert_id"} → hora del clic (en hora de Deriv)
@@ -100,9 +101,13 @@ def _num(v, lo: float = 0.0, hi: float = 10**7) -> float | None:
     return x
 
 
+GRAN_DIRS = {"gran-blitz": Path("runtime/gran_blitz"), "gran-okx5": Path("runtime/gran_okx5"),
+             "gran-okx15": Path("runtime/gran_okx15")}
+
+
 def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("runtime/senales"),
                  nocturna_dir: Path = Path("runtime/nocturna"), blitz_dir: Path = Path("runtime/blitz"),
-                 okx_dir: Path = Path("runtime/okx")):
+                 okx_dir: Path = Path("runtime/okx"), gran_dirs: dict | None = None):
     runtime_dir, results_dir, senal_dir = Path(runtime_dir), Path(results_dir), Path(senal_dir)
     nocturna_dir = Path(nocturna_dir)
     ack_lock = threading.Lock()
@@ -111,6 +116,11 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
     # OKX: ganancia por unidad apostada si se acierta comprando a 0,52 con comisión, (1 − 0,5312) / 0,5312 ≈ 0,88
     modos = {"senal": (senal_dir, threading.Lock(), 0.85), "blitz": (Path(blitz_dir), threading.Lock(), 0.86),
              "okx": (Path(okx_dir), threading.Lock(), 0.88)}
+    for modo, carpeta in {**GRAN_DIRS, **(gran_dirs or {})}.items():  # el gran bot: mismas reglas que blitz y OKX
+        modos[modo] = (Path(carpeta), threading.Lock(), 0.86 if modo == "gran-blitz" else 0.88)
+    paginas = {f"/{m}" for m in modos if m != "senal"} | {"/senales"}
+    estados = {f"/api/{m}/state" for m in modos}
+    posts = {f"/api/{m}/{x}" for m in modos for x in ("clic", "registro")}
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):  # silencio en consola
@@ -145,10 +155,10 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
                 state["research"] = research_verdict(results_dir)
                 state["server_time"] = utcnow().isoformat()
                 return self._json(200, state)
-            if self.path in ("/senales", "/blitz", "/okx"):  # la página elige el modo por su ruta
+            if self.path in paginas:  # la página elige el modo por su ruta
                 html = resources.files("tradingbot.app").joinpath("static/senales.html").read_bytes()
                 return self._send(200, html, "text/html; charset=utf-8")
-            if self.path in ("/api/senal/state", "/api/blitz/state", "/api/okx/state"):
+            if self.path in estados:
                 from ..live import anticipada
 
                 folder, _, pago_def = modos[self.path.split("/")[2]]
@@ -194,8 +204,7 @@ def make_handler(runtime_dir: Path, results_dir: Path, senal_dir: Path = Path("r
             return data if isinstance(data, dict) else None
 
         def do_POST(self):  # noqa: N802
-            if self.path in ("/api/senal/clic", "/api/senal/registro", "/api/blitz/clic", "/api/blitz/registro",
-                             "/api/okx/clic", "/api/okx/registro"):
+            if self.path in posts:
                 return self._post_senal()
             if self.path == "/api/nocturna/clic":
                 return self._post_nocturna()
@@ -305,8 +314,9 @@ class PanelServer(ThreadingHTTPServer):
 
 def make_server(host: str, port: int, runtime_dir: Path, results_dir: Path,
                 senal_dir: Path = Path("runtime/senales"), nocturna_dir: Path = Path("runtime/nocturna"),
-                blitz_dir: Path = Path("runtime/blitz"), okx_dir: Path = Path("runtime/okx")):
-    return PanelServer((host, port), make_handler(runtime_dir, results_dir, senal_dir, nocturna_dir, blitz_dir, okx_dir))
+                blitz_dir: Path = Path("runtime/blitz"), okx_dir: Path = Path("runtime/okx"), gran_dirs: dict | None = None):
+    return PanelServer((host, port), make_handler(runtime_dir, results_dir, senal_dir, nocturna_dir, blitz_dir, okx_dir,
+                                                  gran_dirs))
 
 
 def serve(host: str = "127.0.0.1", port: int = 8765, runtime_dir: Path = Path("runtime/demo"),
