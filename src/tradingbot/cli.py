@@ -564,6 +564,18 @@ def cmd_research_study70(a) -> int:
     return 0
 
 
+def cmd_research_study72(a) -> int:
+    from .research import study72
+
+    if a.desarrollo:
+        rep = study72.desarrollo()
+        print(json.dumps({h: {k: r[k] for k in ("senales", "vetadas", "resto", "suma_vetadas", "p")}
+                          for h, r in rep.items()}, indent=2, ensure_ascii=False, default=float))
+        return 0
+    study72.run(a.mirada)
+    return 0
+
+
 def cmd_research_study71(a) -> int:
     from .research import study71
 
@@ -1201,6 +1213,12 @@ def build_parser() -> argparse.ArgumentParser:
         g.add_argument("--mirada", choices=["enero", "abril"])
         g.add_argument("--desarrollo", action="store_true")
         x.set_defaults(func=fn)
+    x = r.add_parser("study72", help="Estudio 72: capa de vetos (tendencia de 60 min y apertura de Nueva York); "
+                                     "miradas enero/abril/julio de 2027; --desarrollo reproduce el pre-registro")
+    g = x.add_mutually_exclusive_group(required=True)
+    g.add_argument("--mirada", choices=["enero", "abril", "julio"])
+    g.add_argument("--desarrollo", action="store_true")
+    x.set_defaults(func=cmd_research_study72)
     x = r.add_parser("study63", help="Estudio 63: el «gran bot» (metamodelo de seis modelos propios, OKX 5 min)")
     x.set_defaults(func=cmd_research_study63)
     x = r.add_parser("study62", help="Estudio 62: el favorito dentro de la ventana en OKX (BTC 5 min; desde el "
