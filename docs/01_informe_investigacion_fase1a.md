@@ -5423,3 +5423,91 @@ antes de recomendar IQ Option.
 
 **Consecuencia inmediata (no depende de ningún resultado):** el panel `/blitz` deja de avisar fuera del horario
 congelado y muestra «IQ cerrado: no operar OTC». Nunca dinero real sin autorización expresa y específica.
+
+## Estudio 72 — capa de vetos: no seguir la tendencia de la última hora y no operar en la apertura de Nueva York (pre-registro, 2026-11-21, ANTES de abrir `results/registro/blitz/` y `results/registro/gran15/`, sellados hasta el 2027-01-19)
+
+**Origen.** Investigación del prompt de datos alternativos del usuario (2026-11-15 → 11-21; informe en
+docs/11). Las redes, el posicionamiento de la multitud y las noticias dieron SIN SEÑAL. Al medir las lógicas de las
+comunidades apareció lo contrario de «la tendencia es tu amiga»: a 5–15 min, la tendencia de 60 min continúa solo
+el 47–49 % de las veces. Nuestras señales que van a favor de esa tendencia aciertan menos.
+
+Las cifras son *post hoc*, con predicciones de desarrollo ≤ 2026-10-25. Se recalcularon con código propio,
+independiente del agente que las propuso:
+- **Blitz con p42** (Estudio 42), en las horas en que IQ Option abre el blitz real (horario prudente congelado,
+  enmienda del 2026-11-15), 2025-11 → 2026-10:
+  - sin veto: 7 979 operaciones, 54,53 %, ganancia +113,9;
+  - D1 (señal a favor de la tendencia de 60 min): 1 086 vetadas, 48,6 %, EV −0,096. Dentro de cada tercil de
+    confianza, 47,5–50,1 % frente a 54,5–56,9 %. En una logística del acierto con logit(p_dir), el coeficiente de D1
+    es −0,27 (z −4,1): no es «poca confianza». Con la tendencia del compuesto de IQ da lo mismo (coincide 99,7 %);
+  - D2 (apertura de Nueva York, 9:30–10:59 ET): 741 vetadas, 50,3 %, EV −0,064;
+  - **D1 o D2:** 1 722 vetadas (21,6 %), 49,6 %, EV −0,078, suma −133,6; cuantil 95 % de la suma por semanas
+    −59,2 (p ≈ 0,001); peores en 12 de 12 meses. Con el veto: 6 257 operaciones, **55,89 %**, ganancia +247,4.
+- **Gran bot de OKX 15 min** (Estudio 67, regenerado; control +484,1): D1 o D2 veta 3 273 (18 %), con 51,3 % y EV
+  −0,018; suma −58,7 (p ≈ 0,044); peores en 11 de 12 meses.
+- **No sirve:**
+  - gran bot de OKX 5 min: +6,5 (p ≈ 0,42);
+  - BTC 1 min: D1 no aplica, las señales a favor de la tendencia son iguales o mejores; D2 da +18,6 (p ≈ 0,17), y
+    +18,2 en 2024-07 → 2025-08.
+- **Gran bot del blitz en horas abiertas (informativo):** D1 o D2 +96,5 (p ≈ 0,068); D2 sola +119,1 (p ≈ 0,009);
+  D1 sola +15,3.
+- **Mecanismo:**
+  - D1: a minutos domina la reversión, y el modelo sigue confiado cuando apuesta a que la tendencia continúa.
+  - D2: la apertura de la bolsa de EE. UU. trae flujos (ETF, institucionales) que nuestras variables de microestructura
+    de Binance no ven. El «desplome de las 10» como dirección NO existe: las ventanas bajan el 49,5–50,4 %.
+- **Advertencia:**
+  - el agente hizo ~110 comparaciones y aquí se eligieron 2 contratos de 4, después de mirar los datos;
+  - lo único que vale es la confirmación con datos nuevos.
+
+**Reglas (congeladas):**
+- **vela de decisión t:** para el blitz, el campo `vela` del registro; para OKX 15 min, el inicio de la ventana
+  menos 1 min;
+- **tendencia de 60 min:** tend60(t) = signo(ln C[t−1] − ln C[t−61]), donde C es el cierre de 1 min del contado de
+  Binance de la moneda (BTCUSDT o ETHUSDT; archivos diarios públicos de data.binance.vision);
+- **lado:** +1 si la señal es al alza (CALL, «Al alza»), −1 si es a la baja;
+- **D1:** veto si tend60 ≠ 0 y lado = tend60;
+- **D2:** veto si el inicio del contrato, T0 = t + 1 min, cae de lunes a viernes entre las 9:30 y las 10:59 de Nueva
+  York (America/New_York, con horario de verano);
+- **veto** = D1 o D2.
+
+**Hipótesis:**
+- **H72a:** blitz de BTC con el p42 congelado (registro `blitz`, modelo BTCUSDT-blitz3-compuesto-0f8694, política
+  de H42a, resultado de H44a con 3 bolsas), solo velas en horario abierto de IQ (`config/horario_iq_blitz.json`,
+  congelado el 2027-01-12). La suma de la ganancia de las señales vetadas es < 0. Cada una vale +0,86 si gana, −1 si
+  pierde y 0 si empata.
+- **H72b:** gran bot de OKX 15 min (registro `gran15`, filas con `senal_gran` = true y resultado ±1). La suma de la
+  ganancia de las señales vetadas es < 0. Cada una vale +0,4688 o −0,5312.
+Que esa suma sea negativa equivale a que quitar las vetadas sube la ganancia total.
+
+**Criterios (cada hipótesis):**
+1. p < α_H, donde p es la fracción de 10 000 remuestreos de semanas ISO completas (semilla 72; semana de la vela
+   de decisión) en que la suma de lo vetado es ≥ 0;
+2. hay ≥ 100 señales vetadas. Si no se llega a 100, esa mirada es «sin conclusión» para esa hipótesis.
+
+**Tres miradas, cada una una sola vez (Bonferroni entre miradas, total 0,05):**
+- **enero:** señales 2026-10-26 → 2027-01-18; desde el 2027-01-19; α = 0,01;
+- **abril:** señales hasta el 2027-04-26; desde el 2027-04-27; α = 0,02;
+- **julio:** señales hasta el 2027-07-26; desde el 2027-07-27; α = 0,02.
+En cada mirada se evalúan solo las hipótesis que aún no pasaron, con Holm entre ellas: la de menor p contra α/m (m
+= hipótesis pendientes) y la siguiente contra α/(m − 1). Antes de calcular se comprueba que no falte ningún día en
+los registros usados.
+
+**Potencia (realista).** En el registro hay muchas menos señales que en desarrollo: el p42 da ~9 al día frente a 36,
+y gran15 ~28 frente a 50 (conteos sin aciertos, 2026-10-26 → 11-13).
+- H72a: ~100 vetadas en enero, ~220 en abril y ~330 en julio; potencia ~5 %, ~20 % y ~30 %.
+- H72b: potencia ~15–25 % en abril y julio.
+Lo más probable es «sin confirmar». Si el mercado se mueve más, habrá más señales y más potencia.
+
+**Informativo (no decide):**
+- D1 y D2 por separado;
+- el gran bot del blitz en horario abierto;
+- gran5;
+- BTC 1 min (H16b), solo D2;
+- el horario del usuario (02:00–05:59 UTC);
+- la tendencia con el compuesto de IQ.
+
+**Consecuencia:**
+- **si pasa H72a** (y pasaron H44a y H44a-ab): el modo de práctica del blitz deja de avisar las señales vetadas y
+  dice por qué («a favor de la tendencia de 1 h» o «apertura de Nueva York»);
+- **si pasa H72b** (y pasó H69): lo mismo en el gran bot de OKX 15 min;
+- **si no:** nada cambia.
+Siempre sin dinero real; nunca dinero real sin autorización expresa y específica del usuario.
