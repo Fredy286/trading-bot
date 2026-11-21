@@ -1275,3 +1275,43 @@ nube: la reauditoría la hace el registro diario de GitHub (2026-11-21, 06:40 UT
 - Además, el programa no entendía los mensajes escritos en varias líneas, que son justo las señales que sí llegan a tiempo.
 - Ya está corregido: desde mañana se revisan unas 1 200 señales de 6 canales, publicadas 1 a 5 minutos antes de entrar.
 - El veredicto sigue siendo el 31 de enero. Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-21 (autónoma)
+
+**Tema del día (sábado):** robustez y calidad.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y lo hecho ya documentado. El registro diario
+del 19 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo conteos; 25 días cada una).
+
+**Revisiones (sin precios nuevos de nuestras estrategias ni aciertos sellados):**
+- **Reauditoría de canales (enmienda 2):** corrió en el registro diario del 2026-11-20 (15:50 UTC):
+  `dias_auditados_enmienda2.txt` con 22 días (10-29 → 11-19). Señales auditadas: QuotexSignalfreee 566,
+  PocketSignalsM1 413, PocketOptionSignalsM5 111, quotexsignals2814 98, gotraderssinaisfree 59, Unidos 5.
+  - En los 4 canales grandes, todas se publicaron 0–4 min antes de la entrada: la zona horaria configurada (−3) es
+    coherente. GavinVIPResults escribe «UTC-5», pero es un canal de resultados, no se audita.
+  - 22 señales sin resultado: casi todas de quotexsignals2814 (USDMXN y otras) en sábados, domingos o viernes después
+    de las 21 UTC, con el mercado cerrado (no hay precio de Deriv). Correcto que queden fuera.
+  - Lector: en los 4 canales grandes, ningún mensaje con par y hora queda sin dirección por ambigüedad. Quedan fuera,
+    por la lista de pares pre-registrada, ~220 señales no OTC de CADJPY, CHFJPY y CADCHF (Deriv no los tiene). La
+    exclusión no depende del resultado: no sesga, solo reduce la muestra. No se cambia nada.
+- **Grabación del libro de OKX (Estudio 56 y 62):** un solo hueco desde el 2026-11-09: **2026-11-16 de 03:30 a
+  11:30 UTC** (~8 h, ~96 ventanas por moneda). Causa (Actions, run 43798897486): GitHub perdió la máquina a mitad
+  del paso «Grabar el libro» (el paso nunca terminó; los pasos `if: always()` no llegaron a correr), así que se
+  perdieron las ~5 h grabadas, y el vigía relanzó la cadena unas 3 h tarde (11:27 UTC). No es un fallo del código ni
+  depende del resultado de las ventanas (el flujo ya lo advierte). La cadena sigue sana (run 44880706428 en curso).
+  Si se repite, la mejora sería guardar a mitad de la grabación; hoy no compensa tocar el flujo.
+- Vigilancia de canales: 12 canales con capturas hasta hoy o ayer. Pruebas: pasan todas.
+
+**Estudio nuevo:** ninguno (día de revisión).
+
+**Pendientes con fecha**
+- 2026-11-27 (viernes): primera tabla descriptiva de canales con la lectura enmendada (sin veredicto).
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones y apertura del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy tocaba revisar que todo lo automático funcione. Funciona.
+- La revisión corregida de los canales ya corrió: unas 1 250 señales de 6 canales, publicadas 1 a 4 minutos antes de
+  entrar. El veredicto sigue siendo el 31 de enero.
+- El domingo 16 de noviembre GitHub perdió 8 horas de grabación de OKX por una falla de sus máquinas. No afecta a
+  las conclusiones; solo hay un poco menos de datos.
+- Nada cambió en el bot. Solo demo; no operes con dinero real.
