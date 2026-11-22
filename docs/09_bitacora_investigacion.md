@@ -1353,3 +1353,50 @@ del 19 de noviembre llegó a las 12 carpetas (`tbot registro resumen`, solo cont
   viernes 17:00) o `scripts/iniciar_gran.sh okx5` / `okx15` (solo anotar). Da más avisos que los modos de un solo
   modelo; en desarrollo, con casi el mismo acierto.
 - Sigue sin confirmar con datos nuevos (enero y abril de 2027). Solo práctica; nunca dinero real.
+
+## 2026-11-22 (autónoma)
+
+**Tema del día (domingo):** resumen semanal (2026-11-16 → 11-22) y repriorización de docs/10.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. Registro
+diario: las 12 carpetas con 26 días (2026-10-26 → 11-20; `tbot registro resumen`, solo conteos; corrida del
+2026-11-21 a las 14:57 UTC). La vigilancia de canales (11:10 UTC de hoy) y la cadena del libro de OKX (grabación
+iniciada a las 00:56 UTC, guardada a las 06:44 UTC) siguen corriendo. Pruebas: pasan todas.
+
+**Resumen de la semana**
+- **Investigación:** cinco días de búsqueda sin estudio nuevo, porque nada era realmente distinto de lo ya probado:
+  - efecto de la apertura de Asia en BTC (no robusto);
+  - sesgo del favorito en Kalshi (apoya el Estudio 62);
+  - Hyperliquid (14–17 % de cuentas ganan; las grandes aciertan < 40 %);
+  - efecto del cuarto de hora (10 s, demasiado corto para un clic);
+  - horas de financiación en cripto (ya probado en el Estudio 33).
+- **Calidad:**
+  - error 60: la auditoría de canales contaba señales tardías; corregido con la enmienda 2 del Estudio 32,
+    reauditoría hecha el 20-nov con ~1 250 señales de 6 canales;
+  - hueco de 8 h en el libro de OKX el 16-nov (máquina perdida de GitHub, sin efecto en las conclusiones);
+  - error 61 (sesión local): apertura de vela vacía en los modos en vivo; el registro sellado no estaba afectado.
+- **Sesión local con Fredy (21-nov):**
+  - informe de datos alternativos (docs/11: redes, posicionamiento y noticias, sin señal);
+  - Estudio 72 pre-registrado (vetos D1 y D2);
+  - modo de práctica del gran bot (`scripts/iniciar_gran.sh blitz|okx5|okx15`), con opiniones idénticas al registro.
+- **Registro (solo conteos, 26 días):** el gran bot da muchas más señales que su base: OKX 5 min 1 234 frente a 793,
+  OKX 15 min 706 frente a 451, blitz 1 078 frente a 236. Sus aciertos siguen sellados.
+
+**Repriorización (docs/10):** la idea 7 queda hecha y baja; suben la 1 y la 1b (anotar en la demo de IQ Option el
+precio de entrada, el empate y la hora al segundo), que ahora se pueden hacer practicando con el gran bot.
+
+**Próximas fechas**
+- 2026-11-27 (viernes): primera tabla descriptiva de canales con la lectura enmendada (sin veredicto).
+- 2026-12-13: Estudio 62 (favorito de BTC 5 min en OKX al segundo 60), evaluación única.
+- 2027-01-12: plazo para que Fredy confirme el horario del blitz de Bitcoin en IQ Option (idea 7b).
+- 2027-01-19: confirmaciones pre-registradas, una vez cada una, y apertura del registro.
+- 2027-01-31: veredicto de los canales (Estudio 32).
+
+**Para Fredy**
+- Semana tranquila: busqué ideas nuevas cinco días y ninguna valía una prueba; casi todo ya lo habíamos probado.
+- Corregí un error en la revisión de canales (contaba señales publicadas tarde). El veredicto sigue el 31 de enero.
+- Lo nuevo: ya puedes practicar con el «gran bot» (`scripts/iniciar_gran.sh blitz`), que da más avisos.
+- Si practicas en la demo de IQ Option, anota la hora exacta, el precio de entrada y si hubo empate: es lo que más
+  ayuda ahora.
+- Próximas fechas: 13 de diciembre (una prueba de OKX) y 19 de enero (todas las confirmaciones).
+- Nada cambió en el bot. Solo demo; no operes con dinero real.
