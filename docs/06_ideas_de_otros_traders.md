@@ -280,6 +280,30 @@ mdpi.com no abre desde la nube.
 liquidez; no hay motivo para esperar una reversión. Y la distancia a la financiación ya se probó como variable en el
 Estudio 33 (no mejoró la política). **Sin estudio nuevo.**
 
+## 3k. Microestructura de cripto: flujo de órdenes, Hawkes y umbral de confianza (2026-11-23, solo resúmenes)
+
+Búsqueda del lunes (literatura). Solo resúmenes del buscador: mdpi.com, link.springer.com, ceur-ws.org y
+delphicalpha.substack.com no abren desde la nube.
+- Informe de Delphi Digital (feb-2026, blog sin revisión; https://delphicalpha.substack.com/p/crypto-orderflow-alpha-report-feb):
+  con fotos de 1 s de Binance (BTC, ETH, SOL, BNB), las señales de desequilibrio del flujo pierden la mitad de su valor
+  en 5 s de retraso. Coincide con nuestro Estudio 15 (la ventaja extra vive en 1–2 s; a +10 s ≈ 0).
+- Raffaelli, Cestari, Marazzina y Formentin, «Forecasting Bitcoin price movements using multivariate Hawkes processes
+  and limit order book data» (Decisions in Economics and Finance, 2026; precursor https://arxiv.org/abs/2312.16190):
+  predicen el signo del siguiente movimiento con eventos del libro. Necesita el libro completo evento a evento, que no
+  tenemos en historia pública (Binance solo publica operaciones y velas).
+- Kuznetsov, «Blockchain-Native Asset Direction Prediction: A Confidence-Threshold Approach…» (Algorithms 18(12) 758,
+  2025; https://www.mdpi.com/1999-4893/18/12/758): separar «hacia dónde» de «cuándo operar» con un umbral de confianza
+  posterior; con más confianza, menos operaciones y más ganancia por operación; lo mejor a 400–600 min. Un artículo del
+  mismo autor (Applied Sciences 15(20) 11145) dice 82,68 % de acierto con 12 % de cobertura: **no verificado** (no
+  pudimos leer el método) y a horizontes de horas, no de 1–5 min.
+- Krohn, Mueller y Whelan (ya en la bitácora): las 17:00 de NY son la hora de mayor diferencial y menor volumen en
+  divisas; Mueller (BIS, https://www.bis.org/events/221213_bis_bdi_ecb_exchange_rates/mueller.pdf) dice que el patrón
+  diario no lo explica el diferencial. Es un patrón de horas; nuestro Estudio 34 mide minutos y sí ve que la reversión
+  vive en el diferencial abierto. No se contradicen: son horizontes distintos.
+
+**Lectura:** todo repite dos lecciones que ya teníamos: (1) filtrar por confianza es lo único que sube el acierto, y
+(2) la información del flujo dura segundos. **Sin estudio nuevo.**
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:

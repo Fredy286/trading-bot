@@ -1400,3 +1400,36 @@ precio de entrada, el empate y la hora al segundo), que ahora se pueden hacer pr
   ayuda ahora.
 - Próximas fechas: 13 de diciembre (una prueba de OKX) y 19 de enero (todas las confirmaciones).
 - Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-23 (autónoma)
+
+**Tema del día (lunes):** literatura y microestructura.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. Registro
+diario: las 12 carpetas con 27 días (`tbot registro resumen`, solo conteos). Vigilancia de canales (08:57 UTC) y
+cadena del libro de OKX (11:45 UTC) siguen corriendo. Pruebas: pasan todas.
+
+**Búsquedas (solo resúmenes del buscador; mdpi.com, link.springer.com, ceur-ws.org y substack no abren desde la nube):**
+- Desequilibrio del flujo de órdenes en BTC/ETH con fotos de 1 s (Delphi Digital, feb-2026, blog): pierde la mitad de
+  su valor en 5 s. Igual que nuestro Estudio 15.
+- Procesos de Hawkes con eventos del libro de BTC/USD (Raffaelli et al., Decisions in Economics and Finance 2026;
+  https://arxiv.org/abs/2312.16190): necesita el libro evento a evento; no hay historia pública.
+- Umbral de confianza posterior (Kuznetsov, Algorithms 18(12) 758, https://www.mdpi.com/1999-4893/18/12/758): misma
+  lección que nuestros Estudios 20–21; lo mejor a 400–600 min. Un 82,68 % de otro artículo del autor, no verificado.
+- Divisas a las 17:00 de NY (Krohn, Mueller y Whelan; Mueller, BIS): diferencial máximo; patrón de horas, compatible
+  con el Estudio 34 (minutos).
+Detalle en docs/06, 3k.
+
+**Estudio nuevo:** ninguno. Nada era distinto de lo ya probado o hacía falta un libro de órdenes que no existe en
+historia pública.
+
+**Pendientes con fecha**
+- 2026-11-27 (viernes): tabla descriptiva de canales con la lectura enmendada (sin veredicto).
+- 2026-12-13: Estudio 62. 2027-01-19: confirmaciones y apertura del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy leí estudios recientes sobre cómo se mueve el precio segundo a segundo. Nada nuevo para probar.
+- Confirman lo que ya vimos: la información de las compras y ventas dura muy pocos segundos, y lo que más sube el
+  acierto es operar solo cuando el modelo está muy seguro.
+- Un artículo dice 82 % de acierto, pero no se puede revisar cómo lo midió y es a varias horas: no le creemos.
+- Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.

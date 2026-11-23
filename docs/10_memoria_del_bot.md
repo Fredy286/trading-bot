@@ -257,6 +257,10 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   paridad exacta con el registro. Lección: cuando la búsqueda no da nada nuevo, lo que más vale es revisar que lo que
   medimos y lo que mostramos en vivo sea lo mismo.
 
+- **Literatura del 2026-11-23 (docs/06, 3k):** flujo de órdenes (pierde la mitad de su valor en 5 s), Hawkes con el libro
+  y umbral de confianza posterior (Kuznetsov 2025) repiten lo ya sabido. Un 82 % de acierto publicado sin método
+  verificable y a horas no a minutos: no se persigue. Sin datos públicos del libro evento a evento, Hawkes no es probable.
+
 ## Ideas pendientes (prioridad de arriba abajo; repriorizado el 2026-11-22)
 
 Repriorización del 2026-11-22: la idea 7 (modo de práctica del gran bot) quedó HECHA y baja al final de la tabla. Suben
