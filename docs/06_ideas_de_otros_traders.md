@@ -304,6 +304,28 @@ delphicalpha.substack.com no abren desde la nube.
 **Lectura:** todo repite dos lecciones que ya teníamos: (1) filtrar por confianza es lo único que sube el acierto, y
 (2) la información del flujo dura segundos. **Sin estudio nuevo.**
 
+## 3l. Historial verificado, cuarta pasada: Darwinex, señales de MQL5 y concentración de ganancias (2026-11-24, solo resúmenes)
+
+Búsqueda de los martes (traders con historial verificado). Solo resúmenes del buscador; no se abrieron las páginas.
+
+- **Darwinex (resumen DarwinIA, enero de 2026):** publica rentabilidades medianas a 6 meses y caídas, sin porcentaje de
+  acierto, y antes de comisiones (1,2 % de gestión y 20 % de éxito). Es material de la propia empresa.
+- **Señales de MQL5 enlazadas a Darwinex:** cuentas sueltas con aciertos muy distintos (57 % en 962 operaciones; 12 % en
+  una cuenta con apalancamiento 1:200). Son autodeclaradas y elegidas por quien las publica; no se pueden generalizar.
+- **Concentración (Finance Magnates sobre datos de iSAM Securities):** el 1 % de las cuentas minoristas ganadoras se
+  llevó el 66,5 % de la ganancia de todos los clientes en un año, y el 5 %, el 85,5 %. Encaja con Hyperliquid (3h).
+- **Acierto ≠ ganancia (reseña de Cohen, Makov y Schwartz, «The Winning Trade», 2023; no se leyó el artículo):** la
+  mayoría de los minoristas gana más operaciones de las que pierde y aun así el 82 % pierde dinero.
+
+**Lectura:** nada nuevo para probar. Repite lo de 3b, 3c y 3h: el acierto alto no es la medida, la ganancia se concentra
+en muy pocos y las listas verificadas no dan reglas desarmables sin el historial completo de cada cuenta (solo en sesión
+local, idea 2 de docs/10).
+
+Fuentes: https://blog.darwinex.com/hubfs/DarwinIA_SILVER_GOLD_Darwinex/Recap%20Jan%2026.pdf?hsLang=en ;
+https://www.mql5.com/en/signals/2310741 ; https://mql5.com/en/signals/2235392 ;
+https://www.financemagnates.com/forex/the-winning-few-top-1-of-retail-traders-cause-two-thirds-of-broker-losses/ ;
+https://dataconomy.com/?p=98348 ; https://www.mql5.com/en/blogs/post/775015
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:

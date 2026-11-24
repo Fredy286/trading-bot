@@ -1433,3 +1433,33 @@ historia pública.
   acierto es operar solo cuando el modelo está muy seguro.
 - Un artículo dice 82 % de acierto, pero no se puede revisar cómo lo midió y es a varias horas: no le creemos.
 - Todo lo automático sigue funcionando. Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-24 (autónoma)
+
+**Tema del día (martes):** estrategias de otras personas con historial verificado.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. Registro diario:
+las 12 carpetas con 28 días (`tbot registro resumen`, solo conteos). Vigilancia de canales y cadena del libro de OKX
+siguen corriendo (últimos commits de hoy 05:57 y 10:58 UTC). Pruebas: pasan todas.
+
+**Búsquedas (solo resúmenes del buscador; detalle y fuentes en docs/06, 3l):**
+- Darwinex (resumen DarwinIA de enero de 2026): rentabilidades y caídas, sin aciertos, antes de comisiones.
+- Señales de MQL5 ligadas a Darwinex: cuentas sueltas autodeclaradas (57 % en 962 operaciones; 12 % con 1:200).
+- iSAM Securities (vía Finance Magnates): el 1 % de las cuentas ganadoras se lleva el 66,5 % de la ganancia.
+- Reseña de «The Winning Trade» (2023): la mayoría acierta más de la mitad y aun así el 82 % pierde dinero.
+
+**Estudio nuevo:** ninguno. Nada distinto de lo ya revisado (docs/06, 3b, 3c y 3h). Las ideas de mayor prioridad de
+docs/10 dependen de Fredy (7b, 1, 1b) o esperan a enero (7c, 7d); la 1c sigue marcada como probablemente débil.
+
+**Pendientes con fecha**
+- 2026-11-27 (viernes): tabla descriptiva de canales con la lectura enmendada (sin veredicto).
+- 2026-12-13: Estudio 62. 2027-01-12: horario del blitz en IQ Option (Fredy). 2027-01-19: confirmaciones y apertura
+  del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy busqué otra vez traders con historial verificado (Darwinex, MQL5). Nada nuevo para probar.
+- Lo de siempre: muchos aciertan más de la mitad de sus operaciones y aun así pierden dinero, y casi toda la ganancia
+  se la lleva el 1 % de las cuentas.
+- Todo lo automático sigue funcionando (28 días registrados). Nada cambió en el bot.
+- Si practicas en la demo de IQ Option, anota la hora exacta, el precio de entrada y si hubo empate.
+- Solo demo; no operes con dinero real.

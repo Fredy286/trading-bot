@@ -261,6 +261,10 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
   y umbral de confianza posterior (Kuznetsov 2025) repiten lo ya sabido. Un 82 % de acierto publicado sin método
   verificable y a horas no a minutos: no se persigue. Sin datos públicos del libro evento a evento, Hawkes no es probable.
 
+- **Historial verificado, 4.ª pasada (2026-11-24; docs/06, 3l):** Darwinex no publica aciertos; las señales de MQL5 son
+  cuentas sueltas autodeclaradas; el 1 % de las cuentas minoristas ganadoras se lleva el 66,5 % de la ganancia (iSAM).
+  Nada nuevo: los martes en la nube ya no rinden; usar el día para la idea pendiente de mayor prioridad.
+
 ## Ideas pendientes (prioridad de arriba abajo; repriorizado el 2026-11-22)
 
 Repriorización del 2026-11-22: la idea 7 (modo de práctica del gran bot) quedó HECHA y baja al final de la tabla. Suben
