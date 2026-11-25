@@ -1463,3 +1463,32 @@ docs/10 dependen de Fredy (7b, 1, 1b) o esperan a enero (7c, 7d); la 1c sigue ma
 - Todo lo automático sigue funcionando (28 días registrados). Nada cambió en el bot.
 - Si practicas en la demo de IQ Option, anota la hora exacta, el precio de entrada y si hubo empate.
 - Solo demo; no operes con dinero real.
+
+## 2026-11-25 (autónoma)
+
+**Tema del día (miércoles):** mejorar el modelo de BTC 1 min (o el de ETH).
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. Registro diario:
+las 12 carpetas con 29 días (`tbot registro resumen`, solo conteos). Vigilancia de canales (02:20 UTC) y cadena del libro
+de OKX (10:11 UTC) siguen corriendo. Pruebas: pasan todas.
+
+**Búsquedas (solo resúmenes del buscador; researchsquare.com y mdpi.com no abren desde la nube; detalle en docs/06, 3m):**
+- Perpetuo frente a contado al segundo: ningún estudio revisado de 2026; un preprint (Research Square) compara Binance con
+  Hyperliquid (~0,48 s de demora de Hyperliquid), con casillas de 5 s. Lo demás son cifras de volumen.
+- Variables de varios plazos (Forecasting 8(3) 40, 2026): AUC 0,60 no basta; lo útil es de 4 h o más.
+- «Separation Index» (arXiv 2406.17083): otra forma de filtrar por confianza (ya en los Estudios 20–21).
+
+**Estudio nuevo:** ninguno. La única pieza sin probar (perpetuo de Binance en los segundos 0–49) queda como idea 2c de
+docs/10, de baja prioridad: el Estudio 24 y el Estudio 15 indican que esa información se pierde antes del clic a +10 s.
+
+**Pendientes con fecha**
+- 2026-11-27 (viernes): tabla descriptiva de canales con la lectura enmendada (sin veredicto).
+- 2026-12-13: Estudio 62. 2027-01-12: horario del blitz en IQ Option (Fredy). 2027-01-19: confirmaciones y apertura
+  del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy busqué formas de mejorar el modelo de Bitcoin de 1 minuto. No encontré nada nuevo que valga una prueba.
+- La única idea sin probar (usar el precio de los futuros de Binance segundo a segundo) probablemente no sirve para un
+  clic humano: esa información se pierde en menos de 10 segundos. La dejo anotada.
+- Todo lo automático sigue funcionando (29 días registrados). Nada cambió en el bot.
+- Solo demo; no operes con dinero real.

@@ -326,6 +326,29 @@ https://www.mql5.com/en/signals/2310741 ; https://mql5.com/en/signals/2235392 ;
 https://www.financemagnates.com/forex/the-winning-few-top-1-of-retail-traders-cause-two-thirds-of-broker-losses/ ;
 https://dataconomy.com/?p=98348 ; https://www.mql5.com/en/blogs/post/775015
 
+## 3m. Modelo de BTC 1 min: perpetuo frente a contado y variables de varios plazos (2026-11-25, solo resúmenes)
+
+Búsqueda de los miércoles (mejorar el modelo de BTC 1 min). Solo resúmenes del buscador; researchsquare.com y mdpi.com
+no abren desde la nube.
+
+- **Perpetuo frente a contado, al segundo:** no apareció ningún estudio revisado de 2026 que mida, al segundo, si el
+  perpetuo de Binance adelanta al contado. Un preprint de Research Square (sin revisión) compara el perpetuo de Binance
+  con el de Hyperliquid: Binance recibe los datos casi sin demora y Hyperliquid ~0,48 s después; su medida de
+  adelanto usa casillas de 5 s. Lo demás que circula (perpetuos con 4–10 veces el volumen del contado) son cifras de
+  volumen, no pruebas de adelanto, y en parte contenido patrocinado.
+- **Variables de varios plazos (revista Forecasting 8(3) 40, 2026):** según el resumen, un AUC de 0,60 no basta para
+  operar con ganancia y las variables más útiles son de 4 h o más, no de 1 min.
+- **«Separation Index» para el minuto de BTC (arXiv 2406.17083, 2024):** elegir las observaciones más informativas;
+  es otra forma del filtro por confianza (Estudios 20–21).
+
+**Lectura:** nada que pruebe algo nuevo. La única pieza no probada es el perpetuo de Binance en los segundos 0–49 del
+minuto (idea 2c de docs/10), pero el Estudio 24 (ETH y BTC/USDC en esos segundos) mejoró el log-loss sin mejorar la
+política, y el Estudio 15 mostró que la información de segundos se pierde antes del clic a +10 s. No se pre-registra.
+
+Fuentes: https://www.researchsquare.com/article/rs-10147582/v1 ; https://www.mdpi.com/2571-9394/8/3/40 ;
+https://arxiv.org/html/2406.17083v2 ;
+https://cryptoquant.com/insights/quicktake/6a1c6342ae348e5baf3fbb6a-Bitcoin-Dominates-the-Perpetuals-Arena-as-Altcoin-Derivatives-Heat-Up
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:
