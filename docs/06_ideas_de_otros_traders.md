@@ -349,6 +349,36 @@ Fuentes: https://www.researchsquare.com/article/rs-10147582/v1 ; https://www.mdp
 https://arxiv.org/html/2406.17083v2 ;
 https://cryptoquant.com/insights/quicktake/6a1c6342ae348e5baf3fbb6a-Bitcoin-Dominates-the-Perpetuals-Arena-as-Altcoin-Derivatives-Heat-Up
 
+## 3n. Reversión nocturna: ¿qué plataformas liquidan divisas con precio medio a esas horas? (2026-11-26, solo resúmenes)
+
+Búsqueda de los jueves (reversión nocturna, 21–24 UTC). Solo resúmenes del buscador; kalshi.com y datawallet.com no
+abren desde la nube.
+
+- **Nadex (hoy Crypto.com Derivatives North America, solo EE. UU.):** binarias de divisas de 5 min que liquidan con la
+  media de los últimos 10 precios MEDIOS antes del vencimiento (justo lo que nuestra reversión necesita). Pero vencen
+  cada 5 min de 18:05 a 17:00 de Nueva York: **cierran de 17:00 a 18:05 NY**, que es exactamente nuestra hora fuerte
+  (22 UTC en invierno, 21 UTC en verano). Lectura: quien liquida con precio medio se aparta justo cuando el diferencial
+  se abre; refuerza que parte de la reversión es efecto de la cotización (docs/10).
+- **IG «digital 100s» de 5 min** (EUR/USD, GBP/USD, AUD/USD, USD/JPY): liquidan con el precio medio de IG; no se pudo
+  ver su horario a 21–24 UTC. Es un producto de apuestas con diferencial del Reino Unido, no disponible en Colombia.
+- **Kalshi:** existe una serie de contratos de EUR/USD a 15 min (KXEURUSD15M; un ejemplo con vencimiento a las 04:00
+  de NY del 2026-10-21). Un registro ante la CFTC de un contrato «EUR/USD por encima/debajo de… en <periodo>» nombra
+  como fuente a **Pyth Network** (no se pudo leer la regla exacta de la serie de 15 min). Kalshi dice operar en más de
+  140 países sin publicar la lista; no se encontró un bloqueo de Kalshi en Colombia, pero Coljuegos bloqueó Polymarket y
+  su presidente llama «apuestas disfrazadas» a los mercados de predicción.
+
+**Lectura:** nada que probar hoy. Kalshi 15 min sería la única vía con precio externo (Pyth), pero falta saber (1) si
+abre de 21 a 24 UTC, (2) cómo calcula Pyth el precio a esas horas (medio o no) y (3) si es legal y accesible desde
+Colombia. Las tres respuestas requieren una sesión local (kalshi.com no abre desde la nube). Queda como idea 5b de
+docs/10, de prioridad baja. No se pre-registra nada.
+
+Fuentes: https://cftc.gov/filings/ptc/ptc121614nadexdcm003.pdf ; https://website-prod.nadex.com/contract-specs-forex ;
+https://www.ig.com/en/help-and-support/articles/681865-digital-100s-spread-bet-product-details ;
+https://kalshi.com/markets/kxeurusd15m/15minute-eurusd/kxeurusd15m-26oct210400 (no abrió) ;
+https://www.cftc.gov/filings/orgrules/rules042623963.pdf ; https://help.kalshi.com/en/articles/14026044-international-access-eligibility ;
+https://www.bloomberglinea.com/mercados/el-boom-de-polymarket-y-kalshi-apunta-a-us1-billon-pero-enfrenta-bloqueos-en-america-latina/ ;
+https://www.pulzo.com/nacion/bloquean-polymarket-colombia-denuncia-por-apuestas-electorales-PP5102235
+
 ## 4. Señales de alerta de estafa (lista de control)
 
 Si una oferta cumple **dos o más**, trátala como sospechosa:

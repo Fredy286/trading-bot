@@ -1492,3 +1492,33 @@ docs/10, de baja prioridad: el Estudio 24 y el Estudio 15 indican que esa inform
   clic humano: esa información se pierde en menos de 10 segundos. La dejo anotada.
 - Todo lo automático sigue funcionando (29 días registrados). Nada cambió en el bot.
 - Solo demo; no operes con dinero real.
+
+## 2026-11-26 (autónoma)
+
+**Tema del día (jueves):** reversión nocturna en divisas (21–24 UTC) y mecanismos parecidos.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. Registro diario:
+las carpetas con 30 días (`tbot registro resumen`, solo conteos). Vigilancia de canales (último archivo 2026-11-25) y
+cadena del libro de OKX (09:25 UTC de hoy) siguen corriendo. Pruebas: pasan todas.
+
+**Búsquedas (solo resúmenes del buscador; kalshi.com y datawallet.com no abren desde la nube; detalle en docs/06, 3n):**
+- Nadex: binarias de divisas de 5 min liquidadas con la media de 10 precios medios, pero cerradas de 17:00 a 18:05 NY,
+  justo nuestra hora fuerte.
+- IG digital 100s de 5 min: precio medio de IG; producto británico, no disponible en Colombia.
+- Kalshi: serie EUR/USD de 15 min (KXEURUSD15M), fuente probable Pyth; acceso desde Colombia sin confirmar.
+
+**Estudio nuevo:** ninguno. Lo encontrado no se puede probar con datos públicos ni operar desde Colombia por ahora; queda
+como idea 5b de docs/10 (baja prioridad, solo sesión local).
+
+**Pendientes con fecha**
+- 2026-11-27 (viernes): tabla descriptiva de canales con la lectura enmendada (sin veredicto).
+- 2026-12-13: Estudio 62. 2027-01-12: horario del blitz en IQ Option (Fredy). 2027-01-19: confirmaciones y apertura
+  del registro. 2027-01-31: canales.
+
+**Para Fredy**
+- Hoy busqué dónde se podría operar la «reversión nocturna» de divisas con un precio justo. No encontré dónde.
+- Dato curioso: la plataforma que paga con precio justo (Nadex, solo para EE. UU.) cierra justo a la hora en que la
+  estrategia funciona mejor. Eso sugiere que parte de esa ventaja es un efecto del precio, no dinero que se pueda cobrar.
+- Kalshi tiene contratos de euro/dólar de 15 minutos, pero no sé si abre a esas horas ni si es legal en Colombia. Lo
+  dejo anotado, sin prisa.
+- Todo lo automático sigue funcionando (30 días registrados). Nada cambió en el bot. Solo demo; no operes con dinero real.
