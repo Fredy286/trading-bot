@@ -1522,3 +1522,47 @@ como idea 5b de docs/10 (baja prioridad, solo sesión local).
 - Kalshi tiene contratos de euro/dólar de 15 minutos, pero no sé si abre a esas horas ni si es legal en Colombia. Lo
   dejo anotado, sin prisa.
 - Todo lo automático sigue funcionando (30 días registrados). Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-27 (autónoma)
+
+**Tema del día (viernes):** canales de señales.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. Registro diario:
+las 12 carpetas con 31 días (`tbot registro resumen`, solo conteos). Vigilancia de canales (archivos del 2026-11-27) y
+cadena del libro de OKX (08:38 UTC de hoy) siguen corriendo; la reauditoría de canales llega hasta el 2026-11-25. Pruebas:
+pasan todas.
+
+**Búsqueda de canales nuevos:** sin resultado. t.me sigue sin abrir desde la nube (curl sin respuesta). Las búsquedas web
+solo devolvieron otra vez vfxAlert_binarysignals (Pocket Option OTC, descartado el 2026-11-06;
+https://t.me/s/vfxAlert_binarysignals/1345), reseñas de afiliados con aciertos sin método
+(https://coinspot.io/en/trading/best-quotex-signals-telegram-channels/) y listas de advertencias
+(https://brokerlistings.com/es/scams/signals-telegram). No se añadió ningún canal.
+
+**Tabla descriptiva (`tbot canales tabla`, lectura enmendada del Estudio 32, SIN veredicto hasta el 2027-01-31):**
+
+| Canal | Verificadas | Acierto 1.ª entrada | Lím. inf. 95 % |
+|---|---|---|---|
+| QuotexSignalfreee | 672 | 51,6 % | 47,9 % |
+| PocketSignalsM1 | 494 | 47,0 % | 42,6 % |
+| PocketOptionSignalsM5 | 113 | 51,3 % | 42,2 % |
+| quotexsignals2814 | 98 | 42,9 % | 33,5 % |
+| gotraderssinaisfree | 58 | 48,3 % | 35,9 % |
+| Unidos | 5 | 20,0 % | 3,6 % |
+
+Lo que se ve (descriptivo): todos alrededor del azar o por debajo; ninguno cerca del 54,05 % que haría falta con pago
+85 %. Las señales publicadas a tiempo (1–4 min antes) no se comportan mejor que las tardías que se descartaron.
+
+**Estudio nuevo:** ninguno (el tema del día no da para uno; las ideas de mayor prioridad de docs/10 dependen de Fredy o
+esperan a enero).
+
+**Pendientes con fecha**
+- 2026-12-13: Estudio 62. 2027-01-12: horario del blitz en IQ Option (Fredy). 2027-01-19: confirmaciones y apertura
+  del registro. 2027-01-31: veredicto de canales.
+
+**Para Fredy**
+- Hoy revisé los canales de Telegram que vigilamos, ya con la corrección de la semana pasada (solo señales publicadas
+  antes de la hora de entrada).
+- Con unas 1 400 señales revisadas, ningún canal acierta más que tirar una moneda; algunos aciertan menos.
+- Para ganar con pago del 85 % hace falta acertar al menos 54 de cada 100. Ninguno se acerca.
+- No encontré canales nuevos que valga la pena vigilar. El veredicto oficial sigue siendo el 31 de enero.
+- Nada cambió en el bot. Solo demo; no operes con dinero real.
