@@ -1,0 +1,2 @@
+{"ventana": "2026-11-26T06:40:00+00:00", "instrumento": "ETH-UPDOWN-5MIN-261126-1440-1445", "lado": "Up", "p": 0.5901, "ev_accion": 0.0588, "horario_usuario": false, "resultado": "gana", "fuente": "oficial", "partida": 1686.54, "liquidacion": 1686.5927, "modelo": "ETHUSDT-okx5-2fffa5"}
+{"ventana": "2026-11-26T21:50:00+00:00", "instrumento": "ETH-UPDOWN-5MIN-261127-0550-0555", "lado": "Down", "p": 0.5657, "ev_accion": 0.0345, "horario_usuario": false, "resultado": "gana", "fuente": "oficial", "partida": 1709.26, "liquidacion": 1706.5263, "modelo": "ETHUSDT-okx5-2fffa5"}
