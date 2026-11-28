@@ -182,6 +182,8 @@ Lo detallado está en docs/01 (pre-registros y resultados), docs/06 (ideas de te
     ventanas; favorito a 0,60–0,90 con ~10 contratos en 54 %; libro del 2026-11-11, sin resultados).
   - **Estudio 62** (pre-registro ac1cabf): comprar ese favorito al segundo 60. Ventanas del 2026-11-12 al 12-11;
     se evalúa una vez desde el 2026-12-13. Si pasa, sería la primera señal operable con un minuto de margen.
+    Datos revisados el 2026-11-28 sin unirlos con el resultado: 4 801 fotos del segundo 60, sin errores ni duplicadas,
+    4 800 con resultado oficial; el empate de OKX (16 de 60 333) cuenta como «Al alza», igual que en el Estudio 54.
 - **Más contratos de OKX (2026-11-10):**
   - **15 min, ETH y BTC (Estudio 60):** modelos congelados y registro diario (`okx15_eth`, `okx15_btc`). Confirmación en
     enero (α 0,01) y abril (α 0,04).

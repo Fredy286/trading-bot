@@ -1566,3 +1566,45 @@ esperan a enero).
 - Para ganar con pago del 85 % hace falta acertar al menos 54 de cada 100. Ninguno se acerca.
 - No encontré canales nuevos que valga la pena vigilar. El veredicto oficial sigue siendo el 31 de enero.
 - Nada cambió en el bot. Solo demo; no operes con dinero real.
+
+## 2026-11-28 (autónoma)
+
+**Tema del día (sábado):** robustez y calidad.
+
+**Preparación:** sin ramas de rutina pendientes; cola de estudios vacía y todo lo hecho ya documentado. Registro diario:
+las 12 carpetas con 32 días (2026-10-26 → 11-26; `tbot registro resumen`, solo conteos). Vigilancia de canales (10:16 UTC
+de hoy) y cadena del libro de OKX (guardado a las 07:50 UTC; la grabación siguiente ya corre) funcionan.
+
+**Revisiones (sin precios nuevos de nuestras estrategias ni aciertos sellados; nada se unió con su resultado):**
+- **Datos del Estudio 62** (se evalúa una vez desde el 2026-12-13), revisados ANTES de la evaluación y sin cruzar el libro
+  con el resultado:
+  - BTC 5 min, foto del segundo 60: 4 801 fotos, 0 errores, 0 duplicadas; libros ordenados (mejor precio primero) en
+    todas; la foto llega 0,45–2,2 s después del segundo 60 (mediana 0,68 s).
+  - 4 800 de las 4 801 ventanas ya tienen resultado oficial (la que falta es la más reciente).
+  - Único hueco: 2026-11-16 de 03:30 a 11:30 UTC (ya conocido; máquina perdida de GitHub).
+  - Etiqueta: en los 60 333 resultados de OKX guardados, «1» = cierre > partida y «2» = cierre < partida, sin
+    excepciones; los 16 empates (cierre = partida) cuentan como «Al alza». El código del Estudio 62 usa el resultado
+    oficial (como dice su pre-registro) y el del Estudio 54 también trata el empate como «Al alza» (`settle >= strike`):
+    coherente. No se cambia nada.
+  - Pequeña diferencia de redacción: el pre-registro dice «si una ventana tiene dos fotos, cuenta la primera», y el
+    código salta primero las fotos con error. Hoy no hay ni duplicadas ni errores, así que no cambia nada.
+- **Libro de antes de la ventana (Estudio 56):** desde el 2026-11-20, 287–288 ventanas por día y moneda (de 288), sin
+  errores. Únicos huecos desde el inicio: 2026-11-08 (arranque) y 2026-11-16. Los nombres de contrato del registro
+  sellado coinciden con los del libro: ETH 104 de 104 señales desde el 2026-11-09, BTC 359 de 360 (la que falta cae en el
+  hueco del 16-nov). Solo se leyeron nombres, no aciertos.
+- Conteo del registro de OKX 5 min (sin aciertos): ETH sigue dando pocas señales (1–13 por día esta semana; en
+  desarrollo 25,5) y BTC 5–49. Ya conocido (mercado tranquilo); el Estudio 55 amplía la muestra hasta abril si no llega a
+  300.
+
+**Estudio nuevo:** ninguno (día de revisión). No se halló ningún error nuevo.
+
+**Pendientes con fecha**
+- 2026-12-13: Estudio 62, evaluación única (`tbot research study62`, por la cola de GitHub).
+- 2027-01-12: horario del blitz en IQ Option (Fredy). 2027-01-19: confirmaciones y apertura del registro.
+  2027-01-31: veredicto de canales.
+
+**Para Fredy**
+- Hoy tocaba revisar que todo lo automático funcione. Funciona, sin huecos nuevos.
+- Revisé con cuidado los datos de la prueba de OKX del 13 de diciembre (comprar al favorito al minuto 1): están
+  completos y limpios. No miré si gana o pierde; eso se ve una sola vez ese día.
+- Nada cambió en el bot. Solo demo; no operes con dinero real.
